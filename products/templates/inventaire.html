@@ -1,0 +1,103 @@
+<html>
+<head>
+  <script src="/static/js/jquery.min.js"></script>
+  <link href="/static/css/minified.css" rel="stylesheet" />
+  <script src="/static/js/chart.js"></script>
+  <script src="/static/js/xlsx.full.min.js"></script>
+
+</head>
+<style media="screen">
+  .blurred{
+    filter:blur(8px);
+  }
+
+  table {
+    border-color: black;
+  }
+</style>
+<body style="background: white; font-family: monospace;">
+  <div class="p-2 container">
+
+
+      <!-- mini tables (header) -->
+      <div class="d-flex">
+        <input type="file" class="form-control excelfile">
+        <button class="btn-success btn-sm" onclick="excelpdcts(event)
+        ">Importer</button>
+
+      </div>
+      <div class="position-relative">
+        <div class="loadingscreen w-100 h-100 d-none" style="position: absolute;top: 0;background: #12121285;">
+          <div class="spinner-border text-light" role="status">
+          </div>
+        </div>
+        <div class="mt-5 entries">
+
+        </div>
+        <div class="row">
+          <div class="mt-5 difftracker p-2 border rounded col-7">
+
+          </div>
+          <div class="mt-5 referrors p-2 text-danger col-5">
+
+
+          </div>
+        </div>
+
+
+
+
+      </div>
+
+  </div>
+  <script>
+  function excelpdcts(event){
+        let parentdiv=$(event.target).parent().parent()
+        excelfile=$('.excelfile')
+        // send excel file data in a ajax request
+        let formData = new FormData();
+
+        // Append the Excel file to the FormData object
+        formData.append('excelFile', excelfile[0].files[0]);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+      // Make an AJAX request to send the file data
+        $('.loadingscreen').removeClass('d-none')
+        $.ajax({
+          //url: '/products/excelpdcts', // to get products to databese
+          url: '/products/updatestockinv', // Replace with your server endpoint
+          type: 'POST', // Use POST or other HTTP method as needed
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            // Handle the success response from the server
+            $('.loadingscreen').addClass('d-none')
+            if (data.success){
+              console.log(data.difftracker)
+              console.log(data.referrors)
+              $('.entries').text('Nombre des reference: '+data.entries)
+              difftrackerhtml=''
+              for (i of data.difftracker){
+                difftrackerhtml+=`${i}`
+              }
+              $('.difftracker').html(`<strong>Differences</strong><table class="table table-bordered"><tbody><tr><td>ref</td><td>stock system</td><td>inventaire</td><td>difference</td></tr>${difftrackerhtml}</tbody></table>`)
+              referrorshtml='<strong>ERRORS</strong>'
+              for (i of data.referrors){
+                referrorshtml+=`<div>${i}</div>`
+              }
+              $('.referrors').html(referrorshtml)
+              //alertify.success('File uploaded successfully')
+            }else{
+              $('.referrors').text(data.error)
+            }
+
+          },
+          error: function(xhr, status, error) {
+            $('.loadingscreen').addClass('d-none')
+            // Handle errors if the AJAX request fails
+            //alertify.error('Error uploading file');
+          }
+        });
+    }
+  </script>
+</body>

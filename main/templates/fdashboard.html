@@ -1,0 +1,269 @@
+{% extends 'adminbase.html' %}
+
+{% block content %}
+<div class="tabsholder expended" style="width: 100%;">
+  <h1 class="text-center">
+    Farah
+  </h1>
+  
+  <!-- tabs s -->
+  
+</div>
+<!-- side bar -->
+<div class="d-flex">
+  <div class="sidebarholder p-0 position-relative" style="width: 13%;">
+    <div class="d-flex">
+        <img src="/media/logos/logo2.jpg" alt="" style="width: 100%; z-index: 9999">
+  
+  
+  
+    </div>
+    <div class="bg-darkblue" style="height: 90vh; overflow-y: scroll;">
+      <nav class="account-nav__list mt-2">
+        
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/addbonlivraison?target=f')">
+          <a  href="#">+ Bon de sortie</a>
+          
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/stock?target=f')">
+          <a href="#"> List Produits</a>
+          
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistfactures', 'FACTURES', '/products/listfactures')">
+          <a  href="#">List des Factures</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistbonachat', 'BON ACHAT', '/products/listbonachat')">
+          <a  href="#">List Bons achat</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementbl', 'REGL BL', '/products/listreglementbl')">
+          <a  href="#">Reglement clients</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementfc', 'REGLEMENT FACTURE', '/products/listreglementfc')">
+          <a  href="#">Reglement FC</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementsupp', 'REGLEMENT FOURNISSEUR', '/products/listreglementsupp')">
+          <a  href="#">Reglement Fournisseur</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('addCommandestab', 'BON COMMANDES', 'products/listboncommnd')">
+          <a  href="#">
+            List bons Commandes
+            <span class="badge bg-danger rounded-pill boncmndindex"></span>
+  
+          </a>
+  
+        </li>
+        <!-- <li class="tab-link">
+          <div class="accordion" id="accordionreglfc">
+            <div class="">
+  
+                <button class="w-100" type="button" data-toggle="collapse" data-target="#collapsereglfc" aria-expanded="true" aria-controls="collapsereglfc" style="border-radius: 10px;">
+                    + Ajouter
+                </button>
+  
+              <div id="collapsereglfc" class="collapse" aria-labelledby="headingOne" data-parent="#accordionreglfc">
+                <div class="card-body border shadow rounded">
+                    <div class="row">
+  
+                      ddd
+  
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+  
+        </li> -->
+  
+        <li class="account-nav__item tab-link" onclick="ajaxpage('avoircl', 'AVOIR CLIENT', '/products/listavoirclient')">
+          <a  href="#">List Avoir clients</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('avoirsupp', 'AVOIR FOURNISSEUR', '/products/listavoirsupplier')">
+          <a  href="#">Avoir Fournisseurs</a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('echeancetab', 'ECHEANCES', '/products/listecheance')">
+          <a  href="#">
+            Echeances
+            <span class="badge bg-danger rounded-pill echeanceindex">0</span>
+          </a>
+  
+        </li>
+        <li class="account-nav__item tab-link" onclick="ajaxpage('connectedtab', 'CONNECT', '/products/listeconnected')">
+          <a  href="#">
+            Connecté
+          </a>
+        </li>
+        <!-- <li class="account-nav__item tab-link" onclick="ajaxpage('notificationstab', 'Notifications', '/products/listnotifications')">
+          <a  href="#">
+            Notifications
+          </a>
+        </li> -->
+        <li class="account-nav__item">
+          <a href="/catalogpage" target="_blank">Catalog</a>
+        </li>
+  
+        <!-- <li class="account-nav__item" onclick="ajaxpage('alert', 'Alert de stock', '/products/alertstock')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Alert de stock ({{alerts}})</a>
+        </li> -->
+  
+        <li class="account-nav__item" onclick="ajaxpage('carlogo', 'LOGO VOITURES', '/products/carlogospage')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Logo voiture</a>
+        </li>
+  
+  
+        <li class="account-nav__item" onclick="ajaxpage('ctg', 'CATEGORIES', '/products/categoriespage')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Categories</a>
+        </li>
+  
+        <li class="account-nav__item" onclick="ajaxpage('mrks', 'MARQUES', '/products/marquespage')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Marques</a>
+        </li>
+  
+        <li class="account-nav__item" onclick="ajaxpage('promotionstab', 'PROMOTIONS', '/products/promotionspage')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Promotions</a>
+        </li>
+        <!--<li class="account-nav__item" onclick="ajaxpage('Yearstab', 'A', '/products/yearspage')">
+          <a href="#" class="tab-link" data-target="Alert" url="">Years</a>
+        </li>
+  
+         Products -->
+  
+  
+        <!-- Fournisseurs -->
+  
+        <!-- stock -->
+        <div class="sec-center">
+          <input class="dropdown" type="checkbox" name="checkboxsidebar" id="dropdown" name="dropdown"/>
+          <label class="for-dropdown" for="dropdown">Stock</label>
+          <div class="section-dropdown">
+            <a href="#" onclick="ajaxpage('add', '+ ARTICLE', '/products/addproductspage')">+ Ajouter un article</a>
+            <a href="#" onclick="ajaxpage('addjournalachat', 'JOURN ACHAT', '/products/journalachat')">Journal Achat</a>
+            <a href="#" onclick="ajaxpage('addjournalachatfc', 'JOURN ACHAT FC', '/products/journalachatfc')">Journal Achat FC</a>
+            <a href="#" onclick="ajaxpage('addjournalvente', 'JOURN VENTE', '/products/journalvente')">Journal Ventes</a>
+            <a href="#" onclick="ajaxpage('addjournalventefc', 'JOURNAL VENTE FC', '/products/journalventefc')">Journal Ventes FC</a>
+          </div>
+        </div>
+  
+        <!-- suppliers -->
+        <div class="sec-center">
+          <input class="dropdown" type="checkbox" name="checkboxsidebar" id="suppdropdown" name="dropdown"/>
+          <label class="for-dropdown" for="suppdropdown">Fournisseurs</label>
+          <div class="section-dropdown">
+            <a href="#" onclick="ajaxpage('supplist', 'FOURNISSEURS', '/products/supplierspage')">List Fournisseurs</a>
+            <a href="#" onclick="ajaxpage('addrecevoir', '+ ACHAT', '/products/recevoir')">Recevoir Products</a>
+            <a href="#" onclick="ajaxpage('addavoirsupp', '+ AVOIR FOURNISSEUR', '/products/avoirsupplier')">Avoir Fournisseur</a>
+            <a href="#" onclick="ajaxpage('addsituationsupplier', 'SITUATION FOURNISSEURS', 'products/situationsupplier')">Situation Fournisseur</a>
+          </div>
+        </div>
+        <!-- <li class="account-nav__item">
+          <a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Clients</a>
+          <div class="collapse multi-collapse" id="multiCollapseExample1">
+            <a href="#" onclick="ajaxpage('addclientstab', 'ListCLIENT', '/products/clientspage')">List Clients</a>
+            <a href="#" class="dashboard-nav-dropdown-item">Facture Client</a>
+            <a href="#" onclick="ajaxpage('addavoir', '+AvoirCLIENT', '/products/avoirclient')">Avoir Client</a>
+            <a href="#" onclick="ajaxpage('situationcl', 'Sit.CLBL', 'products/situationcl')">Situation Client</a>
+            <a href="#" onclick="ajaxpage('situationclfc', 'Sit.CLFC', 'products/situationclfc')">Situation Client Facture</a>
+          </div>
+        </li> -->
+        <!-- Clients -->
+        <div class="sec-center">
+          <input class="dropdown" type="checkbox" name="checkboxsidebar" id="cldropdown" name="dropdown"/>
+          <label class="for-dropdown" for="cldropdown">Clients</label>
+          <div class='section-dropdown'>
+            <a href="#" onclick="ajaxpage('addclientstab', 'CLIENTS', '/products/clientspage')">List Clients</a>
+            <a href="#" class="dashboard-nav-dropdown-item">Facture Client</a>
+            <a href="#" onclick="ajaxpage('addavoir', '+ AVOIR CLIENT', '/products/avoirclient')">Avoir Client</a>
+            <a href="#" onclick="ajaxpage('addsituationcl', 'RELVE CLIENT', 'products/situationcl')">Situation Client</a>
+            <!-- <a href="#" onclick="ajaxpage('addsituationclfc', 'Sit.CLFC', 'products/situationclfc')">Situation Client Facture</a> -->
+          </div>
+        </div>
+  
+  
+  
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('addreplist', 'REPRESENTANTS', '/products/commercialspage')">
+            List des commercials
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('admintab', 'ADMIN', '/products/adminpage')">
+            Admin
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('addrefstab', 'REFS', '/products/refspage')">
+            Refrences
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('carttab', 'PANIER', '/products/cartpage')">
+            Panier
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('reliquatab', 'RELIQUAT', '/products/reliquatpage')">
+            Reliquat
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('notavatab', 'HORSSTOCK', '/products/notavailable')">
+            HorsStock
+          </a>
+        </li>
+        <li class="account-nav__item">
+          <a href="#" onclick="ajaxpage('stockupdatedtab', 'STOCK MODIFIÉ', '/products/stockupdated')">
+            Stock Modifié
+          </a>
+        </li>
+          <!-- <li class="account-nav__item">
+            <a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Toggle first element</a>
+            <div class="collapse multi-collapse" id="multiCollapseExample1">
+              <div class="card card-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+              </div>
+            </div>
+          </li> -->
+        <li class="account-nav__item">
+          <a href="  {%url 'main:logoutuser'%} ">Logout</a>
+        </li>
+      </nav>
+    </div>
+  
+  </div>
+  <div id="maintab" class="w-100">
+    
+  
+  </div>
+</div>
+
+<!-- tabs holder -->
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  $.get('/products/echeancetoday', (data)=>{
+    if (data.length > 0){
+      $('.echeanceindex').removeClass('d-none').text(data.length)
+      //alertify.confirm('Echenaces', data.length+' ECHEANES AUJOURD HUI', function(){
+      //  ajaxpage('echeancetab', 'Echeances', '/products/listecheance')
+      //}, ()=>{
+
+      //})
+    }
+  })
+  $.get('/products/boncommandes', (data)=>{
+    $('.boncmndindex').removeClass('d-none').text(data.length)
+
+  })
+
+</script>
+{% endblock %}

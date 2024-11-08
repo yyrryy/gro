@@ -1,0 +1,237 @@
+{% load global_tags %}
+
+
+<!-- add one client model -->
+<!-- bon entree data holder -->
+<div class="bondataholder row d-none">
+    <div class="col-6" 
+        style="background: #0000006f;">
+    </div>
+    <div class="bg-white rounded shadow col-6 text-center bondata">
+        <div class="spinner-grow text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="bg-white rounded shadow col-md-3">
+        <div>
+            <table style="font-size: 12px;" class="table table-bordered">
+                <tr>
+                    <td>Fournisseur</td>
+                    <td>{{supplier.name.upper}}</td>
+                </tr>
+                <tr>
+                    <td>phone</td>
+                    <td>{{supplier.phone}}</td>
+                </tr>
+                <tr>
+                    <td>Total payements</td>
+                    <td>{{totalpayments|floatformat:2|intspace}} DH</td>
+                </tr>
+                <tr>
+                    <td>Total transactions</td>
+                    <td>{{totaltr|floatformat:2|intspace}} DH</td>
+                </tr>
+                <tr>
+                    <td>Avoirs</td>
+                    <td>{{ totalavoirs|floatformat:2|intspace }} DH</td>
+                </tr>
+                <tr>
+                    <td>Sold</td>
+                    <td>{{ supplier.rest|floatformat:2|intspace }} DH</td>
+                </tr>
+            </table>
+            <!-- <div class="mt-3">
+                <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    Link with href
+                  </a>
+                  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Button with data-target
+                  </button>
+                </p>
+                
+                <div class="mb-3">
+                    <button class="btn btn-success w-100" type="button" data-toggle="collapse" data-target="#addreglsuppl{{supplierid}}" aria-expanded="false" aria-controls="collapseExample">
+                        + Reglement
+                    </button>
+                </div>
+                <div class="collapse" id="addreglsuppl{{supplierid}}">
+                    <div class="card card-body">
+                      
+                    </div>
+                  </div>
+                <div class="mt-3 row">
+                    <div class="col-6 p-2">
+                        <small>Du</small>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="col-6 p-2">
+                        <small>Au</small>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary relvesupp w-100">
+                    Relevé
+                </button>
+            </div> -->
+            <!-- <h2 class="text-center">
+                {{supplier.name.upper}}
+            </h2>
+            <div>
+                <h2>
+                    <span class="totalholder">
+                    
+                    </span> DH
+                </h2>
+            </div> -->
+        </div>
+    </div>
+    <div class="row col-md-9">
+        <!-- <br>
+        <button type="button" class="btn btn-success addoneproduct" data-toggle="modal" data-target="#exampleModal">
+            Ajouter+
+        </button> 
+        <br><br><br> -->
+        <!-- bons -->
+        <div class="col-md-6">
+            <div class="bg-white shadow rounded p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Bon</h4>
+                    <strong>
+                        {{nbrbons}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered p-2">
+                    <thead class="bg-darkblue text-white">
+                        <tr>
+                            <th>Date</th>
+                            <th>Numéro</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bon in bons %}
+                        <tr style="cursor: pointer;">
+                            <td>{{bon.date|date:'d/m/Y'}}</td>
+                            <td>{{bon.nbon}}</td>
+                            <td>{{bon.total|floatformat:2}}</td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                <!--  -->
+            </div>
+        </div>
+
+        <!-- payments -->
+        <div class="col-md-6">
+            <div class="bg-white shadow rounded p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Les paiments</h4>
+                    <strong>
+                        {{nbrpayments}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered p-2">
+                    <thead class="bg-darkblue text-white">
+                        <tr>
+                            <th>Date</th>
+                            <th>Mode</th>
+                            <th>Montant</th>
+                            <th>Echeance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bon in payments %}
+                        <tr>
+                            <td>{{bon.date|date:'d/m/Y'}}</td>
+                            <td>{{bon.mode}}</td>
+                            <td>{{bon.amount|floatformat:2}}</td>
+                            <td>
+                                {% if bon.mode == 'espece' %}
+                                --
+                                {% else %}
+                                {{bon.echeance}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                <!--  -->
+            </div>
+        </div>
+
+        <!-- avoirs -->
+        <div class="mt-2">
+            <div class="bg-white rounded shadow p-2">
+                <div class="p-2 d-flex justify-content-between align-items-center">
+                    <h4>Les avoirs</h4>
+                    <strong>
+                        {{navoirs}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered">
+                    <thead class="bg-darkblue text-white">
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i in avoirs %}
+                        <tr>
+                            <td>{{i.date|date:'d/m/Y'}}</td>
+                            <td>{{i.total|floatformat:2}}</td>
+                            <!-- <td>
+                                {{i.items}}
+                            </td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-2">
+    
+</div>
+<script>
+    // function avoirsupdata(id){
+    //     $('.bondataholder').removeClass('d-none')
+    //     $.post(`/product/avoirsupdata/`,{
+    //         'id':id,
+    //         'csrfmiddlewaretoken':'{{csrf_token}}'
+    //     }, 
+    //     function(data){
+    //         $('.bondata').html(data.data)
+    //     })
+    // }
+    // $('.relvesupp').on('click', ()=>{
+        
+    // })
+    // const bondata=(id)=>{
+    //     $('.bondataholder').removeClass('d-none')
+    //     $.post(`/product/bonentree/${id}`,{
+    //         'csrfmiddlewaretoken':'{{csrf_token}}'
+    //     }, 
+    //     function(data){
+    //         $('.bondata').html(data.data)
+    //     })
+    // }
+    
+// serch in tables instead of sending ajax request
+       
+    // $(function() {
+    // $('input[name="daterange"]').daterangepicker({
+    //     opens: 'left',
+    //     locale: {
+    //         format: 'D/MM/Y'
+    //     }
+    // }, function(start, end, label) {
+    //     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+    // });
+    // });
+ 
+
+</script>

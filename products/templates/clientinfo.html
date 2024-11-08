@@ -1,0 +1,376 @@
+{% load global_tags %}
+<div class="row">
+    <div class="col-3">
+        <div class="bg-white p-2">
+            <table class="table table-bordered">
+                <tr>
+                    <td>
+                        Sold Bl
+                    </td>
+                    <td>
+                        {{client.mehtodsoldbl|floatformat:2|intspace}}
+                    </td>
+                </tr>
+                <tr>
+
+                    <td>
+                        Sold Facture
+                    </td>
+                    <td>
+                        {{client.methodsoldfc|floatformat:2|intspace}}
+                    </td>
+                </tr>
+                <!-- <tr>
+
+                    <td>
+                        Sold total
+                    </td>
+                    <td>
+                        {{client.soldtotal|floatformat:2|intspace}}
+                    </td>
+                </tr> -->
+                <tr>
+
+                    <td>
+                        Username
+                    </td>
+                    <td>
+                        {{client.user.username}}
+                    </td>
+                </tr>
+                <tr>
+
+                    <td>
+                        Mot de passe
+                    </td>
+                    <td>
+                        {% if client.user %}
+                        <button class="btn w-100 btn-secondary" onclick="$('.cretenewacc{{client.id}}').toggleClass('d-none')">
+                            NEW account
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Compte
+                    </td>
+                    <td>
+                        {% if client.user %}
+                        {% if client.user.is_active %}
+                        <button class="btn w-100 btn-danger" onclick="desactivercompte('{{client.user.id}}', 'client{{client.id}}', '/products/client/{{client.id}}')">
+                            Desactiver
+                        </button>
+                        {% else %}
+                        <button class="btn w-100 btn-success" onclick="activercompte('{{client.user.id}}', 'client{{client.id}}', '/products/client/{{client.id}}')">
+                            Activer
+                        </button>
+                        {% endif %}
+                        {% else %}
+                        <button class="btn w-100 btn-info" onclick="$('.creteacc{{client.id}}').toggleClass('d-none')">
+                            Creer compte
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                </tr>
+            </table>
+            {{client.accesscatalog}}
+            {% if client.accesscatalog %}
+                <button class="btn w-100 btn-danger" onclick="allowcatalog('{{client.code}}')">
+                    Fermer catalog
+                </button>
+                {% else %}
+                <button class="btn w-100 btn-success" onclick="allowcatalog('{{client.code}}')">
+                    Ouvrir catalog
+                </button>
+            {% endif %}
+            <div class="mt-5 p-2 creteacc{{client.id}} d-none">
+
+                <div class="align-items-center">
+                    <div class="">
+                      <label class="sr-only" for="inlineFormInput">username</label>
+                      <input autocomplete="off" type="text" class="form-control mb-2" name="clientusername">
+                    </div>
+                    <div class="">
+                      <label class="sr-only" for="inlineFormInputGroup">Password (+6 Characters)</label>
+                      <div class="input-group mb-2">
+
+                        <input autocomplete="off" type="text" class="form-control" name="clientpassword">
+                    </div>
+
+                    <div class="col-auto">
+                      <button type="submit" class="btn w-100 btn-primary mb-2" onclick="createclientaccount(event)">Submit</button>
+                    </div>
+                  </div>
+
+            </div>
+
+            </div>
+
+            <div class="mt-5 p-2 cretenewacc{{client.id}} d-none">
+
+                <div class="align-items-center">
+                    <div class="">
+                      <label class="sr-only" for="inlineFormInput">username</label>
+                      <input autocomplete="off" type="text" class="form-control mb-2" name="newclientusername">
+                    </div>
+                    <div class="">
+                      <label class="sr-only" for="inlineFormInputGroup">Password (+6 Characters)</label>
+                      <div class="input-group mb-2">
+
+                        <input autocomplete="off" type="text" class="form-control" name="newclientpassword">
+                    </div>
+
+                    <div class="col-auto">
+                      <button type="submit" class="btn w-100 btn-primary mb-2" onclick="createnewclientaccount(event)">Submit</button>
+                    </div>
+                  </div>
+
+                </div>
+
+            </div>
+            <!-- udate password -->
+            <div class="mt-5 p-2 updatepassword{{client.id}} d-none">
+
+                <div class="align-items-center">
+
+                    <div class="">
+                        <input type="hidden" name="clientid" value="client.id">
+                      <label class="sr-only" for="inlineFormInputGroup">Password (+6 Characters)</label>
+                      <div class="input-group mb-2">
+
+                        <input autocomplete="off" type="text" class="form-control" name="updatedclientpassword">
+                    </div>
+
+                    <div class="col-auto">
+                      <button type="submit" class="btn w-100 btn-primary mb-2" onclick="updateclientpassword(event)">Submit</button>
+                    </div>
+                  </div>
+
+            </div>
+        </div>
+        </div>
+        </div>
+<div class="row col-md-9">
+        <!-- <br>
+        <button type="button" class="btn btn-success addoneproduct" data-toggle="modal" data-target="#exampleModal">
+            Ajouter+
+        </button>
+        <br><br><br> -->
+        <!-- bons -->
+        <div class="d-flex">
+          <!-- <div class="me-2">
+             <input type="date" name="" id="" class="startdatefilterclientonfo{{client.id}}">
+          </div>
+          <div>
+            <input type="date" name="" id="" class="enddatefilterclientonfo{{client.id}}">
+          </div>
+          <div>
+            <div class="me-2">
+                <select class="bontarget">
+                    <option value="all">--</option>
+                    <option value="1">Reglé</option>
+                    <option value="0">Non reglé</option>
+                </select>
+            <button class="btn btn-sm bg-dark text-white" onclick="filteclientbons('{{client.id}}')">Filtrer</button>
+            </div>
+            </div> -->
+        </div>
+        <div class="col-md-6">
+            <div class="bg-white shadow rounded p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Bon</h4>
+                    <strong>
+                        {{nbrbons}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered p-2">
+                    <thead class="bg-darkblue text-white">
+                        <tr>
+                            <th>Date</th>
+                            <th>Numéro</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bon in bons %}
+                        <tr onclick="" style="cursor: pointer;">
+                            <td>{{bon.date|date:'d/m/Y'}}</td>
+                            <td>{{bon.bon_no}}</td>
+                            <td>{{bon.total|floatformat:2|intspace}}</td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                <!--  -->
+            </div>
+        </div>
+
+        <!-- payments -->
+        <div class="col-md-6">
+            <div class="bg-white shadow rounded p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Les paiments</h4>
+                    <strong>
+                        {{nbrpayments}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered p-2">
+                    <thead class="bg-darkblue text-white">
+                        <tr>
+                            <th>Date</th>
+                            <th>Mode</th>
+                            <th>Montant</th>
+                            <th>Echeance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bon in payments %}
+                        <tr>
+                            <td>{{bon.date|date:'d/m/Y'}}</td>
+                            <td>{{bon.mode}}</td>
+                            <td>{{bon.amount|floatformat:2|intspace}}</td>
+                            <td>
+                                {% if bon.mode == 'espece' %}
+                                --
+                                {% else %}
+                                {{bon.echance|date:'d/m/Y'}}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </table>
+                <!--  -->
+            </div>
+        </div>
+
+        <!-- avoirs -->
+        <div class="mt-2">
+            <div class="bg-white rounded shadow p-2">
+                <div class="p-2 d-flex justify-content-between align-items-center">
+                    <h4>Les avoirs</h4>
+                    <strong>
+                        {{navoirs}}
+                    </strong>
+                </div>
+                <table style="font-size: 12px;" class="table table-bordered">
+                    <thead class="bg-darkblue text-white">
+                      <th>Date</th>
+                        <th>N°</th>
+                        <th>Total</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for i in avoirs %}
+                        <tr>
+                          <td>{{i.date|date:'d/m/Y'}}</td>
+                            <td>{{i.no}}</td>
+                            <td>{{i.total|floatformat:2|intspace}}</td>
+                            <!-- <td>
+                                {{i.items}}
+                            </td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    function allowcatalog(clientcode){
+        $.get('/products/allowcatalog', {'clientcode':clientcode}, (data)=>{
+            updatetab('client{{client.id}}', '/products/client/{{client.id}}')
+        })
+    }
+    function createnewclientaccount(event){
+        parentdiv=$(event.target).parent().parent().parent()
+        var username = parentdiv.find('input[name="newclientusername"]').val();
+        var password = parentdiv.find('input[name="newclientpassword"]').val();
+        if (username=='' || password=='' || password.length<6){
+            alertify.error('alert', 'Veuillez remplir les champs correctement')
+            return;
+        }
+        var clientid = '{{client.id}}';
+        $.ajax({
+            url: '/products/createnewclientaccount',
+            type: 'POST',
+            data: {
+                'username': username,
+                'password': password,
+                'clientid': clientid,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.success){
+                    alertify.success('OK')
+                    updatetab('client{{client.id}}', 'products/client/{{client.id}}')
+                }else{
+                    alertify.error('alert', data.error);
+                }
+            }
+        });
+    }
+    function createclientaccount(event){
+        parentdiv=$(event.target).parent().parent().parent()
+        var username = parentdiv.find('input[name="clientusername"]').val();
+        var password = parentdiv.find('input[name="clientpassword"]').val();
+        if (username=='' || password=='' || password.length<6){
+            alertify.error('alert', 'Veuillez remplir les champs correctement')
+            return;
+        }
+        var clientid = '{{client.id}}';
+        $.ajax({
+            url: '/products/createclientaccount',
+            type: 'POST',
+            data: {
+                'username': username,
+                'password': password,
+                'clientid': clientid,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.success){
+                    updatetab('client{{client.id}}', 'products/client/{{client.id}}')
+                }else{
+                    alertify.error('alert', data.error);
+                }
+            }
+        });
+    }
+
+    function updateclientpassword(event){
+        parentdiv=$(event.target).parent().parent().parent()
+        var password = parentdiv.find('input[name="updatedclientpassword"]').val();
+        if (password=='' || password.length<6){
+            alertify.error('alert', 'Veuillez remplir les champs correctement')
+            return;
+        }
+        console.log(password, parentdiv)
+        var clientid = '{{client.id}}';
+        $.ajax({
+            url: '/products/updateclientpassword',
+            type: 'POST',
+            data: {
+                'password': password,
+                'clientid': clientid,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.success){
+                    updatetab('client{{client.id}}', 'products/client/{{client.id}}')
+                }else{
+                    alertify.error('alert', data.error);
+                }
+            }
+        });
+    }
+
+</script>

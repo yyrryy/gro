@@ -1,0 +1,53 @@
+{% load global_tags %}
+{% for order in bons %}
+    <tr class="ord {% if not notloading %} bl-row {%endif%} {% if order.ispaid %} text-danger{% endif %}" orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
+            <td >{{ order.bon_no }}</td>
+            <td >{{ order.date|date:'d/m/Y' }}</td>
+            <td >{{ order.client.name }}</td>
+            <td >{{ order.client.code }}</td>
+            <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}</td>
+            <td >{{ order.client.region }}</td>
+            <td >{{ order.client.city }}</td>
+            <td >{{ order.client.soldbl|floatformat:2|intspace }}</td>
+            <td >{{ order.salseman }}</td>
+            <td class="d-flex justify-content-between">
+              {% if order.ispaid %}
+              <div>
+                R0
+              </div>
+              <div style="width:15px; height:15px; border-radius:50%; background:green;" ></div>
+
+
+              {% else %}
+
+                <div>
+                  N1
+                </div>
+                <div style="width:15px; height:15px; border-radius:50%; background:orange;" ></div>
+
+              {% endif %}
+            </td>
+            {% if order.isfacture %}
+            <td class="text-danger">
+              OUI
+            </td>
+            {% else %}
+            <td>
+              Non
+            </td>
+            {% endif %}
+            <td>
+              {{order.commande.order_no}}
+            </td>
+            <td>
+              {{order.modlvrsn}}
+            </td>
+            <td>
+              {{order.note}}
+            </td>
+            <td class="d-flex">
+              <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button>
+              <button class="btn btn-sm bi bi-download" onclick="printlivraison('{{order.id}}')"></button>
+            </td>
+          </tr>
+{% endfor %}

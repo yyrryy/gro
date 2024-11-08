@@ -1,0 +1,51 @@
+{% for i in bons %}
+<tr class="reglbl-row" style={% if i.echance and i.echance == today %}"background: yellow;"{% elif i.echance and i.echance < today %}"color:red" {% endif %} >
+        <td>
+            {{i.mode}} <br>
+            <!-- <select name="updatemodereglbl{{i.id}}" id=""></select> -->
+        </td>
+        <td>
+            {{i.npiece}} <br>
+            <input type="text" class="d-none updatenpiecereglbl{{i.id}}">
+        </td>
+        <td>
+            {{i.amount|floatformat:2}}<br>
+            <!-- <input type="text" class="d-none updateamountreglbl{{i.id}}"> -->
+        </td>
+        <td>
+            {{i.date|date:"d/m/Y"}}<br>
+            <input type="date" class="d-none updatetdatereglbl{{i.id}}">
+        </td>
+        <td class="text-start">
+            {{i.client.name}}<br>
+        </td>
+        <td>
+            {{i.client.code}}<br>
+        </td>
+        <td>
+            {{i.echance|date:"d/m/Y"}}<br>
+        </td>
+        <td class="d-flex justify-content-between">
+            <div class="accordion" id="accordionbons{{i.id}}">
+                    
+                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsbon{{i.id}}" aria-expanded="true" aria-controls="collapsbon{{i.id}}">
+                    
+                    
+                </button>
+          
+                <div id="collapsbon{{i.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{i.id}}">
+                    {% for bon in i.bons.all %}
+                    -{{ bon.bon_no }} <br>
+                    {% endfor %}
+                    
+                    
+                </div>
+            </div>
+        <!-- <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" data-tooltip="Bon Nos: {% for bon in i.bons.all %}{{ bon.bon_no }}{% if not forloop.last %}, {% endif %}{% endfor %}" onclick="ajaxpage('regl{{i.id}}tab', 'regl{{i.id}}tab', 'products/viewreglement/{{i.id}}')">    
+        </button> -->
+            
+        <button class="btn btn-success btn-sm" onclick="updatereglementbl({{i.id}})" style="font-size: 12px;
+        height: 19px;">✐</button>
+        </td>
+</tr>
+{% endfor %}
