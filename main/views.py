@@ -17,13 +17,11 @@ from .models import UserSession
 #import telegram
 import asyncio
 # # Your Telegram bot token
-TOKEN = '6716455240:AAFgHhoQLrmCU8Elc_A_DQFLrwCJtsHk3P8'
 # user_chat_ids = ['USER_CHAT_ID_1', 'USER_CHAT_ID_2', 'USER_CHAT_ID_3']
 # group_chat_id = '-4164185930'
 
 def tocatalog(user):
     return (user.groups.filter(name='salsemen').exists() or user.groups.filter(name='clients').exists() or user.groups.filter(name='admin').exists() )
-
 
 def admincreatecategory(request):
     name=request.POST.get('name')
