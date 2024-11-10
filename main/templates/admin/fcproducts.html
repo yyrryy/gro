@@ -376,7 +376,7 @@
     if (filterValue==""){
         ajaxpage('addpducts', 'Articles', '/products/stock?fc=1')
     }else
-      {$.get('/products/searchproductsforstock', {'term':filterValue.trim(), 'facture':1}, (data)=>{
+      {$.get('/products/searchproduct?target={{target}}sforstock', {'term':filterValue.trim(), 'facture':1}, (data)=>{
 
               $(".productstable tbody").html('')
               $(".productstable tbody").html(data.trs)

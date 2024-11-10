@@ -92,6 +92,9 @@ class Produit(models.Model):
     stocktotalorgh=models.IntegerField(default=0, null=True, blank=True)
     stockfactureorgh=models.IntegerField(default=0, null=True, blank=True)
     stockbon=models.IntegerField(default=None, null=True, blank=True)
+    # check if product is farah product
+    farahproduct=models.BooleanField(default=False)
+    orghproduct=models.BooleanField(default=False)
     farahref=models.CharField(max_length=500, default=None, null=True, blank=True)
     orghref=models.CharField(max_length=500, default=None, null=True, blank=True)
     # stock=models.BooleanField(default=True)
@@ -196,6 +199,10 @@ class Supplier(models.Model):
 class Itemsbysupplier(models.Model):
     supplier= models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='provider')
     date = models.DateTimeField(default=None)
+    # track bon achat farah
+    isfarah=models.BooleanField(default=False)
+    # track bon achat orgh
+    isorgh=models.BooleanField(default=False)
     #date saisie
     dateentree=models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     items = models.TextField(blank=True, null=True, help_text='Quantity and Product name would save in JSON format')
@@ -210,12 +217,12 @@ class Itemsbysupplier(models.Model):
 
 class Stockin(models.Model):
     # WE NEED to distinguish between to societies
-    farah=models.BooleanField(default=False)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
     date=models.DateField()
     quantity=models.IntegerField()
     price=models.FloatField(default=0.00)
-    devise=models.FloatField(default=0.00)
     ref=models.CharField(max_length=500, default='-', null=True, blank=True)
     name=models.CharField(max_length=500, default='-', null=True, blank=True)
     # to delete stock facture is stock in is facture
@@ -237,6 +244,7 @@ class Stockin(models.Model):
     avoir=models.ForeignKey('Avoirclient', on_delete=models.CASCADE, default=None, null=True, blank=True)
     def __str__(self) -> str:
         return f'{self.nbon} - {self.product}'
+
 class Pricehistory(models.Model):
     date=models.DateField()
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
@@ -794,3 +802,7 @@ class Sortieitem(models.Model):
     def __str__(self) -> str:
         return f'{self.bon.bon_no} - {self.product.ref}'
 
+class Factureachat(models.Model):
+    facture_no=models.CharField(max_length=500, null=True, default=None)
+    date = models.DateTimeField(default=None, blank=True, null=True)
+    bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name='facturebons')

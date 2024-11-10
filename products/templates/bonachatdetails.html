@@ -101,8 +101,10 @@
               <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
               <td style="width: 7%;">P.U</td>
-              <td style="width: 7%;">Dvs</td>
-              <td style="width: 5%;">Rem</td>
+              <td style="width: 7%;">Rem1</td>
+              <td style="width: 5%;">Rem2</td>
+              <td style="width: 5%;">Rem3</td>
+              <td style="width: 5%;">Rem4</td>
               <td style="width: 13%;">Mantant</td>
             </tr>
           </thead>
@@ -144,19 +146,38 @@
                   {% endfor %}
               </td>
               <td class="text-center">
-                  {% for v in i %}
+                {% for v in i %}
 
-                  {{v.devise|floatformat:2}}
-                  <br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  {% for v in i %}
+                {{v.remise1|floatformat:-2}}
+                <br>
+                {% endfor %}
+            </td>
+            <td class="text-center">
+                {% for v in i %}
 
-                  {{v.remise}}%
-                  <br>
-                  {% endfor %}
-              </td>
+                {{v.remise2|floatformat:-2}}
+                %
+                <br>
+                {% endfor %}
+            </td>
+
+            <td class="text-center">
+              {% for v in i %}
+
+              {{v.remise3|floatformat:-2}}
+              %
+              <br>
+              {% endfor %}
+          </td>
+
+          <td class="text-center">
+            {% for v in i %}
+
+            {{v.remise4|floatformat:-2}}
+            %
+            <br>
+            {% endfor %}
+        </td>
               <td class="text-center">
                   {% for v in i %}
 
@@ -245,8 +266,10 @@
               <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
               <td style="width: 7%;">P.U</td>
-              <td style="width: 7%;">Dvs</td>
-              <td style="width: 5%;">Rem</td>
+              <td style="width: 7%;">Rem1</td>
+              <td style="width: 5%;">Rem2</td>
+              <td style="width: 5%;">Rem3</td>
+              <td style="width: 5%;">Rem4</td>
               <td style="width: 13%;">Mantant</td>
             </tr>
           </thead>
@@ -289,17 +312,36 @@
               <td class="text-center">
                   {% for v in i %}
 
-                  {{v.devise|floatformat:2}}
+                  {{v.remise1|floatformat:-2}}
                   <br>
                   {% endfor %}
               </td>
               <td class="text-center">
                   {% for v in i %}
 
-                  {{v.remise}}%
+                  {{v.remise2|floatformat:-2}}
+                  %
                   <br>
                   {% endfor %}
               </td>
+
+              <td class="text-center">
+                {% for v in i %}
+
+                {{v.remise3|floatformat:-2}}
+                %
+                <br>
+                {% endfor %}
+            </td>
+
+            <td class="text-center">
+              {% for v in i %}
+
+              {{v.remise4|floatformat:-2}}
+              %
+              <br>
+              {% endfor %}
+          </td>
               <td class="text-center">
                   {% for v in i %}
 

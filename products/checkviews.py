@@ -13,7 +13,7 @@ thisyear=timezone.now().year
 def checklivraisonno(request):
     no=request.GET.get('no')
     id=request.GET.get('id')
-    bl=Bonsortie.objects.exclude(pk=id).filter(bon_no=no).first()
+    bl=Bonlivraison.objects.exclude(pk=id).filter(bon_no=no).first()
     
     return JsonResponse({
         'exist':True if bl else False
@@ -248,26 +248,49 @@ def addbonsortie(request):
 def farahhome(request):
     return render(request, 'farahhome.html', {'target':'f'})
 
+def orghhome(request):
+    return render(request, 'orghhome.html', {'target':'f'})
+
 def clientsection(request):
     target=request.GET.get('target')
     print('>> terget', target)
     print('faracl', Client.objects.filter(clientfarah=True).count())
     if target=='s':
+        try:
+            lastcode = Client.objects.filter(code__startswith='CP-').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
+                codecl = f"CP-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CP-1"
+        except:
+            codecl="CP-1"
         clients=Client.objects.filter(clientsortie=True).order_by('-soldtotal')[:50]
     elif target=='f':
+        try:
+            lastcode = Client.objects.filter(code__startswith='CF').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
+
+                codecl = f"CF-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CF-1"
+        except:
+            codecl="CF-1"
         clients=Client.objects.filter(clientfarah=True).order_by('-soldtotal')[:50]
     else:
-        clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
-    try:
-        lastcode = Client.objects.last()
-        print('lastcode', lastcode.code)
-        if lastcode:
+        try:
+            lastcode = Client.objects.filter(code__startswith='CO').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
 
-            codecl = f"{int(lastcode.code) + 1:09}"
-        else:
-            codecl = f"000000001"
-    except:
-        codecl="000000001"
+                codecl = f"CO-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CO-1"
+        except:
+            codecl="CO-1"
+        clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
+    
     ctx={
         'clients':clients,
         'title':'List des clients',
@@ -310,3 +333,29 @@ def ventesection(request):
         'target':target
     }
     return render(request, 'ventesection.html', ctx)
+
+
+def achatsection(request):
+    target=request.GET.get('target')
+    thisyear=timezone.now().year
+    if target=='f':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True).order_by('-date')[:50]
+    elif target=='o':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isorgh=True).order_by('-date')[:50]
+    ctx={
+        'title':'List des bon achat',
+        'bons':bons,
+        'target':target
+    }
+    if bons:
+        ctx['total']=round(Itemsbysupplier.objects.all().aggregate(Sum('total'))['total__sum'], 2)
+        ctx['totaltva']=round(Itemsbysupplier.objects.all().aggregate(Sum('tva'))['tva__sum'], 2)
+    return render(request, 'achatsection.html', ctx)
+
+def listbonsortie(request):
+    bons=Bonsortie.objects.all().order_by('-date')[:50]
+    ctx={
+        'title':'List des bons de sortie',
+        'bons':bons
+    }
+    return render(request, 'listbonsortie.html', ctx)

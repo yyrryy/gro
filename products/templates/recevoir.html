@@ -1,10 +1,10 @@
-<div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+<!-- <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
     <div>
       {{title}}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
-  </div>
+  </div> -->
 <div class="row">
     <div class="col-2">
        <div class="bg-white rounded shadow p-2 databonachat">
@@ -130,7 +130,7 @@
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchproduct',
+          url: '/products/searchproduct?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
@@ -238,13 +238,15 @@
         return
       }
 
-      let netp=(addprice.val()-(addprice.val()*addremise1.val()/100)-(addprice.val()*addremise2.val()/100)-(addprice.val()*addremise3.val()/100)-(addprice.val()*addremise4.val()/100)).toFixed(2)
-      // second methode
-      let netp2=(addprice.val()-(addprice.val()*addremise1.val()/100))
-      netp2-=addprice.val()*addremise2.val()/100
-      netp2-=addprice.val()*addremise3.val()/100
-      netp2-=(addprice.val()*addremise4.val()/100).toFixed(2)
-      let addtotal=(addqty.val()*netp2).toFixed(2)
+      // let netp1=(addprice.val()-(addprice.val()*addremise1.val()/100)
+      // (addprice.val()*addremise2.val()/100)-(addprice.val()*addremise3.val()/100)-(addprice.val()*addremise4.val()/100)).toFixed(2)
+      // // second methode
+      let netp1=(addprice.val()-(addprice.val()*addremise1.val()/100))
+      netp2=netp1-(netp1*addremise2.val()/100).toFixed(4)
+      netp3=netp2-(netp2*addremise3.val()/100).toFixed(4)
+      netp4=netp3-(netp3*addremise4.val()/100).toFixed(4)
+      console.log('netp1', netp1, netp2, netp3, netp4)
+      let addtotal=(addqty.val()*netp4).toFixed(2)
       item={
         'id':id,
         'ref':ref,
@@ -424,8 +426,8 @@
             url: "{% url 'products:addsupply' %}",
             type: 'POST',
             data: {
+                'target':'{{target}}',
                 'mode': mode,
-                'farah': farah,
                 'totalbon': totalbon,
                 'supplierid': supplierid,
                 'nbon': nbon,
@@ -438,7 +440,7 @@
                 localStorage.removeItem('pdctsinbonachat')
                 $('.loadingscreen').addClass('d-none')
                 deletetab('addrecevoir')
-                createtab('listbonachat', 'list achat', '/products/listbonachat')
+                ajaxpage('listbonachat', 'list achat', '/products/listbonachat?target={{target}}')
                 alertify.success('Bon acaht valider')
                 // $('.select2').select2()
             }
@@ -500,6 +502,26 @@
     // }
 
     $(document).ready(function(){
+      pdcts=JSON.parse(localStorage.getItem('bonachat')) || []
+      for (let i=0; i<pdcts.length; i++){
+        item=pdcts[i]
+        $('.bonachatbody').prepend(`<tr class="itemrow">
+        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${item.ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
+        <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
+        <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>
+        <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${item.devise}" style="width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise2}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise3}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise4}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
+        <input type="hidden" name="productid" value="${item.id}">
+        
+        </tr>`)}
+      $('.totalbon').text(localStorage.getItem('totalbonachat') || '0.00')
     $('.searchref').focus()
     $('.searchref').on('keyup', ()=>{
         let ref = $('.searchref').val()

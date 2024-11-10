@@ -52,7 +52,7 @@
     height: 21px;
     border-radius: 11px;"></button> -->
   </div>
-  <button class="btn btn-sm bi bi-plus btn-success" onclick="ajaxpage('add', '+ Article', '/products/addproductspage')"></button>
+  <!-- <button class="btn btn-sm bi bi-plus btn-success" onclick="ajaxpage('add', '+ Article', '/products/addproductspage')"></button> -->
   <!-- <div class="d-flex" > -->
   <div class="d-none" >
     <input type="file" class="form-control excelfile">
@@ -391,7 +391,7 @@
     //     return term.trim();
     // });
     if (filterValue==""){
-        ajaxpage('addpducts', 'Articles', '/products/stock')
+        ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
     }else
       {$.get('/products/searchproductsforstock?target={{target}}', {'term':filterValue.trim()}, (data)=>{
 

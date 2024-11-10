@@ -103,21 +103,21 @@
                             </tr>
                             <tr>
                                 <td>Remise 1</td>
-                                <td>EE</td>
+                                <td>{{product.remise1}}</td>
                             </tr>
                             <tr>
                                 <td>Remise 2</td>
-                                <td>EE</td>
+                                <td>{{product.remise2}}</td>
                             </tr><tr>
                                 <td>Remise 3</td>
-                                <td>EE</td>
+                                <td>{{product.remise3}}</td>
                             </tr><tr>
                                 <td>Remise 4</td>
-                                <td>EE</td>
+                                <td>{{product.remise4}}</td>
                             </tr>
                             <tr>
                                 <td>Prix achat net</td>
-                                <td>{{product.prixnet}}</td>
+                                <td>{{product.netbuyprice}}</td>
                             </tr>
                             <tr>
 
@@ -129,47 +129,46 @@
                                 </td>
                             </tr>
                             <tr>
+                                {% if target == "f" %}
                                 <td>
                                     Stock
                                 </td>
                                 <td class="stocktotal{{product.id}} d-flex">
-                                    {{product.stocktotal}}
-                                    <!-- <div class="accordion" id="accordionpdct{{product.id}}">
-                                        <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseupdatestock{{product.id}}" aria-expanded="true" aria-controls="collapseupdatestock{{product.id}}">
-
-
-                                        </button>
-
-                                        <div id="collapseupdatestock{{product.id}}" class="collapse row" aria-labelledby="headingOne" data-parent="#accordionpdct{{product.id}}">
-                                            <input class="col-9" type="number">
-                                            <button class="btn btn-success col-3" onclick="updateproductstock(event, '{{product.id}}')"></button>
-
-
-                                        </div>
-                                      </div> -->
+                                    
+                                    {{product.stocktotalfarah}}
+                                    
                                 </td>
-                            </tr>
-                            <tr style="background: #ffaa76;">
+                                {% elif target == 'o' %}
                                 <td>
-                                    Stock facture
+                                    Stock
                                 </td>
-                                <td class="d-flex">
-                                    {{product.stockfacture}}
-                                    <!-- <div class="accordion" id="accordionpdctstockfc{{product.id}}">
-                                        <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseupdatestockfc{{product.id}}" aria-expanded="true" aria-controls="collapseupdatestockfc{{product.id}}">
-
-
-                                        </button>
-
-                                        <div id="collapseupdatestockfc{{product.id}}" class="collapse row" aria-labelledby="headingOne" data-parent="#accordionpdctstockfc{{product.id}}">
-                                            <input class="col-9" type="number">
-                                            <button class="btn btn-success col-3" onclick="updateproductstockfc(event, '{{product.id}}')"></button>
-
-
-                                        </div>
-                                      </div> -->
+                                <td class="stocktotal{{product.id}} d-flex">
+                                    
+                                    {{product.stocktotalorgh}}
+                                    
                                 </td>
+                                {% else %}
+                                <td>
+                                    Stock farah
+                                </td>
+                                <td class="stocktotal{{product.id}} d-flex">
+                                    
+                                    {{product.stocktotalfarah}}
+                                    
+                                </td>
+                                <td>
+                                    Stock orgh
+                                </td>
+                                <td class="stocktotal{{product.id}} d-flex">
+                                    
+                                    {{product.stocktotalorgh}}
+                                    
+                                </td>
+                                {% endif %}
+
                             </tr>
+                            <!-- <
+                             -->
                             <!-- <tr style="background: #ffaa76;">
                                 <td>
                                     Stock bon

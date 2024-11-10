@@ -2,13 +2,13 @@
 {% load global_tags %}
 
 <div class="bg-white shadow rounded">
-  <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+  <!-- <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('listbonachat')">x</button>
     <div>
       {{title.upper}} {% if facturesection %}FACTURE{% endif %}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistbonachat', '/products/listbonachat?facture={% if facturesection %}1{% endif %}')">↻</button>
-  </div>
+  </div> -->
   <div class="d-flex justify-content-between">
     <!-- <div class="d-flex">
       <div class="me-2">
@@ -32,7 +32,7 @@
 
       </select>
       {% if not facturesection %}
-      <button class="btn btn-success" onclick="ajaxpage('addrecevoir', '+Achat', '/products/recevoir')">
+      <button class="btn btn-success" onclick="ajaxpage('addrecevoir', '+Achat', '/products/recevoir?target={{target}}')">
         +Ajouter
       </button>
       {% endif %}
@@ -101,31 +101,21 @@
           <td style="width: 8%;">Date</td>
           <td style="width: 12%;" onclick="sorttable(event)">Fournisseur</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Total</td>
-          <td style="width: 5%;" onclick="intsorttable(event)">TVA</td>
           <td style="width: 5%;" onclick="sorttable(event)">type</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Solde fourn.</td>
-          <td style="width: 4%;" onclick="sorttable(event)">Reglé</td>
           <td style="width: 4%;"></td>
         </tr>
       </thead>
       <tbody>
         {% for order in bons %}
-          <tr class="ord {% if loadmore %}achat-row{% endif %}" orderid="{{order.id}}" ondblclick="ajaxpage('bonachat{{order.id}}', 'Bon achat {{order.nbon}}', '/products/bonachatdetails/{{order.id}}')">
+          <tr class="ord {% if loadmore %}achat-row{% endif %}" orderid="{{order.id}}" ondblclick="ajaxpage('bonachat{{order.id}}', 'Bon achat {{order.nbon}}', '/products/bonachatdetails/{{order.id}}?target={{target}}')">
             <td>{{ order.nbon }}</td>
             <td>{{ order.date|date:'d/m/Y' }}</td>
             <td>{{ order.supplier.name }}</td>
             <td>{{ order.total|floatformat:2|intspace}}</td>
-            <td>{{ order.tva|floatformat:2|intspace}}</td>
             <td>{% if order.isfacture %} Facture {% else %} Bl {% endif %}</td>
             <td>{{ order.supplier.rest|floatformat:2|intspace }}</td>
-            <td class="d-flex">
-              {% if order.ispaid %}
-              R0<div style="width:15px; height:15px; border-radius:50%; background:green;" ></div>
-
-              {% else %}
-              N1<div style="width:15px; height:15px; border-radius:50%; background:red;" ></div>
-              {% endif %}
-            </td>
+            
             <td>
               <button class="btn bi bi-download" onclick="printbonachat('{{order.id}}')"></button>
             </td>
@@ -178,14 +168,14 @@
     loadinglistbl = false;
     $('.listachatholder').on('scroll', handleScrolllistachat)
 
-    $.get('/products/yeardatabachat?facture={%if facturesection%}1{%endif%}', {year:year}, (data)=>{
+    $.get('/products/yeardatabachat?target={{target}}', {year:year}, (data)=>{
       $(".listachattable tbody").html(data.trs)
       $('.totalbbonachat').text(data.total)
       $('.totaltvabbonachat').text(data.totaltva)
     })
   }
   function getachatfacture(){
-    $.get('/products/getachatfacture', {
+    $.get('/products/getachatfacture?target={{target}}', {
 
       'year':$('[name="yearsachat"]').val()
     }, (data)=>{
@@ -206,7 +196,7 @@
     // });
     let startdate=$('.startdatelistachat').val()==""?0:$('.startdatelistachat').val()
     let enddate=$('.enddatelistachat').val()==""?0:$('.enddatelistachat').val()
-    $.get('/products/searchforlistachat?facture={% if facturesection %}1{% endif %}&startdate=0&enddate=0', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate, 'year':year}, (data)=>{
+    $.get('/products/searchforlistachat?target={{target}}&startdate=0&enddate=0', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate, 'year':year}, (data)=>{
       $(".listachattable tbody").html('')
       $(".listachattable tbody").html(data.trs)
       $('.totalbbonachat').text(data.total)
@@ -226,7 +216,7 @@
     // $('.totalbbonachat').text(total)
   function loadMoreRecordslistachat (year, startdate, enddate, term)  {
     loadinglistachat = true;
-    $.get(`/products/loadlistachat/?page=${currentPagelistachat}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    $.get(`/products/loadlistachat/?target={{target}}&page=${currentPagelistachat}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
 
       const tbody = $('.listachattable tbody');
       tbody.append(data.trs);
@@ -279,7 +269,7 @@ $('.filterachatdate').on('click', function(){
       alertify.error('Date')
       return
     }
-    $.get('/products/filterachatdate', {startdate:startdate, enddate:enddate},(data)=>{
+    $.get('/products/filterachatdate?target={{target}}', {startdate:startdate, enddate:enddate},(data)=>{
       parentdiv.find('tbody').html(data.html)
       parentdiv.find('.totalbbonachat').text(data.total)
     })

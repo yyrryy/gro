@@ -387,13 +387,13 @@ def viewoneproduct(request, id):
     totalout=outbl+outfacture
     totalrev=round(revbl+revfacture, 2)
     if target=='f':
-        stockout=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).order('-id')
+        stockout=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product, isfarah=True).exclude(facture__bon__isnull=True).order_by('-id')
     elif target=='o':
         stockout=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).order('-id')
         stockoutfc=Outfacture.objects.filter(product=product, isorgh=True).exclude(facture__bon__isnull=True).order_by('-id')
     else:
-        stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order('-id')
+        stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
     # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
@@ -427,7 +427,6 @@ def viewoneproduct(request, id):
         'totalcoutout':totalrev,
         'avoirs':avoirs,
         'reps':Represent.objects.all(),
-        'repswithprice':commercial_prices,
         'today':timezone.now().date()
     }
     return render(request, 'viewoneproduct.html', ctx)
@@ -581,8 +580,8 @@ def cacelcommand(request):
     })
 
 def recevoir(request):
-    farah=request.GET.get('farah')=='1'
-    return render(request, 'recevoir.html', {'title':"Bon d'achat", 'suppliers':Supplier.objects.all(), 'today':timezone.now().date(), "farah":farah})
+    target=request.GET.get('target')
+    return render(request, 'recevoir.html', {'title':"Bon d'achat", 'suppliers':Supplier.objects.all(), 'today':timezone.now().date(), "target":target})
 
 def bonlivraison(request):
     # get the last order_no
@@ -640,7 +639,7 @@ def searchref(request):
 def addsupply(request):
     supplierid=request.POST.get('supplierid')
     products=request.POST.get('products')
-    farah=request.POST.get('farah')
+    target=request.POST.get('target')
     datebon=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d')
     datefacture=datetime.strptime(request.POST.get('datefacture'), '%Y-%m-%d')
     nbon=request.POST.get('nbon')
@@ -681,6 +680,8 @@ def addsupply(request):
     supplier.rest=float(supplier.rest)+float(totalbon)
     supplier.save()
     bon=Itemsbysupplier.objects.create(
+        isfarah=True if target=='f' else False,
+        isorgh=True if target=='o' else False,
         supplier_id=supplierid,
         total=totalbon,
         date=datebon,
@@ -690,37 +691,48 @@ def addsupply(request):
         dateentree=datefacture
     )
     for i in json.loads(products):
-        devise=0 if i['devise']=='' else i['devise']
         product=Produit.objects.get(pk=i['productid'])
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         remise2=0 if i['remise2']=='' else int(i['remise2'])
         remise3=0 if i['remise3']=='' else int(i['remise3'])
         remise4=0 if i['remise4']=='' else int(i['remise4'])
+        product.remise1=remise1
+        product.remise2=remise2
+        product.remise3=remise3
+        product.remise4=remise4
         buyprice=0 if i['price']=='' else i['price']
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
-
-        if product.stocktotal>0:
-            totalqtys=int(product.stocktotal)+int(i['qty'])
-            actualtotal=float(product.buyprice)*float(product.stocktotal)
-            totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
-            pondire=round(totalprices/totalqtys, 2)
-            product.coutmoyen=pondire
-            product.save()
-        if isfacture:
-            product.stockfacture=int(product.stockfacture)+int(i['qty'])
-
+        if target=='f':
+            if product.stocktotalfarah>0:
+                totalqtys=int(product.stocktotalfarah)+int(i['qty'])
+                actualtotal=float(product.buyprice)*float(product.stocktotalfarah)
+                totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
+                pondire=round(totalprices/totalqtys, 2)
+                product.coutmoyen=pondire
+                product.save()
+        else:
+            if product.stocktotalorgh>0:
+                totalqtys=int(product.stocktotalorgh)+int(i['qty'])
+                actualtotal=float(product.buyprice)*float(product.stocktotalorgh)
+                totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
+                pondire=round(totalprices/totalqtys, 2)
+                product.coutmoyen=pondire
+                product.save()
+        
         product.buyprice=buyprice
-        product.prixnet=netprice
+        product.netbuyprice=netprice
         # recodrd remise 1, 2, 3, 4
-        product.stocktotal=int(product.stocktotal)+int(i['qty'])
-        product.devise= devise
+        if target=='f':
+            product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+        
         #product.isnew=True
         print('creating', product.ref)
         Stockin.objects.create(
             date=datebon,
             product=product,
-            devise=devise,
             quantity=i['qty'],
             price=i['price'],
             ref=i['ref'],
@@ -734,7 +746,9 @@ def addsupply(request):
             total=i['total'],
             supplier_id=supplierid,
             nbon=bon,
-            facture=isfacture
+            facture=isfacture,
+            isfarah=True if target=='f' else False,
+            isorgh=True if target=='o' else False
         )
     # # update cout moyen, it will be calculated by deviding total prices by total qty
 
@@ -942,22 +956,43 @@ def clientspage(request):
     #     clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
 
     target=request.GET.get('target')
+    print('>> terget', target)
+    print('faracl', Client.objects.filter(clientfarah=True).count())
     if target=='s':
+        try:
+            lastcode = Client.objects.filter(code__startswith='CP-').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
+                codecl = f"CP-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CP-1"
+        except:
+            codecl="CP-1"
         clients=Client.objects.filter(clientsortie=True).order_by('-soldtotal')[:50]
     elif target=='f':
+        try:
+            lastcode = Client.objects.filter(code__startswith='CF').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
+
+                codecl = f"CF-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CF-1"
+        except:
+            codecl="CF-1"
         clients=Client.objects.filter(clientfarah=True).order_by('-soldtotal')[:50]
     else:
-        clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
-    try:
-        lastcode = Client.objects.last()
-        print('lastcode', lastcode.code)
-        if lastcode:
+        try:
+            lastcode = Client.objects.filter(code__startswith='CO').last()
+            print('lastcode', lastcode.code)
+            if lastcode:
 
-            codecl = f"{int(lastcode.code) + 1:09}"
-        else:
-            codecl = f"000000001"
-    except:
-        codecl="000000001"
+                codecl = f"CO-{int(lastcode.code.split('-')[1]) + 1}"
+            else:
+                codecl = f"CO-1"
+        except:
+            codecl="CO-1"
+        clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
     ctx={
         'clients':clients,
         'title':'List des clients',
@@ -2841,11 +2876,17 @@ def getclientrep(request, id):
     })
 
 def listbonachat(request):
+    target=request.GET.get('target')
     thisyear=timezone.now().year
-    bons=Itemsbysupplier.objects.filter(date__year=thisyear).order_by('-date')[:50]
+    if target=='f':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True).order_by('-date')[:50]
+    elif target=='o':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isorgh=True).order_by('-date')[:50]
     ctx={
         'title':'List des bon achat',
-        'bons':bons
+        'bons':bons,
+        'today':timezone.now().date(),
+        'target':target
     }
     if bons:
         ctx['total']=round(Itemsbysupplier.objects.all().aggregate(Sum('total'))['total__sum'], 2)
@@ -3529,53 +3570,52 @@ def loadjournalventefc(request):
 def searchproductbonsortie(request):
     # get url pams
     term=request.GET.get('term')
-    products=Produit.objects.filter(Q(ref=term) |Q(farahref=term)).order_by('-stocktotal')
+    products=Produit.objects.filter(Q(ref=term) |Q(farahref=term))
 
     results=[]
     for i in products:
         results.append({
-            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotal}§{i.stockfacture}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{term}',
+            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{term}',
             'text':f'{i.ref.upper()} - {i.name.upper()}',
-            'stock':i.stocktotal,
-            'stockfacture':i.stockfacture,
+            'stock':i.stocktotalfarah,
+            'stockfacture':i.stockfacturefarah,
             # return term to use it as adistinguisher
             'term':term
         })
     return JsonResponse({'results': results})
 # regular search fro products
 def searchproduct(request):
-    # get url pams
     term=request.GET.get('term')
+    target=request.GET.get('target')
     search_terms = term.split('+')
     print(search_terms)
 
     # Create a list of Q objects for each search term and combine them with &
     q_objects = Q()
     for term in search_terms:
-        # q_objects &= (
-        #         Q(ref__icontains=term) |
-        #         Q(name__icontains=term) |
-        #         Q(mark__name__icontains=term) |
-        #         Q(category__name__icontains=term) |
-        #         Q(equivalent__icontains=term) |
-        #         Q(farahref__icontains=term)
-        #     )
         q_objects &= (
-            Q(ref=term) |
-            Q(farahref=term)
+            Q(ref__icontains=term) |
+            Q(name__icontains=term) |
+            Q(mark__name__icontains=term) |
+            Q(category__name__icontains=term) |
+            Q(equivalent__icontains=term) |
+            Q(diametre__icontains=term)|
+            Q(cars__icontains=term)
         )
     # check if term in product.ref or product.name
-    products=Produit.objects.filter(q_objects).order_by('-stocktotal')
+    products=Produit.objects.filter(q_objects)
+    # check if term in product.ref or product.name
 
     results=[]
     for i in products:
         results.append({
-            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotal}§{i.stockfacture}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}',
+            'id':f"{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}",
             'text':f'{i.ref.upper()} - {i.name.upper()}',
-            'stock':i.stocktotal,
-            'stockfacture':i.stockfacture,
+            'stock':i.stocktotalfarah if target=='f' else i.stocktotalorgh,
+            'stockfacture':i.stockfacturefarah if target=='f' else i.stocktotalorgh,
             # return term to use it as adistinguisher
-            'term':term
+            'term':term,
+            'target':target
         })
     return JsonResponse({'results': results})
 
