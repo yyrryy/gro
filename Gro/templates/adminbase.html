@@ -25,6 +25,16 @@
     button{
       border-bottom:5px solid black;
     }
+    .sectionbtn.active::after{
+      content: '';
+      position: absolute;
+      width: 10px;
+      transform: rotate(45deg);
+      height: 10px;
+      background: white;
+      bottom: -7px;
+      left: 16px;
+    }
     button:active {
       box-shadow: 1px 1px 3px gray;
       transform: translateY(3px);
@@ -967,6 +977,23 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function getsection(event, title, url){
+        $('.sectionbtn').removeClass('active')
+        $(event.target).addClass('active')
+        $('.seystemsection').html(
+          `<div class="spinner-grow" role="status"></div>`
+        )
+        $.get(url, (data) => {
+          //$('.loadingscreen').removeClass('d-none')
+
+          $('.seystemsection').html(data)
+            
+            // $('.select2').select2();
+            // if ($('.productstable').length){
+
+            // }
+        })
+      }
       function ajaxpage(id, title, url){
         $(`#maintab`).html(
           `<div class="spinner-grow" role="status"></div>`

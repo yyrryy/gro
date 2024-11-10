@@ -39,19 +39,21 @@ def getproductsbycategory(request):
     # category = Category.objects.get(pk=request.POST.get('category'))
     # products = category.product.filter(category=category)[:10]
     # get ten products from the category
-    products = Produit.objects.filter(category__pk=request.POST.get('category')).order_by('code')
+    target=request.GET.get('target')
+    products = Produit.objects.filter(category__pk=request.GET.get('category'))
     # get marks of the products filtered
     marks = Mark.objects.filter(produit__in=products).distinct().annotate(count=Count('produit'))
     ctx={
         'products':products,
         'home':False,
+        'target':target,
         'marks':marks,
 
     }
     return JsonResponse({
-        'data':render(request, 'product_search.html', ctx).content.decode('utf-8'),
-        'stocktotal':products.aggregate(Sum('stocktotal'))['stocktotal__sum'] or 0,
-        'stockfacture':products.aggregate(Sum('stockfacture'))['stockfacture__sum'] or 0,
+        'data':render(request, 'stocktrs.html', ctx).content.decode('utf-8'),
+        # 'stocktotal':products.aggregate(Sum('stocktotal'))['stocktotal__sum'] or 0,
+        # 'stockfacture':products.aggregate(Sum('stockfacture'))['stockfacture__sum'] or 0,
     })
 
 def adminaddproductpage(request):
@@ -69,7 +71,7 @@ def adminaddproductpage(request):
 def categoriespage(request):
     ctx={
         'categories':Category.objects.all().order_by('code'),
-        'commercials':Represent.objects.all(),
+        #'commercials':Represent.objects.all(),
         'title':'Categories'
     }
     return render(request, 'categories.html', ctx)
@@ -286,6 +288,7 @@ def updatesupplier(request):
     })
 
 def addoneproduct(request):
+    target=request.POST.get('target')
     try:
 
         ref=request.POST.get('refinadd').lower().strip()
@@ -328,12 +331,9 @@ def addoneproduct(request):
             repsprice=commercialsprix,
             block=block,
             carlogos_id=logo,
-            stocktotal=0,
-            stockfacture=0,
             isactive=False
         )
-        if image:
-            image=product.image.url.replace('/media/', '')
+        
         # req.get('http://serverip/products/addoneproduct', {
         #     'ref':ref,
         #     'name':name,
@@ -370,18 +370,33 @@ def addoneproduct(request):
 
 
 def viewoneproduct(request, id):
+    target=request.GET.get('target')
     product=Produit.objects.get(pk=id)
-    commercial_prices = product.getcommercialsprice()  # Note the parentheses ()
     stockin=Stockin.objects.filter(product=product)
     outbl=Livraisonitem.objects.filter(product=product, isfacture=False).aggregate(Sum('qty'))['qty__sum'] or 0
     outfacture=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).aggregate(Sum('qty'))['qty__sum'] or 0
-    revbl=Livraisonitem.objects.filter(product=product, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
-    revfacture=Outfacture.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
+    if target=='f':
+        revbl=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
+        revfacture=Outfacture.objects.filter(product=product, isfarah=True).aggregate(Sum('total'))['total__sum'] or 0
+    elif target=='o':
+        revbl=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
+        revfacture=Outfacture.objects.filter(product=product, isorgh=True).aggregate(Sum('total'))['total__sum'] or 0
+    else:
+        revbl=Livraisonitem.objects.filter(product=product, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
+        revfacture=Outfacture.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
     totalout=outbl+outfacture
     totalrev=round(revbl+revfacture, 2)
-    print(totalrev)
-    stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
-    stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
+    if target=='f':
+        stockout=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).order('-id')
+        stockoutfc=Outfacture.objects.filter(product=product, isfarah=True).exclude(facture__bon__isnull=True).order_by('-id')
+    elif target=='o':
+        stockout=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).order('-id')
+        stockoutfc=Outfacture.objects.filter(product=product, isorgh=True).exclude(facture__bon__isnull=True).order_by('-id')
+    else:
+        stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order('-id')
+        stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
+    #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
+    # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     avoirs=Returned.objects.filter(product=product)
     qtyin=stockin.aggregate(Sum('quantity'))['quantity__sum'] or 0
     qtyavoir=avoirs.aggregate(Sum('qty'))['qty__sum'] or 0
@@ -1028,8 +1043,8 @@ def addcommercial(request):
         })
 
 def checkcodeclient(request):
-    code=request.POST.get('code')
-    name=request.POST.get('name')
+    code=request.GET.get('code')
+    name=request.GET.get('name')
     print(Client.objects.filter(Q(name=name) | Q(code=code)))
     if Client.objects.filter(Q(name=name) | Q(code=code)).exists():
         return JsonResponse({
@@ -1054,8 +1069,12 @@ def addclientdivers(request):
         diver=True
     )
     
-    
-    
+    if target=='f':
+        client.clientfarah=True
+    elif target=='s':
+        client.clientsortie=True
+    else:
+        client.clientorgh=True
     return JsonResponse({
         'succes':True
     })
@@ -1164,7 +1183,6 @@ def updateclient(request):
     client.location=request.POST.get('updateclientlocation')
     client.address=request.POST.get('updateclientaddress')
     client.region=request.POST.get('updateclientregion').lower().strip()
-    client.represent_id=request.POST.get('updateclientrep')
     client.save()
     # req.get('http://serverip/products/updateclient', {
     #     'clientcode':oldcode,
@@ -1353,26 +1371,32 @@ def getclientprice(request):
     #        })
 
 def listbonlivraison(request):
+    target=request.GET.get('target')
     today = timezone.now().date()
     thisyear=timezone.now().year
     current_time = datetime.now().strftime('%H:%M:%S')
     three_months_ago = timezone.now() - timedelta(days=90)  # Assuming 30 days per month on average
 
     # Query for Bonlivraison objects that have a 'date' field earlier than three months ago
-    depasser = Bonlivraison.objects.filter(date__lt=three_months_ago, ispaid=False, total__gt=0).count()
+    #depasser = Bonlivraison.objects.filter(date__lt=three_months_ago, ispaid=False, total__gt=0).count()
     # get only the last 100 orders of the current year
-    bons= Bonlivraison.objects.filter(date__year=timezone.now().year).order_by('-bon_no')[:50]
-    total=Bonlivraison.objects.filter(date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+    # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
+    if target=='f':
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+    else:
+        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
         'bons':bons,
         'total':total,
-        'boncommand':Order.objects.filter(isdelivered=False).exclude(note__icontains='Reliquat').count(),
-        'depasser':depasser,
-        'reps':Represent.objects.all(),
-        'today':timezone.now().date()
+        #'boncommand':Order.objects.filter(isdelivered=False).exclude(note__icontains='Reliquat').count(),
+        #'depasser':depasser,
+        #'reps':Represent.objects.all(),
+        'today':timezone.now().date(),
+        'target':target
     }
-    print(ctx)
     return render(request, 'listbonlivraison.html', ctx)
 
 def exportbl(request):
@@ -1990,12 +2014,19 @@ def updatebonfacture(request):
 
 
 def listreglementbl(request):
-    reglements=PaymentClientbl.objects.all().order_by('-id')[:50]
+    target=request.GET.get('target')
+    if target=="f":
+        reglements=PaymentClientbl.objects.filter(client__clientfarah=True).order_by('-id')[:50]
+    elif target=="o":
+        reglements=PaymentClientbl.objects.filter(client__clientorgh=False).order_by('-id')[:50]
+    else:
+        reglements=PaymentClientbl.objects.all().order_by('-id')[:50]
     print('lenreg', len(reglements))
     ctx={
         'title':'List des reglements CL BL',
         'reglements':reglements,
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'target':target,
     }
     if reglements:
         ctx['total']=round(PaymentClientbl.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
@@ -2329,9 +2360,11 @@ def viewreglementfc(request, id):
 
 
 def situationcl(request):
+    target=request.GET.get('target')
     ctx={
         'title':'Situation des clients',
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'target':target
     }
     return render(request, 'situationcl.html', ctx)
 
@@ -4376,6 +4409,21 @@ def activateaccount(request):
         'success':True
     })
 
+def stocksection(request):
+    target=request.GET.get('target')
+    categories=Category.objects.all()
+    products=Produit.objects.all()[:50]
+    ctx={'categories':categories,
+        'title':'Liste des Articles',
+        'products':products,
+        'target':target
+        # 'stocktotal':Produit.objects.all().aggregate(Sum('stocktotal'))['stocktotal__sum']or 0,
+        # 'stockfacture':Produit.objects.all().aggregate(Sum('stockfacture'))['stockfacture__sum']or 0,
+
+
+    }
+    return render(request, 'stocksection.html', ctx)
+
 def stock(request):
     target=request.GET.get('target')
     categories=Category.objects.all()
@@ -4389,7 +4437,7 @@ def stock(request):
 
 
     }
-    return render(request, 'admin/products.html', ctx)
+    return render(request, 'stock.html', ctx)
 
 
 def getreglementsupp(request, id):
@@ -5000,94 +5048,15 @@ def updatepromotion(request):
 
 def searchproductsforstock(request):
     term=request.GET.get('term')
-    if(term==''):
-        products=Produit.objects.all()[:50]
-        trs=''
-        for i in products:
-            trs+=f'''
-        <tr ondblclick="ajaxpage('addpdct{i.id}', 'Produit {i.ref}', '/products/viewoneproduct/{i.id}')"
-            style="background:{'#f3d6d694;' if not i.isactive else '' }"
-                data-product-id="{ i.id }" class="product-row">
-                  <td style="padding: 5px; font-weight: bold;" >
-                      {i.ref.upper()}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.name}
-                  </td>
-
-                  <td style="padding: 5px; font-weight: bold;" class="text-center prachat">
-                      {i.buyprice if i.buyprice else 0}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold; font-size: 14px; color: var(--orange);" class="text-center">
-                      {i.sellprice}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center">
-                      {i.remise}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center">
-                      {i.prixnet}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
-                      {i.stocktotal}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center stockfacture" style="color: blue;">
-                    <span class="stockfacture invisible">{i.stockfacture}</span>
-                </td>
-
-                  <td style="padding: 5px; font-weight: bold;">
-                    {i.diametre}
-                </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-success">
-                    {i.block}
-                </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[0] if i.getequivalent() else ''}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[1] if i.getequivalent() else ''}
-
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[2] if i.getequivalent() else ''}
-
-                  </td>
-
-                    <td style="padding: 5px; font-weight: bold;">
-                        {i.mark}
-                    </td>
-                    <td style="padding: 5px; font-weight: bold;">
-                        {i.code}
-                    </td>
-                    <td style="padding: 5px; font-weight: bold;" class="text-danger"><span class="percentage invisible"> {round(i.getpercentage(), 2)}</span></td>
-
-              </tr>
-        '''
-        return JsonResponse({
-            'trs':trs,
-            'stocktotal':Produit.objects.all().aggregate(Sum('stocktotal'))['stocktotal__sum']or 0,
-            'stockfacture':Produit.objects.all().aggregate(Sum('stockfacture'))['stockfacture__sum']or 0,
-        })
+    target=request.GET.get('target')
     term = request.GET.get('term').lower()
 
     # Remove non-alphanumeric characters and convert to lowercase
 
     if not '+' in term:
-        products=Produit.objects.filter(ref__istartswith=term).order_by('-stocktotal')
-
-        q_objects = Q()
-        q_objects &= (
-            Q(ref__icontains=term) |
-            Q(name__icontains=term) |
-            Q(mark__name__icontains=term) |
-            Q(category__name__icontains=term) |
-            Q(equivalent__icontains=term) |
-            Q(refeq1__icontains=term) |
-            Q(refeq2__icontains=term) |
-            Q(refeq3__icontains=term) |
-            Q(refeq4__icontains=term)
-        )
+        
         # check if term in product.ref or product.name
-        products=Produit.objects.filter(ref__istartswith=term).order_by('-stocktotal')
+        products=Produit.objects.filter(ref__istartswith=term)
 
         q_objects = Q()
         q_objects &= (
@@ -5102,7 +5071,7 @@ def searchproductsforstock(request):
             Q(refeq4__icontains=term)
         )
             # adding other products that have equivalent
-        products=products | Produit.objects.filter(q_objects).order_by('-stocktotal')
+        products=products | Produit.objects.filter(q_objects)
     else:
         # Split the cleaned term into individual words separated by '*'
         search_terms = term.split('+')
@@ -5115,70 +5084,13 @@ def searchproductsforstock(request):
 
                 # term = ''.join(char for char in term if char.isalnum())
                 q_objects &= (Q(ref__icontains=term) | Q(coderef__icontains=term) | Q(name__icontains=term) | Q(category__name__icontains=term) |  Q(mark__name__icontains=term) |  Q(equivalent__icontains=term)  |  Q(refeq1__icontains=term) |  Q(refeq2__icontains=term)  |  Q(block__icontains=term) | Q(refeq3__icontains=term) | Q(refeq4__icontains=term) | Q(sellprice__icontains=term)  | Q(buyprice__icontains=term)  | Q(cars__icontains=term)  | Q(diametre__icontains=term))
-        products=Produit.objects.filter(q_objects)[:50]
-    trs=''
-    for i in products:
-        trs+=f'''
-        <tr ondblclick="ajaxpage('addpdct{i.id}', 'Produit {i.ref}', '/products/viewoneproduct/{i.id}')"
-              style="background:{'#f3d6d694;' if not i.isactive else '' }"
-              class="product-row" data-product-id="{ i.id }"
-              >
-                  <td style="padding: 5px; font-weight: bold;" >
-                      {i.ref.upper()}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.name}
-                  </td>
-
-                  <td style="padding: 5px; font-weight: bold;" class="text-center prachat">
-                      {i.buyprice if i.buyprice else 0}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold; font-size: 14px; color: var(--orange);" class="text-center">
-                      {i.sellprice}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center">
-                      {i.remise}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center">
-                      {i.prixnet}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
-                      {i.stocktotal}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-center stockfacture" style="color: blue;">
-                    <span class="stockfacture invisible">{i.stockfacture}</span>
-                  </td>
-
-                  <td style="padding: 5px; font-weight: bold;">
-                    {i.diametre}
-                </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-success">
-                    {i.block}
-                </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                    {i.coderef}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[0] if i.getequivalent() else ''}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[1] if i.getequivalent() else ''}
-
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.getequivalent()[2] if i.getequivalent() else ''}
-
-                  </td>
-                <td style="padding: 5px; font-weight: bold;">
-                      {i.mark}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                      {i.code}
-                  </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-danger"><span class="percentage invisible"> {round(i.getpercentage(), 2)}</span></td>
-        '''
+            products=Produit.objects.filter(q_objects)[:50]
+        
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'stocktrs.html', {
+            'products':products,
+            'target':target
+        }).content.decode('utf-8'),
         #'stocktotal':Produit.objects.filter(q_objects).aggregate(Sum('stocktotal'))['stocktotal__sum']or 0,
         #'stockfacture':Produit.objects.filter(q_objects).aggregate(Sum('stockfacture'))['stockfacture__sum']or 0,
     })
@@ -7900,26 +7812,22 @@ def makebondelivered(request):
 
 def getitemsforlistbl(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
     search_terms = term.split('+')
     print(search_terms)
 
     # Create a list of Q objects for each search term and combine them with &
     q_objects = Q()
     for term in search_terms:
-        if term:
-            q_objects &= (
-                Q(ref__icontains=term) |
-                Q(name__icontains=term) |
-                Q(mark__name__icontains=term) |
-                Q(category__name__icontains=term) |
-                Q(equivalent__icontains=term) |
-                Q(refeq1__icontains=term) |
-                Q(refeq2__icontains=term) |
-                Q(refeq3__icontains=term) |
-                Q(refeq4__icontains=term) |
-                Q(diametre__icontains=term)|
-                Q(cars__icontains=term)
-            )
+        q_objects &= (
+            Q(ref__icontains=term) |
+            Q(name__icontains=term) |
+            Q(mark__name__icontains=term) |
+            Q(category__name__icontains=term) |
+            Q(equivalent__icontains=term) |
+            Q(diametre__icontains=term)|
+            Q(cars__icontains=term)
+        )
     # check if term in product.ref or product.name
     products=Produit.objects.filter(q_objects)
     brands = [product.mark for product in products]
@@ -7929,20 +7837,20 @@ def getitemsforlistbl(request):
     unique_brands = set(brands)
     brands = [{'id': mark.id, 'name': mark.name, 'image':mark.image.url if mark.image else '/media/default.png'} for mark in unique_brands]
     categories = [{'id': category.id, 'name': category.name, 'image':category.image.url if category.image else '/media/default.png'} for category in unique_categories]
-    trs=[f'''<tr class="productsbrand{i.mark.id if i.mark else ''}">
-    <td><img src={i.image.url if i.image else ''}></td>
-    <td>{i.ref.upper()}</td>
-    <td>{i.name.upper()}</td>
-    <td style="color: #ff6409;
-    font-weight: bold;">{i.stocktotal}</td>
-    <td style="color:blue;font-weight: bold;">{i.sellprice}</td>
-    <td>{i.remise}</td>
-    <td>{i.prixnet}</td>
-    <td>{i.diametre}</td>
-    </tr>
-    ''' for i in products]
+    # trs=[f'''<tr class="productsbrand{i.mark.id if i.mark else ''}">
+    # <td><img src={i.image.url if i.image else ''}></td>
+    # <td>{i.ref.upper()}</td>
+    # <td>{i.name.upper()}</td>
+    # <td style="color: #ff6409;
+    # font-weight: bold;">{i.stocktotalfarah if target=='f' el} </td>
+    # <td style="color:blue;font-weight: bold;">{i.sellprice}</td>
+    # <td>{i.remise}</td>
+    # <td>{i.prixnet}</td>
+    # <td>{i.diametre}</td>
+    # </tr>
+    # ''' for i in products]
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'product_search.html', {'products':products, 'target':target}).content.decode('utf-8'),
         'brands':brands,
         'categories':categories
     })

@@ -13,20 +13,7 @@
                     <input name="marquename" type="text" class="form-control mb-2" placeholder="Marque" required>
                     <strong>Image</strong>
                     <input name="marqueimage" type="file" class="form-control" required>
-                    Representants caché
-                    <select class="select" name="commercialexcludedmrk" multiple="multiple" style="width:100%;">
-                        {% for i in commercials %}
-                        <option value="{{i.id}}">
-                            {{i.name}}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <div class="form-check position-relative mt-2">
-                        <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate" name="hideclientmrk">
-                        <label class="form-check-label" for="flexCheckIndeterminate">
-                        Masquer les clients
-                        </label>
-                    </div>
+                    
                     <button class="btn btn-primary w-100 mt-2 createmarquebtn">Ajouter</button>
                 
                 </form>
@@ -51,20 +38,7 @@
                                 {% endif %}
                                 <input type="file" name="image" class="form-control">
                                 <input type="text" name="name" class="form-control" value="{{i.name}}">
-                                Representants caché:
-                                <select class="select" name="commercialexcludedmrk" multiple="multiple" style="width:100%;">
-                                    {% for c in commercials %}
-                                    <option value="{{c.id}}" {% if c in i.excludedrep.all %}selected{% endif %}>
-                                        {{c.name}}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                <div class="form-check position-relative mt-2">
-                                    <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate" name="hideclientmrk" {% if i.masqueclients %} checked {% endif %}>
-                                    <label class="form-check-label" for="flexCheckIndeterminate">
-                                    Masquer les clients
-                                    </label>
-                                </div>
+                                
                                 <button class="btn btn-sm w-100 updatemarquebtn btn btn-success">Mise à jour</button>
                             </form>
                         </div>
@@ -120,7 +94,7 @@
             processData: false,
             contentType: false,
             success:((data)=>{
-                updatetab('mrks', '/products/marquespage')
+                ajaxpage('mrks', 'list marque', '/products/marquespage')
             })
         })
     })

@@ -244,3 +244,69 @@ def addbonsortie(request):
     return JsonResponse({
         "success":True
     })
+
+def farahhome(request):
+    return render(request, 'farahhome.html', {'target':'f'})
+
+def clientsection(request):
+    target=request.GET.get('target')
+    print('>> terget', target)
+    print('faracl', Client.objects.filter(clientfarah=True).count())
+    if target=='s':
+        clients=Client.objects.filter(clientsortie=True).order_by('-soldtotal')[:50]
+    elif target=='f':
+        clients=Client.objects.filter(clientfarah=True).order_by('-soldtotal')[:50]
+    else:
+        clients=Client.objects.filter(clientorgh=True).order_by('-soldtotal')[:50]
+    try:
+        lastcode = Client.objects.last()
+        print('lastcode', lastcode.code)
+        if lastcode:
+
+            codecl = f"{int(lastcode.code) + 1:09}"
+        else:
+            codecl = f"000000001"
+    except:
+        codecl="000000001"
+    ctx={
+        'clients':clients,
+        'title':'List des clients',
+        'lastcode':codecl,
+        'target':target
+        # 'sortiesection':sortie,
+        # 'farahsection':farah,
+        # 'orghsection':orgh,
+        # 'soldtotal':round(Client.objects.aggregate(Sum('soldtotal'))['soldtotal__sum'] or 0, 2),
+        # 'soldbl':round(Client.objects.aggregate(Sum('soldbl'))['soldbl__sum'] or 0, 2),
+        # 'soldfacture':round(Client.objects.aggregate(Sum('soldfacture'))['soldfacture__sum'] or 0, 2),
+    }
+    return render(request, 'clientsection.html', ctx)
+
+def ventesection(request):
+    target=request.GET.get('target')
+    today = timezone.now().date()
+    thisyear=timezone.now().year
+    current_time = datetime.now().strftime('%H:%M:%S')
+    three_months_ago = timezone.now() - timedelta(days=90)  # Assuming 30 days per month on average
+
+    # Query for Bonlivraison objects that have a 'date' field earlier than three months ago
+    #depasser = Bonlivraison.objects.filter(date__lt=three_months_ago, ispaid=False, total__gt=0).count()
+    # get only the last 100 orders of the current year
+    # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
+    if target=='f':
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+    else:
+        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+    ctx={
+        'title':'Bons de livraison',
+        'bons':bons,
+        'total':total,
+        #'boncommand':Order.objects.filter(isdelivered=False).exclude(note__icontains='Reliquat').count(),
+        #'depasser':depasser,
+        #'reps':Represent.objects.all(),
+        'today':timezone.now().date(),
+        'target':target
+    }
+    return render(request, 'ventesection.html', ctx)

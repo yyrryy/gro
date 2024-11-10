@@ -32,11 +32,10 @@
 </div>
 <div class="row" >
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addpducts')">x</button>
     <div>
       {{title}}
     </div>
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addpducts', '/products/stock')">↻</button>
+    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addpducts', 'list articles', '/products/stock?target={{target}}')">↻</button>
   </div>
   <div class="d-flex justify-content-between">
 
@@ -394,7 +393,7 @@
     if (filterValue==""){
         ajaxpage('addpducts', 'Articles', '/products/stock')
     }else
-      {$.get('/products/searchproductsforstock', {'term':filterValue.trim()}, (data)=>{
+      {$.get('/products/searchproductsforstock?target={{target}}', {'term':filterValue.trim()}, (data)=>{
 
               $(".productstable tbody").html('')
               $(".productstable tbody").html(data.trs)
@@ -445,7 +444,7 @@
         $('.categorynameholder').text(categoryname)
         $('.product_search_result').html('')
     $.ajax({
-    url: "{% url 'products:getproductsbycategory' %}",
+    url: "/products/getproductsbycategory?target={{target}}",
     type: "GET",
     data: {
         'category': categoryid,

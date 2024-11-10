@@ -1,4 +1,28 @@
 {% load global_tags %}
+<div class="row">
+    <div class="col-2 p-0" style="background: rgb(241, 241, 241);">
+      <div class="sectionitem bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')">
+        List Bons
+      </div>
+
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target={{target}}')">
+        + Bon
+      </div>
+      
+      <!-- <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationcl?target={{target}}')">
+        Situation
+      </div> -->
+      
+      <!-- <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/marquespage?target={{target}}')">
+        Marques
+      </div> -->
+      
+      <!-- <div class="sectionitem bg-white border-bottom p-2 btn w-100 text-start" onclick="ajaxpage('add', '+ Article', '/products/addproductspage')">+ Article</div> -->
+      
+      
+    </div>
+    <div class="col-10" id="maintab">
+        {% load global_tags %}
 <style>
   .blink {
   animation: blinker .6s cubic-bezier(.5, 0, 1, 1) infinite alternate;
@@ -77,7 +101,7 @@
       </select>
     </div>
     <div class="d-flex flex-column">
-      <!-- <button class="btn btn-success" style="border-radius: 10px; margin: 0 9px 9px 0;" onclick="ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target={{target}}')">
+      <!-- <button class="btn btn-success" style="border-radius: 10px; margin: 0 9px 9px 0;" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonlivraison?target={{target}}')">
         +Ajouter
       </button> -->
 
@@ -91,16 +115,54 @@
 " type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
 
   <div>
-    
+    <input style="width: 60em;
+    background: #80808038;
+    border-radius: 11px;
+    margin-bottom: 9px;
+    " type="text" placeholder="Recherche Bons" class="searchitemsforlistbl"
+    onfocus="$('.itemssearchresultslistbl').removeClass('d-none')"
+    onchange="getitemsforlistbl(event)">
+    <div style="position: absolute;
+    height: 60vh;
+    width: 70vw;
+    overflow-y: scroll;
+    z-index: 99;
+    background: white;
+    padding: 10px;
+    box-shadow: -6px 5px 4px 4px #24232391" class="itemssearchresultslistbl d-none">
+      <div class="sticky-top bg-white">
+        <button class="w-100 btn btn-danger" onclick="$('.itemssearchresultslistbl').addClass('d-none')">X</button>
+        <div class="suggestions__group-title brands d-flex" >
+
+        </div>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr class="text-center bg-darkblue text-white">
+            <td>IMAGE</td>
+            <td>REF.</td>
+            <td>ARTICLE</td>
+            <td>STOCK</td>
+            <td>PR. BRUT</td>
+            <td>REMISE</td>
+            <td>PR. NET</td>
+            <td>DIAMETRE</td>
+          </tr>
+        </thead>
+        <tbody class="itemsforlistblresult">
+
+        </tbody>
+      </table>
+    </div>
   </div>
 
 
-  <!-- <button class="btn bi bi-download text-white" onclick="$('.exportblholder').css('top', '10vh')" style="width: 5.7em;
+  <button class="btn bi bi-download text-white" onclick="$('.exportblholder').css('top', '10vh')" style="width: 5.7em;
   background: #df691a;
   border-radius: 11px;
   margin: 0 9px 9px 0;"></button>
   <button class="btn bi bi-list border btn-dark" title="Orta tffo4" onclick="getbonswhite(event)" style="
-  border-radius: 11px;"></button> -->
+  border-radius: 11px;"></button>
 
   </div>
   <div style="height: 70vh; overflow: scroll;" class="listblholder">
@@ -581,3 +643,6 @@
     // })
 
 </script>
+
+    </div>
+</div>

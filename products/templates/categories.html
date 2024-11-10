@@ -1,6 +1,5 @@
 
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
     <div>
       {{title}}
     </div>
@@ -13,7 +12,7 @@
                 {% csrf_token %}
                 <input name="categoryname" type="text" class="form-control mb-2" placeholder="Categorie" required>
                 <input name="categorycode" type="text" class="form-control mb-2" placeholder="Code" required>
-                <select name="categoryaffichage" class="form-control mb-2" required>
+                <select hidden name="categoryaffichage" class="form-control mb-2" required>
                     <option value="full">full</option>
                     <option value="table">table</option>
                     <option value="double">double</option>
@@ -21,20 +20,8 @@
                 <strong>Image</strong>
                 <input name="categoryimage" type="file" class="form-control" required>
                 
-                Representants caché
-                <select class="select" name="commercialexcluded" multiple="multiple" style="width:100%;">
-                    {% for i in commercials %}
-                    <option value="{{i.id}}">
-                        {{i.name}}
-                    </option>
-                    {% endfor %}
-                </select>
-                <div class="form-check position-relative mt-2">
-                    <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate" name="hideclient">
-                    <label class="form-check-label" for="flexCheckIndeterminate">
-                      Masquer les clients
-                    </label>
-                </div>
+                
+                
                 <button class="btn btn-success mt-2 createcategorybtn">Ajouter</button>
             </form>
         </div>
@@ -59,25 +46,7 @@
                             <input type="file" name="updatecategoryimage" class="form-control imageinp">
                             <input type="text" name="updatecategoryname" class="form-control nameinp mb-2" value="{{i.name}}" placeholder="Nom de categorie">
                             <input type="text" name="updatecategorycode" class="form-control codeinp" value="{{i.code}}" placeholder="Code">
-                            <select name="updatecategoryaffichage" class="form-control mb-2" required>
-                                <option value="full" {% if i.affichage == "full" %} selected {% endif %}>full</option>
-                                <option value="table" {% if i.affichage == "table" %} selected {% endif %}>table</option>
-                                <option value="double" {% if i.affichage == "double" %} selected {% endif %}>double</option>
-                            </select>
-                            Representants caché:
-                            <select class="select" name="commercialexcluded" multiple="multiple" style="width:100%;">
-                                {% for c in commercials %}
-                                <option value="{{c.id}}" {% if c in i.excludedrep.all %}selected{% endif %}>
-                                    {{c.name}}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-check position-relative mt-2">
-                                <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate" name="hideclient" {% if i.masqueclients %} checked {% endif %}>
-                                <label class="form-check-label" for="flexCheckIndeterminate">
-                                Masquer les clients
-                                </label>
-                            </div>
+                            
                             <button class="btn btn-sm btn-success w-100 updatecategorybtn" id="{{i.id}}">Mise à jour</button>
                         </form>
                     </div>
@@ -123,7 +92,7 @@
     $('.createcategorybtn').on('click', function(event){
         event.preventDefault()
         console.log('sending')
-        if ($('[name="categoryname"]').val()==""||$('[name="categoryimage"]').val()==""){
+        if ($('[name="categoryname"]').val()==""){
             $('#createcategory').css('border', '1px solid red')
             return
         }
@@ -137,7 +106,7 @@
             contentType: false,
             success:((data)=>{
                 //$(`#ctg`).html(data.html)
-                updatetab('ctg', '/products/categoriespage')
+                ajaxpage('ctg', 'list catg', '/products/categoriespage')
             })
         })
     })

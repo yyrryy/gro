@@ -85,6 +85,7 @@
         }
         $(e.target).addClass('disabled')
         var formData = new FormData($('.addoneproductform')[0]);
+        formData.append('target', '{{target}}')
         console.log($('[name="commercialsprixinadd"]').val())
         $.ajax({
             url: '{% url "products:addoneproduct" %}',
@@ -98,9 +99,9 @@
                 if (data.success) {
                     
                     alertify.success('Produit ajouté avec success');
-                    alertify.success('Ajouter le Produit dans le server');
-                    deletetab('add')
-                    ajaxpage('addpducts', 'Articles', '/products/stock')
+                    
+                    //ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
+                    ajaxpage('add', '+ Article', '/products/addproductspage?target={{target}}')
                     
                 } else {
                     alertify.error(data.error);

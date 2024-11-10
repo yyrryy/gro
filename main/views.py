@@ -266,8 +266,7 @@ def searchrefphone(request):
 
     return JsonResponse({'data':a, 'brands':brands, 'categories':categories})
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def clientshome(request):
     request.session.set_expiry(30 * 24 * 60 * 60)
     constraction=False
@@ -565,8 +564,7 @@ def addbulk(request):
     #         print(e)
     return redirect(create)
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def commande(request):
     # clientname=request.POST.get('clientname')
     # clientaddress=request.POST.get('clientaddress')
@@ -798,8 +796,7 @@ def paied(request, id):
 
 
 # gets products after clicking on a category
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def products(request, id):
     # get the products from the db
     c=Mark.objects.get(pk=id)
@@ -811,8 +808,7 @@ def products(request, id):
          'newproducts':newproducts}
     return render(request, 'products.html', ctx)
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def productscategories(request, id):
     # get the products from the db
     c=Category.objects.get(pk=id)
@@ -847,8 +843,7 @@ def productscategories(request, id):
         }
     return render(request, 'products.html', ctx)
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def productsmarks(request, id):
     # get the products from the db
     c=Mark.objects.get(pk=id)
@@ -884,8 +879,8 @@ def system(request):
     }
     return render(request, 'dashboard.html', ctx)
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+#@user_passes_test(tocatalog, login_url='main:loginpage')
+#@login_required(login_url='main:loginpage')
 def catalog(request):
     # categories = Category.objects.annotate(
     #     has_promotion=Exists(Produit.objects.filter(category_id=OuterRef('pk'), isoffer=True)),
@@ -918,8 +913,7 @@ def catalog(request):
     return render(request, 'searchpage.html', ctx)
 
 
-@user_passes_test(tocatalog, login_url='main:loginpage')
-@login_required(login_url='main:loginpage')
+
 def catalogpage(request):
     # categories = Category.objects.annotate(
     #     has_promotion=Exists(Produit.objects.filter(category_id=OuterRef('pk'), isoffer=True)),

@@ -249,7 +249,7 @@
                               Date incorrect
                             </small>
                         </div><br>
-                        <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button>
+                        <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
                         <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;">
 
                         </select>
@@ -572,7 +572,7 @@
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchclient',
+          url: '/products/searchclient?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
