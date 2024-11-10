@@ -23,6 +23,7 @@ import asyncio
 def tocatalog(user):
     return (user.groups.filter(name='salsemen').exists() or user.groups.filter(name='clients').exists() or user.groups.filter(name='admin').exists() )
 
+
 def admincreatecategory(request):
     name=request.POST.get('name')
     # get image file
