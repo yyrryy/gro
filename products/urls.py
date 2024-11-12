@@ -305,7 +305,7 @@ urlpatterns = [
     path('achatsection', checkviews.achatsection, name='achatsection'),
     path('orghhome', checkviews.orghhome, name='orghhome'),
     path('listbonsortie', checkviews.listbonsortie, name='listbonsortie'),
-    # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
+    path('suppliersection', checkviews.suppliersection, name='suppliersection'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
 ]

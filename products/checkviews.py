@@ -138,41 +138,11 @@ def addbonsortie(request):
     print('>>>>>>', len(json.loads(products))>0)
     if len(json.loads(products))>0:
         with transaction.atomic():
-            farahitems=[]
-            orghitems=[]
-            totalfarah=0
-            totalorgh=0
+            
             for i in json.loads(products):
                 farah=i['farah']=='1'
                 product=Produit.objects.get(pk=i['productid'])
-                if farah:
-                    totalfarah+=float(i['total'])
-                    product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
-                    livraisonfarah=Livraisonitem.objects.create(
-                        total=i['total'],
-                        qty=i['qty'],
-                        product=product,
-                        price=i['price'],
-                        client_id=clientid,
-                        date=datebon,
-                        isfarah=True
-                    )
-                    farahitems.append(livraisonfarah)
-                else:
-                    totalorgh+=float(i['total'])
-                    product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
-                    livraisonorgh=Livraisonitem.objects.create(
-                        total=i['total'],
-                        qty=i['qty'],
-                        product=product,
-                        price=i['price'],
-                        client_id=clientid,
-                        date=datebon,
-                        isorgh=True
-                    )
-                    orghitems.append(livraisonorgh)
-                #product.stocktotal=int(product.stocktotal)-int(i['qty'])
-                product.save()
+                
                 Sortieitem.objects.create(
                     bon=order,
                     remise=i['remise'],
@@ -186,57 +156,7 @@ def addbonsortie(request):
                     date=datebon,
                     isfarah=farah
                 )
-            if len(farahitems)>0:
-                latest_receipt = Bonlivraison.objects.filter(
-                    bon_no__startswith=f'FR-BL{year}'
-                ).last()
-                # latest_receipt = Bonsortie.objects.filter(
-                #     bon_no__startswith=f'FR-BL{year}'
-                # ).order_by("-bon_no").first()
-                if latest_receipt:
-                    latest_receipt_no = int(latest_receipt.bon_no[-9:])
-                    receipt_no = f"FR-BL{year}{latest_receipt_no + 1:09}"
-                else:
-                    receipt_no = f"FR-BL{year}000000001"
-                # create bon livraison in farah
-                bon=Bonlivraison.objects.create(
-                    client_id=clientid,
-                    total=totalfarah,
-                    date=datebon,
-                    bon_no=receipt_no,
-                    note=note,
-                    isfarah=True
-                )
-                # assign bons
-                for i in farahitems:
-                    i.bon=bon
-                    i.save()
-            if len(orghitems)>0:
-                latest_receipt = Bonlivraison.objects.filter(
-                    bon_no__startswith=f'BL{year}'
-                ).last()
-                # latest_receipt = Bonsortie.objects.filter(
-                #     bon_no__startswith=f'BL{year}'
-                # ).order_by("-bon_no").first()
-                if latest_receipt:
-                    latest_receipt_no = int(latest_receipt.bon_no[-9:])
-                    receipt_no = f"BL{year}{latest_receipt_no + 1:09}"
-                else:
-                    receipt_no = f"BL{year}000000001"
-                # create bon livraison in orgh
-                bon=Bonlivraison.objects.create(
-                    client_id=clientid,
-                    total=totalorgh,
-                    date=datebon,
-                    bon_no=receipt_no,
-                    note=note,
-                    isorgh=True
-                )
-                # assign bons
-                for i in orghitems:
-                    i.bon=bon
-                    i.save()
-                
+            
             
 
 
@@ -244,6 +164,97 @@ def addbonsortie(request):
     return JsonResponse({
         "success":True
     })
+
+def validatebonsortie(request):
+    bonid=request.GET.get('bonid')
+    bon=Bonsortie.objects.get(pk=bonid)
+    items=Sortieitem.objects.filter(bon=bon)
+    totalfarah=0
+    farahitems=[]
+    totalorgh=0
+    orghitems=[]
+    for i in items:
+        product=i.product
+        if i.isfarah:
+            totalfarah+=float(i['total'])
+            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+            livraisonfarah=Livraisonitem.objects.create(
+                total=i.total,
+                qty=i.qty,
+                product=product,
+                price=i.price,
+                client_id=i.client,
+                date=i.bon.date,
+                isfarah=True
+            )
+            farahitems.append(livraisonfarah)
+        else:
+            totalorgh+=float(i.total)
+            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+            livraisonorgh=Livraisonitem.objects.create(
+                total=i.total,
+                qty=i.qty,
+                product=product,
+                price=i.price,
+                client_id=i.client,
+                date=i.bon.date,
+                isorgh=True
+            )
+            orghitems.append(livraisonorgh)
+        #product.stocktotal=int(product.stocktotal)-int(i['qty'])
+        product.save()
+    if len(farahitems)>0:
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'FR-BL{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     bon_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"FR-BL{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-BL{year}000000001"
+        # create bon livraison in farah
+        bon=Bonlivraison.objects.create(
+            client_id=clientid,
+            total=totalfarah,
+            date=datebon,
+            bon_no=receipt_no,
+            note=note,
+            isfarah=True
+        )
+        # assign bons
+        for i in farahitems:
+            i.bon=bon
+            i.save()
+    if len(orghitems)>0:
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'BL{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     bon_no__startswith=f'BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"BL{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"BL{year}000000001"
+        # create bon livraison in orgh
+        bon=Bonlivraison.objects.create(
+            client_id=clientid,
+            total=totalorgh,
+            date=datebon,
+            bon_no=receipt_no,
+            note=note,
+            isorgh=True
+        )
+        # assign bons
+        for i in orghitems:
+            i.bon=bon
+            i.save()
+        
+
 
 def farahhome(request):
     return render(request, 'farahhome.html', {'target':'f'})
@@ -359,3 +370,13 @@ def listbonsortie(request):
         'bons':bons
     }
     return render(request, 'listbonsortie.html', ctx)
+
+def suppliersection(request):
+    target=request.GET.get('target')
+    suppliers=Supplier.objects.all()
+    ctx={
+        'title':'List des fournisseurs',
+        'suppliers':suppliers,
+        'target':target,
+    }
+    return render(request, 'suppliersection.html', ctx)

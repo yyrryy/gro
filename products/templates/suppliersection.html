@@ -1,24 +1,30 @@
 {% load global_tags %}
 <div class="row">
     <div class="col-2 p-0" style="background: rgb(241, 241, 241);">
-      <div class="sectionitem bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/clientspage?target={{target}}')">
-        List client
+      <div class="sectionitem bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/supplierspage?target={{target}}')">
+        List fournisserus
       </div>
 
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementbl?target={{target}}')">
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementsupp?target={{target}}')">
         Reglement
       </div>
       
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationcl?target={{target}}')">
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationsupplier?target={{target}}')">
         Situation
       </div>
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')">
-        List Bons
+
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target={{target}}')">
+        List Bons achat
       </div>
 
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target={{target}}')">
-        + Bon
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/achatfacture?target={{target}}')">
+        Factures
       </div>
+
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/recevoir?target={{target}}')">
+        + Bon achat
+      </div>
+      
       <!-- <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/marquespage?target={{target}}')">
         Marques
       </div> -->

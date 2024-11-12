@@ -340,6 +340,7 @@ class Order(models.Model):
 
 class Bonlivraison(models.Model):
     commande=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    bonsortie=models.ForeignKey('Bonsortie', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     client=models.ForeignKey(Client, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     salseman=models.ForeignKey(Represent, on_delete=models.SET_NULL, default=None, null=True, blank=True)
@@ -761,7 +762,37 @@ class Excelecheances(models.Model):
     amount=models.FloatField(default=None, null=True, blank=True)
     tva=models.FloatField(default=None, null=True, blank=True)
 
+# devi becom bonsorie, then bl
+class Devi(models.Model):
+    date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
+    client=models.ForeignKey(Client, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    total=models.FloatField(default=0.00)
+    amountpaid=models.FloatField(default=0.00)
+    rest=models.FloatField(default=0.00)
+    bon_no=models.CharField(max_length=50, null=True, default=None)
+
+class DeviItme(models.Model):
+    devi=models.ForeignKey(Devi, on_delete=models.CASCADE, default=None)
+    product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
+    remise=models.CharField(max_length=100, null=True, default=None)
+    ref=models.CharField(max_length=100, null=True, default=None)
+    name=models.CharField(max_length=100, null=True, default=None)
+    qty=models.IntegerField()
+    price=models.FloatField(default=0.00)
+    total=models.FloatField(default=0.00)
+    # this total represents the revenue of this product
+    client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    # track farah products in sortie items
+    isfarah=models.BooleanField(default=False)
+    # to track ligns that are facture
+    isorgh=models.BooleanField(default=False)
+    date=models.DateField(default=None, null=True, blank=True)
+    def __str__(self) -> str:
+        return f'{self.devi.bon_no} - {self.product.ref}'
+
 class Bonsortie(models.Model):
+    
+    devi=models.ForeignKey(Devi, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     client=models.ForeignKey(Client, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     total=models.FloatField(default=0.00)

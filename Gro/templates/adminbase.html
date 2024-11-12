@@ -25,7 +25,10 @@
     button{
       border-bottom:5px solid black;
     }
-    .sectionbtn.active::after{
+    .sectionbtn.active{
+      border-bottom: 2px solid;
+    }
+    /* .sectionbtn.active::after{
       content: '';
       position: absolute;
       width: 10px;
@@ -34,7 +37,7 @@
       background: white;
       bottom: -7px;
       left: 16px;
-    }
+    } */
     button:active {
       box-shadow: 1px 1px 3px gray;
       transform: translateY(3px);
@@ -1006,7 +1009,7 @@ a .uil {
   
       function getsection(event, title, url){
         $('.sectionbtn').removeClass('active')
-        $(event.target).addClass('active')
+        $(event.target).closest('.sectionbtn').addClass('active');
         $('.seystemsection').html(
           `<div class="spinner-grow" role="status"></div>`
         )
