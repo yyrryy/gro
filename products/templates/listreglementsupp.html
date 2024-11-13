@@ -1,8 +1,8 @@
 <style>
     [data-tooltip] {
-    position: relative;
-    letter-spacing: 0.1rem;
-}
+        position: relative;
+        letter-spacing: 0.1rem;
+    }
 
 [data-tooltip]::before,
 [data-tooltip]::after {
@@ -520,7 +520,7 @@ function submitupdatereglementsupp(event){
         tbody.html('')
         console.log(date, mantant)
         // get regl data
-        $.get('products/getreglementsupp/'+reglementid, {
+        $.get('/products/getreglementsupp/'+reglementid, {
 
             }, function(data){
                 $('.submitupdatereglementsupp').removeClass('disabled')
@@ -744,9 +744,9 @@ function submitupdatereglementsupp(event){
             bons:JSON.stringify(selectedValues),
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
-                forceupdatetab('addlistreglementsupp', '/products/listreglementsupp')
+                ajaxpage('addlistreglementsupp', 'list reglemnts', '/products/listreglementsupp')
                 alertify.success('Reglement ajouté')
-        })
+            })
     })
 
 </script>

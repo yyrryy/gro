@@ -142,7 +142,6 @@ def addbonsortie(request):
             for i in json.loads(products):
                 farah=i['farah']=='1'
                 product=Produit.objects.get(pk=i['productid'])
-                
                 Sortieitem.objects.create(
                     bon=order,
                     remise=i['remise'],
@@ -158,7 +157,11 @@ def addbonsortie(request):
                 )
             
             
-
+                if farah:
+                    product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
+                else:
+                    product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
+                product.save()
 
     # increment it
     return JsonResponse({
@@ -166,6 +169,7 @@ def addbonsortie(request):
     })
 
 def validatebonsortie(request):
+    year=timezone.now().year
     bonid=request.GET.get('bonid')
     bon=Bonsortie.objects.get(pk=bonid)
     items=Sortieitem.objects.filter(bon=bon)
@@ -177,32 +181,32 @@ def validatebonsortie(request):
         product=i.product
         if i.isfarah:
             totalfarah+=float(i['total'])
-            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+            #product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
             livraisonfarah=Livraisonitem.objects.create(
                 total=i.total,
                 qty=i.qty,
                 product=product,
                 price=i.price,
                 client_id=i.client,
-                date=i.bon.date,
+                date=timezone.now,
                 isfarah=True
             )
             farahitems.append(livraisonfarah)
         else:
             totalorgh+=float(i.total)
-            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+            #product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
             livraisonorgh=Livraisonitem.objects.create(
                 total=i.total,
                 qty=i.qty,
                 product=product,
                 price=i.price,
                 client_id=i.client,
-                date=i.bon.date,
+                date=timezone.now,
                 isorgh=True
             )
             orghitems.append(livraisonorgh)
         #product.stocktotal=int(product.stocktotal)-int(i['qty'])
-        product.save()
+        #product.save()
     if len(farahitems)>0:
         latest_receipt = Bonlivraison.objects.filter(
             bon_no__startswith=f'FR-BL{year}'
@@ -217,11 +221,11 @@ def validatebonsortie(request):
             receipt_no = f"FR-BL{year}000000001"
         # create bon livraison in farah
         bon=Bonlivraison.objects.create(
-            client_id=clientid,
+            client_id=bon.client,
             total=totalfarah,
-            date=datebon,
+            date=timezone.now,
             bon_no=receipt_no,
-            note=note,
+            note=bon.note,
             isfarah=True
         )
         # assign bons
@@ -242,11 +246,11 @@ def validatebonsortie(request):
             receipt_no = f"BL{year}000000001"
         # create bon livraison in orgh
         bon=Bonlivraison.objects.create(
-            client_id=clientid,
+            client=bon.client,
             total=totalorgh,
-            date=datebon,
+            date=timezone.now,
             bon_no=receipt_no,
-            note=note,
+            note=bon.note,
             isorgh=True
         )
         # assign bons
@@ -380,3 +384,21 @@ def suppliersection(request):
         'target':target,
     }
     return render(request, 'suppliersection.html', ctx)
+
+def bonsortiedetails(request, id):
+    order=Bonsortie.objects.get(pk=id)
+    orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
+    print('orderitems', orderitems)
+    #reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
+    ctx={
+        'title':f'Bon de livraison {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+        'bonsortie':True
+    }
+    return render(request, 'bonlivraisondetails.html', ctx)
+
+
+

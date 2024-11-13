@@ -132,7 +132,7 @@
       </thead>
       <tbody class="listblbody">
         {% for order in bons %}
-          <tr class="ord bl-row {% if order.ispaid %} text-danger{% endif %}" orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
+          <tr class="ord bl-row {% if order.ispaid %} text-danger{% endif %}" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonsortiedetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>
             <td >{{ order.client.name }}</td>
@@ -320,7 +320,7 @@
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
     loadinglistbl = true;
-    $.get(`/products/loadlistbl/?page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    $.get(`/products/loadlistbs/?target={{target}}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
 
       const tbody = $('.listbltable tbody');
       tbody.append(data.trs);

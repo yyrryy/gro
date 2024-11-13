@@ -44,6 +44,7 @@ urlpatterns = [
     path('onereppage/<int:id>', views.onereppage, name='onereppage'),
     path('addbonlivraison', views.addbonlivraison, name='addbonlivraison'),
     path('bonlivraisondetails/<int:id>', views.bonlivraisondetails, name='bonlivraisondetails'),
+    path('bonsortiedetails/<int:id>', checkviews.bonsortiedetails, name='bonsortiedetails'),
     path('getrepswithprice', views.getrepswithprice, name='getrepswithprice'),
     path('getclientprice', views.getclientprice, name='getclientprice'),
     path('listbonlivraison', views.listbonlivraison, name='listbonlivraison'),
