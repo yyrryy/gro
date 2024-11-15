@@ -127,7 +127,7 @@
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">REF</td>
                       <td style="padding: 2px 0; font-size: 13px;">Article</td>
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr.</td>
-                      <td style="padding: 2px 0; font-size: 13px;">Stock</td>
+                      <!-- <td style="padding: 2px 0; font-size: 13px;">Stock</td> -->
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr. cli</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Quantité</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix unit.</td>
@@ -277,6 +277,8 @@
           addname.val('')
           addremise.val('')
           addprice.val('')
+          $('.addstock').text('')
+          $('.addstockfacture').text('')
           alertify.error('Ce produit est deja dans le bon')
           $('.resultsholderbonsortie').select2('open')
 
@@ -383,7 +385,6 @@
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp}</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="stock">${stock}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
@@ -616,7 +617,6 @@
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${item.id})">${item.ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp}</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="stock">${item.stock}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
@@ -658,8 +658,8 @@
           if ($(this).val()==''){
               return
           }
-          var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, term] = $(this).val().split('§');
-          console.log('>> term', term)
+          var [ref, name, dp, stocktotalfarah, stockfacturefarah, stocktotalorgh, stockfactureorgh, id, sellprice, remise, netprice, representprice, term] = $(this).val().split('§');
+          console.log('>> id', id)
           if (term.startsWith('fr-')){
             // add a sign to addrowbtn to use it when adding row #sfefr435
             // 1 means thsi product is a farah product
@@ -680,7 +680,9 @@
           addqty.focus()
           addprice.val(sellprice)
           addremise.val(remise)
-          addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+          addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+          $('.addstock').text('Stock farah: '+stocktotalfarah)
+          $('.addstockfacture').text('Stock orgh: '+stocktotalorgh)
           // we are getting ere list of reps that have price
           
           $.ajax({

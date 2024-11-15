@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, wishlist, Notification, Modifierstock, Cartitems, Notesrepresentant, Achathistory, Excelecheances
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, wishlist, Notification, Modifierstock, Cartitems, Notesrepresentant, Achathistory, Excelecheances, Bonsortie
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -390,7 +390,7 @@ def viewoneproduct(request, id):
         stockout=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product, isfarah=True).exclude(facture__bon__isnull=True).order_by('-id')
     elif target=='o':
-        stockout=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).order('-id')
+        stockout=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product, isorgh=True).exclude(facture__bon__isnull=True).order_by('-id')
     else:
         stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
@@ -427,7 +427,8 @@ def viewoneproduct(request, id):
         'totalcoutout':totalrev,
         'avoirs':avoirs,
         'reps':Represent.objects.all(),
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'target':target
     }
     return render(request, 'viewoneproduct.html', ctx)
 
@@ -3575,7 +3576,7 @@ def searchproductbonsortie(request):
     results=[]
     for i in products:
         results.append({
-            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{term}',
+            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{term}',
             'text':f'{i.ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah,
             'stockfacture':i.stockfacturefarah,
@@ -8275,6 +8276,15 @@ def updatenotebl(request):
     note=request.GET.get('note')
     blid=request.GET.get('blid')
     bon=Bonlivraison.objects.get(pk=blid)
+    bon.note=note
+    bon.save()
+    return JsonResponse({
+        'success':True
+       } )
+def updatenotebs(request):
+    note=request.GET.get('note')
+    blid=request.GET.get('blid')
+    bon=Bonsortie.objects.get(pk=blid)
     bon.note=note
     bon.save()
     return JsonResponse({

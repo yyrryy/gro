@@ -1632,6 +1632,18 @@ a .uil {
           })
         }
       }
+      function updatenotebs(event, blid){
+        let note= $(event.target).parent().find('input').val()
+        if (note!=''){
+          $.get('/products/updatenotebs', {
+          'note':note,
+          'blid':blid
+          }, (data)=>{
+            ajaxpage(`bons${blid}`, `/products/bonsortiedetails/${blid}`)
+          })
+        }
+      }
+      
       function updaterepbl(event, blid){
         let rep= $(event.target).parent().find('select').val()
         if (rep!=''){

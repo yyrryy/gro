@@ -5,35 +5,18 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    {% if order.isfacture %}
-    <button class="btn mt-2 w-100 bg-orange" onclick="degenerer(event, '{{order.id}}', 'bonl{{order.id}}', '/products/bonlivraisondetails/{{order.id}}')">
-      Dégenerer Facture
+    
+    <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
+      Valider Bon sortie
     </button>
-    <select name="client" id="" style="width:100%;" class="select2 clientselectchangeinbl form-select notemptylivraison mt-5">
-
-    </select>
-    {% if order.total == 0 %}
-
-    {% endif %}
-    {% else %}
-    {% if order.ispaid %}
-    <p>
-      Bon est reglé
-    </p>
-    {% else %}
-    <button class="btn w-100 btn-success" onclick="ajaxpage('generatefacturetab{{order.id}}', 'Generer Fact.', '/products/validatebonsortie?bonid={{order.id}}')">
-      Generer Bon sortie
-    </button>
-    <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
+    <!-- <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
       Modifier
-    </button>
+    </button> -->
 
 
-    {% endif %}
-    {% endif %}
-    <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">
+    <!-- <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">
       Entette
-    </button>
+    </button> -->
 
     <!-- <strong class="mt-2">Transport</strong>
     <div class="d-flex">
@@ -43,7 +26,7 @@
     <strong class="mt-2">Note</strong>
     <div class="d-flex">
       <input value="{% if order.note %}{{order.note}}{% endif %}">
-      <button onclick="updatenotebl(event, '{{order.id}}')">+</button>
+      <button onclick="updatenotebs(event, '{{order.id}}')">+</button>
     </div>
     <!-- <strong class="mt-2">Reprenant</strong>
     <div class="d-flex">
@@ -115,7 +98,7 @@
           </div>
           <h3>
               <b>
-                Bon de Livraison
+                Bon de Sortie
               </b>
             </h3>
 

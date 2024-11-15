@@ -340,7 +340,7 @@ class Order(models.Model):
 
 class Bonlivraison(models.Model):
     commande=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
-    bonsortie=models.ForeignKey('Bonsortie', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    bonsortie=models.ForeignKey('Bonsortie', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonsortie')
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     client=models.ForeignKey(Client, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     salseman=models.ForeignKey(Represent, on_delete=models.SET_NULL, default=None, null=True, blank=True)
@@ -791,7 +791,7 @@ class DeviItme(models.Model):
         return f'{self.devi.bon_no} - {self.product.ref}'
 
 class Bonsortie(models.Model):
-    
+    bonlivraison=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='blofbon')
     devi=models.ForeignKey(Devi, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     client=models.ForeignKey(Client, on_delete=models.SET_NULL, default=None, null=True, blank=True)

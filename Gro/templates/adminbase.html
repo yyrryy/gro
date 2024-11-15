@@ -1561,9 +1561,26 @@ a .uil {
           'note':note,
           'blid':blid
           }, (data)=>{
-            updatetab(`bonl${blid}`, `/products/bonlivraisondetails/${blid}`)
+            ajaxpage(`bonl${blid}`, `/products/bonlivraisondetails/${blid}`)
           })
         }
+      }
+      function updatenotebs(event, blid){
+        let note= $(event.target).parent().find('input').val()
+        if (note!=''){
+          $.get('/products/updatenotebs', {
+          'note':note,
+          'blid':blid
+          }, (data)=>{
+            console.log('here')
+            ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
+          })
+        }
+      }
+      function validatebonsortie(event, blid){
+        $.get('/products/validatebonsortie', {'bonid':blid}, (data)=>{
+          ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
+        })
       }
       function updaterepbl(event, blid){
         let rep= $(event.target).parent().find('select').val()
