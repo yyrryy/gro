@@ -262,12 +262,9 @@ def addbonsortie(request):
 #     })
 
 #optimized code
-from django.db import transaction
-from django.utils import timezone
-from django.http import JsonResponse
 
 def validatebonsortie(request):
-    year = timezone.now().year
+    year = timezone.now().strftime("%y")
     bonid = request.GET.get('bonid')
     
     try:
