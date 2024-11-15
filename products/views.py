@@ -332,7 +332,7 @@ def addoneproduct(request):
             block=block,
             carlogos_id=logo,
             isactive=False,
-            farahref='fr-'ref
+            farahref='fr-'+ref
         )
         
         # req.get('http://serverip/products/addoneproduct', {
