@@ -267,7 +267,7 @@
           return
         }
         var [ref, name, dp, stockfarah, stockfacturefarah, stockorgh, stockfactureorgh, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
-        console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
+        //console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
         pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie')) || []
         console.log(id, pdcts, pdcts.includes(id))
         if (pdcts.includes(id)){
@@ -286,7 +286,7 @@
         }
 
         // here is the case if qty is greater than stock
-        console.log(addqty.val(), stock)
+        //console.log(addqty.val(), stock)
         
         // if (parseInt(addqty.val())>parseInt(stock)){
         //   console.log('qty', addqty.val(), 'stock', stock, 'qty > stock', addqty>stock)
@@ -405,7 +405,7 @@
           'name': name,
           'ref': ref,
           'dp': dp,
-          'stock': stock,
+          'stock': stockfarah,
           'clientprice': priceclient,
           'netprice': netprice
         }
