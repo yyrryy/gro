@@ -331,7 +331,8 @@ def addoneproduct(request):
             repsprice=commercialsprix,
             block=block,
             carlogos_id=logo,
-            isactive=False
+            isactive=False,
+            farahref='fr-'ref
         )
         
         # req.get('http://serverip/products/addoneproduct', {
