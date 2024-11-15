@@ -438,8 +438,9 @@
             },
             success: function(data){
                 localStorage.removeItem('pdctsinbonachat')
+                localStorage.removeItem('bonachat')
+                localStorage.removeItem('totalbonachat')
                 $('.loadingscreen').addClass('d-none')
-                deletetab('addrecevoir')
                 ajaxpage('listbonachat', 'list achat', '/products/listbonachat?target={{target}}')
                 alertify.success('Bon acaht valider')
                 // $('.select2').select2()
