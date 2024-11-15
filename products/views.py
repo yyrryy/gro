@@ -3570,7 +3570,7 @@ def loadjournalventefc(request):
 # product search selects2 for bon sortie, 
 def searchproductbonsortie(request):
     # get url pams
-    term=request.GET.get('term')
+    term=request.GET.get('term').lower().strip()
     products=Produit.objects.filter(Q(ref=term) |Q(farahref=term))
 
     results=[]
