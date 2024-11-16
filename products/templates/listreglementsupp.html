@@ -742,7 +742,8 @@ function submitupdatereglementsupp(event){
             echeance:JSON.stringify(echeance),
             date:date,
             bons:JSON.stringify(selectedValues),
-            csrfmiddlewaretoken: '{{ csrf_token }}'
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            'target':'{{target}}'
             }, function(data){
                 ajaxpage('addlistreglementsupp', 'list reglemnts', '/products/listreglementsupp')
                 alertify.success('Reglement ajouté')

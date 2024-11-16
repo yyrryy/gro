@@ -404,7 +404,7 @@ class PaymentSupplier(models.Model):
     #factures reglé onetomanys
     bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name="reglementssupp")
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
-
+    isfarah=models.BooleanField(default=False)
 class Notesrepresentant(models.Model):
     represent=models.ForeignKey('Represent', on_delete=models.SET_NULL, default=None, null=True)
     note=models.TextField()
@@ -611,7 +611,7 @@ class Avoirsupplier(models.Model):
     no = models.CharField(
         max_length=20, unique=True, blank=True, null=True
     )
-
+    isfarah=models.BooleanField(default=False)
     supplier = models.ForeignKey(
         Supplier,
         related_name='supplier_avoir',
@@ -799,7 +799,8 @@ class Bonsortie(models.Model):
     amountpaid=models.FloatField(default=0.00)
     rest=models.FloatField(default=0.00)
     bon_no=models.CharField(max_length=50, null=True, default=None)
-    
+    # true when the bon is generated to be a bon liv
+    generated=models.BooleanField(default=False)
     # true when the bon is generated to be a facture
     ispaid=models.BooleanField(default=False)
     note=models.TextField(default=None, null=True, blank=True)

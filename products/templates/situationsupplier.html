@@ -56,7 +56,7 @@
         alertify.error('ERRO')
         return
       }
-      var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/relevsuppprint?supplierid='+suppid+'&datefrom='+datefrom+'&dateto='+dateto, '', 'width=900,height=900');
+      var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/relevsuppprint?target={{target}}&supplierid='+suppid+'&datefrom='+datefrom+'&dateto='+dateto, '', 'width=900,height=900');
 
         myWindow.focus();
         setTimeout(function() {

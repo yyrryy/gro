@@ -267,10 +267,7 @@ def validatebonsortie(request):
     year = timezone.now().strftime("%y")
     bonid = request.GET.get('bonid')
     
-    try:
-        bon = Bonsortie.objects.get(pk=bonid)
-    except Bonsortie.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Bon sortie not found'}, status=404)
+    bon = Bonsortie.objects.get(pk=bonid)
     
     items = Sortieitem.objects.filter(bon=bon)
     totalfarah, totalorgh = 0, 0
@@ -284,6 +281,8 @@ def validatebonsortie(request):
         livraison_data = {
             'total': item_total,
             'qty': i.qty,
+            'ref': i.ref,
+            'name': i.name,
             'product': product,
             'price': i.price,
             'client': i.client,
@@ -313,6 +312,7 @@ def validatebonsortie(request):
         
         bon_data = {
             'client': bon.client,
+            
             'total': total,
             'date': timezone.now(),
             'bon_no': receipt_no,
@@ -337,7 +337,8 @@ def validatebonsortie(request):
     # Create Bonlivraison for orgh items
     if orghitems:
         create_bonlivraison('BL', totalorgh, orghitems, is_farah=False)
-    
+    bon.generated=True
+    bon.save()
     return JsonResponse({'success': True})
 
 
@@ -449,7 +450,7 @@ def achatsection(request):
     return render(request, 'achatsection.html', ctx)
 
 def listbonsortie(request):
-    bons=Bonsortie.objects.all().order_by('-date')[:50]
+    bons=Bonsortie.objects.all().order_by('-bon_no')[:50]
     ctx={
         'title':'List des bons de sortie',
         'bons':bons

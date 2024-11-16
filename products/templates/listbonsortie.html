@@ -48,7 +48,7 @@
     <div>
       {{title}}
     </div>
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target={{target}}')">↻</button>
+    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}')">↻</button>
   </div>
   <div class="d-flex justify-content-between">
     <div class="d-flex">
@@ -415,7 +415,7 @@
     var filterValue = $(this).val().toLowerCase();
     console.log(filterValue)
     if (filterValue==""){
-      ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target={{target}}')
+      ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}')
 
 
     }

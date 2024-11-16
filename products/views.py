@@ -451,20 +451,20 @@ def updateproduct(request):
     sellprice=request.POST.get('sellprice')
     netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
     product=Produit.objects.get(pk=productid)
-    if float(sellprice) != float(product.sellprice):
-        print('price changed')
-        reliquas=wishlist.objects.filter(product=product)
-        for i in reliquas:
-            i.total=round(float(netprice)*float(i.qty), 2)
-            i.save()
-        cartitems=Cartitems.objects.filter(product=product)
-        for i in cartitems:
-            newtotal=round(float(netprice)*float(i.qty), 2)
-            newcarttotal=i.cart.total-i.total+newtotal
-            i.total=newtotal
-            i.save()
-            i.cart.total=newtotal
-            i.cart.save()
+    # if float(sellprice) != float(product.sellprice):
+    #     print('price changed')
+    #     reliquas=wishlist.objects.filter(product=product)
+    #     for i in reliquas:
+    #         i.total=round(float(netprice)*float(i.qty), 2)
+    #         i.save()
+    #     cartitems=Cartitems.objects.filter(product=product)
+    #     for i in cartitems:
+    #         newtotal=round(float(netprice)*float(i.qty), 2)
+    #         newcarttotal=i.cart.total-i.total+newtotal
+    #         i.total=newtotal
+    #         i.save()
+    #         i.cart.total=newtotal
+    #         i.cart.save()
     equivalent=' '.join(i for i in request.POST.get('equivalent').split())
     product.carlogos_id=logo
     if new=='on':
@@ -496,36 +496,36 @@ def updateproduct(request):
     if image:
         product.image=image
     product.save()
-    data={
-        #'image':product.image.url.replace('/media/', '') if product.image else '/media/default.png',
-        'new':True if request.POST.get('switch')=='on' else False,
-        'logo':request.POST.get('updatepdctlogo'),
-        'productid':request.POST.get('productid'),
-        'remise':request.POST.get('remise'),
-        'sellprice':request.POST.get('sellprice'),
-        'netprice':round(float(sellprice)-(float(sellprice)*float(remise)/100), 2),
-        'equivalent':equivalent,
-        'near':near,
-        'code':request.POST.get('updatecode'),
-        'refeq1':request.POST.get('refeq1'),
-        'refeq2':request.POST.get('refeq2'),
-        'refeq3':request.POST.get('refeq3'),
-        'refeq4':request.POST.get('refeq4'),
-        'repprice':request.POST.get('updaterepprice') or 0,
-        # 'coderef':request.POST.get('updatecoderef'),
-        'name':request.POST.get('name'),
-        'cars':json.dumps(request.POST.getlist('cars')),
-        'ref':request.POST.get('ref').lower().strip(),
-        'category_id':request.POST.get('category'),
-        'mark_id':request.POST.get('marque'),
-        'diametre':request.POST.get('diametre'),
-        'stock':product.stocktotal
-    }
-    if image:
-        print('sending new image')
-        data['image']=product.image.url.replace('/media/', '') if product.image else '/media/default.png',
-    print('>>end ',product)
-    print('>>>>>>>>>>>>>> equivalent>',equivalent)
+    # data={
+    #     #'image':product.image.url.replace('/media/', '') if product.image else '/media/default.png',
+    #     'new':True if request.POST.get('switch')=='on' else False,
+    #     'logo':request.POST.get('updatepdctlogo'),
+    #     'productid':request.POST.get('productid'),
+    #     'remise':request.POST.get('remise'),
+    #     'sellprice':request.POST.get('sellprice'),
+    #     'netprice':round(float(sellprice)-(float(sellprice)*float(remise)/100), 2),
+    #     'equivalent':equivalent,
+    #     'near':near,
+    #     'code':request.POST.get('updatecode'),
+    #     'refeq1':request.POST.get('refeq1'),
+    #     'refeq2':request.POST.get('refeq2'),
+    #     'refeq3':request.POST.get('refeq3'),
+    #     'refeq4':request.POST.get('refeq4'),
+    #     'repprice':request.POST.get('updaterepprice') or 0,
+    #     # 'coderef':request.POST.get('updatecoderef'),
+    #     'name':request.POST.get('name'),
+    #     'cars':json.dumps(request.POST.getlist('cars')),
+    #     'ref':request.POST.get('ref').lower().strip(),
+    #     'category_id':request.POST.get('category'),
+    #     'mark_id':request.POST.get('marque'),
+    #     'diametre':request.POST.get('diametre'),
+    #     'stock':product.stocktotal
+    # }
+    # if image:
+    #     print('sending new image')
+    #     data['image']=product.image.url.replace('/media/', '') if product.image else '/media/default.png',
+    # print('>>end ',product)
+    # print('>>>>>>>>>>>>>> equivalent>',equivalent)
 
     # res=req.get('http://serverip/products/updateproduct', data)
     # print('>>>>>>', res)
@@ -760,7 +760,8 @@ def addsupply(request):
         product.qtycommande=0
         product.save()
     return JsonResponse({
-        'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
+        'success':True
+        #'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
     })
 
 
@@ -2425,7 +2426,8 @@ def situationclblfc(request):
 def situationsupplier(request):
     ctx={
         'title':'Situation des Fouurnisseurs',
-        'suppliers':Supplier.objects.all()
+        'suppliers':Supplier.objects.all(),
+        'target':request.GET.get('target'),
     }
     return render(request, 'situationsupplier.html', ctx)
 
@@ -2612,6 +2614,7 @@ def avoirsupplier(request):
 
 
 def addavoirsupp(request):
+    isfarah=request.POST.get('target')=="f"
     supplierid=request.POST.get('supplierid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
@@ -2635,8 +2638,8 @@ def addavoirsupp(request):
         supplier_id=supplierid,
         total=totalbon,
         date=datebon,
-        avoirfacture=avoirfacture
-
+        avoirfacture=avoirfacture,
+        isfarah=isfarah
     )
     supplier.rest-=float(totalbon)
     supplier.save()
@@ -2767,16 +2770,24 @@ def relevclient(request):
 
 def relevsupplier(request):
     supplierid=request.POST.get('supplierid')
+    target=request.POST.get('target')
     supplier=Supplier.objects.get(pk=supplierid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
-    reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
+    if target=="f":
+        avoirs=Avoirsupplier.objects.filter(isfarah=True, supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
+        reglementsbl=PaymentSupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate])
 
-    bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
-    print('rr', supplierid)
+        bons=Itemsbysupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate])
+        print('rr', supplierid)
+    else:
+        avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
+        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
+
+        bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
+        print('rr', supplierid)
     # chain all the data based on dates
     # first get all dates
     releve = chain(*[
@@ -3015,7 +3026,8 @@ def updatebonachat(request):
 
 def getsuppbons(request):
     supplierid=request.POST.get('supplierid')
-    bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, ispaid=False)
+    isfarah=request.POST.get('target')=='f'
+    bons=Itemsbysupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False)
     trs=''
     for i in bons:
         trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td class="text-danger">{i.rest if i.rest>0 else "---"}</td> <td><input type="checkbox" value="{i.id}" name="bonsachattopay" onchange="checkreglementbox(event)"></td></tr>'
@@ -3025,6 +3037,7 @@ def getsuppbons(request):
     })
 
 def reglebonsachat(request):
+    isfarah=request.POST.get('target')=="f"
     supplierid=request.POST.get('supplierid')
     supplier=Supplier.objects.get(pk=supplierid)
     bons=json.loads(request.POST.get('bons'))
@@ -3098,6 +3111,7 @@ def reglebonsachat(request):
             echeance=ech,
             mode=mod,
             npiece=np,
+            isfarah=isfarah
         )
         regl.bons.set(livraisons)
         # for i in livraisons:

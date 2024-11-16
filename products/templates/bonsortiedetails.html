@@ -5,10 +5,11 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    
+    {% if not order.generated %}
     <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
       Valider Bon sortie
     </button>
+    {% endif %}
     <!-- <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
       Modifier
     </button> -->
