@@ -133,7 +133,8 @@ def addbonsortie(request):
         total=totalbon,
         date=datebon,
         bon_no=receipt_no,
-        note=note
+        note=note,
+        user=request.user
     )
     print('>>>>>>', len(json.loads(products))>0)
     if len(json.loads(products))>0:
@@ -262,6 +263,15 @@ def addbonsortie(request):
 #     })
 
 #optimized code
+
+def paybonsortie(request):
+    bonid = request.GET.get('bonid')
+    bon=Bonsortie.objects.get(pk=bonid)
+    bon.ispaid=True
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })
 
 def validatebonsortie(request):
     year = timezone.now().strftime("%y")

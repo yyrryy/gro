@@ -127,12 +127,13 @@
           <td style="width: 5%;" onclick="sorttable(event)">Cmnd</td>
           <td style="width: 5%;" onclick="sorttable(event)">Transport</td>
           <td style="width: 5%;" onclick="sorttable(event)">Notes</td>
+          <td style="width: 5%;" onclick="sorttable(event)">Useer</td>
           <td style="width: 2%;"></td>
         </tr>
       </thead>
       <tbody class="listblbody">
         {% for order in bons %}
-          <tr class="ord bl-row {% if order.ispaid %} text-danger{% endif %}" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonsortiedetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
+          <tr class="ord bl-row {% if order.ispaid %} text-danger{% endif %}" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonsortiedetails/{{order.id}}')" style="background:{% if order.generated %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>
             <td >{{ order.client.name }}</td>
@@ -177,8 +178,11 @@
             <td>
               {% if order.note %} {{order.note}} {% endif %}
             </td>
+            <td>
+              {% if order.user %} {{order.user.username}} {% endif %}
+            </td>
             <td class="d-flex">
-              <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button>
+              <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
               <button class="btn btn-sm bi bi-download" onclick="printlivraison('{{order.id}}')"></button>
             </td>
           </tr>

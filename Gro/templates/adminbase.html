@@ -1582,6 +1582,13 @@ a .uil {
           ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
         })
       }
+      function paybonsortie(event, blid){
+        console.log('ddf>>>')
+        $.get('/products/paybonsortie', {'bonid':blid}, (data)=>{
+          console.log('>> after get request')
+          ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
+        })
+      }
       function updaterepbl(event, blid){
         let rep= $(event.target).parent().find('select').val()
         if (rep!=''){
