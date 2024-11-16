@@ -270,7 +270,9 @@
         //console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
         pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie')) || []
         console.log(id, pdcts, pdcts.includes(id))
-        if (pdcts.includes(id)){
+        // distinguished id will be an id to store in ids local
+        distid=farah=='1'?'f'+id:'o'+id
+        if (pdcts.includes(distid)){
           parentdiv.find('.addstock').val('')
           parentdiv.find('.addstockfacture').val('')
           addqty.val('')
@@ -372,7 +374,7 @@
         //   return
         // }
 
-        pdcts.push(id)
+        pdcts.push(distid)
         localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
         console.log(afterremise)
