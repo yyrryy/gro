@@ -175,6 +175,11 @@ def addbonsortie(request):
             mode='espece',
             npiece=f'Paiement de bon de sortie {order.bon_no}'
         )
+        if float(payment)<float(totalbon):
+            order.rest=round(float(totalbon)-float(payment), 2)
+        if float(payment)==float(totalbon):
+            order.ispaid=True
+        order.save()
     
 
     # increment it

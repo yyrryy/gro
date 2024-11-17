@@ -69,11 +69,13 @@
             </div>
 
             <div class="col-7 row productsholder d-none">
-              <div class="col-12">
+              <div class="col-12 d-flex">
 
                 <select class="resultsholderbonsortie mb-2 form-select " style="width: 100%;" id="productsselect2">
 
                 </select>
+                <button class="btn bg-darkblue text-white">+</button>
+
               </div>
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Quantité" name="addqty">
@@ -160,6 +162,9 @@
                 <button class="btn btn-success submitbonsortie" style="border-radius: 10px;">
                       Valider
                 </button>
+                <button class="btn btn-danger" onclick="annulerbon()" style="border-radius: 10px;">
+                  Annuler
+                  </button>
                 <div>
                   <b class="totalbon text-danger totalbonsortie">
                     0.00
@@ -180,7 +185,13 @@
               </div>
               <div class="">
                 <div>
-                  <input type="number" class="form-control payment" placeholder="Payment" value="0.00">
+                  <input type="number" class="form-control payment" placeholder="Payment" value="0.00" onkeyup="paymentbon()">
+                </div>
+                <div>
+                  Rondu: <strong class="rondu"></strong>
+                </div>
+                <div>
+                  Rest: <strong class="rest"></strong>
                 </div>
                 
               </div>
@@ -192,6 +203,23 @@
   </div>
 
   <script>
+    function paymentbon(){
+      let total = parseFloat($('.totalbonsortie').text())
+      let payment = parseFloat($('.payment').val())
+      if (!isNaN(payment)){
+        if (payment<total){
+          $('.rondu').text('0.00')
+          let rest = total - payment
+          $('.rest').text(rest.toFixed(2))
+        }else{
+          let rondu = payment - total
+          $('.rondu').text(rondu.toFixed(2))
+          $('.rest').text('0.00')
+        }
+        
+      }
+      
+    }
     $(function(){
 
       $('.clientselectbl').select2({
@@ -238,6 +266,12 @@
         }
 
     })
+    function annulerbon(){
+      localStorage.removeItem('bonsortie')
+      localStorage.removeItem('totalbonsortie')
+      localStorage.removeItem('pdctsinbonsortie')
+      ajaxpage('bonsortie', 'Bons Sortie', '/products/bonsortie?target=s')
+    }
     function removelinebl(event, id) {
           let parentdiv=$(event.target).parent().parent().parent().parent().parent().parent()
           clicksinbl++;
