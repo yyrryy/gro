@@ -698,10 +698,7 @@ def addsupply(request):
         remise2=0 if i['remise2']=='' else int(i['remise2'])
         remise3=0 if i['remise3']=='' else int(i['remise3'])
         remise4=0 if i['remise4']=='' else int(i['remise4'])
-        product.remise1=remise1
-        product.remise2=remise2
-        product.remise3=remise3
-        product.remise4=remise4
+        
         buyprice=0 if i['price']=='' else i['price']
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
@@ -713,6 +710,13 @@ def addsupply(request):
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
+            product.frremise1=remise1
+            product.frremise2=remise2
+            product.frremise3=remise3
+            product.frremise4=remise4
+            product.frbuyprice=buyprice
+            product.frnetbuyprice=netprice
+            product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
         else:
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
@@ -721,14 +725,14 @@ def addsupply(request):
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
-        
-        product.buyprice=buyprice
-        product.netbuyprice=netprice
-        # recodrd remise 1, 2, 3, 4
-        if target=='f':
-            product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
-        else:
+            product.remise1=remise1
+            product.remise2=remise2
+            product.remise3=remise3
+            product.remise4=remise4
+            product.buyprice=buyprice
+            product.netbuyprice=netprice
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+        # recodrd remise 1, 2, 3, 4
         
         #product.isnew=True
         print('creating', product.ref)

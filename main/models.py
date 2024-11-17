@@ -68,6 +68,13 @@ class Produit(models.Model):
     remise3= models.FloatField(default=None, null=True, blank=True)
     remise4= models.FloatField(default=None, null=True, blank=True)
     netbuyprice= models.FloatField(default=None, null=True, blank=True)
+
+    frbuyprice= models.FloatField(default=None, null=True, blank=True)
+    frremise1= models.FloatField(default=None, null=True, blank=True)
+    frremise2= models.FloatField(default=None, null=True, blank=True)
+    frremise3= models.FloatField(default=None, null=True, blank=True)
+    frremise4= models.FloatField(default=None, null=True, blank=True)
+    frnetbuyprice= models.FloatField(default=None, null=True, blank=True)
     supplier=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='supplier')
     sellprice=models.FloatField(default=None, null=True, blank=True)
     sellpricebrut=models.FloatField(default=None, null=True, blank=True)
@@ -791,6 +798,7 @@ class DeviItme(models.Model):
         return f'{self.devi.bon_no} - {self.product.ref}'
 
 class Bonsortie(models.Model):
+    paidamount=models.FloatField(default=0.00)
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     bonlivraison=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='blofbon')
     devi=models.ForeignKey(Devi, on_delete=models.SET_NULL, default=None, null=True, blank=True)

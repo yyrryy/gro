@@ -105,12 +105,14 @@ def addbonsortie(request):
     # orderno
     #transport=request.POST.get('transport')
     note=request.POST.get('note')
+    payment=request.POST.get('payment')
+    print('>>>>>>', products, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
     client=Client.objects.get(pk=clientid)
-    # client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
-    # client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
-    # client.save()
+    client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
+    client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
+    client.save()
     if orderid is not None:
         cmnd=Order.objects.get(pk=orderid)
         cmnd.isdelivered=True
@@ -134,7 +136,8 @@ def addbonsortie(request):
         date=datebon,
         bon_no=receipt_no,
         note=note,
-        user=request.user
+        user=request.user,
+        paidamount=payment
     )
     print('>>>>>>', len(json.loads(products))>0)
     if len(json.loads(products))>0:
@@ -163,6 +166,16 @@ def addbonsortie(request):
                 else:
                     product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
                 product.save()
+
+    if float(payment)>0:
+        PaymentClientbl.objects.create(
+            client_id=clientid,
+            amount=payment,
+            date=date.today(),
+            mode='espece',
+            npiece=f'Paiement de bon de sortie {order.bon_no}'
+        )
+    
 
     # increment it
     return JsonResponse({
@@ -494,3 +507,12 @@ def bonsortiedetails(request, id):
 
 
 
+def checkplafon(request):
+    clientid=request.GET.get('clientid')
+    client=Client.objects.get(pk=clientid)
+    plafon=client.plafon
+    soldtotal=client.soldtotal
+    return JsonResponse({
+        'plafon':plafon,
+        'soldtotal':soldtotal
+    })

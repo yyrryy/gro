@@ -32,10 +32,10 @@
 
   <div class="bonsortieparentdiv">
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
-            <div class="col-5">
+            <div class="col-5 row">
                 <div class="mb-2 clientselectblholder">
-                    <div class="alert alert-danger p-2 d-none oldbonswarning">
-                      CLIENT ANCIEN BONS/FACTURE
+                    <div class="alert alert-danger p-2 oldbonswarning d-none">
+                      
                     </div>
                     <small>Clients:
                     </small>
@@ -47,7 +47,7 @@
                         <option value="{{i.id}}">{{i.name}} | {{i.code}} | {{i.city}} | {{i.region}} | {{i.represent}} </option>
                         {% endfor %} -->
                     </select>
-                </div>
+                  </div>
                 <!-- <div class="mb-2 cerpselectholder">
                     <small>Representant:</small> <strong class="text-danger repblname"></strong>
                     <select name="representant" id="" style="width:100%;" class="select2 repsselectsbl form-select notemptylivraison">
@@ -57,13 +57,13 @@
                         {% endfor %}
                     </select>
                 </div> -->
-                <div class="mb-2">
+                <div class="mb-2 col-4">
                     <input type="date" class="form-control datebonbl" name="datebon" placeholder="Date bon">
                 </div>
-                <div class="mb-2">
+                <div class="mb-2 col-4">
                   <input placeholder="transport" type="text" class="form-control transport" name="transport">
                 </div>
-                <div class="mb-2">
+                <div class="mb-2 col-4">
                     <input type="text" class="form-control note" name="note" placeholder="Note">
                 </div>
             </div>
@@ -83,8 +83,9 @@
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Prix" name="addprice">
                 <div class="addclientprice text-danger"></div>
+                <div class="addbuyprice text-danger"></div>
               </div>
-              <div class="col-3" hidden>
+              <div class="col-3">
                 <input type="number" class="form-control" placeholder="Remise" name="addremise">
               </div>
               <div class="col-3">
@@ -103,8 +104,8 @@
 
           </div>
 
-      <div>
-          <div class="bg-white rounded shadow p-2 tableholder">
+      <div class="d-flex">
+          <div class="bg-white rounded p-2 tableholder col-10">
               <!-- <div>
                   <small>
                       Ref.
@@ -159,10 +160,32 @@
                 <button class="btn btn-success submitbonsortie" style="border-radius: 10px;">
                       Valider
                 </button>
-                <b class="totalbon text-danger totalbonsortie">
-                  0.00
-                </b>
+                <div>
+                  <b class="totalbon text-danger totalbonsortie">
+                    0.00
+                  </b>
+
+                </div>
+
             </div>
+          </div>
+          <div class="col-2">
+            <!-- <strong>Payment</strong> -->
+            <!-- bordered box with title peyment, it will have input for the given amount and a div ta calculate the remaining amount -->
+            <div class="bg-white rounded p-2">
+              <div class="">
+                <div>
+                  <strong>Payment Espece</strong>
+                </div>
+              </div>
+              <div class="">
+                <div>
+                  <input type="number" class="form-control payment" placeholder="Payment" value="0.00">
+                </div>
+                
+              </div>
+
+
           </div>
       </div>
 
@@ -497,12 +520,14 @@
       parentdiv=$(this).parent().parent().parent()
       parentdiv.find('.productsholder').removeClass('d-none')
         console.log('check for old unpaid bons')
-        $.get('products/checkplafon', {"clientid":$(this).val()}, (data)=>{
-          if (data.exist){
-          $('.oldbonswarning').removeClass('d-none')
-          }else{
-            $('.oldbonswarning').addClass('d-none')
-          }
+        // will check plafon and sold
+        $.get('/products/checkplafon', {"clientid":$(this).val()}, (data)=>{
+          // if (data.exist){
+          // $('.oldbonswarning').removeClass('d-none')
+          // }else{
+          //   $('.oldbonswarning').addClass('d-none')
+          // }
+          $('.oldbonswarning').removeClass('d-none').text('Sold: '+data.soldtotal.toFixed(2)+' HD')
         })
         $('#productsselect2').select2({
 
@@ -765,11 +790,11 @@
           let datebon = parentdiv.find('.datebonbl').val()
           let transport = parentdiv.find('.transport').val()
           let note = parentdiv.find('.note').val()
+          let payment = parentdiv.find('.payment').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          localStorage.setItem('pdctsinbonsortie', '[]')
           // data={
           //     'totalbon': totalbon,
           //     'clientid': clientid,
@@ -781,7 +806,7 @@
           //     'csrfmiddlewaretoken': '{{csrf_token}}'
           // },
           // console.log(data)
-          console.log(products)
+          console.log(payment)
           $.ajax({
               url: "{% url 'products:addbonsortie' %}",
               type: 'POST',
@@ -792,6 +817,7 @@
                   'transport':transport,
                   'datebon': datebon,
                   'note': note,
+                  'payment': payment,
                   'products': JSON.stringify(products),
                   'csrfmiddlewaretoken': '{{csrf_token}}'
               },
@@ -800,7 +826,7 @@
                   // remove list in localstorage
                   localStorage.removeItem('pdctsinbonsortie')
                   localStorage.removeItem('bonsortie')
-                  deletetab('addbonsortie')
+                  localStorage.removeItem('totalbonsortie')
                   ajaxpage('addlistbonsortie', 'list bl', '/products/listbonsortie')
 
 
