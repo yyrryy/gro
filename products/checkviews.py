@@ -516,3 +516,57 @@ def checkplafon(request):
         'plafon':plafon,
         'soldtotal':soldtotal
     })
+
+def getclientpricesortie(request):
+    pdctid=request.POST.get('id')
+    clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
+    term=request.POST.get('term')
+    product=Produit.objects.get(pk=pdctid)
+    price=0
+    remise=0
+    buyprice=product.frbuyprice if 'fr' in term else product.buyprice
+    remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
+    try:
+            clientprice=Sortieitem.objects.filter(client_id=clientid, product_id=pdctid).last()
+            price=clientprice.price
+            remise=clientprice.remise
+            return JsonResponse({
+                'price':price,
+                'remise':remise,
+                'buyprice':buyprice,
+                'remisebuyprice':remisebuyprice
+            })
+    except:
+        return JsonResponse({
+            'price':0,
+            'remise':0,
+            'buyprice':buyprice,
+            'remisebuyprice':remisebuyprice
+        })
+    #if target=='bl':
+    #    try:
+    #        clientprice=Livraisonitem.objects.filter(client_id=clientid, product_id=id).last()
+    #        price=clientprice.price
+    #        remise=clientprice.remise
+    #        return JsonResponse({
+    #            'price':price,
+    #            'remise':remise
+    #        })
+    #    except:
+    #        return JsonResponse({
+    #            'price':0
+    #        })
+    #else:
+    #    try:
+    #        clientprice=Outfacture.objects.filter(client_id=clientid, product_id=id).last()
+    #        price=clientprice.price
+    #        remise=clientprice.remise
+    #        return JsonResponse({
+    #            'price':price,
+    #            'remise':remise
+    #        })
+    #    except:
+    #        return JsonResponse({
+    #            'price':0
+    #        })

@@ -713,17 +713,19 @@
           // we are getting ere list of reps that have price
           
           $.ajax({
-              url: "{% url 'products:getclientprice' %}",
+              url: "{% url 'products:getclientpricesortie' %}",
               type: 'POST',
               data: {
                   'target':'bl',
                   'id': id,
                   'clientid': $('.clientselectbl').val(),
-                  'csrfmiddlewaretoken': '{{csrf_token}}'
+                  'csrfmiddlewaretoken': '{{csrf_token}}',
+                  // term to use it in case it has fr- to get buyprice
+                  'term':term
               },
               success: function(data){
-                console.log(data.price)
-                parentdiv.find('.addclientprice').text((data.price).toFixed(2))
+                console.log(data)
+                parentdiv.find('.addclientprice').html((`Client D.p: ${data.price} (${data.remise}%) <br> pr. achat: ${data.buyprice} (${data.remisebuyprice}%)`))
               }
             })
 

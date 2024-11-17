@@ -1373,17 +1373,28 @@ def getclientprice(request):
     pdctid=request.POST.get('id')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
+    term=request.POST.get('term')
+    product=Produit.objects.get(pk=pdctid)
+    price=0
+    remise=0
+    buyprice=product.frbuyprice if 'fr' in term else product.buyprice
+    remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
     try:
             clientprice=Livraisonitem.objects.filter(bon__client_id=clientid, product_id=pdctid).last()
             price=clientprice.price
             remise=clientprice.remise
             return JsonResponse({
                 'price':price,
-                'remise':remise
+                'remise':remise,
+                'buyprice':buyprice,
+                'remisebuyprice':remisebuyprice
             })
     except:
         return JsonResponse({
-            'price':0
+            'price':0,
+            'remise':0,
+            'buyprice':buyprice,
+            'remisebuyprice':remisebuyprice
         })
     #if target=='bl':
     #    try:
