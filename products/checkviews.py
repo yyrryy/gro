@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, Sortieitem, Bonlivraison
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, DeviItem, Sortieitem, Devi, Bonlivraison
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
 from datetime import datetime, date, timedelta
@@ -339,8 +339,6 @@ def validatebonsortie(request):
             receipt_no = f"{prefix}{year}000000001"
         
         bon_data = {
-            'client': bon.client,
-            
             'total': total,
             'date': timezone.now(),
             'bon_no': receipt_no,
@@ -349,8 +347,10 @@ def validatebonsortie(request):
         
         if is_farah:
             bon_data['isfarah'] = True
+            bon_data['client'] = Client.objects.get(code='CF-1')
         else:
             bon_data['isorgh'] = True
+            bon_data['client'] = Client.objects.get(code='CO-1')
         
         new_bon = Bonlivraison.objects.create(**bon_data)
         
@@ -603,6 +603,107 @@ def addcategory(request):
         'success':True,
         'id':m.id,
         'name':name
+    })
+
+def listdevi(request):
+    target=request.GET.get('target')
+    if target=='f':
+        bons=Devi.objects.filter(isfarah=True).order_by('-bon_no')[:50]
+    else:
+        bons=Devi.objects.filter(isorgh=True).order_by('-bon_no')[:50]
+    ctx={
+        'title':'Devi',
+        'bons':Devi.objects.all().order_by('-bon_no')[:50],
+        'target':target
+    }
+    return render(request, 'listdevi.html', ctx)
+def bondevi(request):
+    target=request.GET.get('target')
+    
+    ctx={
+        'title':'Bon de Devi',
+        'target':target
+    }
+    return render(request, 'bondevi.html', ctx)
+
+def createdevi(request):
+    target=request.GET.get('target')
+    isfarah=False
+    isorgh=False
+    if target=='f':
+        isfarah=True
+        year = timezone.now().strftime("%y")
+        latest_receipt = Devi.objects.filter(
+            bon_no__startswith=f'FR-DV{year}'
+        ).last()
+        # latest_receipt = Devi.objects.filter(
+        #     bon_no__startswith=f'FR-DV{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"FR-DV{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-DV{year}000000001"
+    else:
+        isorgh=True
+        year = timezone.now().strftime("%y")
+        latest_receipt = Devi.objects.filter(
+            bon_no__startswith=f'DV{year}'
+        ).last()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"DV{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"DV{year}000000001"
+    clientid=request.POST.get('clientid')
+    products=request.POST.get('products')
+    totalbon=request.POST.get('totalbon')
+    orderid=request.POST.get('orderid', None)
+    # orderno
+    transport=request.POST.get('transport')
+    note=request.POST.get('note')
+    datebon=request.POST.get('datebon')
+    datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
+    
+    # if orderid is not None:
+    #     cmnd=Order.objects.get(pk=orderid)
+    #     cmnd.isdelivered=True
+    #     cmnd.save()
+    # get the last bon no
+    
+    order=Devi.objects.create(
+        client_id=clientid,
+        total=totalbon,
+        date=datebon,
+        bon_no=receipt_no,
+        note=note,
+        isfarah=isfarah,
+        isorgh=isorgh
+    )
+    # if len(json.loads(products))>0:
+    with transaction.atomic():
+        for i in json.loads(products):
+            product=Produit.objects.get(pk=i['productid'])
+            
+            DeviItem.objects.create(
+                devi=order,
+                remise=i['remise'],
+                name=i['name'],
+                ref=i['ref'],
+                product=product,
+                qty=i['qty'],
+                price=i['price'],
+                total=i['total'],
+                client_id=clientid,
+                date=datebon,
+                isfarah=isfarah,
+                isorgh=isorgh
+            )
+
+
+    # increment it
+    return JsonResponse({
+        "success":True
     })
 
 

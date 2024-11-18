@@ -2072,9 +2072,9 @@ def listreglementbl(request):
     if target=="f":
         reglements=PaymentClientbl.objects.filter(client__clientfarah=True).order_by('-id')[:50]
     elif target=="o":
-        reglements=PaymentClientbl.objects.filter(client__clientorgh=False).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(client__clientorgh=True).order_by('-id')[:50]
     else:
-        reglements=PaymentClientbl.objects.all().order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(client__clientsortie=True).order_by('-id')[:50]
     print('lenreg', len(reglements))
     ctx={
         'title':'List des reglements CL BL',
@@ -2120,9 +2120,14 @@ def listreglementfc(request):
 
 def getclientbons(request):
     clientid=request.POST.get('clientid')
-    print('>>>', clientid)
-    bons=Bonlivraison.objects.filter(client_id=clientid).order_by('date')[:50]
-    total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    target=request.POST.get('target')
+    print('>> target', target)
+    if target=='s':
+        bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
+        total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    else:
+        bons=Bonlivraison.objects.filter(client_id=clientid).order_by('date')[:50]
+        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
         # old code, if reglement is paid it's checked from here
@@ -3717,7 +3722,7 @@ def searchclient(request):
                 Q(city__icontains=term) |
                 Q(address__icontains=term))
     filter_params = {'clientsortie': True} if target == 's' else {'clientfarah': True} if target == 'f' else {'clientorgh': True}
-
+    print('target >>', target)
     # Perform the query with the combined Q object and conditional filter parameters
     clients = Client.objects.filter(q_objects, **filter_params)
 

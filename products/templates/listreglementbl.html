@@ -48,7 +48,7 @@
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistreglementbl')">x</button>
     <div>
-      {{title}}
+      {{title}} {{target}}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistreglementbl', '/products/listreglementbl')">↻</button>
   </div>
@@ -785,7 +785,7 @@
         console.log(clientid)
         $.post(
             'products/getclientbons',
-            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}'},
 
             (data)=>{
                 $('.reglementclientbonholder').html(data.trs)
@@ -1062,6 +1062,7 @@
         $('.loadingscreen').removeClass('d-none')
         $.post('/products/getclientbons', {
             clientid:clientid,
+            target:'{{target}}',
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
                 console.log(data)

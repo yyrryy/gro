@@ -421,6 +421,7 @@ class Notesrepresentant(models.Model):
 
 
 
+
 class PaymentClientbl(models.Model):
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
     date = models.DateTimeField(default=None)
@@ -428,6 +429,7 @@ class PaymentClientbl(models.Model):
     mode=models.CharField(max_length=10, default=None)
     amountofeachbon=models.CharField(max_length=100000, default=None, null=True, blank=True)
     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name="reglements")
+    bonsortie=models.ManyToManyField('Bonsortie', default=None, blank=True, related_name="reglementsortie")
     # mode: 0 bl, 1 facture
     echance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
@@ -777,8 +779,11 @@ class Devi(models.Model):
     amountpaid=models.FloatField(default=0.00)
     rest=models.FloatField(default=0.00)
     bon_no=models.CharField(max_length=50, null=True, default=None)
+    note=models.CharField(max_length=5500, null=True, default=None)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
 
-class DeviItme(models.Model):
+class DeviItem(models.Model):
     devi=models.ForeignKey(Devi, on_delete=models.CASCADE, default=None)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
     remise=models.CharField(max_length=100, null=True, default=None)
