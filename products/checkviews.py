@@ -575,3 +575,34 @@ def getclientpricesortie(request):
     #        return JsonResponse({
     #            'price':0
     #        })
+
+def addmark(request):
+    name=request.POST.get('marque')
+    if Mark.objects.filter(name=name).exists():
+        return JsonResponse({
+            'exist':True,
+            'error':'deja exist'
+        })
+    m=Mark.objects.create(name=name)
+    return JsonResponse({
+        'success':True,
+        'id':m.id,
+        'name':name
+    })
+
+
+def addcategory(request):
+    name=request.POST.get('category')
+    if Category.objects.filter(name=name).exists():
+        return JsonResponse({
+            'exist':True,
+            'error':'deja exist'
+        })
+    m=Category.objects.create(name=name)
+    return JsonResponse({
+        'success':True,
+        'id':m.id,
+        'name':name
+    })
+
+

@@ -26,7 +26,7 @@
                 <input type="number" class="form-control" name="minstockinadd" required>
             </div>
             <div class="col-3">
-                <small>Categorie</small> <br>
+                <small>Categorie</small><br>
                 <select name="categoryinadd" class="form-select select" style="width: 100%;" required>
                     {% for i in categories %}
                     <option value="{{i.id}}">
@@ -70,11 +70,83 @@
             + Ajouter
         </button>
     </form>
+    <hr class="mt-5">
+    <!-- add category -->
+    <div class="row">
+        <div class="col-6">
+            <strong>Ajouter une category</strong>
+            <div class=" d-flex">
+                <input type="text" class="form-control" placeholder="Category">
+                <button class="btn btn-success" onclick="addcategory(event)">+</button>
+                
+            </div>
+        </div>
+        
+        <div class="col-6">
+            <strong>Ajouter une marque</strong>
+            <div class=" d-flex">
+                <input type="text" class="form-control" placeholder="Marque">
+                <button class="btn btn-success" onclick="addmark(event)">+</button>
+                
+            </div>
+        </div>
+
+    </div>
 </div>
 
 {% block js %}
 <script>
-    
+    function addmark(event){
+        event.preventDefault()
+        var marque = $(event.target).prev().val()
+        if (marque==''){
+            alertify.error('Veuillez remplir le champ')
+            return
+        }
+        $.ajax({
+            url: '{% url "products:addmark" %}',
+            type: 'POST',
+            data: {
+                'marque': marque,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+            success: function(data){
+                if (data.success){
+                    alertify.success('Marque ajoutée avec success')
+                    $('[name="marqueinadd"]').append(`<option value="${data.id}">${marque}</option>`)
+                    $(event.target).prev().val('')
+                }else{
+                    alertify.error(data.error)
+                }
+            }
+        })
+    }
+    function addcategory(event){
+        event.preventDefault()
+        var category = $(event.target).prev().val()
+        if (category==''){
+            alertify.error('Veuillez remplir le champ')
+            return
+        }
+        $.ajax({
+            url: '{% url "products:addcategory" %}',
+            type: 'POST',
+            data: {
+                'category': category,
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+            },
+            success: function(data){
+                console.log(data)
+                if (data.success){
+                    alertify.success('Categorie ajoutée avec success')
+                    $('[name="categoryinadd"]').append(`<option value="${data.id}">${category}</option>`)
+                    $(event.target).prev().val('')
+                }else{
+                    alertify.error(data.error)
+                }
+            }
+        })
+    }
     $('.submitbtn').on('click', function(e) {
         e.preventDefault();
         if ($('[name="refinadd"]').val()=='' || $('[name="nameinadd"]').val()=='' || $('[name="marqueinadd"]').val()=='' || $('[name="categoryinadd"]').val()==''){
