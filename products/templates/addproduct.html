@@ -74,9 +74,7 @@
 
 {% block js %}
 <script>
-    $(function(){
-     $('.select').select2()
-    })
+    
     $('.submitbtn').on('click', function(e) {
         e.preventDefault();
         if ($('[name="refinadd"]').val()=='' || $('[name="nameinadd"]').val()=='' || $('[name="marqueinadd"]').val()=='' || $('[name="categoryinadd"]').val()==''){
@@ -99,9 +97,10 @@
                 if (data.success) {
                     
                     alertify.success('Produit ajouté avec success');
-                    
+                    // resetform
+                    $('.addoneproductform').trigger('reset');
                     //ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
-                    ajaxpage('add', '+ Article', '/products/addproductspage?target={{target}}')
+                    //ajaxpage('add', '+ Article', '/products/addproductspage?target={{target}}')
                     
                 } else {
                     alertify.error(data.error);

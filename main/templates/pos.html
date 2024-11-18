@@ -6,6 +6,17 @@
   <!-- tabs s -->
   <div class="px-2 d-flex justify-content-between border-bottom align-items-center">
     <button class="btn border">Clients</button>
+    <div class="dropdown show">
+      <a class="btn border dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        + Ajouter
+      </a>
+
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a class="dropdown-item" onclick="addscreen('/products/addproductspage')">Produit</a>
+        <a class="dropdown-item" href="#">Client</a>
+        <a class="dropdown-item" href="#">Fournisseur</a>
+      </div>
+    </div>
     <h1 class="text-center">
       POS
     </h1>
@@ -103,7 +114,7 @@
     </div>
   
   </div>
-  <div id="maintab" class="w-100">
+  <div id="maintab" class="w-100" style="height: 90vh; overflow-y: scroll;">
     
   
   </div>

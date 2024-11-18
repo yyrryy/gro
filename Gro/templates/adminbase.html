@@ -819,7 +819,13 @@ a .uil {
 </head>
 
 <body>
+  <div class="w-70 shadow position-fixed bg-white border p-2 addscreen d-none" style="top: 0; right: 0; z-index: 9999; height: 100vh; overflow-y: scroll;">
+    <button class="btn btn-danger" onclick="$('.addscreen').addClass('d-none')">X</button>
+    <div class="addscreenhtml">
 
+    </div>
+
+  </div>
     <!-- mobile header -->
 
     <!-- site -->
@@ -980,6 +986,12 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function addscreen(url){
+        $('.addscreen').removeClass('d-none')
+        $.get(url, (data)=>{
+          $('.addscreenhtml').html(data)
+        })
+      }
       function getitemsforlistbl(event){
     let term=$('.searchitemsforlistbl').val()
     if (term.length>=2){

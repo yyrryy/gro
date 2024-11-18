@@ -484,6 +484,7 @@ def updateproduct(request):
     # product.representremise=request.POST.get('updaterepremise') or 0
     product.sellprice=sellprice
     product.remise=remise
+    product.farahref='fr-'+ref
     product.prixnet=netprice
     product.name=request.POST.get('name')
     product.cars=json.dumps(request.POST.getlist('cars'))
