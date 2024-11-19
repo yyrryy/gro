@@ -29,7 +29,7 @@
   </div>
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
 </div> -->
-  <div class="bonlivraisonparentdiv">
+  <div class="bondeviparentdiv">
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
             <div class="col-5">
                 <div class="mb-2 clientselectblholder">
@@ -70,7 +70,7 @@
             <div class="col-7 row productsholder d-none">
               <div class="col-12">
 
-                <select class="resultsholderbonlivraison mb-2 form-select " style="width: 100%;" id="productsselect2">
+                <select class="resultsholderbondevi mb-2 form-select " style="width: 100%;" id="productsselect2">
 
                 </select>
               </div>
@@ -87,7 +87,7 @@
                 <input type="number" class="form-control" placeholder="Remise" name="addremise">
               </div>
               <div class="col-3">
-                <button class="btn" onclick="addrowbonlivraison(event)" style="border: 4px solid;
+                <button class="btn" onclick="addrowbondevi(event)" style="border: 4px solid;
                 border-color: var(--darkblue);
                 border-radius: 10px;
                 height: 36px;
@@ -118,9 +118,9 @@
 
             </div>
             <div class="col-5">
-              <input type="text" class="searchbonlivraisoncreation" placeholder="Search..." />
+              <input type="text" class="searchbondevicreation" placeholder="Search..." />
             </div>
-            <table class="table table-bordered text-center bonlivraisoncreation">
+            <table class="table table-bordered text-center bondevicreation">
               <thead style="background: orange; color:#091b27;">
                   <tr>
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">REF</td>
@@ -150,15 +150,15 @@
                   </td>
                 </tr>
               </tfoot> -->
-              <tbody class="bonlivraisonbody">
+              <tbody class="bondevibody">
 
               </tbody>
             </table>
             <div class="d-flex justify-content-between bg-white" style="position: sticky; bottom: 0;">
-                <button class="btn btn-success submitbonlivraison" style="border-radius: 10px;">
+                <button class="btn btn-success submitbondevi" style="border-radius: 10px;">
                       Valider
                 </button>
-                <b class="totalbon text-danger totalbonlivraison">
+                <b class="totalbon text-danger totalbondevi">
                   0.00
                 </b>
             </div>
@@ -227,17 +227,17 @@
                 $(event.target).parent().remove()
                 // remove id from localstorage
 
-                pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison'))
+                pdcts=JSON.parse(localStorage.getItem('pdctsinbondevi'))
                 pdcts.splice(pdcts.indexOf(id.toString()), 1)
-                localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+                localStorage.setItem('pdctsinbondevi', JSON.stringify(pdcts))
                 // update total
-                let totalbon = parseFloat(parentdiv.find('.totalbonlivraison').text())
+                let totalbon = parseFloat(parentdiv.find('.totalbondevi').text())
                 let totalrow = parseFloat($(event.target).parent().find('.total').text())
                 let totalbonvalue = (totalbon-totalrow).toFixed(2)
-                parentdiv.find('.totalbonlivraison').html(totalbonvalue)
+                parentdiv.find('.totalbondevi').html(totalbonvalue)
                 // Reset the count
                 clicksinbl = 0;
-                removeinlocalstorage('bonlivraison', id)
+                removeinlocalstorage('bondevi', id)
 
               }
                 , function(){ alertify.error('Cancel')});
@@ -246,14 +246,14 @@
           }
       }
 
-  function addrowbonlivraison(event){
+  function addrowbondevi(event){
         let target=$(event.target)
         parentdiv=target.parent().parent().parent().parent()
         console.log(parentdiv)
         // this reset the select2 value
-        // $('.resultsholderbonlivraison').val('').trigger('change')
+        // $('.resultsholderbondevi').val('').trigger('change')
         // ids of products in bon stored in localstorage
-        let bonachatbody = parentdiv.find('.bonlivraisonbody')
+        let bonachatbody = parentdiv.find('.bondevibody')
         let addname=parentdiv.find('[name="addname"]')
         let addqty=parentdiv.find('[name="addqty"]')
         let addprice=parentdiv.find('[name="addprice"]')
@@ -265,7 +265,7 @@
         }
         var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
         console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
-        pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison')) || []
+        pdcts=JSON.parse(localStorage.getItem('pdctsinbondevi')) || []
         console.log(id, pdcts, pdcts.includes(id))
         if (pdcts.includes(id)){
           parentdiv.find('.addstock').val('')
@@ -275,7 +275,7 @@
           addremise.val('')
           addprice.val('')
           alertify.error('Ce produit est deja dans le bon')
-          $('.resultsholderbonlivraison').select2('open')
+          $('.resultsholderbondevi').select2('open')
 
           return
         }
@@ -300,11 +300,11 @@
               addremise.val('')
               addprice.val('')
               alertify.error('Ce produit est deja dans le bon')
-              $('.resultsholderbonlivraison').select2('open')
+              $('.resultsholderbondevi').select2('open')
               return
             }
             pdcts.push(id)
-            localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+            localStorage.setItem('pdctsinbondevi', JSON.stringify(pdcts))
             afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
             let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
             console.log(net)
@@ -316,9 +316,9 @@
                 <td style="paddingpx 0; font-size: 13px;" class="dp">${dp}</td>
                 <td style="padding: 2px 0; font-size: 13px;" class="stock">${stock}</td>
                 <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
-                <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
-                <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
-                <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="remise" style="height:23px; width:100%;"></td>
+                <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
+                <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
+                <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="remise" style="height:23px; width:100%;"></td>
                 <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
                 <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
                 <input type="hidden" name="productid" value="${id}">
@@ -354,12 +354,12 @@
             });
             
             console.log('saving items')
-            savetolocalstorage(item, totalSum, 'bonlivraison')
+            savetolocalstorage(item, totalSum, 'bondevi')
             parentdiv.find('.totalbon').text(totalSum.toFixed(2))
-            parentdiv.find('.resultsholderbonlivraison').select2('open')
+            parentdiv.find('.resultsholderbondevi').select2('open')
           }, function(){
             alertify.error('Cancel')
-            parentdiv.find('.resultsholderbonlivraison').select2('open')
+            parentdiv.find('.resultsholderbondevi').select2('open')
 
           }
           );
@@ -367,7 +367,7 @@
         }
 
         pdcts.push(id)
-        localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+        localStorage.setItem('pdctsinbondevi', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
         console.log(afterremise)
         let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
@@ -380,9 +380,9 @@
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="stock">${stock}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="remise" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
@@ -417,12 +417,12 @@
             totalSum += parseFloat($(this).text());
         });
         
-        savetolocalstorage(item, totalSum, 'bonlivraison')
+        savetolocalstorage(item, totalSum, 'bondevi')
         totalbon.text(totalSum.toFixed(2))
-        // $('.resultsholderbonlivraison').val('').trigger('change')
-        $('.resultsholderbonlivraison').select2('open')
+        // $('.resultsholderbondevi').val('').trigger('change')
+        $('.resultsholderbondevi').select2('open')
 
-        // let selected = $('.resultsholderbonlivraison').find(':selected')
+        // let selected = $('.resultsholderbondevi').find(':selected')
         // selected.remove()
 
       }
@@ -594,15 +594,15 @@
       //}end else
 
     })
-    //localStorage.removeItem('pdctsinbonlivraison')
-    //localStorage.setItem('pdctsinbonlivraison', '[]')
+    //localStorage.removeItem('pdctsinbondevi')
+    //localStorage.setItem('pdctsinbondevi', '[]')
 
     $(document).ready(function(){
       $('.clientselectbl').select2('open')
       // get products from localstorage
-      pdcts=JSON.parse(localStorage.getItem('bonlivraison')) || []
-      total=localStorage.getItem('totalbonlivraison') || 0
-      parentdiv=$('.bonlivraisonbody')
+      pdcts=JSON.parse(localStorage.getItem('bondevi')) || []
+      total=localStorage.getItem('totalbondevi') || 0
+      parentdiv=$('.bondevibody')
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
         let tr = `
@@ -612,9 +612,9 @@
             <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="stock">${item.stock}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="remise" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${item.id})" name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${item.id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${item.netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
             <input type="hidden" name="productid" value="${item.id}">
@@ -646,7 +646,7 @@
         dateInput.value = currentDate;
 
 
-      $('.resultsholderbonlivraison').on('change', function(){
+      $('.resultsholderbondevi').on('change', function(){
           console.log($(this).val())
           parentdiv=$(this).parent().parent()
           if ($(this).val()==''){
@@ -720,7 +720,7 @@
           // delect selected option
       })
 
-      $('.submitbonlivraison').on('click', (e)=>{
+      $('.submitbondevi').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
         if (parentdiv.find('.clientselectbl').val()==null ||parentdiv.find('.clientselectbl').val()=='' || parentdiv.find('.datebonbl').val()=='' ){
             parentdiv.find('.data').addClass('border border-danger')
@@ -747,8 +747,8 @@
                 return
             }
 
-          parentdiv.find('.submitbonlivraison').addClass('disabled')
-          trs=parentdiv.find('.bonlivraisonbody tr')
+          parentdiv.find('.submitbondevi').addClass('disabled')
+          trs=parentdiv.find('.bondevibody tr')
           let products = []
           trs.each(function(){
               let tr = $(this)
@@ -781,7 +781,7 @@
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          localStorage.setItem('pdctsinbonlivraison', '[]')
+          localStorage.setItem('pdctsinbondevi', '[]')
           data={
               'totalbon': totalbon,
               'clientid': clientid,
@@ -811,19 +811,19 @@
               success: function(data){
                 console.log('sent')
                   // remove list in localstorage
-                  localStorage.removeItem('pdctsinbonlivraison')
-                  localStorage.removeItem('bonlivraison')
-                  deletetab('addbonlivraison')
-                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison')
+                  localStorage.removeItem('pdctsinbondevi')
+                  localStorage.removeItem('bondevi')
+                  deletetab('addbondevi')
+                  ajaxpage('addlistbondevi', 'list bl', '/products/listdevi?target=f')
 
 
               }
           })
 
         })
-      $('.searchbonlivraisoncreation').on("keyup", function() {
+      $('.searchbondevicreation').on("keyup", function() {
     var value = $(this).val().toLowerCase();
-    $(".bonlivraisoncreation tbody tr").filter(function() {
+    $(".bondevicreation tbody tr").filter(function() {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
@@ -849,9 +849,9 @@
       //                     <option value="depot">Depot</option>
       //                 </select>
       //             </td>
-      //             <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="qty"></td>
-      //             <td><input type="number" class="form-control calculate price" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="price"></td>
-      //             <td><input type="number" class="form-control calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="remise"></td>
+      //             <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="qty"></td>
+      //             <td><input type="number" class="form-control calculate price" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="price"></td>
+      //             <td><input type="number" class="form-control calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="remise"></td>
       //             <td class="total"></td>
       //             <input type="hidden" name="productid" value="${id}">
       //             <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
@@ -875,8 +875,8 @@
       //         <td>${name}</td>
       //         <td>${stock}</td>
 
-      //         <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="qty"></td>
-      //         <td><input type="number" class="form-control calculate price" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${id})" name="price"></td>
+      //         <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="qty"></td>
+      //         <td><input type="number" class="form-control calculate price" onkeyup="calculate(event); updateinlocalstorage(event, 'bondevi', ${id})" name="price"></td>
       //         <td class="total"></td>
       //         <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
       //     </tr>

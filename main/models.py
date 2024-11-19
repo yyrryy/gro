@@ -782,6 +782,10 @@ class Devi(models.Model):
     note=models.CharField(max_length=5500, null=True, default=None)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    generatedbl=models.BooleanField(default=False)
+    bl=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    generatedbc=models.BooleanField(default=False)
+    #bc=models.ForeignKey(Boncommande, on_delete=models.SET_NULL, default=None, null=True, blank=True)
 
 class DeviItem(models.Model):
     devi=models.ForeignKey(Devi, on_delete=models.CASCADE, default=None)
