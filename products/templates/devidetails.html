@@ -6,7 +6,7 @@
       Imprimer
     </button>
     {% if not order.generatedbl %}
-    <button class="btn w-100 btn-success mb-2" onclick="devitobl(event, '{{order.id}}')">
+    <button class="btn w-100 btn-success mb-2" onclick="ajaxpage('id', 'title', '/products/devitobl?devid={{order.id}}&&target={{target}}')">
       Generer bon livraison
     </button>
     {% endif %}
@@ -340,6 +340,7 @@
 
 <script>
   function devitobl(event, devid){
+    $(event.target).attr('disabled', true)
     $.get('/products/devitobl', {'devid':devid, 'target':'{{target}}'}, (data)=>{
       ajaxpage('bonl{{order.id}}', 'tt', '/products/devidetails?id={{order.id}}&target={{target}}')
     })

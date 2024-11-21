@@ -726,8 +726,18 @@ def devidetails(request):
 def devitobl(request):
     target=request.GET.get('target')
     devid=request.GET.get('devid')
-    devi=Devi.objects.get(pk=devid)
-    items=DeviItem.objects.filter(devi=devi)
+    order=Devi.objects.get(pk=devid)
+    items=DeviItem.objects.filter(devi=order)
+    client=order.client
+    ctx={
+        'order':order,
+        'items':items,
+        'sold':client.soldtotal,
+        #'receipt_no':receipt_no,
+        #'clients':Client.objects.all(),
+        'today':timezone.now().date()
+    }
+    return render(request, 'genererbonlivraison.html', ctx)
     print('>>> target', target)
     if target=='f':
         year = timezone.now().strftime("%y")
