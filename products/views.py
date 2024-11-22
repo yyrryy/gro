@@ -789,7 +789,9 @@ def addbonlivraison(request):
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
+    print('>>', "clientid", clientid, "repid", repid, "products", products, "totalbon", totalbon, "devid", devid, "comndid", comndid, "transport", transport, "note", note, "datebon", datebon, "target", target)
     client=Client.objects.get(pk=clientid)
+    print('cleint', client, 'soldtotal', client.soldtotal, 'totalbon', totalbon)
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
     client.save()
@@ -834,14 +836,12 @@ def addbonlivraison(request):
         note=note,
         isfarah=True
     )
-    # if comndid is not None:
-    #     cmnd=Commande.objects.get(pk=comndid)
-    #     cmnd.isdelivered=True
-    #     cmnd.save()
-        # cmnd.generatedbl=True
-        # cmnd.bl=order
-        # cmnd.save()
-    if devid is not None:
+    if not comndid == "":
+        cmnd=Command.objects.get(pk=comndid)
+        cmnd.generatedbl=True
+        cmnd.bl=order
+        cmnd.save()
+    if not devid == "":
         cmnd=Devi.objects.get(pk=devid)
         cmnd.generatedbl=True
         cmnd.bl=order
@@ -1200,7 +1200,9 @@ def addclient(request):
             phone=phone,
             phone2=phone2,
             address=address,
-            diver=False
+            diver=False,
+            soldbl=0.00,
+            soldfacture=0.00,
         )
         if target=="s":
             client.clientsortie=True

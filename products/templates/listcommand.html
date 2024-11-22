@@ -128,7 +128,7 @@
       <tbody class="listblbody">
         <!-- {% if order.generated %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%} {% if order.ispaid %} text-danger{% endif %} -->
         {% for order in bons %}
-          <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/commanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
+          <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/boncommanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>
             <td >{{ order.client.name }}</td>

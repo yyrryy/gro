@@ -71,7 +71,7 @@
               {% endif %}
             <div class="mb-2">
               <!-- if devi means we are generatingn devi not command -->
-              <small>Client Bon {%if devi%}Devi{%else%}commande{%endif%}: {{order.client.name}}</small> <br>
+              <small>Client Bon {%if devi%}Devi{%else%}commande{%endif%}: {{order.client.name}}{{command.client.name}}</small> <br>
               <select name="clientsgenlivraison{{order.id}}" id="" style="width:100%;" class="clientsgenlivraison{{order.id}}">
 
               </select>
@@ -95,7 +95,7 @@
                     <input type="text" class="form-control orderno" name="ordernono" value="{{receipt_no}}">
                 </div>-->
                 <input class="devid" type="text" hidden readonly value="{{order.id}}">
-                <input class="cmndid" type="text" hidden readonly value="{{comnd.id}}">
+                <input class="cmndid" type="text" hidden readonly value="{{command.id}}">
                 <div class="mb-2">
                   <small>Transport</small>
                   <input type="text" class="form-control transport" placeholder="Transport">
@@ -220,7 +220,7 @@
                       Valider
                 </button>
                 <b class="totalbon totalgenbl{{order.id}} text-danger">
-                  {{order.total}}
+                  {{order.total}}{{command.total}}
                 </b>
             </div>
           </div>
@@ -577,7 +577,7 @@
               }
               products.push(product)
           })
-          let clientid = parentdiv.find('[name="clientsgenlivraison{{order.id}}"]').val()?parentdiv.find('[name="clientsgenlivraison{{order.id}}"]').val():'{{order.client.id}}'
+          let clientid = parentdiv.find('[name="clientsgenlivraison{{order.id}}"]').val()?parentdiv.find('[name="clientsgenlivraison{{order.id}}"]').val():'{{order.client.id}}{{command.client.id}}'
           let repid = parentdiv.find('[name="repgenlivraison{{order.id}}"]').val()
           let datebon = parentdiv.find('.datebon').val()
           let transport = parentdiv.find('.transport').val()
