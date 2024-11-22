@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, wishlist, Notification, Modifierstock, Cartitems, Notesrepresentant, Achathistory, Excelecheances, Bonsortie
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -592,6 +592,7 @@ def bonlivraison(request):
     # else increment it by one
 
     # increment it
+    target=request.GET.get('target')
     year = timezone.now().strftime("%y")
     latest_receipt = Bonlivraison.objects.filter(
         bon_no__startswith=f'BL{year}'
@@ -606,7 +607,8 @@ def bonlivraison(request):
         'title':'Bon de livraison',
         # 'clients':Client.objects.all(),
         # 'products':Produit.objects.all(),
-        'commercials':Represent.objects.all(),
+        # 'commercials':Represent.objects.all(),
+        'target':target
     })
 
 def facture(request):
@@ -615,11 +617,13 @@ def facture(request):
     # else increment it by one
 
     # increment it
+
     return render(request, 'facture.html', {
         'title':'Facture',
         # 'clients':Client.objects.all(),
         # 'products':Produit.objects.all(),
-        'commercials':Represent.objects.all(),
+        # 'commercials':Represent.objects.all(),
+        'target':request.GET.get('target')
         #'order_no':receipt_no
     })
 
@@ -774,10 +778,12 @@ def addbonlivraison(request):
 
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
     repid=request.POST.get('repid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
-    orderid=request.POST.get('orderid', None)
+    devid=request.POST.get('devid', None)
+    comndid=request.POST.get('cmndid', None)
     # orderno
     transport=request.POST.get('transport')
     note=request.POST.get('note')
@@ -787,49 +793,81 @@ def addbonlivraison(request):
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
     client.save()
-    if orderid is not None:
-        cmnd=Order.objects.get(pk=orderid)
-        cmnd.isdelivered=True
-        cmnd.save()
+    
     # get the last bon no
     year = timezone.now().strftime("%y")
-    latest_receipt = Bonlivraison.objects.filter(
-        bon_no__startswith=f'BL{year}'
-    ).order_by("-bon_no").first()
-    if latest_receipt:
-        latest_receipt_no = int(latest_receipt.bon_no[-5:])
-        receipt_no = f"BL{year}{latest_receipt_no + 1:05}"
+    isfarah=target=='f'
+    print('isfarah, target', isfarah, target)
+    if isfarah:
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'FR-BL{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     bon_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"FR-BL{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-BL{year}000000001"
     else:
-        receipt_no = f"BL{year}00001"
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'BL{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     bon_no__startswith=f'BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"BL{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"BL{year}000000001"
     order=Bonlivraison.objects.create(
-        commande_id=orderid,
+        command_id=comndid,
+        devi_id=devid,
         client_id=clientid,
         salseman_id=repid,
         total=totalbon,
         date=datebon,
         modlvrsn=transport,
         bon_no=receipt_no,
-        note=note
+        note=note,
+        isfarah=True
     )
+    # if comndid is not None:
+    #     cmnd=Commande.objects.get(pk=comndid)
+    #     cmnd.isdelivered=True
+    #     cmnd.save()
+        # cmnd.generatedbl=True
+        # cmnd.bl=order
+        # cmnd.save()
+    if devid is not None:
+        cmnd=Devi.objects.get(pk=devid)
+        cmnd.generatedbl=True
+        cmnd.bl=order
+        cmnd.save()
     print('>>>>>>', len(json.loads(products))>0)
-    if len(json.loads(products))>0:
-        with transaction.atomic():
-            for i in json.loads(products):
-                product=Produit.objects.get(pk=i['productid'])
-                product.stocktotal=int(product.stocktotal)-int(i['qty'])
-                product.save()
-                Livraisonitem.objects.create(
-                    bon=order,
-                    remise=i['remise'],
-                    name=i['name'],
-                    ref=i['ref'],
-                    product=product,
-                    qty=i['qty'],
-                    price=i['price'],
-                    total=i['total'],
-                    client_id=clientid,
-                    date=datebon
-                )
+    with transaction.atomic():
+        for i in json.loads(products):
+            product=Produit.objects.get(pk=i['productid'])
+            if isfarah:
+                product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
+            else:
+                product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
+            product.save()
+            Livraisonitem.objects.create(
+                bon=order,
+                remise=i['remise'],
+                name=i['name'],
+                ref=i['ref'],
+                product=product,
+                qty=i['qty'],
+                price=i['price'],
+                total=i['total'],
+                client_id=clientid,
+                date=datebon,
+                isfarah=isfarah
+            )
 
 
     # increment it
@@ -1571,7 +1609,8 @@ def exportfc(request):
 
 
 def listavoirclient(request):
-    bons= Avoirclient.objects.filter(date__year=thisyear).order_by('-date')
+    isfarah=request.GET.get('target')=='f'
+    bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-date')[:50]
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Avoir Client',
@@ -1593,16 +1632,21 @@ def listavoirsupplier(request):
     return render(request, 'listavoirsupplier.html', ctx)
 
 def listfactures(request):
+    target=request.GET.get('target')
     three_months_ago = timezone.now() - timedelta(days=90)
     depasser = Facture.objects.filter(date__lt=three_months_ago, ispaid=False).count()
     # get only the last 100 orders of the current year
-    bons= Facture.objects.filter(date__year=timezone.now().year).order_by('-facture_no')[:50]
+    if target=='f':
+        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
+    else:
+        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
     ctx={
         'title':'List des factures',
         'bons':bons,
         'reps':Represent.objects.all(),
         'depasserfc':depasser,
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'target':target
     }
     if bons:
         ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)

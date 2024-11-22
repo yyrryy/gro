@@ -6,6 +6,7 @@
     <div class="btn p-2 text-white text-center sectionbtn active position-relative" onclick="getsection(event, 'Farah', '/products/farahhome')">
       F
     </div>
+
     <div class="d-flex">
       <div class="bi bi-box-seam-fill d-flex flex-column btn p-2 text-white sectionbtn position-relative" title="Stock" onclick="getsection(event, 'Farah', '/products/stocksection?target=f')">
         <small>Stock</small>
@@ -29,12 +30,22 @@
         <small>Banque</small>
       </div>
     </div>
+    <div class="dropdown show">
+      <a class="btn border dropdown-toggle bg-white" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      </a>
 
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        <a class="dropdown-item" href="#" onclick="addscreen('/products/addproductspage?target=f')">Produit</a>
+        <a class="dropdown-item" href="#" onclick="addscreen('/products/bondevi?target=f')">Bon Livraison</a>
+        <a class="dropdown-item" href="#">Devi</a>
+      </div>
+    </div>
     <!-- search -->
     <div>
+      
       <input style="
-      width: 10em;
-      background: #80808038;
+      width: 19em;
+      
       border-radius: 11px;
       margin-bottom: 9px;
       " type="text" placeholder="Cherche Article" class="searchitemsforlistbl"

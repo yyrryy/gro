@@ -70,12 +70,13 @@
               </div>
               {% endif %}
             <div class="mb-2">
-              <small>Client Bon commande: {{order.client.name}}</small> <br>
+              <!-- if devi means we are generatingn devi not command -->
+              <small>Client Bon {%if devi%}Devi{%else%}commande{%endif%}: {{order.client.name}}</small> <br>
               <select name="clientsgenlivraison{{order.id}}" id="" style="width:100%;" class="clientsgenlivraison{{order.id}}">
 
               </select>
             </div>
-            <div class="mb-2">
+            <div class="mb-2" hidden>
               <small>Representant Bon commande: {{order.salseman.name}}</small> <br>
               <select name="repgenlivraison{{order.id}}" class="select2" style="width: 100%;">
                 <option value="{{order.salseman.id}}">{{order.salseman.name}}</option>
@@ -93,7 +94,8 @@
                 <!--<div class="mb-2">
                     <input type="text" class="form-control orderno" name="ordernono" value="{{receipt_no}}">
                 </div>-->
-                <input class="orderid" type="text" hidden readonly value="{{order.id}}">
+                <input class="devid" type="text" readonly value="{{order.id}}">
+                <input class="cmndid" type="text" hidden readonly value="{{comnd.id}}">
                 <div class="mb-2">
                   <small>Transport</small>
                   <input type="text" class="form-control transport" placeholder="Transport">
@@ -253,7 +255,7 @@
         minimumInputLength:1,
         placeholder: 'Select un client',
         ajax: {
-          url: "{% url 'products:searchclient' %}",
+          url: '/products/searchclient?target={{target}}',
           type: 'GET',
           dataType: 'json',
           data: function (params) {
@@ -548,11 +550,11 @@
 
     $('.submitgen{{order.id}}').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('[name="repgenlivraison{{order.id}}"]').val()==''){
-            parentdiv.find('.data').addClass('border border-danger')
-            return
-        }
-        parentdiv.find('.data').removeClass('border border-danger')
+        // if (parentdiv.find('[name="repgenlivraison{{order.id}}"]').val()==''){
+        //     parentdiv.find('.data').addClass('border border-danger')
+        //     return
+        // }
+        // parentdiv.find('.data').removeClass('border border-danger')
         // check if .itemrow is exist
         // if (parentdiv.find('.itemrow').length==0){
         //     parentdiv.find('.tableholder').addClass('border border-danger')
@@ -600,7 +602,8 @@
           let repid = parentdiv.find('[name="repgenlivraison{{order.id}}"]').val()
           let datebon = parentdiv.find('.datebon').val()
           let transport = parentdiv.find('.transport').val()
-          let orderid = parentdiv.find('.orderid').val()
+          let devid = parentdiv.find('.devid').val()
+          let cmndid = parentdiv.find('.cmndid').val()
           let orderno = parentdiv.find('.orderno').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
           console.log(products)
@@ -612,12 +615,14 @@
               url: "{% url 'products:addbonlivraison' %}",
               type: 'POST',
               data: {
+                  'target':'{{target}}',
                   'totalbon': totalbon,
                   'clientid': clientid,
-                  'orderid': orderid,
                   'repid':repid,
                   'transport':transport,
                   'datebon': datebon,
+                  'devid': devid,
+                  'cmndid': cmndid,
                   'orderno': orderno,
                   'products': JSON.stringify(products),
                   'csrfmiddlewaretoken': '{{csrf_token}}'
@@ -628,7 +633,7 @@
                   $(e.target).addClass('disabled')
                   localStorage.removeItem('pdctsingenbonlivraison{{order.id}}')
                   deletetab('addgenererbonlivraison{{order.id}}')
-                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison')
+                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
                   // $('#addbonlivraison').html('')
                   // $('#addbonlivraison').html(data.html)
                   // $('.select2').select2()

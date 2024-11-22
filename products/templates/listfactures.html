@@ -34,11 +34,11 @@
 </div>
 <div class="bg-white shadow rounded p-2 rounded">
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button>
+    <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button> -->
     <div>
       {{title}}
     </div>
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistfactures', '/products/listfactures')">↻</button>
+    <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistfactures', '/products/listfactures')">↻</button> -->
   </div>
   <div class="bg-orange text-white p-2">
     <div class="d-flex justify-content-between">
@@ -65,19 +65,19 @@
 
 
         </select>
-        <button class="btn btn-success" onclick="getcompatbilse()">
+        <!-- <button class="btn btn-success" onclick="getcompatbilse()">
           Comptabilisé
-        </button>
+        </button> -->
       </div>
-      <div style="color: red; cursor: pointer; padding: 7px; border-radius: 12px; height: 2.5em; width: 4em;" title="BON 3 MOIS" class="bg-white text-center" onclick="getnotpaidfc(event)">
+      <!-- <div style="color: red; cursor: pointer; padding: 7px; border-radius: 12px; height: 2.5em; width: 4em;" title="BON 3 MOIS" class="bg-white text-center" onclick="getnotpaidfc(event)">
         {{depasserfc}}
 
-      </div>
+      </div> -->
       <div class="d-flex flex-column">
-        <button class="btn btn-success" style="border-radius: 10px;" onclick="ajaxpage('addfacture', '+ Facture', '/products/facture')">
+        <button class="btn btn-success" style="border-radius: 10px;" onclick="ajaxpage('addfacture', '+ Facture', '/products/facture?target={{target}}')">
           + Facture
         </button>
-        <button class="btn bi bi-download bg-white mt-2" style="border-radius: 10px;" onclick="$('.exportfcholder').css('top', '10vh')"></button>
+        <!-- <button class="btn bi bi-download bg-white mt-2" style="border-radius: 10px;" onclick="$('.exportfcholder').css('top', '10vh')"></button> -->
       </div>
 
     </div>
@@ -110,7 +110,7 @@
             <td style="width: 5%;" onclick="sorttable(event)">Notes</td>
             <td style="width: 3%;" onclick="sorttable(event)">Reglements</td>
             <td style="width: 5%;" onclick="sorttable(event)">N° Bon livr.</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Comptablisé</td>
+            <!-- <td style="width: 5%;" onclick="sorttable(event)">Comptablisé</td> -->
           </tr>
         </thead>
         <tbody class="listfcbody">
@@ -140,7 +140,7 @@
 
               <td class="d-flex justify-content-between">
                 <div style="width:15px; height:15px; border-radius:50%; background:orange;" ></div>
-                <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{{order.id}}')"></button>
+                <!-- <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{{order.id}}')"></button> -->
               </td>
 
               {% endif %}

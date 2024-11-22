@@ -22,13 +22,13 @@
   margin: 0;
 }
 </style>
-<!-- <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-  <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('')">x</button>
+<div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+  <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('')">x</button> -->
   <div>
     {{title}}
   </div>
-  <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
-</div> -->
+  <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
+</div>
   <div class="bondeviparentdiv">
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
             <div class="col-5">
@@ -77,7 +77,7 @@
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Quantité" name="addqty">
                 <div class="addstock text-danger"></div>
-                <div class="addstockfacture text-danger mt-2"></div>
+                <div hidden class="addstockfacture text-danger mt-2"></div>
               </div>
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Prix" name="addprice">
@@ -354,7 +354,6 @@
             });
             
             console.log('saving items')
-            savetolocalstorage(item, totalSum, 'bondevi')
             parentdiv.find('.totalbon').text(totalSum.toFixed(2))
             parentdiv.find('.resultsholderbondevi').select2('open')
           }, function(){
@@ -781,7 +780,6 @@
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          localStorage.setItem('pdctsinbondevi', '[]')
           data={
               'totalbon': totalbon,
               'clientid': clientid,
@@ -813,6 +811,7 @@
                   // remove list in localstorage
                   localStorage.removeItem('pdctsinbondevi')
                   localStorage.removeItem('bondevi')
+                  localStorage.removeItem('totalbondevi')
                   deletetab('addbondevi')
                   ajaxpage('addlistbondevi', 'list bl', '/products/listdevi?target=f')
 

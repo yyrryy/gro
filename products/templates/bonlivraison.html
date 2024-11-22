@@ -23,11 +23,11 @@
 }
 </style>
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-  <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('')">x</button>
+  <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('')">x</button> -->
   <div>
-    {{title}}
+    {{title}} {{target}}
   </div>
-  <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
+  <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
 </div>
   <div class="bonlivraisonparentdiv">
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
@@ -175,7 +175,7 @@
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchclient',
+          url: '/products/searchclient?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
@@ -798,6 +798,7 @@
               url: "{% url 'products:addbonlivraison' %}",
               type: 'POST',
               data: {
+                'target':'{{target}}',
                   'totalbon': totalbon,
                   'clientid': clientid,
                   'repid':repid,
@@ -813,7 +814,7 @@
                   localStorage.removeItem('pdctsinbonlivraison')
                   localStorage.removeItem('bonlivraison')
                   deletetab('addbonlivraison')
-                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison')
+                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
 
 
               }

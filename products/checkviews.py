@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, DeviItem, Sortieitem, Devi, Bonlivraison
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, DeviItem, Sortieitem, Devi, Bonlivraison, Command
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
 from datetime import datetime, date, timedelta
@@ -626,6 +626,16 @@ def bondevi(request):
     }
     return render(request, 'bondevi.html', ctx)
 
+def boncommand(request):
+    target=request.GET.get('target')
+    
+    ctx={
+        'title':'Bon de Commande',
+        'target':target
+    }
+    return render(request, 'boncommand.html', ctx)
+
+
 def createdevi(request):
     target=request.POST.get('target')
     isfarah=False
@@ -678,7 +688,8 @@ def createdevi(request):
         bon_no=receipt_no,
         note=note,
         isfarah=isfarah,
-        isorgh=isorgh
+        isorgh=isorgh,
+        user=request.user
     )
     # if len(json.loads(products))>0:
     with transaction.atomic():
@@ -735,85 +746,101 @@ def devitobl(request):
         'sold':client.soldtotal,
         #'receipt_no':receipt_no,
         #'clients':Client.objects.all(),
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'devi':True,
+        'target':target
     }
-    return render(request, 'genererbonlivraison.html', ctx)
-    print('>>> target', target)
-    if target=='f':
-        year = timezone.now().strftime("%y")
-        latest_receipt = Bonlivraison.objects.filter(
-            bon_no__startswith=f'FR-BL{year}'
-        ).last()
-        # latest_receipt = Bonsortie.objects.filter(
-        #     bon_no__startswith=f'FR-BL{year}'
-        # ).order_by("-bon_no").first()
-        if latest_receipt:
-            latest_receipt_no = int(latest_receipt.bon_no[-9:])
-            receipt_no = f"FR-BL{year}{latest_receipt_no + 1:09}"
-        else:
-            receipt_no = f"FR-BL{year}000000001"
-        bon=Bonlivraison.objects.create(
-            client_id=devi.client_id,
-            total=devi.total,
-            date=date.today(),
-            bon_no=receipt_no,
-            note=devi.note,
-            isfarah=True
-        )   
-        for i in items:
-            product=i.product
-            product.stocktotalfarah=float(product.stocktotalfarah)-float(i.qty)
-            product.save()
-            Livraisonitem.objects.create(
-                bon=bon,
-                remise=i.remise,
-                name=i.name,
-                ref=i.ref,
-                product=product,
-                qty=i.qty,
-                price=i.price,
-                total=i.total,
-                client_id=devi.client_id,
-                date=date.today(),
-                isfarah=True
-            )
 
-    else:
-        year = timezone.now().strftime("%y")
-        latest_receipt = Bonlivraison.objects.filter(
-            bon_no__startswith=f'BL{year}'
-        ).last()
-        if latest_receipt:
-            latest_receipt_no = int(latest_receipt.bon_no[-9:])
-            receipt_no = f"BL{year}{latest_receipt_no + 1:09}"
-        else:
-            receipt_no = f"BL{year}000000001"
-        bon=Bonlivraison.objects.create(
-            client_id=devi.client_id,
-            total=devi.total,
-            date=date.today(),
-            bon_no=receipt_no,
-            note=devi.note,
-            isorgh=True
-        )   
-        for i in items:
-            product=i.product
-            product.stocktotalorgh=float(product.stocktotalorgh)-float(i.qty)
-            Livraisonitem.objects.create(
-                bon=bon,
-                remise=i.remise,
-                name=i.name,
-                ref=i.ref,
-                product=i.product,
-                qty=i.qty,
-                price=i.price,
-                total=i.total,
-                client_id=devi.client_id,
-                date=date.today(),
-                isorgh=True
-            )
-    devi.generatedbl=True
-    devi.save()
-    return JsonResponse({
-        'success':True
-    })
+    return render(request, 'genererbonlivraison.html', ctx)
+    # print('>>> target', target)
+    # if target=='f':
+    #     year = timezone.now().strftime("%y")
+    #     latest_receipt = Bonlivraison.objects.filter(
+    #         bon_no__startswith=f'FR-BL{year}'
+    #     ).last()
+    #     # latest_receipt = Bonsortie.objects.filter(
+    #     #     bon_no__startswith=f'FR-BL{year}'
+    #     # ).order_by("-bon_no").first()
+    #     if latest_receipt:
+    #         latest_receipt_no = int(latest_receipt.bon_no[-9:])
+    #         receipt_no = f"FR-BL{year}{latest_receipt_no + 1:09}"
+    #     else:
+    #         receipt_no = f"FR-BL{year}000000001"
+    #     bon=Bonlivraison.objects.create(
+    #         client_id=devi.client_id,
+    #         total=devi.total,
+    #         date=date.today(),
+    #         bon_no=receipt_no,
+    #         note=devi.note,
+    #         isfarah=True
+    #     )   
+    #     for i in items:
+    #         product=i.product
+    #         product.stocktotalfarah=float(product.stocktotalfarah)-float(i.qty)
+    #         product.save()
+    #         Livraisonitem.objects.create(
+    #             bon=bon,
+    #             remise=i.remise,
+    #             name=i.name,
+    #             ref=i.ref,
+    #             product=product,
+    #             qty=i.qty,
+    #             price=i.price,
+    #             total=i.total,
+    #             client_id=devi.client_id,
+    #             date=date.today(),
+    #             isfarah=True
+    #         )
+
+    # else:
+    #     year = timezone.now().strftime("%y")
+    #     latest_receipt = Bonlivraison.objects.filter(
+    #         bon_no__startswith=f'BL{year}'
+    #     ).last()
+    #     if latest_receipt:
+    #         latest_receipt_no = int(latest_receipt.bon_no[-9:])
+    #         receipt_no = f"BL{year}{latest_receipt_no + 1:09}"
+    #     else:
+    #         receipt_no = f"BL{year}000000001"
+    #     bon=Bonlivraison.objects.create(
+    #         client_id=devi.client_id,
+    #         total=devi.total,
+    #         date=date.today(),
+    #         bon_no=receipt_no,
+    #         note=devi.note,
+    #         isorgh=True
+    #     )   
+    #     for i in items:
+    #         product=i.product
+    #         product.stocktotalorgh=float(product.stocktotalorgh)-float(i.qty)
+    #         Livraisonitem.objects.create(
+    #             bon=bon,
+    #             remise=i.remise,
+    #             name=i.name,
+    #             ref=i.ref,
+    #             product=i.product,
+    #             qty=i.qty,
+    #             price=i.price,
+    #             total=i.total,
+    #             client_id=devi.client_id,
+    #             date=date.today(),
+    #             isorgh=True
+    #         )
+    # devi.generatedbl=True
+    # devi.save()
+    # return JsonResponse({
+    #     'success':True
+    # })
+def listcommand(request):
+    isfarah=request.GET.get('target')=='f'
+    bons=Command.objects.filter(isfarah=isfarah).order_by('-bon_no')[:50]
+    ctx={
+        'title':'List des commandes',
+        'bons':bons,
+        'target':request.GET.get('target')
+    }
+    return render(request, 'listcommand.html', ctx)
+        
+
+
+
