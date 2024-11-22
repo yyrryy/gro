@@ -95,7 +95,6 @@
                     <input type="text" class="form-control orderno" name="ordernono" value="{{receipt_no}}">
                 </div>-->
                 <input class="devid" type="text" hidden readonly value="{{order.id}}">
-                <input class="cmndid" type="text" hidden readonly value="{{comnd.id}}">
                 <div class="mb-2">
                   <small>Transport</small>
                   <input type="text" class="form-control transport" placeholder="Transport">
@@ -591,7 +590,7 @@
           localStorage.setItem('pdctsingenbonlivraison{{order.id}}', '[]')
 
           $.ajax({
-              url: "{% url 'products:addbonlivraison' %}",
+              url: "{% url 'products:createboncommand' %}",
               type: 'POST',
               data: {
                   'target':'{{target}}',
@@ -602,7 +601,6 @@
                   'datebon': datebon,
                   'devid': devid,
                   'cmndid': cmndid,
-                  'orderno': orderno,
                   'products': JSON.stringify(products),
                   'csrfmiddlewaretoken': '{{csrf_token}}'
               },
@@ -612,7 +610,7 @@
                   $(e.target).addClass('disabled')
                   localStorage.removeItem('pdctsingenbonlivraison{{order.id}}')
                   deletetab('addgenererbonlivraison{{order.id}}')
-                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
+                  ajaxpage('addlistbonlivraison', 'list bl', '/products/listcommand?target={{target}}')
                   // $('#addbonlivraison').html('')
                   // $('#addbonlivraison').html(data.html)
                   // $('.select2').select2()

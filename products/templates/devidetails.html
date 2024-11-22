@@ -11,7 +11,7 @@
     </button>
     {% endif %}
     {% if not order.generatedbc %}
-    <button class="btn w-100 btn-success">
+    <button class="btn w-100 btn-success" onclick="ajaxpage('id', 'title', '/products/devitoboncommand?devid={{order.id}}&&target={{target}}')">
       Generer bon commande
     </button>
     {% endif %}

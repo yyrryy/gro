@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, DeviItem, Sortieitem, Devi, Bonlivraison, Command
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
 from datetime import datetime, date, timedelta
@@ -635,6 +635,24 @@ def boncommand(request):
     }
     return render(request, 'boncommand.html', ctx)
 
+def devitoboncommand(request):
+    target=request.GET.get('target')
+    devid=request.GET.get('devid')
+    order=Devi.objects.get(pk=devid)
+    items=DeviItem.objects.filter(devi=order)
+    client=order.client
+    ctx={
+        'order':order,
+        'items':items,
+        'sold':client.soldtotal,
+        #'receipt_no':receipt_no,
+        #'clients':Client.objects.all(),
+        'today':timezone.now().date(),
+        'devi':True,
+        'target':target
+    }
+
+    return render(request, 'devitoboncommand.html', ctx)
 
 def createdevi(request):
     target=request.POST.get('target')
@@ -716,6 +734,92 @@ def createdevi(request):
     return JsonResponse({
         "success":True
     })
+
+
+def createboncommand(request):
+    target=request.POST.get('target')
+    devid=request.POST.get('devid', None)
+    isfarah=False
+    isorgh=False
+    if target=='f':
+        isfarah=True
+        year = timezone.now().strftime("%y")
+        latest_receipt = Command.objects.filter(
+            bon_no__startswith=f'FR-BC{year}'
+        ).last()
+        # latest_receipt = Devi.objects.filter(
+        #     bon_no__startswith=f'FR-BC{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"FR-BC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-BC{year}000000001"
+    else:
+        isorgh=True
+        year = timezone.now().strftime("%y")
+        latest_receipt = Command.objects.filter(
+            bon_no__startswith=f'BC{year}'
+        ).last()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"BC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"BC{year}000000001"
+    clientid=request.POST.get('clientid')
+    products=request.POST.get('products')
+    totalbon=request.POST.get('totalbon')
+    note=request.POST.get('note')
+    datebon=request.POST.get('datebon')
+    datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
+    
+    # if orderid is not None:
+    #     cmnd=Order.objects.get(pk=orderid)
+    #     cmnd.isdelivered=True
+    #     cmnd.save()
+    # get the last bon no
+    
+    order=Command.objects.create(
+        client_id=clientid,
+        total=totalbon,
+        date=datebon,
+        bon_no=receipt_no,
+        note=note,
+        isfarah=isfarah,
+        isorgh=isorgh,
+        user=request.user
+    )
+    if devid is not None:
+        devi=Devi.objects.get(pk=devid)
+        devi.generatedbc=True
+        devi.bc=order
+        devi.save()
+    # if len(json.loads(products))>0:
+    with transaction.atomic():
+        for i in json.loads(products):
+            product=Produit.objects.get(pk=i['productid'])
+            
+            CommandItem.objects.create(
+                command=order,
+                remise=i['remise'],
+                name=i['name'],
+                ref=i['ref'],
+                product=product,
+                qty=i['qty'],
+                price=i['price'],
+                total=i['total'],
+                client_id=clientid,
+                date=datebon,
+                isfarah=isfarah,
+                isorgh=isorgh
+            )
+
+
+    # increment it
+    return JsonResponse({
+        "success":True
+    })
+
 
 def devidetails(request):
     id=request.GET.get('id')
