@@ -5,10 +5,10 @@
         List fournisserus
       </div>
 
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/devis?target={{target}}')">
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistdevi?target={{target}}&&suppliersection=1')">
         Devis
       </div>
-      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/devis?target={{target}}')">
+      <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistcommand?target={{target}}')">
         Commandes
       </div>
       <div class="sectionitem border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target={{target}}')">
@@ -216,7 +216,8 @@
             processData: false,
             contentType: false,
             success:((data)=>{
-                $(`#supplist`).html(data.html)
+                ajaxpage('ee', 'rr', '/products/supplierspage?target={{target}}')
+                
             })
         })
     })

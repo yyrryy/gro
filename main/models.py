@@ -798,6 +798,7 @@ class Command(models.Model):
     bl=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommand')
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     #bc=models.ForeignKey(Boncommande, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    forsupplier=models.BooleanField(default=False)
 
 class CommandItem(models.Model):
     command=models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
@@ -835,7 +836,7 @@ class Devi(models.Model):
     generatedbc=models.BooleanField(default=False)
     bc=models.ForeignKey(Command, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='commandofdevi')
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
-
+    forsupplier=models.BooleanField(default=False)
 class DeviItem(models.Model):
     devi=models.ForeignKey(Devi, on_delete=models.CASCADE, default=None)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
@@ -856,6 +857,82 @@ class DeviItem(models.Model):
         return f'{self.devi.bon_no} - {self.product.ref}'
 
 # devi becom bonsorie, then bl
+
+class Commandsupplier(models.Model):
+    devi=models.ForeignKey('Devisupplier', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='devisupplierofcommand')
+    date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
+    supplier=models.ForeignKey(Supplier, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    total=models.FloatField(default=0.00)
+    amountpaid=models.FloatField(default=0.00)
+    rest=models.FloatField(default=0.00)
+    bon_no=models.CharField(max_length=50, null=True, default=None)
+    note=models.CharField(max_length=5500, null=True, default=None)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+    generatedbl=models.BooleanField(default=False)
+    bl=models.ForeignKey(Itemsbysupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommandsupplier')
+    user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    #bc=models.ForeignKey(Boncommande, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    forsupplier=models.BooleanField(default=False)
+
+class CommandItemsupplier(models.Model):
+    command=models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
+    remise=models.CharField(max_length=100, null=True, default=None)
+    ref=models.CharField(max_length=100, null=True, default=None)
+    name=models.CharField(max_length=100, null=True, default=None)
+    qty=models.IntegerField()
+    price=models.FloatField(default=0.00)
+    total=models.FloatField(default=0.00)
+    # this total represents the revenue of this product
+    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    # track farah products in sortie items
+    isfarah=models.BooleanField(default=False)
+    # to track ligns that are facture
+    isorgh=models.BooleanField(default=False)
+    date=models.DateField(default=None, null=True, blank=True)
+    def __str__(self) -> str:
+        return f'{self.devi.bon_no} - {self.product.ref}'
+
+
+# devi becom bonsorie, then bl
+class Devisupplier(models.Model):
+    date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
+    supplier=models.ForeignKey(Supplier, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    total=models.FloatField(default=0.00)
+    amountpaid=models.FloatField(default=0.00)
+    rest=models.FloatField(default=0.00)
+    bon_no=models.CharField(max_length=50, null=True, default=None)
+    note=models.CharField(max_length=5500, null=True, default=None)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+    generatedbl=models.BooleanField(default=False)
+    bl=models.ForeignKey(Itemsbysupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofdevisupplier')
+    generatedbc=models.BooleanField(default=False)
+    bc=models.ForeignKey(Commandsupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='commandofdevisupplier')
+    user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    forsupplier=models.BooleanField(default=False)
+class DeviItemsupplier(models.Model):
+    devi=models.ForeignKey(Devisupplier, on_delete=models.CASCADE, default=None)
+    product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
+    remise=models.CharField(max_length=100, null=True, default=None)
+    ref=models.CharField(max_length=100, null=True, default=None)
+    name=models.CharField(max_length=100, null=True, default=None)
+    qty=models.IntegerField()
+    price=models.FloatField(default=0.00)
+    total=models.FloatField(default=0.00)
+    # this total represents the revenue of this product
+    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    # track farah products in sortie items
+    isfarah=models.BooleanField(default=False)
+    # to track ligns that are facture
+    isorgh=models.BooleanField(default=False)
+    date=models.DateField(default=None, null=True, blank=True)
+    def __str__(self) -> str:
+        return f'{self.devi.bon_no} - {self.product.ref}'
+
+# devi becom bonsorie, then bl
+
 
 class Bonsortie(models.Model):
     paidamount=models.FloatField(default=0.00)

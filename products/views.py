@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -647,11 +647,14 @@ def addsupply(request):
     supplierid=request.POST.get('supplierid')
     products=request.POST.get('products')
     target=request.POST.get('target')
+    devid=request.POST.get('devid')
+    cmndid=request.POST.get('cmndid')
+    nbon=request.POST.get('nbon')
     datebon=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d')
     datefacture=datetime.strptime(request.POST.get('datefacture'), '%Y-%m-%d')
-    nbon=request.POST.get('nbon')
     isfacture= True if request.POST.get('mode')=='facture' else False
     totalbon=request.POST.get('totalbon')
+    print('>>>>>>', 'target', target, 'devid', devid, 'cmndid', cmndid, 'nbon', nbon, 'datebon', datebon, 'datefacture', datefacture, 'isfacture', isfacture, 'totalbon', totalbon, 'supplierid', supplierid, 'products', products)
     tva=0
     if isfacture:
         tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
@@ -697,6 +700,16 @@ def addsupply(request):
         tva=tva,
         dateentree=datefacture
     )
+    if not devid == "":
+        devi=Devisupplier.objects.get(pk=devid)
+        devi.generatedbl=True
+        devi.bl=bon
+        devi.save()
+    if not cmndid == "":
+        cmnd=Commandsupplier.objects.get(pk=cmndid)
+        cmnd.generatedbl=True
+        cmnd.bl=bon
+        cmnd.save()
     for i in json.loads(products):
         product=Produit.objects.get(pk=i['productid'])
         remise1=0 if i['remise1']=='' else int(i['remise1'])
@@ -708,6 +721,7 @@ def addsupply(request):
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
         if target=='f':
+            # calcul pondiré, stock needs to be more than 0
             if product.stocktotalfarah>0:
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
                 actualtotal=float(product.buyprice)*float(product.stocktotalfarah)
@@ -722,6 +736,8 @@ def addsupply(request):
             product.frbuyprice=buyprice
             product.frnetbuyprice=netprice
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+            if isfacture:
+                product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
         else:
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
@@ -737,6 +753,8 @@ def addsupply(request):
             product.buyprice=buyprice
             product.netbuyprice=netprice
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+            if isfacture:
+                product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
         # recodrd remise 1, 2, 3, 4
         
         #product.isnew=True

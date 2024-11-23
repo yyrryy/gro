@@ -173,7 +173,8 @@
             processData: false,
             contentType: false,
             success:((data)=>{
-                $(`#supplist`).html(data.html)
+                console.log('ajaxpage')
+                ajaxpage('ee', 'rr', '/products/supplierspage?target={{target}}')
             })
         })
     })
