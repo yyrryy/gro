@@ -1084,7 +1084,7 @@ def supplierboncommand(request):
         'title':'Bon de Commande',
         'target':target
     }
-    return render(request, 'boncommand.html', ctx)
+    return render(request, 'supplierboncommand.html', ctx)
 def supplierdevitoboncommand(request):
     target=request.GET.get('target')
     devid=request.GET.get('devid')
@@ -1185,13 +1185,13 @@ def suppliercreatedevi(request):
     })
 def suppliercreateboncommand(request):
     target=request.POST.get('target')
-    devid=request.POST.get('devid', None)
+    devid=request.POST.get('devid')
     isfarah=False
     isorgh=False
     if target=='f':
         isfarah=True
         year = timezone.now().strftime("%y")
-        latest_receipt = Command.objects.filter(
+        latest_receipt = Commandsupplier.objects.filter(
             bon_no__startswith=f'FR-BC{year}'
         ).last()
         # latest_receipt = Devi.objects.filter(
@@ -1199,35 +1199,35 @@ def suppliercreateboncommand(request):
         # ).order_by("-bon_no").first()
         if latest_receipt:
             latest_receipt_no = int(latest_receipt.bon_no[-9:])
-            receipt_no = f"FR-BC{year}{latest_receipt_no + 1:09}"
+            receipt_no = f"FR-FBC{year}{latest_receipt_no + 1:09}"
         else:
-            receipt_no = f"FR-BC{year}000000001"
+            receipt_no = f"FR-FBC{year}000000001"
     else:
         isorgh=True
         year = timezone.now().strftime("%y")
-        latest_receipt = Command.objects.filter(
-            bon_no__startswith=f'BC{year}'
+        latest_receipt = Commandsupplier.objects.filter(
+            bon_no__startswith=f'FBC{year}'
         ).last()
         if latest_receipt:
             latest_receipt_no = int(latest_receipt.bon_no[-9:])
-            receipt_no = f"BC{year}{latest_receipt_no + 1:09}"
+            receipt_no = f"FBC{year}{latest_receipt_no + 1:09}"
         else:
-            receipt_no = f"BC{year}000000001"
-    clientid=request.POST.get('clientid')
+            receipt_no = f"FBC{year}000000001"
+    supplierid=request.POST.get('supplierid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
-    
+    print('target', target, 'isfarah', isfarah, 'isorgh', isorgh, 'receipt_no', receipt_no, 'supplierid', supplierid, 'products', products, 'totalbon', totalbon, 'note', note, 'datebon', datebon, 'devid', devid)
     # if orderid is not None:
     #     cmnd=Order.objects.get(pk=orderid)
     #     cmnd.isdelivered=True
     #     cmnd.save()
     # get the last bon no
     
-    order=Command.objects.create(
-        client_id=clientid,
+    order=Commandsupplier.objects.create(
+        supplier_id=supplierid,
         total=totalbon,
         date=datebon,
         bon_no=receipt_no,
@@ -1237,7 +1237,7 @@ def suppliercreateboncommand(request):
         user=request.user
     )
     if devid is not None:
-        devi=Devi.objects.get(pk=devid)
+        devi=Devisupplier.objects.get(pk=devid)
         devi.generatedbc=True
         devi.bc=order
         devi.save()
@@ -1246,7 +1246,7 @@ def suppliercreateboncommand(request):
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             
-            CommandItem.objects.create(
+            CommandItemsupplier.objects.create(
                 command=order,
                 remise=i['remise'],
                 name=i['name'],
@@ -1255,7 +1255,7 @@ def suppliercreateboncommand(request):
                 qty=i['qty'],
                 price=i['price'],
                 total=i['total'],
-                client_id=clientid,
+                supplier_id=supplierid,
                 date=datebon,
                 isfarah=isfarah,
                 isorgh=isorgh
@@ -1492,13 +1492,13 @@ def supplierdevitobl(request):
     # })
 def supplierlistcommand(request):
     isfarah=request.GET.get('target')=='f'
-    bons=Command.objects.filter(isfarah=isfarah).order_by('-bon_no')[:50]
+    bons=Commandsupplier.objects.filter(isfarah=isfarah).order_by('-bon_no')[:50]
     ctx={
         'title':'List des commandes',
         'bons':bons,
         'target':request.GET.get('target')
     }
-    return render(request, 'listcommand.html', ctx)
+    return render(request, 'supplierlistcommand.html', ctx)
  
 
 

@@ -1431,29 +1431,22 @@ def getrepswithprice(request):
 def getclientprice(request):
     pdctid=request.POST.get('id')
     clientid=request.POST.get('clientid')
-    target=request.POST.get('target')
-    term=request.POST.get('term')
+    isfarah=request.POST.get('target')=='f'
     product=Produit.objects.get(pk=pdctid)
     price=0
     remise=0
-    buyprice=product.frbuyprice if 'fr' in term else product.buyprice
-    remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
     try:
-            clientprice=Livraisonitem.objects.filter(bon__client_id=clientid, product_id=pdctid).last()
-            price=clientprice.price
-            remise=clientprice.remise
-            return JsonResponse({
-                'price':price,
-                'remise':remise,
-                'buyprice':buyprice,
-                'remisebuyprice':remisebuyprice
-            })
+        clientprice=Livraisonitem.objects.filter(bon__client_id=clientid, product_id=pdctid, isfarah=isfarah).last()
+        price=clientprice.price
+        remise=clientprice.remise
+        return JsonResponse({
+            'price':price,
+            'remise':remise,
+        })
     except:
         return JsonResponse({
             'price':0,
             'remise':0,
-            'buyprice':buyprice,
-            'remisebuyprice':remisebuyprice
         })
     #if target=='bl':
     #    try:
@@ -1635,7 +1628,8 @@ def listavoirclient(request):
     ctx={
         'title':'Avoir Client',
         'bons':bons,
-        'total':total
+        'total':total,
+        'target':request.GET.get('target')
     }
     return render(request, 'listavoirclient.html', ctx)
 
@@ -2600,10 +2594,11 @@ def recevoirexcel(request):
 
 
 def avoirclient(request):
-
+    target=request.GET.get('target')
     ctx={
             'title':'Avoir client',
-            'commercials':Represent.objects.all(),
+            'target':target,
+            # 'commercials':Represent.objects.all(),
             #'receipt_no':receipt_no
         }
     return render(request, 'avoirclient.html', ctx)

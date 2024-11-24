@@ -876,7 +876,7 @@ class Commandsupplier(models.Model):
     forsupplier=models.BooleanField(default=False)
 
 class CommandItemsupplier(models.Model):
-    command=models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    command=models.ForeignKey(Commandsupplier, on_delete=models.CASCADE, default=None)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
     remise=models.CharField(max_length=100, null=True, default=None)
     ref=models.CharField(max_length=100, null=True, default=None)
