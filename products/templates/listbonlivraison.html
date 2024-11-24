@@ -118,15 +118,15 @@
           <td style="width: 12%;" onclick="sorttable(event)">Client</td>
           <td style="width: 5%;">Code client</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Total</td>
-          <td style="width: 5%;" onclick="sorttable(event)">Region</td>
           <td style="width: 5%;" onclick="sorttable(event)">Ville</td>
           <td style="width: 5%;">Solde bl cl.</td>
-          <td style="width: 5%;" onclick="sorttable(event)">Repr</td>
-          <td style="width: 4%;">Reglé</td>
-          <td style="width: 5%;">Facturé</td>
-          <td style="width: 5%;" onclick="sorttable(event)">Cmnd</td>
+          <td style="width: 5%;">N° Facture</td>
+          <td style="width: 5%;" onclick="sorttable(event)">N° bon sortie</td>
+          <td style="width: 5%;" onclick="sorttable(event)">N° devis</td>
+          <td style="width: 5%;" onclick="sorttable(event)">N° Commande</td>
           <td style="width: 5%;" onclick="sorttable(event)">Transport</td>
           <td style="width: 5%;" onclick="sorttable(event)">Notes</td>
+          <td style="width: 2%;" onclick="sorttable(event)">Utilisateur</td>
           <td style="width: 2%;"></td>
         </tr>
       </thead>
@@ -138,44 +138,43 @@
             <td >{{ order.client.name }}</td>
             <td >{{ order.client.code }}</td>
             <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}</td>
-            <td >{{ order.client.region }}</td>
             <td >{{ order.client.city }}</td>
             <td >{{ order.client.soldbl|floatformat:2|intspace }}</td>
-            <td >{{ order.salseman }}</td>
             <td class="d-flex justify-content-between">
-              {% if order.ispaid %}
+              {% if order.isfacture %}
               <div>
-                R0
+                {{order.facture.facture_no}}
               </div>
               <div style="width:15px; height:15px; border-radius:50%; background:green;" ></div>
 
 
               {% else %}
 
-                <div>
-                  N1
-                </div>
+                
                 <div style="width:15px; height:15px; border-radius:50%; background:orange;" ></div>
 
               {% endif %}
             </td>
-            {% if order.isfacture %}
             <td class="text-danger">
-              OUI
+              {{order.bonsortie.bon_no}}
             </td>
-            {% else %}
+            
             <td>
-              Non
-            </td>
-            {% endif %}
-            <td>
-              {{order.commande.order_no}}
+              {{order.devi.bon_no}}
             </td>
             <td>
-              {{order.modlvrsn}}
+              {{order.command.bon_no}}
+            </td>
+            <td>
+              {{order.transport}}
             </td>
             <td>
               {% if order.note %} {{order.note}} {% endif %}
+            </td>
+            <td>
+              {% if order.user %}
+              {{order.user.username}}
+              {% endif %}
             </td>
             <td class="d-flex">
               <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button>
@@ -184,7 +183,7 @@
           </tr>
         {% endfor %}
       </tbody>
-      <thead style="position: sticky; bottom: 0; background: white;">
+      <!-- <thead style="position: sticky; bottom: 0; background: white;">
         <tr>
           <td style="width: 8%;"></td>
           <td style="width: 8%;"></td>
@@ -204,7 +203,7 @@
           <td style="width: 5%;"></td>
           <td></td>
         </tr>
-      </thead>
+      </thead> -->
       <!-- <tfoot>
         <tr>
           <td>N° bon</td>

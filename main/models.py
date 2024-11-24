@@ -56,6 +56,8 @@ class Incaisse(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
 
 class Produit(models.Model):
+    # quantity of product in jeu (2, 4)
+    qtyjeu=models.IntegerField(default=0, null=True, blank=True)
     name=models.CharField(max_length=500, null=True)
     block=models.CharField(max_length=500, null=True, default=None)
     # code = classement
@@ -345,6 +347,30 @@ class Order(models.Model):
     def __str__(self) -> str:
         return self.client.name+' '+str(self.total)
 
+class Avanceclient(models.Model):
+    client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True)
+    date = models.DateTimeField(default=None)
+    amount = models.FloatField()
+    bon=models.ForeignKey('Bonlivraison', on_delete=models.CASCADE, default=None, null=True)
+    facture=models.ForeignKey('Facture', on_delete=models.CASCADE, default=None, null=True)
+    mode=models.CharField(max_length=10, default=None)
+    echeance=models.DateField(default=None, null=True, blank=True)
+    npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+
+class Avancesupplier(models.Model):
+    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
+    date = models.DateTimeField(default=None)
+    bon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True)
+    amount = models.FloatField()
+    mode=models.CharField(max_length=10, default=None)
+    echeance=models.DateField(default=None, null=True, blank=True)
+    npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+
+
 class Bonlivraison(models.Model):
     order=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     #bon command
@@ -374,6 +400,9 @@ class Bonlivraison(models.Model):
     statusreg=models.CharField(max_length=50, null=True, default='n1', blank=True)
     #statud if factur == f1
     statusfc=models.CharField(max_length=50, null=True, default='b1', blank=True)
+    user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
+    # payments of this bon
+    payment=models.FloatField(default=0.00)
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)
@@ -401,6 +430,8 @@ class Facture(models.Model):
     # true if facture is accounting
     isaccount=models.BooleanField(default=False)
     statusreg=models.CharField(max_length=50, null=True, default='b1', blank=True)
+    # if we have more than one bon for the same facture
+    bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name='bonsoffactures')
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)
@@ -612,6 +643,7 @@ class Avoirclient(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
 
@@ -624,7 +656,7 @@ class Returned(models.Model):
     avoir=models.ForeignKey(Avoirclient, related_name='returned_invoice', on_delete=models.CASCADE, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
-
+    bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True, blank=True)
 class Avoirsupplier(models.Model):
     date=models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     no = models.CharField(

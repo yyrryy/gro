@@ -32,6 +32,7 @@
   <button class="btn btn-danger" onclick="$('.exportfcholder').css('top', '-10vh')"></button>
 
 </div>
+
 <div class="bg-white shadow rounded p-2 rounded">
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button> -->
@@ -40,6 +41,115 @@
     </div>
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistfactures', '/products/listfactures')">↻</button> -->
   </div>
+  <div class="accordion" id="accordionreglbl">
+    <div class="">
+
+        <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#collapsereglbl" aria-expanded="true" aria-controls="collapsereglbl"
+        style="border-radius: 10px;"
+        >
+            Ajouter facture global
+        </button>
+
+      <div id="collapsereglbl" class="collapse" aria-labelledby="headingOne" data-parent="#accordionreglbl">
+        <div class="card-body border shadow rounded">
+            <div class="row">
+
+                <div class="d-flex justify-content-between">
+                    <div class="">
+                        <small>Date:</small> <br>
+                        <input type="date" name="datereglementclientbl" class="w-100 notempty datereglement mb-2" value="{{today|date:'Y-m-d'}}" onchange="checkyearreglbl(event)">
+                        <small class="errordatereglclbl text-danger d-none">
+                          Date incorrect
+                        </small>
+                    </div>
+                    <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
+                    <div class="col-3">
+                      <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;">
+
+                      </select>
+                    </div>
+                </div>
+
+                
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <div>
+                            <small>Bons:</small> <strong class="totalcheckedbl">0.00</strong><br>
+                        </div>
+                        
+                        
+                    </div>
+
+                    <div class="mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
+
+                        <table class="table table-bordered listaddreglbl table-hover" style="font-size: 12px;">
+                            <thead style="position: sticky; top: 0; background: white;">
+                                <tr>
+                                    <td>
+                                        Date
+                                    </td>
+                                    <td>
+                                        N° Bon
+                                    </td>
+                                    <td>
+                                        Client
+                                    </td>
+                                    <td>
+                                        total
+                                    </td>
+                                    <td>
+                                      <input type="checkbox">
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody class="reglementclientbonholder">
+                            </tbody>
+                            
+
+                        </table>
+                        <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
+
+                        </select> -->
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small>Client facture:</small><br>
+                            <select name="clientoffacture" id="" class="clientoffacture"></select>
+                        </div>
+                        <div>
+                          <small>Date:</small><br>
+                          <input type="date" class="dateoffacture form-control" value="{{today|date:'Y-m-d'}}">
+                      </div>
+                      <div>
+                        <small>N° facture:</small><br>
+                        <input readonly value="{{receipt_no}}" type="text" class="facture_no form-control">
+                      </div>
+                    </div>
+                    <button class="btn text-white w-100 facturemultiple" style="background: #00538c;">
+                        Valider
+                    </button>
+                    <!-- <div class="mb-2">
+                        <small>Facture</small>
+                        <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
+
+                        </select>
+                    </div>
+
+                    <select name="addreglementfactures disabled" id="" class="select2 form-select " multiple="multiple">
+
+                    </select> -->
+
+                </div>
+                <div class="mt-3">
+                    {% csrf_token %}
+
+
+                </div>
+
+            </div>
+        </div>
+      </div>
+</div>
   <div class="bg-orange text-white p-2">
     <div class="d-flex justify-content-between">
       <div>
@@ -204,6 +314,55 @@
 
 
 <script>
+
+  $(function(){
+      $('.addreglementclientsbl').select2({
+        minimumInputLength: 1,
+        placeholder:'Chercher client',
+        ajax: {
+          type:'get',
+          dataType: 'json',
+          url: '/products/searchclient?target={{target}}',
+          data: function (params) {
+            var query = {
+              term: params.term,
+            }
+            // Query parameters will be ?search=[term]&type=public
+            return query;
+          },
+          proccessresults: function (data) {
+              return {
+                results:data.results
+              }
+          },
+          cache:true
+        }
+      });
+      $('.clientoffacture').select2({
+        minimumInputLength: 1,
+        placeholder:'Chercher client',
+        ajax: {
+          type:'get',
+          dataType: 'json',
+          url: '/products/searchclient?target={{target}}',
+          data: function (params) {
+            var query = {
+              term: params.term,
+            }
+            // Query parameters will be ?search=[term]&type=public
+            return query;
+          },
+          proccessresults: function (data) {
+              return {
+                results:data.results
+              }
+          },
+          cache:true
+        }
+      });
+
+    })
+
   $(document).ready(function () {
     // popukate years starting from 2024
     console.log('>> populating years')
@@ -220,6 +379,60 @@
     }
     $select.val(currentYear);
   })
+  function handleScrollreglblcl () {
+      console.log('scroll')
+      console.log(currentPageblregl, loadingblregl)
+
+      const container = $('.listaddreglblholder')[0]; // Get the native DOM element
+
+      const lastRow = document.querySelector('.blreglrow:last-child');
+      let clientid=lastRow.getAttribute('clientid')
+      let nonregllist=lastRow.classList.contains('nr')?1:0
+      const lastRowOffset = lastRow.offsetTop + lastRow.clientHeight;
+
+      const containerBottom = container.scrollTop + container.clientHeight;
+
+      if (containerBottom+900 >= lastRowOffset && !loadingblregl) {
+          currentPageblregl++;
+          loadMoreRecordsreglblcl(clientid, nonregllist);
+      }
+    };
+
+  $('[name="addreglementclientsbl"]').on('change', function(){
+        currentPageblregl=1
+        loadingblregl = false;
+        $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
+        if ($(this).val()==""){
+            // disable the divholder of the multiselects
+            // disable the button
+            $('.submitaddreglemntclientbtn').addClass('disabled')
+            return
+        }
+        $('.submitaddreglemntclientbtn').removeClass('disabled')
+        $('.reglementbonsholder').removeClass('d-none')
+        clientid=$(this).val()
+        $('.loadingscreen').removeClass('d-none')
+        $.post('/products/getclientbonsforfacture', {
+            clientid:clientid,
+            target:'{{target}}',
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function(data){
+                console.log(data)
+                $('.loadingscreen').addClass('d-none')
+                $('.reglementclientbonholder').html(data.trs)
+                $('.totalbonsbl').text(data.total)
+                $('.soldblregl').text((data.soldbl).toFixed(2))
+                // $('.select2').select2()
+            // populate bons multiselect
+        })
+        // enable the divholder of the multiselects
+        // get client bons
+        //populate bons multiselect
+        // get client facture
+        // populate facture multiselect
+    })
+
+    
   function makefacturecompta(event, factureid){
     tr=$(event.target).parent().parent()
     $.get('/products/comptable', {
@@ -342,6 +555,36 @@
       tbody.html(data.html)
     })
   }
+  $('.facturemultiple').on('click', function(event){
+        event.preventDefault()
+        $(event.target).addClass('disabled')
+        let parentdiv=$(this).parent().parent()
+        // if ((selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
+        //     return this.value;
+        // }).get()).length == 0){
+        //     alertify.error('Veuillez selectionner au moins un bon')
+        //     return
+        // }
+        selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        $(this).addClass('disabled')
+        clientid=$('[name="clientoffacture"]').val()
+        
+        date=$(".dateoffacture").val()
+
+        bons=parentdiv.find('[name="addreglementbons"]').map(function() {
+            return this.value;
+        }).get();
+        
+
+        console.log(clientid, date, selectedValues)
+        // $.get('/products/facturemultiple?target={{target}}', {
+        //   'clientid':clientid,
+        //   'bons':selectedValues
+        // })
+    })
+
 $('.filterfcdate').on('click', function(){
     currentPagelistfc=1
     loadinglistfc = false;

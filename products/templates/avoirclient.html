@@ -32,18 +32,13 @@
          <div class="bg-white rounded shadow p-2 mb-3 dataavoircl d-flex justify-content-between">
             <div class="col-5">
               <div class="mb-2">
-                <small>Mode</small>
                 <select name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectav">
                   <option value="bl">BL</option>
                   <option value="facture">Facture</option>
                 </select>
               </div>
-                <div class="mb-2">
-                    <select name="client" id="" style="width:100%;" class="select2 clientselectavoir form-select notemptylivraison">
-
-                    </select>
-                </div>
-                <div class="mb-2">
+                
+                <div hidden class="mb-2">
 
                     <select name="representant" id="" style="width:100%;" class="select2 repsavclselects form-select notemptylivraison">
                         <option value="">Representant</option>
@@ -52,8 +47,15 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="mb-2">
-                    <input type="date" class="form-control datebon" name="datebon" placeholder="Date bon">
+                <div class="row">
+                  <div class="mb-2 col-6">
+                    <select name="client" id="" style="width:100%;" class="select2 clientselectavoir form-select notemptylivraison">
+
+                    </select>
+                </div>
+                  <div class="mb-2 col-6">
+                      <input type="date" class="form-control datebon" name="datebon" placeholder="Date bon">
+                  </div>
                 </div>
                 <!--<div class="mb-2">
                     <input type="text" class="form-control orderno" name="orderno" value="{{receipt_no}}">
@@ -86,6 +88,9 @@
                 height: 36px;
                 text-align: center;
                 background: #00800024;">Valider</button>
+              </div>
+              <div class="col-12 tabeldata">
+                
               </div>
               <div class="col-12">
                 <input hidden readonly type="text" name="addname" class="form-control">
@@ -158,6 +163,58 @@
                   0.00
                 </b>
             </div>
+          </div>
+          <div>
+            <b>
+              Reglements
+            </b>
+            <br>
+            <div class="reglementbonsholder border position-relative">
+
+              <div class="inputsholder">
+                  <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
+                  <strong class="totalreglblfields">0.00</strong>
+                      <div class="row align-items-center">
+                            <div class="col-3">
+                                <small>Mantant:</small> <br>
+
+                            </div>
+                            <div class="col-3">
+                                <small>N° piece:</small> <br>
+
+                            </div>
+                            <div class="col-3">
+                                <small>Mode Paiment:</small> <br>
+
+                            </div>
+                            <div class="col-3">
+                                <small>Echeance:</small> <br>
+
+                            </div>
+                        </div>
+                      <div class="reglements">
+                          <div class="row align-items-center mt-2">
+                              <div class="col-3">
+                                  <input type="number" name="mantantreglementclient" onchange="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
+                              </div>
+                              <div class="col-3">
+                                  <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
+                              </div>
+                              <div class="col-3">
+                                  <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)">
+                                      <option value="cheque">Cheque</option>
+                                      <option value="effet">effet</option>
+                                      <option value="espece">espece</option>
+                                      <option value="avoir">avoir</option>
+                                  </select>
+                              </div>
+                              <div class="col-3">
+                                  <input type="date" name="echeance" class="w-100 notempty echeancereglbl" value="{{today|date:'Y-m-d'}}">
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
       </div>
   </div>
@@ -455,22 +512,25 @@
               type: 'POST',
               data: {
                   'id': id,
+                  'target': '{{target}}',
                   'clientid': $('.clientselectavoir').val(),
-                  'target':$('.modeselectav').val(),
-                  'csrfmiddlewaretoken': '{{csrf_token}}'
+                  'mode':$('.modeselectav').val(),
+                  'csrfmiddlewaretoken': '{{csrf_token}}',
+                  'inavoir': true
               },
               success: function(data){
                 console.log(data.price)
-                if (data.price==0){
+                // if (data.price==0){
 
-                  alertify.error('Prix de client n\'est pas encore défini')
-                  addprice.val(0)
-                  addremise.val(0)
-                }else{
-
+                //   alertify.error('Prix de client n\'est pas encore défini')
+                //   addprice.val(0)
+                //   addremise.val(0)
+                // }else{
+                  
                   addprice.val(data.price)
                   addremise.val(data.remise)
-                }
+                  $('.tabeldata').html(data.table)
+                // }
               }
             })
 
@@ -481,7 +541,7 @@
 
       $('.submitavcl').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('.clientselectavoir').val()=='' || parentdiv.find('.modeselectav').val()=='' || parentdiv.find('.repsavclselects').val()==''){
+        if (parentdiv.find('.clientselectavoir').val()=='' || parentdiv.find('.modeselectav').val()=='' ){
             $('.dataavoircl').addClass('border border-danger')
             console.log('clientselectavoir', parentdiv.find('.clientselectavoir').val(), 'modeselectav', parentdiv.find('.modeselectav').val(), 'repsavclselects', parentdiv.find('.repsavclselects').val())
             return
@@ -493,19 +553,19 @@
             return
         }
         parentdiv.find('.tableholder').removeClass('border border-danger')
-          var isAnyEmpty = parentdiv.find('.notemptylivraison').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;
-            if (isAnyEmpty){
-                let emptyInputs = parentdiv.find('notemptylivraison').filter(function() {
-                    return !this.value.trim();
-                });
+          // var isAnyEmpty = parentdiv.find('.notemptylivraison').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;
+          //   if (isAnyEmpty){
+          //       let emptyInputs = parentdiv.find('notemptylivraison').filter(function() {
+          //           return !this.value.trim();
+          //       });
 
-                // Add a red border to all empty input elements
-                alertify.error('Veuillez remplir tous les champs obligatoires')
-                emptyInputs.css('border', '1px solid red');
-                parentdiv.find('input.notemptylivraison').not(emptyInputs).css('border', '');
-                $(this).attr('disabled', false)
-                return
-            }
+          //       // Add a red border to all empty input elements
+          //       alertify.error('Veuillez remplir tous les champs obligatoires')
+          //       emptyInputs.css('border', '1px solid red');
+          //       parentdiv.find('input.notemptylivraison').not(emptyInputs).css('border', '');
+          //       $(this).attr('disabled', false)
+          //       return
+          //   }
           localStorage.removeItem('pdctsinavoircl')
           parentdiv.find('.submitavcl').addClass('disabled')
           trs=parentdiv.find('.bonlivraisonbody tr')

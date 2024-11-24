@@ -650,7 +650,6 @@ def devitoboncommand(request):
     ctx={
         'order':order,
         'items':items,
-        'sold':client.soldtotal,
         #'receipt_no':receipt_no,
         #'clients':Client.objects.all(),
         'today':timezone.now().date(),
@@ -741,7 +740,7 @@ def createdevi(request):
     })
 def createboncommand(request):
     target=request.POST.get('target')
-    devid=request.POST.get('devid', None)
+    devid=request.POST.get('devid')
     isfarah=False
     isorgh=False
     if target=='f':
@@ -775,7 +774,7 @@ def createboncommand(request):
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
-    
+    print('>>> datebon', datebon, 'target', target, 'isfarah', isfarah, 'isorgh', isorgh, 'clientid', clientid, 'products', products, 'totalbon', totalbon, 'note', note, 'devid', devid, 'receipt_no', receipt_no, 'user', request.user)
     # if orderid is not None:
     #     cmnd=Order.objects.get(pk=orderid)
     #     cmnd.isdelivered=True
@@ -792,11 +791,13 @@ def createboncommand(request):
         isorgh=isorgh,
         user=request.user
     )
-    if devid is not None:
+    if not devid == "":
         devi=Devi.objects.get(pk=devid)
         devi.generatedbc=True
         devi.bc=order
         devi.save()
+        order.devi=devi
+        order.save()
     # if len(json.loads(products))>0:
     with transaction.atomic():
         for i in json.loads(products):
@@ -1500,6 +1501,73 @@ def supplierlistcommand(request):
     }
     return render(request, 'supplierlistcommand.html', ctx)
  
+def getclientbonsforfacture(request):
+    clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
+    print('>> target', target)
+    if target=='s':
+        bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
+        total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    else:
+        bons=Bonlivraison.objects.filter(client_id=clientid).order_by('date')[:50]
+        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    trs=''
+    for i in bons:
+        # old code, if reglement is paid it's checked from here
+        # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+        trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
 
+
+    return JsonResponse({
+        'trs':trs,
+        'total':total,
+        'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2)
+    })
+
+
+def facturemultiple(request):
+    # create  facture with multiple bons
+    date=request.GET.get('date')
+    date=datetime.strptime(f'{date}', '%Y-%m-%d')
+    clientid=request.GET.get('clientid')
+    target=request.GET.get('target')
+    bons=request.GET.get('bons')
+    year=timezone.now().strftime("%y")
+    bons=json.loads(request.POST.get('bons'))
+    mantant=json.loads(request.POST.get('mantant'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    if target=='f':
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FR-FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FR-FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-FC{year}000000001"
+    else:
+        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FC{year}000000001"
+
+    pass
+    
 
 

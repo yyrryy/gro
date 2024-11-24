@@ -800,8 +800,8 @@ def addbonlivraison(request):
     repid=request.POST.get('repid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
-    devid=request.POST.get('devid', None)
-    comndid=request.POST.get('cmndid', None)
+    devid=request.POST.get('devid')
+    comndid=request.POST.get('cmndid')
     # orderno
     transport=request.POST.get('transport')
     note=request.POST.get('note')
@@ -852,7 +852,8 @@ def addbonlivraison(request):
         modlvrsn=transport,
         bon_no=receipt_no,
         note=note,
-        isfarah=True
+        isfarah=isfarah,
+        user=request.user
     )
     if not comndid == "":
         cmnd=Command.objects.get(pk=comndid)
@@ -1431,23 +1432,41 @@ def getrepswithprice(request):
 def getclientprice(request):
     pdctid=request.POST.get('id')
     clientid=request.POST.get('clientid')
+    mode=request.POST.get('mode')
+    inavoir=request.POST.get('inavoir')=='true'
     isfarah=request.POST.get('target')=='f'
     product=Produit.objects.get(pk=pdctid)
+    client=Client.objects.get(pk=clientid)
+    print('>>>>',request.POST.get('target'), client.name, product.ref, isfarah, mode, inavoir)
     price=0
     remise=0
-    try:
-        clientprice=Livraisonitem.objects.filter(bon__client_id=clientid, product_id=pdctid, isfarah=isfarah).last()
-        price=clientprice.price
-        remise=clientprice.remise
-        return JsonResponse({
-            'price':price,
-            'remise':remise,
-        })
-    except:
-        return JsonResponse({
-            'price':0,
-            'remise':0,
-        })
+
+    # try:
+    if mode=='bl':
+        producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
+        clientprice=producthistory.last()
+        if clientprice:
+            price=clientprice.price
+            remise=clientprice.remise
+    else:
+        producthistory=Outfacture.objects.filter(client_id=clientid, product_id=pdctid)
+        clientprice=producthistory.last()
+        if clientprice:
+            price=clientprice.price
+            remise=clientprice.remise
+
+            
+    return JsonResponse({
+        'price':price,
+        'remise':remise,
+        'table':render(request, 'prodctprices.html', {'producthistory':producthistory}).content.decode('utf-8')
+    })
+    # except Exception as e:
+    #     print('error', e)
+    #     return JsonResponse({
+    #         'price':0,
+    #         'remise':0,
+    #     })
     #if target=='bl':
     #    try:
     #        clientprice=Livraisonitem.objects.filter(client_id=clientid, product_id=id).last()
@@ -1647,20 +1666,45 @@ def listavoirsupplier(request):
 
 def listfactures(request):
     target=request.GET.get('target')
+    isfarah=target=='f'
     three_months_ago = timezone.now() - timedelta(days=90)
     depasser = Facture.objects.filter(date__lt=three_months_ago, ispaid=False).count()
+    year=timezone.now().strftime("%y")
     # get only the last 100 orders of the current year
     if target=='f':
         bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FR-FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FR-FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-FC{year}000000001"
     else:
         bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FC{year}000000001"
     ctx={
         'title':'List des factures',
         'bons':bons,
         'reps':Represent.objects.all(),
         'depasserfc':depasser,
         'today':timezone.now().date(),
-        'target':target
+        'target':target,
+        'receipt_no':receipt_no
     }
     if bons:
         ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)

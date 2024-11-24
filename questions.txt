@@ -1,3 +1,8 @@
 generer devi bl in table
 create command
 generer devi commande in table
+
+image of product when selected in select2
+when facture created, create also bl
+reglement avoir client in pyemnts to client table
+farah or orgh in bonsorti lines

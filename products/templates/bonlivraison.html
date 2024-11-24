@@ -29,6 +29,7 @@
   </div>
   <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
 </div>
+
   <div class="bonlivraisonparentdiv">
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
             <div class="col-5">
@@ -163,6 +164,53 @@
                 </b>
             </div>
           </div>
+          <div class="reglementbonsholder mt-3 border position-relative">
+
+            <div class="inputsholder">
+                <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
+                <strong class="totalreglblfields">0.00</strong>
+                    <div class="row align-items-center">
+                          <div class="col-3">
+                              <small>Mantant:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>N° piece:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>Mode Paiment:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>Echeance:</small> <br>
+
+                          </div>
+                      </div>
+                    <div class="reglements">
+                        <div class="row align-items-center mt-2">
+                            <div class="col-3">
+                                <input type="number" name="mantantreglementclient" onchange="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
+                            </div>
+                            <div class="col-3">
+                                <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)">
+                                    <option value="cheque">Cheque</option>
+                                    <option value="effet">effet</option>
+                                    <option value="espece">espece</option>
+                                    <option value="verement">verement</option>
+                                    <option value="versement">versement</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <input type="date" name="echeance" class="w-100 notempty echeancereglbl" value="{{today|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
       </div>
 
   </div>
@@ -804,6 +852,8 @@
                   'repid':repid,
                   'transport':transport,
                   'datebon': datebon,
+                  'devid': "",
+                  'cmndid': "",
                   'note': note,
                   'products': JSON.stringify(products),
                   'csrfmiddlewaretoken': '{{csrf_token}}'
@@ -813,7 +863,7 @@
                   // remove list in localstorage
                   localStorage.removeItem('pdctsinbonlivraison')
                   localStorage.removeItem('bonlivraison')
-                  deletetab('addbonlivraison')
+                  //deletetab('addbonlivraison')
                   ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
 
 

@@ -1,0 +1,21 @@
+<input type="text" class="form-control" placeholder="chercher">
+<table class="table">
+    <thead>
+        <tr>
+            <th>N°</th>
+            <th>Prix</th>
+            <th>Remise</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in producthistory %}
+        <tr>
+            <td>{{ product.bon.bon_no }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.remise }}</td>
+            <td><input type="checkbox"></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

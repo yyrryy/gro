@@ -118,8 +118,8 @@
           <td style="width:10%;"  onclick="sorttable(event)">Client</td>
           <td style="width:10%;" >Code client</td>
           <td style="width:10%;"  onclick="intsorttable(event)">Total</td>
-          <td style="width:10%;"  onclick="sorttable(event)">Staus</td>
-          <td style="width:10%;"  onclick="sorttable(event)">Validation</td>
+          <td style="width:10%;"  onclick="sorttable(event)">N° Devi</td>
+          <td style="width:10%;"  onclick="sorttable(event)">N° Bon livraison</td>
           <td style="width:15%;"  onclick="sorttable(event)">Notes</td>
           <td style="width:10%;"  onclick="sorttable(event)">Useer</td>
           <td style="width:10%;" ></td>
@@ -137,35 +137,17 @@
             </td>
             
             <td class="">
-              {% if order.ispaid %}
-              <div  style="text-align: center; background: lightgreen;">
-                Encaissé
-              </div>
+              {% if order.devi %}
               
-
-              {% else %}
-
-                <div class="" style="text-align: center; background: yellow;">
-                  En attend
-                </div>
-                
-
+              {{order.devi.bon_no}}
+              
               {% endif %}
             </td>
 
             <td class="">
-              {% if order.generated %}
-              <div  style="text-align: center; background: lightgreen;">
-                Valider
-              </div>
-              
-
-              {% else %}
-
-                <div class="" style="text-align: center; background: yellow;">
-                  No valider
-                </div>
+              {% if order.generatedbl %}
                 
+                {{order.bl.bon_no}}
 
               {% endif %}
             </td>

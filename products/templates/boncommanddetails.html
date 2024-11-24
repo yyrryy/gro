@@ -5,7 +5,13 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    {% if not order.generatedbl %}
+    {% if order.devi and order.devi.generatedbl %}
+    <div>
+      <strong>
+        Devis est generé
+      </strong>
+    </div>
+    {% elif not order.generatedbl %}
     <button class="btn w-100 btn-success mb-2" onclick="ajaxpage('id', 'title', '/products/boncommandobl?commandid={{order.id}}&&target={{target}}')">
       Generer bon livraison
     </button>

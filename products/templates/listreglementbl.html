@@ -123,7 +123,7 @@
 
                 <div class="inputsholder">
 
-
+                    dd
                     <div class="row align-items-center">
                         <div class="col-3">
                             <small>Mantant:</small> <br>
@@ -253,6 +253,11 @@
                         <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;">
 
                         </select>
+                        <br>
+                        <select name="" id="">
+                            <option value="bl">bl</option>
+                            <option value="facture">facture</option>
+                        </select>
                     </div>
 
                     <div class="reglementbonsholder d-none col-9 border position-relative">
@@ -315,7 +320,7 @@
 
                         </div>
 
-                        <div class="mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
+                        <div class="col-4 mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
 
                             <table class="table table-bordered listaddreglbl table-hover" style="font-size: 12px;">
                                 <thead style="position: sticky; top: 0; background: white;">
@@ -325,9 +330,6 @@
                                         </td>
                                         <td>
                                             N° Bon
-                                        </td>
-                                        <td>
-                                            Client
                                         </td>
                                         <td>
                                             total
@@ -380,7 +382,7 @@
                 </div>
             </div>
           </div>
-        </div>
+    </div>
     </div>
 
     </div>
@@ -568,7 +570,7 @@
     $(function(){
       $('.addreglementclientsbl').select2({
         minimumInputLength: 1,
-        placeholder:'Chercher',
+        placeholder:'Chercher client',
         ajax: {
           type:'get',
           dataType: 'json',
