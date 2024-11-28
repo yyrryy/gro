@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -793,7 +793,15 @@ def addsupply(request):
 
 
 def addbonlivraison(request):
-
+    mantant=request.POST.get('mantant')
+    mode=request.POST.get('mode')
+    npiece=request.POST.get('npiece')
+    echeance=request.POST.get('echeance')
+    print('>> echeance', echeance, echeance=="")
+    if echeance=="":
+        echeance=None
+    else:
+        echeance=datetime.strptime(echeance, '%Y-%m-%d')
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
@@ -817,6 +825,7 @@ def addbonlivraison(request):
     # get the last bon no
     year = timezone.now().strftime("%y")
     isfarah=target=='f'
+    isorgh=target=='o'
     print('isfarah, target', isfarah, target)
     if isfarah:
         latest_receipt = Bonlivraison.objects.filter(
@@ -887,8 +896,58 @@ def addbonlivraison(request):
                 date=datebon,
                 isfarah=isfarah
             )
-
-
+    if float(mantant)>float(totalbon):
+        diff=float(mantant)-float(totalbon)
+        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+        regl=PaymentClientbl.objects.create(
+            client_id=clientid,
+            amount=mantant,
+            date=datebon,
+            echance=echeance,
+            mode=mode,
+            npiece=npiece,
+            isfarah=isfarah,
+            isorgh=isorgh
+        )
+        regl.bon=order
+        order.ispaid=True
+        Avanceclient.objects.create(
+            client_id=clientid,
+            amount=diff,
+            date=datebon,
+            isfarah=isfarah,
+            isorgh=isorgh
+        )
+    elif float(mantant)==float(totalbon):
+        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+        regl=PaymentClientbl.objects.create(
+            client_id=clientid,
+            amount=mantant,
+            date=datebon,
+            echance=echeance,
+            mode=mode,
+            npiece=npiece,
+            isfarah=isfarah,
+            isorgh=isorgh
+        )
+        regl.bon=order
+        order.ispaid=True
+    else:
+        diff=float(totalbon)-float(mantant)
+        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+        regl=PaymentClientbl.objects.create(
+            client_id=clientid,
+            amount=mantant,
+            date=datebon,
+            echance=echeance,
+            mode=mode,
+            npiece=npiece,
+            isfarah=isfarah,
+            isorgh=isorgh
+        )
+        regl.bon=order
+        order.rest=diff
+    #diff=float(mantant)-float(totalbon)
     # increment it
     return JsonResponse({
         "success":True
@@ -2223,13 +2282,17 @@ def listreglementfc(request):
 def getclientbons(request):
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
+    mode=request.POST.get('mode')
     print('>> target', target)
     if target=='s':
         bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    elif target=="f":
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfarah=True).order_by('date')[:50]
+        #total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid).order_by('date')[:50]
-        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfarah=False).order_by('date')[:50]
+        #total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
         # old code, if reglement is paid it's checked from here

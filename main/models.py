@@ -353,7 +353,7 @@ class Avanceclient(models.Model):
     amount = models.FloatField()
     bon=models.ForeignKey('Bonlivraison', on_delete=models.CASCADE, default=None, null=True)
     facture=models.ForeignKey('Facture', on_delete=models.CASCADE, default=None, null=True)
-    mode=models.CharField(max_length=10, default=None)
+    mode=models.CharField(max_length=10, default=None, null=True)
     echeance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
@@ -375,6 +375,7 @@ class Bonlivraison(models.Model):
     order=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     #bon command
     command=models.ForeignKey('Command', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommand')
+    facture=models.ForeignKey('Facture', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='factureofthisbon')
     devi=models.ForeignKey('Devi', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='deviofbon')
     bonsortie=models.ForeignKey('Bonsortie', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonsortie')
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
@@ -412,7 +413,7 @@ class Bonlivraison(models.Model):
 class Facture(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
-    bon=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    bon=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, blank=True, null=True, related_name='bonofthisfacture')
     date = models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     code=models.CharField(max_length=50, null=True, default=None)
     total=models.FloatField(default=0.00)
@@ -475,7 +476,10 @@ class PaymentClientbl(models.Model):
     ispaid=models.BooleanField(default=False)
     #refused means impyé
     refused=models.BooleanField(default=False)
-
+    bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='bonofreglement')
+    isfara=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+    issortie=models.BooleanField(default=False)
 class Bonsregle(models.Model):
     payment=models.ForeignKey(PaymentClientbl, on_delete=models.CASCADE, default=None, null=True, blank=True)
     bon=models.ForeignKey('Bonlivraison', on_delete=models.CASCADE, default=None, null=True, blank=True)

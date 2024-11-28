@@ -21,12 +21,15 @@
       Bon est reglé
     </p>
     {% else %}
-    <button class="btn w-100 btn-success" onclick="ajaxpage('generatefacturetab{{order.id}}', 'Generer Fact.', '/products/validatebonsortie?bonid={{order.id}}')">
+    <!-- <button class="btn w-100 btn-success" onclick="ajaxpage('generatefacturetab{{order.id}}', 'Generer Fact.', '/products/validatebonsortie?bonid={{order.id}}')">
       Generer Bon sortie
-    </button>
+    </button> -->
+    <!-- if it has bon sortie, dont diplay modifier -->
+    {% if i.bonsortie %}
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
       Modifier
     </button>
+    {% endif %}
 
 
     {% endif %}

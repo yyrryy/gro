@@ -309,7 +309,7 @@ def validatebonsortie(request):
         livraison_data = {
             'total': item_total,
             'qty': i.qty,
-            'ref': i.ref,
+            
             'name': i.name,
             'product': product,
             'price': i.price,
@@ -319,10 +319,12 @@ def validatebonsortie(request):
 
         if i.isfarah:
             totalfarah += item_total
+            livraison_data['ref']=i.ref.replace('(FR) ', ''),
             livraison_data['isfarah'] = True
             farahitems.append(Livraisonitem(**livraison_data))
         else:
             totalorgh += item_total
+            livraison_data['ref']=i.ref.replace('(OR) ', ''),
             livraison_data['isorgh'] = True
             orghitems.append(Livraisonitem(**livraison_data))
     
@@ -343,10 +345,12 @@ def validatebonsortie(request):
             'date': timezone.now(),
             'bon_no': receipt_no,
             'note': bon.note,
+            'bonsortie':bon
         }
         
         if is_farah:
             bon_data['isfarah'] = True
+            # the client of the bon created will always be the first client
             bon_data['client'] = Client.objects.get(code='CF-1')
         else:
             bon_data['isorgh'] = True
@@ -1506,10 +1510,10 @@ def getclientbonsforfacture(request):
     target=request.POST.get('target')
     print('>> target', target)
     if target=='s':
-        bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
+        bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid).order_by('date')[:50]
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False).order_by('date')[:50]
         total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
@@ -1528,20 +1532,17 @@ def getclientbonsforfacture(request):
 def facturemultiple(request):
     # create  facture with multiple bons
     date=request.GET.get('date')
-    date=datetime.strptime(f'{date}', '%Y-%m-%d')
+    date=datetime.strptime(date, '%Y-%m-%d')
     clientid=request.GET.get('clientid')
     target=request.GET.get('target')
-    bons=request.GET.get('bons')
+    client=Client.objects.get(pk=clientid)
+    bons=json.loads(request.GET.get('bons'))
     year=timezone.now().strftime("%y")
-    bons=json.loads(request.POST.get('bons'))
-    mantant=json.loads(request.POST.get('mantant'))
-    mode=json.loads(request.POST.get('mode'))
-    npiece=json.loads(request.POST.get('npiece'))
-    date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
-    echeance=json.loads(request.POST.get('echeance'))
-    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    isfarah=False
+
     if target=='f':
+        isfarah=True
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FR-FC{year}'
         ).last()
@@ -1554,7 +1555,6 @@ def facturemultiple(request):
         else:
             receipt_no = f"FR-FC{year}000000001"
     else:
-        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FC{year}'
         ).last()
@@ -1566,8 +1566,68 @@ def facturemultiple(request):
             receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
         else:
             receipt_no = f"FC{year}000000001"
-
-    pass
-    
-
-
+    total=0
+    facture=Facture.objects.create(
+        facture_no=receipt_no,
+        client_id=clientid,
+        isfarah=isfarah
+    )
+    # if we have just one bon
+    if len(livraisons)==1:
+        print(">> here")
+        bon=livraisons[0]
+        bon.facture=facture
+        facture.total=livraisons[0].total
+        facture.bon=bon
+        bon.isfacture=True
+        bon.save()
+        #get items of bon
+        items=Livraisonitem.objects.filter(bon=bon)
+        # create facture items
+        for i in items:
+            Outfacture.objects.create(
+                facture=facture,
+                remise=i.remise,
+                name=i.name,
+                ref=i.ref,
+                product=i.product,
+                qty=i.qty,
+                price=i.price,
+                total=i.total,
+                client_id=clientid,
+                date=date,
+                isfarah=isfarah
+            )
+        # sold facture
+        client.soldfacture+=bon.total
+    else:
+        # iterate throu bons
+        for bon in livraisons:
+            total+=bon.total
+            bon.isfacture=True
+            bon.facture=facture
+            bon.save()
+            # loop items of bon
+            items=Livraisonitem.objects.filter(bon=bon)
+            for i in items:
+                Outfacture.objects.create(
+                    facture=facture,
+                    remise=i.remise,
+                    name=i.name,
+                    ref=i.ref,
+                    product=i.product,
+                    qty=i.qty,
+                    price=i.price,
+                    total=i.total,
+                    client_id=clientid,
+                    date=date,
+                    isfarah=isfarah
+                )    
+        facture.total=total
+        facture.bons.set(livraisons)
+        client.soldfacture+=total
+    facture.save()
+    client.save()
+    return JsonResponse({
+        'success':True
+    })

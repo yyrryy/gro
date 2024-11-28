@@ -200,26 +200,26 @@
         <thead style="background: rgb(231, 231, 231); position: sticky;top: 0;">
 
           <tr>
-            <td style="width: 8%;" onclick="sorttable(event)">N° facture</td>
-            <td style="width: 8%;" onclick="sorttable(event)">
+            <td  onclick="sorttable(event)">N° facture</td>
+            <td  onclick="sorttable(event)">
               <div class="d-flex justify-content-between align-items-center">
                 <!-- <button class="btn btn-sm" style="font-size: 6px; background: #f06623; color: white;" onclick="sortupfc(event)">↑</button>  -->
                 <div>Date</div>
                 <!-- <button class="btn btn-sm" style="font-size: 6px; background: #f06623; color: white;" onclick="sortdownfc(event)">↓</button>  -->
               </div>
             </td>
-            <td style="width: 5%;" onclick="sorttable(event)">Total</td>
-            <td style="width: 5%;" onclick="sorttable(event)">TVA</td>
-            <td style="width: 12%;" onclick="sorttable(event)">Client</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Code client</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Region</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Ville</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Solde fc cl.</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Repr</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Reglé</td>
-            <td style="width: 5%;" onclick="sorttable(event)">Notes</td>
-            <td style="width: 3%;" onclick="sorttable(event)">Reglements</td>
-            <td style="width: 5%;" onclick="sorttable(event)">N° Bon livr.</td>
+            <td onclick="sorttable(event)">Total</td>
+            <td onclick="sorttable(event)">TVA</td>
+            <td onclick="sorttable(event)">Client</td>
+            <td onclick="sorttable(event)">Code client</td>
+            <!-- <td onclick="sorttable(event)">Region</td> -->
+            <td onclick="sorttable(event)">Ville</td>
+            <td onclick="sorttable(event)">Solde fc cl.</td>
+            <!-- <td onclick="sorttable(event)">Repr</td> -->
+            <td onclick="sorttable(event)">Reglé</td>
+            <td onclick="sorttable(event)">Notes</td>
+            <td onclick="sorttable(event)">Reglements</td>
+            <td onclick="sorttable(event)">N° Bon livr.</td>
             <!-- <td style="width: 5%;" onclick="sorttable(event)">Comptablisé</td> -->
           </tr>
         </thead>
@@ -234,10 +234,10 @@
               <td>{{ order.tva|floatformat:2|intspace}}</td>
               <td>{{ order.client.name }}</td>
               <td>{{ order.client.code }}</td>
-              <td>{{ order.client.region }}</td>
+              <!-- <td>{{ order.client.region }}</td> -->
               <td>{{ order.client.city }}</td>
               <td>{{ order.client.soldfacture|floatformat:2|intspace }}</td>
-              <td>{{ order.salseman }}</td>
+              <!-- <td>{{ order.salseman }}</td> -->
               {% if order.ispaid %}
               <td class="d-flex justify-content-between">
                 <div>
@@ -260,7 +260,27 @@
               <td style="white-space:nowrap;">
                 {{order.getreglement|slice:'16' }}
               </td>
-                <td>{{ order.bon.bon_no }}</td>
+                <td>
+                  {% if order.bon %}
+                  {{ order.bon.bon_no }}
+                  {% else %}
+                  <div class="accordion" id="accordionbons{{order.id}}">
+
+                    <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsbon{{order.id}}" aria-expanded="true" aria-controls="collapsbon{{order.id}}">
+
+
+                    </button>
+
+                    <div id="collapsbon{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{order.id}}">
+                        {% for bon in order.bons.all %}
+                        -{{ bon.bon_no }} <br>
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+                  {% endif %}
+                </td>
                 <td class="d-flex">
                   {% if order.isaccount %}
                   <i class="bi bi-check h3"></i>c
@@ -270,7 +290,7 @@
             </tr>
           {% endfor %}
         </tbody>
-        <thead style="background: rgb(231, 231, 231); position: sticky;bottom: 0;">
+        <!--<thead style="background: rgb(231, 231, 231); position: sticky;bottom: 0;">
 
           <tr>
             <td style="width: 8%;"></td>
@@ -289,7 +309,7 @@
             <td style="width: 5%;"></td>
           </tr>
         </thead>
-        <!-- <tfoot>
+         <tfoot>
           <tr>
             <td>N° bon</td>
             <td>Date</td>
@@ -557,7 +577,6 @@
   }
   $('.facturemultiple').on('click', function(event){
         event.preventDefault()
-        $(event.target).addClass('disabled')
         let parentdiv=$(this).parent().parent()
         // if ((selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
         //     return this.value;
@@ -568,21 +587,25 @@
         selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
             return this.value;
         }).get()
-        $(this).addClass('disabled')
+        
         clientid=$('[name="clientoffacture"]').val()
         
         date=$(".dateoffacture").val()
 
-        bons=parentdiv.find('[name="addreglementbons"]').map(function() {
-            return this.value;
-        }).get();
-        
+       
+        if (selectedValues.length==0 || clientid==null){
+          alertify.error('Champs vide')
+          return
+        }
+        $(this).addClass('disabled')
 
         console.log(clientid, date, selectedValues)
-        // $.get('/products/facturemultiple?target={{target}}', {
-        //   'clientid':clientid,
-        //   'bons':selectedValues
-        // })
+        $.get('/products/facturemultiple?target={{target}}', {
+          'clientid':clientid,
+          'bons':JSON.stringify(selectedValues),
+          'date':date
+        })
+        ajaxpage('add', '+ Article', '/products/listfactures?target=f')
     })
 
 $('.filterfcdate').on('click', function(){

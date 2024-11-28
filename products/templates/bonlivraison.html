@@ -167,8 +167,8 @@
           <div class="reglementbonsholder mt-3 border position-relative">
 
             <div class="inputsholder">
-                <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
-                <strong class="totalreglblfields">0.00</strong>
+                <!-- <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button> -->
+                <!-- <strong class="totalreglblfields">0.00</strong> -->
                     <div class="row align-items-center">
                           <div class="col-3">
                               <small>Mantant:</small> <br>
@@ -774,6 +774,10 @@
             parentdiv.find('.data').addClass('border border-danger')
             return
         }
+        mantant=$('[name="mantantreglementclient"]').val()
+        mode=$('[name="modereglementclient"]').val()
+        npiece=$('[name="npiece"]').val()
+        echeance=$('[name="echeance"]').val()
         parentdiv.find('.data').removeClass('border border-danger')
         // check if .itemrow is exist
         // if (parentdiv.find('.itemrow').length==0){
@@ -821,7 +825,7 @@
               products.push(product)
           })
           let clientid = parentdiv.find('.clientselectbl').val()
-          let repid = parentdiv.find('.repsselectsbl').val()
+          //let repid = parentdiv.find('.repsselectsbl').val()
           let datebon = parentdiv.find('.datebonbl').val()
           let transport = parentdiv.find('.transport').val()
           let note = parentdiv.find('.note').val()
@@ -829,11 +833,11 @@
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          localStorage.setItem('pdctsinbonlivraison', '[]')
+          //localStorage.setItem('pdctsinbonlivraison', '[]')
           data={
               'totalbon': totalbon,
               'clientid': clientid,
-              'repid':repid,
+              //'repid':repid,
               'transport':transport,
               'datebon': datebon,
               'note': note,
@@ -849,9 +853,13 @@
                 'target':'{{target}}',
                   'totalbon': totalbon,
                   'clientid': clientid,
-                  'repid':repid,
+                  //'repid':repid,
                   'transport':transport,
                   'datebon': datebon,
+                  'mantant': mantant,
+                  'mode': mode,
+                  'npiece': npiece,
+                  'echeance': echeance,
                   'devid': "",
                   'cmndid': "",
                   'note': note,

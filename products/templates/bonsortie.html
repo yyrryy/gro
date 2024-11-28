@@ -440,7 +440,7 @@
         // ${stock<=0? "text-danger":"" }"
         let tr = `
         <tr class="itemrow" productid=${id} farah=${farah}>
-            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${ref}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${farah=='1'?'(FR)':'(OR)'} ${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
@@ -461,7 +461,7 @@
           'remise': addremise.val(),
           'total': addtotal,
           'name': name,
-          'ref': ref,
+          'ref': `${farah=='1'?'(FR)':'(OR)'} ${ref}`,
           'dp': dp,
           'stock': stockfarah,
           'clientprice': priceclient,
@@ -758,7 +758,8 @@
               },
               success: function(data){
                 console.log(data)
-                parentdiv.find('.addclientprice').html((`Client D.p: ${data.price} (${data.remise}%) <br> pr. achat: ${data.buyprice} (${data.remisebuyprice}%)`))
+                parentdiv.find('.addclientprice').html((`${data.price} (${data.remise}%)`))
+                $('.addbyuprice').html(`pr. achat: ${data.buyprice} (${data.remisebuyprice}%)`)
               }
             })
 

@@ -250,11 +250,11 @@
                             </small>
                         </div><br>
                         <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
-                        <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;">
+                        <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;" onchange="getbons()">
 
                         </select>
-                        <br>
-                        <select name="" id="">
+                        
+                        <select name="" id="" class="mode mt-2" onchange="getbons()">
                             <option value="bl">bl</option>
                             <option value="facture">facture</option>
                         </select>
@@ -787,7 +787,7 @@
         console.log(clientid)
         $.post(
             'products/getclientbons',
-            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}'},
+            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}', 'mode':$('.mode').val},
 
             (data)=>{
                 $('.reglementclientbonholder').html(data.trs)
@@ -1047,7 +1047,7 @@
     // })
 
     // client change
-    $('[name="addreglementclientsbl"]').on('change', function(){
+    function getbons(){
         currentPageblregl=1
         loadingblregl = false;
         $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
@@ -1060,11 +1060,12 @@
         }
         $('.submitaddreglemntclientbtn').removeClass('disabled')
         $('.reglementbonsholder').removeClass('d-none')
-        clientid=$(this).val()
+        clientid=$('[name="addreglementclientsbl"]').val()
         $('.loadingscreen').removeClass('d-none')
         $.post('/products/getclientbons', {
             clientid:clientid,
             target:'{{target}}',
+            'mode':$('.mode').val(),
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
                 console.log(data)
@@ -1080,7 +1081,7 @@
         //populate bons multiselect
         // get client facture
         // populate facture multiselect
-    })
+    }
 
     // check for npiece existence
     $('[name="npiece"]').on('input', function(){
