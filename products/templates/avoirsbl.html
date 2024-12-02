@@ -9,5 +9,8 @@
     <td>
         {{i.total}}
     </td>
+    <td>
+        <input type="checkbox" value="{{i.id}}" name="avoirstopay" onchange="checkreglementbox(event)">
+    </td>
 </tr>
 {% endfor %}

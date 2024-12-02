@@ -358,6 +358,8 @@ class Avanceclient(models.Model):
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    # avance selected in an rglement
+    inreglement=models.BooleanField(default=False)
 
 class Avancesupplier(models.Model):
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
@@ -404,6 +406,7 @@ class Bonlivraison(models.Model):
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
     # payments of this bon
     payment=models.FloatField(default=0.00)
+
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)
@@ -647,6 +650,8 @@ class Avoirclient(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    # avoir selected in an rglement
+    inreglement=models.BooleanField(default=False)
     
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 

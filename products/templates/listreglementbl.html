@@ -381,12 +381,13 @@
                                         <td>
                                             total
                                         </td>
+                                        <td></td>
                                         
                                     </tr>
                                 </thead>
                                 <tbody class="avoirstable">
                                 </tbody>
-                                <tfoot style="position: sticky; bottom: 0; background: white;">
+                                <!-- <tfoot style="position: sticky; bottom: 0; background: white;">
                                     <tr>
                                         <td colspan="2">
 
@@ -395,7 +396,7 @@
                                         <td class="totalavoirs text-danger" style="background: yellowgreen;">
                                         </td>
                                     </tr>
-                                </tfoot>
+                                </tfoot> -->
 
                             </table>
                             <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
@@ -414,11 +415,13 @@
                                         <td>
                                             Mantant
                                         </td>
+                                        <td></td>
+
                                     </tr>
                                 </thead>
                                 <tbody class="avancestable">
                                 </tbody>
-                                <tfoot style="position: sticky; bottom: 0; background: white;">
+                                <!-- <tfoot style="position: sticky; bottom: 0; background: white;">
                                     <tr>
                                         <td colspan="2">
 
@@ -427,7 +430,7 @@
                                         <td class="totalavances text-danger" style="background: yellowgreen;">
                                         </td>
                                     </tr>
-                                </tfoot>
+                                </tfoot> -->
 
                             </table>
                             <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
@@ -1228,6 +1231,14 @@
         selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
             return this.value;
         }).get()
+        selectedavoirs = parentdiv.find("input[name='avoirstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        
+        selectedavances = parentdiv.find("input[name='avancestopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        
         $(this).addClass('disabled')
         clientid=parentdiv.find('[name="addreglementclientsbl"]').val()
         mantant=parentdiv.find('[name="mantantreglementclient"]').map(function() {
@@ -1251,7 +1262,6 @@
             return this.value;
         }).get();
 
-        console.log(clientid, date, mantant, mode, npiece, echeance, selectedValues)
         $.post('/products/reglebons', {
             clientid:clientid,
             mantant:JSON.stringify(mantant),
@@ -1260,6 +1270,8 @@
             echeance:JSON.stringify(echeance),
             //date:date,
             bons:JSON.stringify(selectedValues),
+            avoirs:JSON.stringify(selectedavoirs),
+            avances:JSON.stringify(selectedavances),
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
                 ajaxpage('addlistreglementbl', 'd', '/products/listreglementbl?target={{target}}')
