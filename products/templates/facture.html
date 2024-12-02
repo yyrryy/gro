@@ -573,7 +573,7 @@
 
       $('.submitfacture').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('.clientselectfacture').val()=='' || parentdiv.find('.repsselectsfacture').val()==''){
+        if (parentdiv.find('.clientselectfacture').val()==''){
             parentdiv.find('.data').addClass('border border-danger')
             return
         }
@@ -624,7 +624,6 @@
               products.push(product)
           })
           let clientid = parentdiv.find('.clientselectfacture').val()
-          let repid = parentdiv.find('.repsselectsfacture').val()
           let datebon = parentdiv.find('.datebonfacture').val()
           let transport = parentdiv.find('.transport').val()
           let note = parentdiv.find('.note').val()
@@ -637,7 +636,6 @@
           data={
               'totalbon': totalbon,
               'clientid': clientid,
-              'repid':repid,
               'transport':transport,
               'datebon': datebon,
               //'orderno': orderno,
@@ -650,6 +648,7 @@
               url: "{% url 'products:addfacture' %}",
               type: 'POST',
               data: {
+                  'target': '{{target}}',
                   'totalbon': totalbon,
                   'clientid': clientid,
                   'repid':repid,

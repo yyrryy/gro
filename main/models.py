@@ -477,7 +477,7 @@ class PaymentClientbl(models.Model):
     #refused means impyé
     refused=models.BooleanField(default=False)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='bonofreglement')
-    isfara=models.BooleanField(default=False)
+    isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     issortie=models.BooleanField(default=False)
 class Bonsregle(models.Model):

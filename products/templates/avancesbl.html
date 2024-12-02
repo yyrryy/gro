@@ -1,0 +1,10 @@
+{% for i in avances %}
+<tr>
+    <td>
+        {{i.date|date:"d/m/Y"}}
+    </td>
+    <td>
+        {{i.amount}}
+    </td>
+</tr>
+{% endfor %}

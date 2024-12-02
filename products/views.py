@@ -896,6 +896,14 @@ def addbonlivraison(request):
                 date=datebon,
                 isfarah=isfarah
             )
+    if mantant=="":
+        return JsonResponse({
+            "success":True
+        })
+    if float(mantant)==0:
+        return JsonResponse({
+            "success":True
+        })
     if float(mantant)>float(totalbon):
         diff=float(mantant)-float(totalbon)
         # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
@@ -949,6 +957,7 @@ def addbonlivraison(request):
         order.rest=diff
     #diff=float(mantant)-float(totalbon)
     # increment it
+    order.save()
     return JsonResponse({
         "success":True
     })
@@ -956,7 +965,7 @@ def addbonlivraison(request):
 # add facture not generer
 def addfacture(request):
     clientid=request.POST.get('clientid')
-    repid=request.POST.get('repid')
+    target=request.POST.get('target')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
     # orderno
@@ -966,17 +975,40 @@ def addfacture(request):
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
     client=Client.objects.get(pk=clientid)
+    isfarah=False
+    isorgh=False
+    if target=='f':
+        isfarah=True
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FR-FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FR-FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-FC{year}000000001"
+    else:
+        isorgh=True
+        latest_receipt = Facture.objects.filter(
+            facture_no__startswith=f'FC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FC{year}000000001"
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldfacture=round(float(client.soldfacture)+float(totalbon), 2)
     client.save()
     tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
     year = timezone.now().strftime("%y")
-    latest_receipt = Facture.objects.filter(facture_no__startswith=f'FC{year}').order_by('-facture_no').first()
-    if latest_receipt:
-        latest_receipt_no = int(latest_receipt.facture_no[-5:])
-        receipt_no = f"FC{year}{latest_receipt_no + 1:05}"
-    else:
-        receipt_no = f"FC{year}00001"
+    
     print('>>>>>>>',latest_receipt)
     facture=Facture.objects.create(
         facture_no=receipt_no,
@@ -984,7 +1016,6 @@ def addfacture(request):
         tva=tva,
         date=datebon,
         client_id=clientid,
-        salseman_id=repid,
         transport=transport,
         note=note
     )
@@ -992,7 +1023,8 @@ def addfacture(request):
         with transaction.atomic():
             for i in json.loads(products):
                 product=Produit.objects.get(pk=i['productid'])
-                product.stockfacture=int(product.stockfacture)-int(i['qty'])
+                if isfarah:
+                    product.stockfacture=int(product.stockfacture)-int(i['qty'])
                 product.save()
                 Outfacture.objects.create(
                     facture=facture,
@@ -1518,7 +1550,7 @@ def getclientprice(request):
     return JsonResponse({
         'price':price,
         'remise':remise,
-        'table':render(request, 'prodctprices.html', {'producthistory':producthistory}).content.decode('utf-8')
+        'table':render(request, 'prodctprices.html', {'producthistory':producthistory.order_by('date')}).content.decode('utf-8')
     })
     # except Exception as e:
     #     print('error', e)
@@ -2283,16 +2315,35 @@ def getclientbons(request):
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
     mode=request.POST.get('mode')
+    datefrom=request.POST.get('datefrom')
+    dateend=request.POST.get('dateend')
     print('>> target', target)
     if target=='s':
         bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     elif target=="f":
-        bons=Bonlivraison.objects.filter(client_id=clientid, isfarah=True).order_by('date')[:50]
-        #total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        if mode=='bl':
+            bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+            avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+            avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+        else:
+            bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+            avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+            avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
+        #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid, isfarah=False).order_by('date')[:50]
+        if mode=='bl':
+            bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+            avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+            avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+        else:
+            bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+            avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+            avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+    # totalbons=bons.aggregate
         #total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    print("bons", bons)
+    print('start, ent', datefrom, dateend)
     trs=''
     for i in bons:
         # old code, if reglement is paid it's checked from here
@@ -2301,9 +2352,14 @@ def getclientbons(request):
 
 
     return JsonResponse({
-        'trs':trs,
-        'total':total,
-        'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2)
+        'bons':trs,
+        'avoirs':render(request, 'avoirsbl.html', {'avoirs':avoir}).content.decode('utf-8'),
+        'avances':render(request, 'avancesbl.html', {'avances':avance}).content.decode('utf-8'),
+        # 'total':total,
+        'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2),
+        'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+        'totalavoirs':round(avoir.aggregate(Sum('total')).get('total__sum') or 0, 2),
+        'totalavances':round(avance.aggregate(Sum('amount')).get('amount__sum') or 0, 2)
     })
 
 def filternonreglr(request):
@@ -2455,7 +2511,7 @@ def reglebons(request):
     mantant=json.loads(request.POST.get('mantant'))
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
-    date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
     echeance=json.loads(request.POST.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
@@ -2529,7 +2585,8 @@ def reglebons(request):
         regl=PaymentClientbl.objects.create(
             client_id=clientid,
             amount=m,
-            date=date,
+            #today
+            date=timezone.now().date(),
             echance=ech,
             mode=mod,
             npiece=np
@@ -2713,6 +2770,7 @@ def avoirclient(request):
 
 
 def addavoirclient(request):
+    target=request.POST.get('target')
     clientid=request.POST.get('clientid')
     repid=request.POST.get('repid')
     products=request.POST.get('products')
@@ -2724,16 +2782,28 @@ def addavoirclient(request):
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
     client=Client.objects.get(pk=clientid)
-
+    isfarah=False
+    isorgh=False
     year = timezone.now().strftime("%y")
+    if target=="f":
+        isfarah=True
 
-    prefix = f'AV{year}'
-    try:
-        avoirclients = Avoirclient.objects.filter(no__startswith=prefix).last()
-        latest_receipt_no = int(avoirclients.no.split('/')[1])
-        receipt_no = f"AV{year}/{latest_receipt_no + 1}"
-    except:
-        receipt_no = f"AV{year}/1"
+        prefix = f'FR-AV{year}'
+        try:
+            avoirclients = Avoirclient.objects.filter(no__startswith=prefix).last()
+            latest_receipt_no = int(avoirclients.no.split('/')[1])
+            receipt_no = f"FR-AV{year}/{latest_receipt_no + 1}"
+        except:
+            receipt_no = f"FR-AV{year}/1"
+    else:
+        isorgh=True
+        prefix = f'AV{year}'
+        try:
+            avoirclients = Avoirclient.objects.filter(no__startswith=prefix).last()
+            latest_receipt_no = int(avoirclients.no.split('/')[1])
+            receipt_no = f"AV{year}/{latest_receipt_no + 1}"
+        except:
+            receipt_no = f"AV{year}/1"
     print(receipt_no, clientid, repid, totalbon, datebon, isfacture)
     try:
 
@@ -2743,14 +2813,19 @@ def addavoirclient(request):
             representant_id=repid,
             total=totalbon,
             date=datebon,
-            avoirfacture=isfacture
+            avoirfacture=isfacture,
+            isfarah=isfarah,
+            isorgh=isorgh
         )
 
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
-            if isfacture:
-                product.stockfacture=int(product.stockfacture)+int(i['qty'])
-            product.stocktotal=int(product.stocktotal)+int(i['qty'])
+            # if isfacture:
+            #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
+            if isfarah:
+                product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+            if isorgh:
+                product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
             product.save()
             Returned.objects.create(
                 avoir=avoir,
@@ -2759,26 +2834,34 @@ def addavoirclient(request):
                 remise=0 if i['remise']=="" else i['remise'],
                 price=0 if i['price']=="" else i['price'],
                 total=i['total'],
+                isfarah=isfarah,
+                isorgh=isorgh
             )
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
-        if isfacture:
-            client.soldfacture=round(float(client.soldfacture)-float(totalbon), 2)
-        else:
-            client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
+        # if isfacture:
+        #     client.soldfacture=round(float(client.soldfacture)-float(totalbon), 2)
+        # else:
+        client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
 
         client.save()
     except Exception as e:
+        return JsonResponse({
+            'success':False,
+            'eorro':e
+        })
         print('>>error av cl:', e)
 
     # increment it
     return JsonResponse({
-        'html':render(request, 'avoirclient.html', {
-            'title':'Bon de livraison',
-            #'clients':Client.objects.all(),
-            #'products':Produit.objects.all(),
-            'commercials':Represent.objects.all(),
-            #'receipt_no':receipt_no
-        }).content.decode('utf-8')
+        'success':True
+        # 'html':render(request, 'avoirclient.html', {
+        #     'title':'Bon de livraison',
+        #     #'clients':Client.objects.all(),
+        #     #'products':Produit.objects.all(),
+        #     'commercials':Represent.objects.all(),
+        #     #'receipt_no':receipt_no
+        # }).content.decode('utf-8')
+
     })
 
 def avoirsupplier(request):

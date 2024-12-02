@@ -1114,6 +1114,12 @@ a .uil {
         function formatRepoSelection (repo) {
           return repo.text;
         }
+      function populateavoir(event, price, remise){
+        console.log('>> ddd')
+        $('[name="addprice"]').val(price);
+        $('[name="addremise"]').val(remise);
+
+      }
       function savetolocalstorage(item, total, target){
         // get the already existing
         let items = JSON.parse(localStorage.getItem(target)) || [];

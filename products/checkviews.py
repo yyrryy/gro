@@ -1631,3 +1631,7 @@ def facturemultiple(request):
     return JsonResponse({
         'success':True
     })
+
+def achatfacture(request):
+    target=request.GET.get('target')
+    return render(request, 'listfactureachat.html')

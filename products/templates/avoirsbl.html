@@ -1,0 +1,13 @@
+{% for i in avoirs %}
+<tr>
+    <td>
+        {{i.date|date:"d/m/Y"}}
+    </td>
+    <td>
+        {{i.no}}
+    </td>
+    <td>
+        {{i.total}}
+    </td>
+</tr>
+{% endfor %}

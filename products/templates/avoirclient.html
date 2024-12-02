@@ -314,7 +314,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;">${dp}</td>
             <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
+            
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event)" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event)" name="remise" style="height:23px; width:100%;"></td>
@@ -324,7 +324,21 @@
 
         </tr>
         `
-
+        item={
+          'ref': ref,
+          'name': name,
+          'dp': dp,
+          'stock': stock,
+          'stockfacture': stockfacture,
+          'id': id,
+          'sellprice': sellprice,
+          'remise': remise,
+          'netprice': netprice,
+          'representprice': representprice,
+          'qty': addqty.val(),
+          'price': addprice.val(),
+          'total': addtotal
+        }
         bonachatbody.prepend(tr)
         // delete selected option
         addqty.val('')
@@ -337,6 +351,7 @@
         totals.each(function() {
             totalSum += parseFloat($(this).text());
         });
+        savetolocalstorage(item, totalSum, 'avoircl')
         totalbon.text(totalSum.toFixed(2))
         $('.avoirclproducts ').select2('open')
 
@@ -463,8 +478,7 @@
 
     // })
 
-    localStorage.removeItem('pdctsinavoircl')
-    localStorage.setItem('pdctsinavoircl', '[]')
+    
     $(document).ready(function(){
       $('.clientselectavoir').select2('open')
     })
@@ -541,7 +555,7 @@
 
       $('.submitavcl').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('.clientselectavoir').val()=='' || parentdiv.find('.modeselectav').val()=='' ){
+        if (parentdiv.find('.clientselectavoir').val()=='' || parentdiv.find('.datebon').val()=='' ){
             $('.dataavoircl').addClass('border border-danger')
             console.log('clientselectavoir', parentdiv.find('.clientselectavoir').val(), 'modeselectav', parentdiv.find('.modeselectav').val(), 'repsavclselects', parentdiv.find('.repsavclselects').val())
             return
@@ -621,6 +635,7 @@
               url: "{% url 'products:addavoirclient' %}",
               type: 'POST',
               data:{
+                'target': '{{target}}',
                 'totalbon': totalbon,
                 'clientid': clientid,
                 'repid':repid,
@@ -633,9 +648,14 @@
               },
               success: function(data){
                 $('.loadingscreen').addClass('d-none')
+                if (data.success){
+                  
                   alertify.success('Bon avoir creé')
                   deletetab('addavoir')
-                  ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient')
+                  ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient?target={{target}}')
+                }else{
+                  alertify.error(data.error)
+                }
                   // remove list in localstorage
                   // $('#addavoir').html('')
                   // $('#addavoir').html(data.html)

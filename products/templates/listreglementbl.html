@@ -107,15 +107,16 @@
             <div class="col-3">
                 <div class="">
                     <small>Date:</small> <br>
-                    <input type="date" name="date" class="w-100 notempty mb-2">
+                    <input type="date" name="" class="w-100 notempty mb-2">
                 </div><br>
+                
                 <input name="reglementid" hidden>
                 <small>Client: <span class="client"></span></small><br>
                 <small>Sold Bl Client: <span class="soldblinupdatereglbl text-danger" style="margin-left: 10px;"></span></small><br>
-                <div class="mt-5">
+                <!-- <div class="mt-5">
                     <input type="password" class="passworddeletereglbl form-control">
                     <button class="btn btn-danger deletereglblbtn w-100" reglid="" onclick="deletereglbl(event)">Supprimer</button>
-                </div>
+                </div> -->
 
             </div>
 
@@ -240,24 +241,29 @@
           <div id="collapsereglbl" class="collapse" aria-labelledby="headingOne" data-parent="#accordionreglbl">
             <div class="card-body border shadow rounded">
                 <div class="row">
-
+                    <small class="errordatereglclbl text-danger d-none">
+                        Date incorrect
+                      </small>
                     <div class="col-3">
                         <div class="">
-                            <small>Date:</small> <br>
-                            <input type="date" name="datereglementclientbl" class="w-100 notempty datereglement mb-2" value="{{today|date:'Y-m-d'}}" onchange="checkyearreglbl(event)">
-                            <small class="errordatereglclbl text-danger d-none">
-                              Date incorrect
-                            </small>
-                        </div><br>
+                            <small>Du:</small> <br>
+                            <input type="date" name="datereglementclientbl" class="w-100 notempty datefrom mb-2" value="{{today|date:'Y-m-d'}}" onchange="checkyearreglbl(event)">
+                            
+                        </div>
+                        <div class="">
+                            <small>Au:</small> <br>
+                            <input type="date" name="dateend" class="w-100 notempty mb-2 dateend" value="{{today|date:'Y-m-d'}}">
+                        </div>
                         <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
                         <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;" onchange="getbons()">
 
                         </select>
                         
-                        <select name="" id="" class="mode mt-2" onchange="getbons()">
+                        <select name="" id="" class="mode mt-2 form-control" onchange="getbons()">
                             <option value="bl">bl</option>
                             <option value="facture">facture</option>
                         </select>
+                        <button class="btn btn-success w-100" onclick="getbons()">Situation</button>
                     </div>
 
                     <div class="reglementbonsholder d-none col-9 border position-relative">
@@ -308,20 +314,22 @@
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
-                            <div>
-                                <small>Bons:</small> <strong class="totalcheckedbl">0.00</strong><br>
-                            </div>
-                            <div>
+                            
+                            
+                            <!-- <div>
                                 <button class="btn btn-sm btn-danger" onclick="filternonreglr()" style="border-radius: 10px;">NR</button>
                                 <button class="btn btn-sm btn-info" onclick="getallbl()" style="border-radius: 10px;">TOUS</button>
                             </div>
                             <input style="width:10em;background: #8080802b;
-                            border-radius: 10px;" type="text" name="" id="" placeholder="Recherche" class="searchinputlistaddreglbl">
+                            border-radius: 10px;" type="text" name="" id="" placeholder="Recherche" class="searchinputlistaddreglbl"> -->
 
                         </div>
 
                         <div class="col-4 mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
-
+                            <div>
+                                <!-- <small>Bons:</small> <strong class="totalcheckedbl">0.00</strong><br> -->
+                                <small>Bons:</small> <strong class="totalbons">0.00</strong><br>
+                            </div>
                             <table class="table table-bordered listaddreglbl table-hover" style="font-size: 12px;">
                                 <thead style="position: sticky; top: 0; background: white;">
                                     <tr>
@@ -358,6 +366,74 @@
 
                             </select> -->
                         </div>
+                        <div class="col-4 mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
+                            Avoirs: <strong class="totalavoirs">0.00</strong>
+
+                            <table class="table table-bordered listaddreglbl table-hover" style="font-size: 12px;">
+                                <thead style="position: sticky; top: 0; background: white;">
+                                    <tr>
+                                        <td>
+                                            Date
+                                        </td>
+                                        <td>
+                                            N° Bon
+                                        </td>
+                                        <td>
+                                            total
+                                        </td>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody class="avoirstable">
+                                </tbody>
+                                <tfoot style="position: sticky; bottom: 0; background: white;">
+                                    <tr>
+                                        <td colspan="2">
+
+                                        </td>
+                                        <td class=" text-danger" style="background: yellowgreen;"></td>
+                                        <td class="totalavoirs text-danger" style="background: yellowgreen;">
+                                        </td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+                            <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
+
+                            </select> -->
+                        </div>
+                        <div class="col-4 mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
+                            Avances: <strong class="totalavances">0.00</strong>
+                            <table class="table table-bordered listaddreglbl table-hover" style="font-size: 12px;">
+                                <thead style="position: sticky; top: 0; background: white;">
+                                    <tr>
+                                        <td>
+                                            Date
+                                        </td>
+                                        
+                                        <td>
+                                            Mantant
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody class="avancestable">
+                                </tbody>
+                                <tfoot style="position: sticky; bottom: 0; background: white;">
+                                    <tr>
+                                        <td colspan="2">
+
+                                        </td>
+                                        <td class=" text-danger" style="background: yellowgreen;"></td>
+                                        <td class="totalavances text-danger" style="background: yellowgreen;">
+                                        </td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+                            <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
+
+                            </select> -->
+                        </div>  
                         <button class="btn text-white w-100 submitaddreglemntclientbtn disabled" style="background: #00538c;">
                             Valider
                         </button>
@@ -780,6 +856,7 @@
     }
 
     function getallbl(){
+        console.log('err')
         currentPageblregl=1
         loadingblregl = false;
         $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
@@ -790,7 +867,9 @@
             {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}', 'mode':$('.mode').val},
 
             (data)=>{
-                $('.reglementclientbonholder').html(data.trs)
+                $('.reglementclientbonholder').html(data.bons)
+                $('.avoirs').html(data.avoirs)
+                $('.avances').html(data.avances)
             }
         )
     }
@@ -975,7 +1054,7 @@
         tbody.html('')
         console.log(date, mantant)
         // get regl data
-        $.get('products/getreglementbl/'+reglementid, {
+        $.get('/products/getreglementbl/'+reglementid, {
 
             }, function(data){
                 $('.searchinputlistreglblupdate').attr('clientid', data.clientid)
@@ -1048,30 +1127,48 @@
 
     // client change
     function getbons(){
+        console.log('err')
         currentPageblregl=1
         loadingblregl = false;
+        console.log('err2')
+        clientid=$('[name="addreglementclientsbl"]').val()
+        mode=$('.mode').val()
+        datefrom=$('.datefrom').val()
+        dateend=$('.dateend').val()
         $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
-        if ($(this).val()==""){
+        if (clientid==null || datefrom=="" || dateend==""){
+            console.log('err3')
+            console.log('err3')
             $('.reglementbonsholder').addClass('d-none')
+            alertify.error('Champs vide')
             // disable the divholder of the multiselects
             // disable the button
             $('.submitaddreglemntclientbtn').addClass('disabled')
             return
         }
+        console.log('rafter')
         $('.submitaddreglemntclientbtn').removeClass('disabled')
         $('.reglementbonsholder').removeClass('d-none')
         clientid=$('[name="addreglementclientsbl"]').val()
+        mode=$('.mode').val()
         $('.loadingscreen').removeClass('d-none')
         $.post('/products/getclientbons', {
             clientid:clientid,
+            datefrom:datefrom,
+            dateend:dateend,
             target:'{{target}}',
             'mode':$('.mode').val(),
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
                 console.log(data)
                 $('.loadingscreen').addClass('d-none')
-                $('.reglementclientbonholder').html(data.trs)
+                $('.reglementclientbonholder').html(data.bons)
+                $('.avoirstable').html(data.avoirs)
+                $('.avancestable').html(data.avances)
                 $('.totalbonsbl').text(data.total)
+                $('.totalbons').text(data.totalbons)
+                $('.totalavoirs').text(data.totalavoirs)
+                $('.totalavances').text(data.totalavances)
                 $('.soldblregl').text((data.soldbl).toFixed(2))
                 // $('.select2').select2()
             // populate bons multiselect
@@ -1161,11 +1258,11 @@
             mode:JSON.stringify(mode),
             npiece:JSON.stringify(npiece),
             echeance:JSON.stringify(echeance),
-            date:date,
+            //date:date,
             bons:JSON.stringify(selectedValues),
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
-                forceupdatetab('addlistreglementbl', '/products/listreglementbl')
+                ajaxpage('addlistreglementbl', 'd', '/products/listreglementbl?target={{target}}')
                 alertify.success('Reglement ajouté')
         })
     })
