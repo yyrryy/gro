@@ -7,7 +7,7 @@
         {{i.amount}}
     </td>
     <td>
-        <input type="checkbox" value="{{i.id}}" name="avancestopay" onchange="checkreglementbox(event)">
+        <input type="checkbox" total="{{i.amount}}" value="{{i.id}}" name="avancestopay" onchange="checkreglementbox(event)">
     </td>
 </tr>
 {% endfor %}

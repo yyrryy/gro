@@ -467,8 +467,11 @@ class PaymentClientbl(models.Model):
     date = models.DateTimeField(default=None)
     amount = models.FloatField(default=0.00)
     mode=models.CharField(max_length=10, default=None)
+    # the name of the bank
+    bank=models.CharField(max_length=100000, default=None, null=True, blank=True)
     amountofeachbon=models.CharField(max_length=100000, default=None, null=True, blank=True)
     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name="reglements")
+    factures=models.ManyToManyField(Facture, default=None, blank=True, related_name="fcreglements")
     bonsortie=models.ManyToManyField('Bonsortie', default=None, blank=True, related_name="reglementsortie")
     # mode: 0 bl, 1 facture
     echance=models.DateField(default=None, null=True, blank=True)

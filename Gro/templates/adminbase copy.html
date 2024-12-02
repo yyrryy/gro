@@ -2018,7 +2018,19 @@ a .uil {
     }
       const checkreglementbox=(event)=>{
         let parentdiv=$(event.target).parent().parent()
+        selectedValues = $("input[name='bonstopay']:checked").map(function() {
+            return $(this).attr('total');
+        }).get()
+        selectedavoirs = ("input[name='avoirstopay']:checked").map(function() {
+            return $(this).attr('total');
+        }).get()
+        
+        selectedavances = $("input[name='avancestopay']:checked").map(function() {
+            return $(this).attr('total');
+        }).get()
+        console.log(selectedValues, selectedavoirs, selectedavances)
         if ($(event.target).is(':checked')){
+
           parentdiv.css('background', '#ddfaed')
           if($($(event.target).parent().parent().find('td')[1]).text().includes('BL24')){
             bons=parseFloat($('.totalcheckedbl').text())

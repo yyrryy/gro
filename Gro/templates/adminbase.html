@@ -1962,6 +1962,24 @@ a .uil {
     }
       const checkreglementbox=(event)=>{
         let parentdiv=$(event.target).parent().parent()
+        selectedValues = $("input[name='bonstopay']:checked").map(function() {
+            return parseFloat($(this).attr('total')); // Convert to float for proper numerical addition
+        })
+        .get()
+        .reduce((sum, value) => sum + value, 0); // Calculate the sum
+        selectedavoirs = $("input[name='avoirstopay']:checked").map(function() {
+            return parseFloat($(this).attr('total')); // Convert to float for proper numerical addition
+        })
+        .get()
+        .reduce((sum, value) => sum + value, 0); // Calculate the sum
+        
+        selectedavances = $("input[name='avancestopay']:checked").map(function() {
+            return parseFloat($(this).attr('total')); // Convert to float for proper numerical addition
+        })
+        .get()
+        .reduce((sum, value) => sum + value, 0); // Calculate the sum*
+        pay=selectedValues-selectedavoirs-selectedavances
+        $('.whattopay').text(pay.toFixed(2))
         if ($(event.target).is(':checked')){
           parentdiv.css('background', '#ddfaed')
           if($($(event.target).parent().parent().find('td')[1]).text().includes('BL')){

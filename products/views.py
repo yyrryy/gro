@@ -2331,15 +2331,15 @@ def getclientbons(request):
             for i in bons:
                 # old code, if reglement is paid it's checked from here
                 # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
         else:
             bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
             avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True, inreglement=False).order_by('date')[:50]
             avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True, inreglement=False).order_by('date')[:50]
             for i in bons:
                 # old code, if reglement is paid it's checked from here
-                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
         #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
         if mode=='bl':
@@ -2514,6 +2514,7 @@ def reglebons(request):
     avoirs=json.loads(request.POST.get('avoirs'))
     avances=json.loads(request.POST.get('avances'))
     mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
     print('bons', bons, 'avoirs', avoirs, 'avances', avances)
@@ -2591,13 +2592,14 @@ def reglebons(request):
     #     print('rest of amount', amount)
 
 
-    for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
         regl=PaymentClientbl.objects.create(
             client_id=clientid,
             amount=m,
             #today
             date=timezone.now().date(),
             echance=ech,
+            bank=bk,
             mode=mod,
             npiece=np
         )
@@ -2619,7 +2621,8 @@ def reglebons(request):
 
 
 def checknpiece(request):
-    npiece=request.POST.get('npiece')
+    npiece=request.GET.get('npiece')
+    print('>>> eee',npiece, PaymentClientbl.objects.filter(npiece=npiece))
     if PaymentClientbl.objects.filter(npiece=npiece).exists():
         return JsonResponse({
             'exist':True
