@@ -55,13 +55,7 @@
             <div class="row">
 
                 <div class="d-flex justify-content-between">
-                    <div class="">
-                        <small>Date:</small> <br>
-                        <input type="date" name="datereglementclientbl" class="w-100 notempty datereglement mb-2" value="{{today|date:'Y-m-d'}}" onchange="checkyearreglbl(event)">
-                        <small class="errordatereglclbl text-danger d-none">
-                          Date incorrect
-                        </small>
-                    </div>
+                    
                     <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
                     <div class="col-3">
                       <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;">
@@ -112,17 +106,14 @@
                         </select> -->
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small>Client facture:</small><br>
-                            <select name="clientoffacture" id="" class="clientoffacture"></select>
-                        </div>
+                        
                         <div>
                           <small>Date:</small><br>
                           <input type="date" class="dateoffacture form-control" value="{{today|date:'Y-m-d'}}">
                       </div>
                       <div>
                         <small>N° facture:</small><br>
-                        <input readonly value="{{receipt_no}}" type="text" class="facture_no form-control">
+                        <input value="" type="text" class="facture_no form-control">
                       </div>
                     </div>
                     <button class="btn text-white w-100 facturemultiple" style="background: #00538c;">
@@ -210,21 +201,17 @@
             </td>
             <td onclick="sorttable(event)">Total</td>
             <td onclick="sorttable(event)">TVA</td>
-            <td onclick="sorttable(event)">Client</td>
-            <td onclick="sorttable(event)">Code client</td>
-            <!-- <td onclick="sorttable(event)">Region</td> -->
-            <td onclick="sorttable(event)">Ville</td>
-            <td onclick="sorttable(event)">Solde fc cl.</td>
+            <td onclick="sorttable(event)">Fourn.</td>
             <!-- <td onclick="sorttable(event)">Repr</td> -->
             <td onclick="sorttable(event)">Reglé</td>
             <td onclick="sorttable(event)">Notes</td>
-            <td onclick="sorttable(event)">Reglements</td>
+            <!-- <td onclick="sorttable(event)">Reglements</td> -->
             <td onclick="sorttable(event)">N° Bon livr.</td>
             <!-- <td style="width: 5%;" onclick="sorttable(event)">Comptablisé</td> -->
           </tr>
         </thead>
         <tbody class="listfcbody">
-          {% for order in bons %}
+          {% for order in factures %}
             <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}')"
               style="{% if order.bon %} color: blue {% endif %}"
             >
@@ -232,11 +219,8 @@
               <td>{{ order.date|date:'d/m/Y' }}</td>
               <td>{{ order.total|floatformat:2|intspace}}</td>
               <td>{{ order.tva|floatformat:2|intspace}}</td>
-              <td>{{ order.client.name }}</td>
-              <td>{{ order.client.code }}</td>
+              <td>{{ order.supplier.name }}</td>
               <!-- <td>{{ order.client.region }}</td> -->
-              <td>{{ order.client.city }}</td>
-              <td>{{ order.client.soldfacture|floatformat:2|intspace }}</td>
               <!-- <td>{{ order.salseman }}</td> -->
               {% if order.ispaid %}
               <td class="d-flex justify-content-between">
@@ -257,12 +241,10 @@
               <td>
                 {{order.note}}
               </td>
-              <td style="white-space:nowrap;">
-                {{order.getreglement|slice:'16' }}
-              </td>
+              
                 <td>
                   {% if order.bon %}
-                  {{ order.bon.bon_no }}
+                    {{ order.bon.nbon }}
                   {% else %}
                   <div class="accordion" id="accordionbons{{order.id}}">
 
@@ -273,7 +255,7 @@
 
                     <div id="collapsbon{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{order.id}}">
                         {% for bon in order.bons.all %}
-                        -{{ bon.bon_no }} <br>
+                        -{{ bon.nbon }} <br>
                         {% endfor %}
 
 
@@ -338,11 +320,11 @@
   $(function(){
       $('.addreglementclientsbl').select2({
         minimumInputLength: 1,
-        placeholder:'Chercher client',
+        placeholder:'Chercher Fournisseur',
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchclient?target={{target}}',
+          url: '/products/searchsupplier?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
@@ -406,7 +388,7 @@
       const container = $('.listaddreglblholder')[0]; // Get the native DOM element
 
       const lastRow = document.querySelector('.blreglrow:last-child');
-      let clientid=lastRow.getAttribute('clientid')
+      let supplierid=lastRow.getAttribute('supplierid')
       let nonregllist=lastRow.classList.contains('nr')?1:0
       const lastRowOffset = lastRow.offsetTop + lastRow.clientHeight;
 
@@ -414,7 +396,7 @@
 
       if (containerBottom+900 >= lastRowOffset && !loadingblregl) {
           currentPageblregl++;
-          loadMoreRecordsreglblcl(clientid, nonregllist);
+          loadMoreRecordsreglblcl(supplierid, nonregllist);
       }
     };
 
@@ -430,10 +412,10 @@
         }
         $('.submitaddreglemntclientbtn').removeClass('disabled')
         $('.reglementbonsholder').removeClass('d-none')
-        clientid=$(this).val()
+        supplierid=$(this).val()
         $('.loadingscreen').removeClass('d-none')
-        $.post('/products/getclientbonsforfacture', {
-            clientid:clientid,
+        $.post('/products/getsupplierbonsforfacture', {
+            supplierid:supplierid,
             target:'{{target}}',
             csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function(data){
@@ -588,24 +570,25 @@
             return this.value;
         }).get()
         
-        clientid=$('[name="clientoffacture"]').val()
+        supplierid=$('[name="addreglementclientsbl"]').val()
         
         date=$(".dateoffacture").val()
 
        
-        if (selectedValues.length==0 || clientid==null){
+        if (selectedValues.length==0 || supplierid==null){
           alertify.error('Champs vide')
           return
         }
         $(this).addClass('disabled')
 
-        console.log(clientid, date, selectedValues)
-        $.get('/products/facturemultiple?target={{target}}', {
-          'clientid':clientid,
+        console.log(supplierid, date, selectedValues)
+        $.get('/products/factureachatmultiple?target={{target}}', {
+          'supplierid':supplierid,
           'bons':JSON.stringify(selectedValues),
-          'date':date
+          'date':date,
+          'factureno':$('.facture_no').val()
         })
-        ajaxpage('add', '+ Article', '/products/listfactures?target=f')
+        ajaxpage('add', '+ Article', '/products/achatfacture?target={{target}}')
     })
 
 $('.filterfcdate').on('click', function(){

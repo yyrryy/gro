@@ -48,7 +48,7 @@
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistreglementbl')">x</button>
     <div>
-      {{title}} {{target}}
+      {{title}}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistreglementbl', '/products/listreglementbl')">↻</button>
   </div>
@@ -584,9 +584,18 @@
 
                             </button>
 
-                            <div id="collapsbon{{i.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{i.id}}">
+                            <div id="collapsbon{{i.id}}" class="text-start collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{i.id}}">
                                 {% for bon in i.bons.all %}
-                                -{{ bon.bon_no }} <br>
+                                (Bon){{ bon.bon_no }} <br>
+                                {% endfor %}
+                                {% for fact in i.factures.all %}
+                                (Facture){{ fact.fact_no }} <br>
+                                {% endfor %}
+                                {% for av in i.avoirs.all %}
+                                (avoir){{ av.no }} <br>
+                                {% endfor %}
+                                {% for av in i.avances.all %}
+                                (Avance) ({{ av.amount }}DH) <br>
                                 {% endfor %}
 
 
@@ -1288,6 +1297,7 @@
 
         $.post('/products/reglebons', {
             clientid:clientid,
+            target:'{{target}}',
             mantant:JSON.stringify(mantant),
             mode:JSON.stringify(mode),
             npiece:JSON.stringify(npiece),

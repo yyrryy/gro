@@ -219,6 +219,7 @@ class Itemsbysupplier(models.Model):
     tva = models.FloatField(default=0.00, null=True, blank=True)
     rest = models.FloatField(default=0.00)
     nbon = models.CharField(max_length=100, blank=True, null=True)
+    facture=models.ForeignKey('Factureachat', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='factureofbonachat')
     ispaid=models.BooleanField(default=False)
     isfacture=models.BooleanField(default=False)
     def __str__(self) -> str:
@@ -366,11 +367,12 @@ class Avancesupplier(models.Model):
     date = models.DateTimeField(default=None)
     bon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True)
     amount = models.FloatField()
-    mode=models.CharField(max_length=10, default=None)
+    mode=models.CharField(max_length=10, default=None, null=True, blank=True)
     echeance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    inreglement=models.BooleanField(default=False)
 
 
 class Bonlivraison(models.Model):
@@ -448,10 +450,17 @@ class PaymentSupplier(models.Model):
     amount = models.FloatField(default=0.00)
     mode=models.CharField(max_length=10, default=None)
     echeance=models.DateField(default=None, null=True, blank=True)
+    bon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="bonofreglement")
     #factures reglé onetomanys
     bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name="reglementssupp")
+    avoirs=models.ManyToManyField("Avoirsupplier", default=None, blank=True, related_name="avoirsofreglement")
+    avances=models.ManyToManyField(Avancesupplier, default=None, blank=True, related_name="avancesofreglement")
+    factures=models.ManyToManyField("Factureachat", default=None, blank=True, related_name="factureofreglement")
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+    #bankname
+    bank=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
+    isoargh=models.BooleanField(default=False)
 class Notesrepresentant(models.Model):
     represent=models.ForeignKey('Represent', on_delete=models.SET_NULL, default=None, null=True)
     note=models.TextField()
@@ -473,6 +482,8 @@ class PaymentClientbl(models.Model):
     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name="reglements")
     factures=models.ManyToManyField(Facture, default=None, blank=True, related_name="fcreglements")
     bonsortie=models.ManyToManyField('Bonsortie', default=None, blank=True, related_name="reglementsortie")
+    avoirs=models.ManyToManyField('Avoirclient', default=None, blank=True, related_name="avoirsofreglement")
+    avances=models.ManyToManyField(Avanceclient, default=None, blank=True, related_name="avancesofreglement")
     # mode: 0 bl, 1 facture
     echance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
@@ -689,6 +700,7 @@ class Avoirsupplier(models.Model):
     avoirfacture=models.BooleanField(default=False)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    inreglement=models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
 class Returnedsupplier(models.Model):
@@ -1028,3 +1040,30 @@ class Factureachat(models.Model):
     facture_no=models.CharField(max_length=500, null=True, default=None)
     date = models.DateTimeField(default=None, blank=True, null=True)
     bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name='facturebons')
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+    total=models.FloatField(default=0.00)
+    tva=models.FloatField(default=0.00)
+    ispaid=models.BooleanField(default=False)
+    bon=models.ForeignKey(Itemsbysupplier, default=None, null=True, blank=True, on_delete=models.CASCADE, related_name='facturebon')
+    supplier=models.ForeignKey(Supplier, default=None, blank=True, on_delete=models.CASCADE, related_name='supplieroffacture')
+
+class Outfactureachat(models.Model):
+    facture=models.ForeignKey(Factureachat, on_delete=models.CASCADE, default=None)
+    total=models.FloatField(default=0.00)
+    product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
+    remise1=models.CharField(max_length=100, null=True, default=None)
+    remise2=models.CharField(max_length=100, null=True, default=None)
+    remise3=models.CharField(max_length=100, null=True, default=None)
+    remise4=models.CharField(max_length=100, null=True, default=None)
+    ref=models.CharField(max_length=100, null=True, default=None)
+    name=models.CharField(max_length=100, null=True, default=None)
+    qty=models.IntegerField()
+    # this total represents the revenue of this product
+    price=models.FloatField(default=0.00)
+    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
+    date=models.DateField(default=None, blank=True, null=True)
+    isfarah=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
+
+

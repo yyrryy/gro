@@ -220,6 +220,36 @@
   </div>
 
   <script>
+    $(document).ready(function(){
+      // get products from localstorage
+      pdcts=JSON.parse(localStorage.getItem('avoircl')) || []
+      total=localStorage.getItem('totalavoircl') || 0
+      parentdiv=$('.bonlivraisonbody')
+      for (let i=0; i<pdcts.length; i++){
+        item=pdcts[i]
+        let tr = `
+        <tr class="itemrow ${item.stock<=0? "text-danger":"" }" id=${item.id}>
+            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${item.id})">${item.ref}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
+            <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="stock">${item.stock}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="remise" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;" class="netprice">${item.netprice}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
+            <input type="hidden" name="productid" value="${item.id}">
+
+        </tr>
+        `
+        parentdiv.prepend(tr)
+      }
+      $('.totalbon').text(total)
+      
+      console.log(pdcts)
+
+    })
     $(function(){
       $('.avoirclproducts').select2({
         minimumInputLength: 1,
@@ -555,7 +585,7 @@
 
       $('.submitavcl').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('.clientselectavoir').val()=='' || parentdiv.find('.datebon').val()=='' ){
+        if (parentdiv.find('.clientselectavoir').val()==null || parentdiv.find('.datebon').val()=='' ){
             $('.dataavoircl').addClass('border border-danger')
             console.log('clientselectavoir', parentdiv.find('.clientselectavoir').val(), 'modeselectav', parentdiv.find('.modeselectav').val(), 'repsavclselects', parentdiv.find('.repsavclselects').val())
             return
@@ -649,9 +679,10 @@
               success: function(data){
                 $('.loadingscreen').addClass('d-none')
                 if (data.success){
-                  
+                  localStorage.removeItem('avoircl')
+                  localStorage.removeItem('pdctsinavoircl')
+                  localStorage.removeItem('totalavoircl')
                   alertify.success('Bon avoir creé')
-                  deletetab('addavoir')
                   ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient?target={{target}}')
                 }else{
                   alertify.error(data.error)

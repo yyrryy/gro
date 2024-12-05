@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
 from datetime import datetime, date, timedelta
@@ -1512,8 +1512,11 @@ def getclientbonsforfacture(request):
     if target=='s':
         bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    elif target=='f':
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=True).order_by('date')[:50]
+        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False).order_by('date')[:50]
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=False).order_by('date')[:50]
         total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
@@ -1527,6 +1530,31 @@ def getclientbonsforfacture(request):
         'total':total,
         'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2)
     })
+
+
+def getsupplierbonsforfacture(request):
+    supplierid=request.POST.get('supplierid')
+    target=request.POST.get('target')
+    print('>> target', target)
+    if target=='f':
+        bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, isfacture=False, isfarah=True).order_by('date')[:50]
+        total=round(Itemsbysupplier.objects.filter(supplier_id=supplierid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    else:
+        bons=Bonlivraison.objects.filter(supplier_id=supplierid, isfacture=False, isfarah=False).order_by('date')[:50]
+        total=round(Bonlivraison.objects.filter(supplier_id=supplierid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    trs=''
+    for i in bons:
+        # old code, if reglement is paid it's checked from here
+        # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+        trs+=f'<tr class="blreglrow" supplierid="{supplierid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+
+
+    return JsonResponse({
+        'trs':trs,
+        'total':total,
+        'soldbl':round(Supplier.objects.get(pk=supplierid).rest, 2)
+    })
+
 
 
 def facturemultiple(request):
@@ -1632,6 +1660,137 @@ def facturemultiple(request):
         'success':True
     })
 
+def factureachatmultiple(request):
+    # create  facture with multiple bons
+    date=request.GET.get('date')
+    date=datetime.strptime(date, '%Y-%m-%d')
+    supplierid=request.GET.get('supplierid')
+    target=request.GET.get('target')
+    supplier=Supplier.objects.get(pk=supplierid)
+    bons=json.loads(request.GET.get('bons'))
+    year=timezone.now().strftime("%y")
+    livraisons=Itemsbysupplier.objects.filter(pk__in=bons)
+    print('target', target, 'livraisons', livraisons, len(livraisons), len(livraisons)==1, 'date', date)
+    isfarah=False
+    
+    if target=='f':
+        isfarah=True
+        latest_receipt = Factureachat.objects.filter(
+            facture_no__startswith=f'FR-AFC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"FR-AFC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"FR-AFC{year}000000001"
+    else:
+        latest_receipt = Factureachat.objects.filter(
+            facture_no__startswith=f'AFC{year}'
+        ).last()
+        # latest_receipt = Bonsortie.objects.filter(
+        #     facture_no__startswith=f'FR-BL{year}'
+        # ).order_by("-bon_no").first()
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.facture_no[-9:])
+            receipt_no = f"AFC{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"AFC{year}000000001"
+    fc_no=request.GET.get('factureno')
+    if not fc_no=='':
+        receipt_no=fc_no
+    total=0
+    facture=Factureachat.objects.create(
+        facture_no=receipt_no,
+        supplier_id=supplierid,
+        isfarah=isfarah,
+        date=date
+    )
+    # if we have just one bon
+    if len(livraisons)==1:
+        print(">> here")
+        bon=livraisons[0]
+        print('Bons', bon, bon.total)
+        bon.facture=facture
+        facture.total=bon.total
+        facture.bon=bon
+        bon.isfacture=True
+        bon.save()
+        facture.save()
+
+        #get items of bon
+        items=Stockin.objects.filter(nbon=bon)
+        # create facture items
+        for i in items:
+            Outfactureachat.objects.create(
+                facture=facture,
+                remise1=i.remise1,
+                remise2=i.remise2,
+                remise3=i.remise3,
+                remise4=i.remise4,
+                name=i.name,
+                ref=i.ref,
+                product=i.product,
+                qty=i.quantity,
+                price=i.price,
+                total=i.total,
+                supplier_id=supplierid,
+                date=date,
+                isfarah=isfarah
+            )
+        # sold facture
+        #supplier.soldfacture+=bon.total
+    else:
+        # iterate throu bons
+        for bon in livraisons:
+            total+=bon.total
+            bon.isfacture=True
+            bon.facture=facture
+            bon.save()
+            # loop items of bon
+            items=Stockin.objects.filter(nbon=bon)
+            print('items in multiple', items)
+            for i in items:
+                Outfactureachat.objects.create(
+                    facture=facture,
+                    remise1=i.remise1,
+                    remise2=i.remise2,
+                    remise3=i.remise3,
+                    remise4=i.remise4,
+                    name=i.name,
+                    ref=i.ref,
+                    product=i.product,
+                    qty=i.quantity,
+                    price=i.price,
+                    total=i.total,
+                    supplier_id=supplierid,
+                    date=date,
+                    isfarah=isfarah
+                )    
+        facture.total=total
+        facture.bons.set(livraisons)
+    facture.save()
+    supplier.save()
+    return JsonResponse({
+        'success':True
+    })
+
+
+
 def achatfacture(request):
     target=request.GET.get('target')
-    return render(request, 'listfactureachat.html')
+    print('target', target)
+    if target=='f':
+        facture=Factureachat.objects.filter(isfarah=True).order_by('-facture_no')
+    else:
+        facture=Factureachat.objects.filter(isorgh=True).order_by('-facture_no')
+    target=request.GET.get('target')
+    ctx={
+        'title':'List facture achat',
+        'factures':facture,
+        'target':target,
+        'today':timezone.now()
+    }
+    return render(request, 'listfactureachat.html', ctx)

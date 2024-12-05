@@ -101,7 +101,7 @@
           <td style="width: 8%;">Date</td>
           <td style="width: 12%;" onclick="sorttable(event)">Fournisseur</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Total</td>
-          <td style="width: 5%;" onclick="sorttable(event)">type</td>
+          <td style="width: 5%;" onclick="sorttable(event)">Facture</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Solde fourn.</td>
           <td style="width: 4%;"></td>
         </tr>
@@ -113,7 +113,7 @@
             <td>{{ order.date|date:'d/m/Y' }}</td>
             <td>{{ order.supplier.name }}</td>
             <td>{{ order.total|floatformat:2|intspace}}</td>
-            <td>{% if order.isfacture %} Facture {% else %} Bl {% endif %}</td>
+            <td>{% if order.isfacture %} {{order.facture.facture_no}} {% endif %}</td>
             <td>{{ order.supplier.rest|floatformat:2|intspace }}</td>
             
             <td>

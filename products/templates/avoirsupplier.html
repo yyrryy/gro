@@ -24,7 +24,7 @@
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
   <div>
-    {{title}}
+    {{title}} {{target}}
   </div>
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
 </div>
@@ -41,14 +41,14 @@
                 <div class="mb-2">
                     <input type="date" class="form-control datebonavsupp" name="datebonavsupp" placeholder="Date bon">
                 </div>
-                <div class="mb-2">
+                <!-- <div class="mb-2">
                   <small>Mode</small>
                   <select name="mode" id="" style="width:100%;" class="form-select notemptyavsupp modeselectavsupp">
                     <option value="">--</option>
                     <option value="bl">BL</option>
                     <option value="facture">Facture</option>
                   </select>
-                </div>
+                </div> -->
 
             </div>
 
@@ -449,6 +449,7 @@
               type: 'POST',
               data: {
                   'totalbon': totalbon,
+                  'target': '{{target}}',
                   'supplierid': supplierid,
                   'repid':repid,
                   'transport':transport,
@@ -464,8 +465,7 @@
                   // $('#addavoirsupp').html(data.html)
                   localStorage.removeItem('pdctsinavoirsupp')
 
-                  deletetab('addavoirsupp')
-                  ajaxpage('avoirsupp', 'AvoirFR', '/products/listavoirsupplier')
+                  ajaxpage('avoirsupp', 'AvoirFR', '/products/listavoirsupplier?target={{target}}')
 
               }
           })
