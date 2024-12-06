@@ -14,11 +14,11 @@
         {% for product in producthistory %}
         <tr>
             <td>{{ product.date|date:"d/m/Y" }}</td>
-            <td>{{ product.bon.bon_no }}</td>
-            <td>{{ product.qty }}</td>
+            <td>{{ product.bon.bon_no }}{{ product.nbon.nbon }}</td>
+            <td>{{ product.qty }}{{ product.quantity }}</td>
             <td>{{ product.price }}</td>
-            <td>{{ product.remise }}%</td>
-            <td><button class="btn btn-sm" onclick="populateavoir(event, '{{ product.price }}', '{{ product.remise }}')">^</button></td>
+            <td>{{ product.remise }}{{ product.remise1 }}%</td>
+            <td><button class="btn btn-sm" onclick="populateavoir(event, '{{ product.price }}', '{{ product.remise }}{{ product.remise1 }}')">^</button></td>
         </tr>
         {% endfor %}
     </tbody>

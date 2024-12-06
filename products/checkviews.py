@@ -1600,7 +1600,8 @@ def facturemultiple(request):
     facture=Facture.objects.create(
         facture_no=receipt_no,
         client_id=clientid,
-        isfarah=isfarah
+        isfarah=isfarah,
+        date=date
     )
     # if we have just one bon
     # if len(livraisons)==1:

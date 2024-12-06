@@ -895,7 +895,7 @@
         console.log(clientid)
         $.post(
             'products/getclientbons',
-            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}', 'mode':$('.mode').val},
+            {clientid:clientid,csrfmiddlewaretoken: '{{ csrf_token }}', target:'{{target}}', moderegl:$('.moderegl').val()},
 
             (data)=>{
                 $('.reglementclientbonholder').html(data.bons)
@@ -1186,6 +1186,7 @@
         mode=$('.mode').val()
         $('.loadingscreen').removeClass('d-none')
         $.post('/products/getclientbons', {
+            moderegl:$('.moderegl').val(),
             clientid:clientid,
             datefrom:datefrom,
             dateend:dateend,

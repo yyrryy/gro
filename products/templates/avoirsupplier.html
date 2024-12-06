@@ -77,6 +77,9 @@
               <div class="col-12">
                 <button class="btn btn-outline-secondary" onclick="addrowavoirsupp(event)">Ajouter</button>
               </div>
+              <div class="col-12 tabeldata">
+                
+              </div>
             </div>
 
 
@@ -329,24 +332,26 @@
                 type: 'POST',
                 data: {
                     'id': id,
+                    'target': '{{target}}',
                     'supplierid': $('.supplierselectavoir').val(),
                     'csrfmiddlewaretoken': '{{csrf_token}}'
                 },
                 success: function(data){
-                  console.log(data.facture)
+                  console.log('data', data)
                   console.log(isfacture)
                   addprice.val(data.price)
                   addremise.val(data.remise)
-                  if (data.facture){
+                  $('.tabeldata').html(data.table)
+                  // if (data.facture){
 
-                    isfacture.val(1)
-                  }else{
-                    isfacture.val(0)
-                  }
+                  //   isfacture.val(1)
+                  // }else{
+                  //   isfacture.val(0)
+                  // }
                 }
               })
 
-            let selected = $(this).find(':selected')
+            //let selected = $(this).find(':selected')
             // selected.remove()
             // delect selected option
         })
@@ -375,7 +380,6 @@
 
       $('.submitavsupp').on('click', (e)=>{
         parentdiv=$(e.target).parent().parent().parent().parent()
-        console.log(parentdiv.find('.supplierselectavoir').val())
         if (parentdiv.find('.supplierselectavoir').val()==null || parentdiv.find('.datebonavsupp').val()=='' || parentdiv.find('.modeselectavsupp').val()==''){
             parentdiv.find('.dataavoirsupp').addClass('border border-danger')
             return
@@ -431,8 +435,6 @@
           let datebon = parentdiv.find('.datebonavsupp').val()
           let transport = parentdiv.find('.transport').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
-          console.log(products)
-          console.log(totalbon)
           console.log('sending')
           data={
               'totalbon': totalbon,

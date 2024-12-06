@@ -592,22 +592,22 @@ function comptabilise(event, excelech_id){
 			})
 	})
 	// check for npiece existence
-	$('.npiecereglementclient').on('change', function(){
-			npiece=$(this).val()
-			console.log('check npiece with get', npiece)
-			$.get('/products/checknpiece', {
-					npiece:npiece,
-					csrfmiddlewaretoken: '{{ csrf_token }}'
-					}, function(data){
-							console.log(data)
-							if (data.exist){
-									alertify.error('N° piece existe deja')
-									$('.submitaddreglemntclientbtnfc').addClass('disabled')
-							}else{
-									$('.submitaddreglemntclientbtnfc').removeClass('disabled')
-							}
-					})
-	})
+	// $('.npiecereglementclient').on('change', function(){
+	// 		npiece=$(this).val()
+	// 		console.log('check npiece with get', npiece)
+	// 		$.get('/products/checknpiece', {
+	// 				npiece:npiece,
+	// 				csrfmiddlewaretoken: '{{ csrf_token }}'
+	// 				}, function(data){
+	// 						console.log(data)
+	// 						if (data.exist){
+	// 								alertify.error('N° piece existe deja')
+	// 								$('.submitaddreglemntclientbtnfc').addClass('disabled')
+	// 						}else{
+	// 								$('.submitaddreglemntclientbtnfc').removeClass('disabled')
+	// 						}
+	// 				})
+	// })
 
 	function totalreglementfc(event){
 		let sum = 0;

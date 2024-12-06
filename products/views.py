@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -1522,6 +1522,25 @@ def facturedetails(request, id):
     }
     return render(request, 'facturedetails.html', ctx)
 
+def supplierfacturedetails(request, id):
+    order=Factureachat.objects.get(pk=id)
+    orderitems=Outfactureachat.objects.filter(facture=order).order_by('product__name')
+    # split the orderitems into chunks of 10 items
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
+
+    ctx={
+        'title':f'Facture {order.facture_no}',
+        'facture':order,
+        'orderitems':orderitems,
+        'tva':order.tva,
+        'ttc':order.total,
+        'ht':round(order.total-order.tva, 2),
+        'reps':Represent.objects.all()
+    }
+    return render(request, 'facturedetails.html', ctx)
+
+
 def avoirdetails(request, id):
     order=Avoirclient.objects.get(pk=id)
     orderitems=Returned.objects.filter(avoir=order)
@@ -2363,48 +2382,50 @@ def listreglementfc(request):
 def getclientbons(request):
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
-    mode=request.POST.get('mode')
+    moderegl=request.POST.get('moderegl')
     datefrom=request.POST.get('datefrom')
     dateend=request.POST.get('dateend')
     print('>> target', target)
     trs=''
-    
-    if target=='s':
-        bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
-        total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
-    elif target=="f":
-        if mode=='bl':
-            bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
-            
-            for i in bons:
-                # old code, if reglement is paid it's checked from here
-                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
-        else:
-            bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True).order_by('date')[:50]
-            for i in bons:
-                # old code, if reglement is paid it's checked from here
-                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
-        #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
-        avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True, inreglement=False).order_by('date')[:50]
-        avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=True, inreglement=False).order_by('date')[:50]
-    else:
-        if mode=='bl':
-            bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
-            for i in bons:
-                # old code, if reglement is paid it's checked from here
-                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
-        else:
-            bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
-            for i in bons:
-                # old code, if reglement is paid it's checked from here
-                # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-                trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+    isfarah=target=='f'
+    # if target=='s':
+    #     bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
+    #     total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    # elif target=="f":
+    print('>>> mode regl', moderegl)
+    if moderegl=='bl':
+        bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
         
-        avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
-        avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
+        for i in bons:
+            # old code, if reglement is paid it's checked from here
+            # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+    else:
+        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
+        for i in bons:
+            # old code, if reglement is paid it's checked from here
+            # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+    #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
+    avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
+
+    # else:
+    #     if moderegl=='bl':
+    #         bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+    #         for i in bons:
+    #             # old code, if reglement is paid it's checked from here
+    #             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+    #             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+    #     else:
+    #         bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False).order_by('date')[:50]
+    #         for i in bons:
+    #             # old code, if reglement is paid it's checked from here
+    #             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+    #             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        
+    #     avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
+    #     avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
     # totalbons=bons.aggregate
         #total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     print("bons", bons)
@@ -2564,7 +2585,8 @@ def reglefactures(request):
 
 def reglebons(request):
     clientid=request.POST.get('clientid')
-    whattopay=request.POST.get('whattopay')
+    whattopay=float(request.POST.get('whattopay'))
+    print('>> whatt', whattopay)
     moderegl=request.POST.get('moderegl')
     target=request.POST.get('target')
     client=Client.objects.get(pk=clientid)
@@ -2582,20 +2604,20 @@ def reglebons(request):
     if moderegl=='bl':
         livraisons=Bonlivraison.objects.filter(pk__in=bons)
     else:
-        Facture.objects.filter(pk__in=bons)
+        livraisons=Facture.objects.filter(pk__in=bons)
     avoirs=Avoirclient.objects.filter(pk__in=avoirs)
     avances=Avanceclient.objects.filter(pk__in=avances)
     avoirs.update(inreglement=True)
     avances.update(inreglement=True)
-    livraisons.update(statusreg='r0')
     totalmantant=sum(mantant)
     totalbons=livraisons.aggregate((Sum('total')))['total__sum'] or 0
     if totalmantant>whattopay:
         livraisons.update(ispaid=True)
+        livraisons.update(statusreg='r1')
         if moderegl=='facture':
             for livraison in livraisons:
                 # Update 'ispaid' for related ManyToManyField (bons)
-                livraison.bons.update(ispaid=True)
+                livraison.bons.all().update(ispaid=True)
         diff=totalmantant-whattopay
         Avanceclient.objects.create(
             client_id=clientid,
@@ -2690,7 +2712,10 @@ def reglebons(request):
             isfarah=target=='f',
             isorgh=target=='o'
         )
-        regl.bons.set(livraisons)
+        if moderegl=='bl':
+            regl.bons.set(livraisons)
+        else:
+            regl.factures.set(livraisons)
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
         # for i in livraisons:
@@ -3477,9 +3502,10 @@ def reglebonsachat(request):
 
             for livraison in livraisons:
                 # Update 'ispaid' for related ManyToManyField (bons)
-                livraison.bons.update(ispaid=True)
+                print('>> bons of facture', livraison.bons.all())
+                livraison.bons.all().update(ispaid=True)
         print('>> rel is ,ore than pay', totalmantant, whattopay)
-        diff=float(totalmantant-whattopay)
+        diff=round(totalmantant-whattopay, 2)
         print('>>>>>>< deiff', diff)
         # create avance supp
         Avancesupplier.objects.create(
@@ -3494,7 +3520,7 @@ def reglebonsachat(request):
             print('facture is paid', livraisons.values())
             for livraison in livraisons:
                 # Update 'ispaid' for related ManyToManyField (bons)
-                livraison.bons.update(ispaid=True)
+                livraison.bons.all().update(ispaid=True)
     if whattopay>totalmantant:
         Avancesupplier.objects.create(
             supplier_id=supplierid,
@@ -4401,24 +4427,24 @@ def updatereglefactures(request):
 
 def getlastsuppprice(request):
     id=request.POST.get('id')
+    isfarah=request.POST.get('target')=='f'
     supplierid=request.POST.get('supplierid')
     print(id, 'rr', supplierid)
-    try:
-        lastprice=Stockin.objects.filter(product_id=id, supplier_id=supplierid).last()
-        print(lastprice)
+    price=0
+    remise=0
+    prices=Stockin.objects.filter(product_id=id, supplier_id=supplierid, isfarah=isfarah)
+    lastprice=prices.last()
+    if lastprice:
         price=lastprice.price
-        remise=lastprice.remise
-
-        return JsonResponse({
-            'price':price,
-            'remise':remise,
-            'facture':lastprice.facture
-        })
-    except:
-        return JsonResponse({
-            'price':0
-        })
-
+        remise=lastprice.remise1
+    print("prices", prices, 'lastprice', lastprice)
+    return JsonResponse({
+        'price':price,
+        'remise':remise,
+        # 'facture':lastprice.facture,
+        'table':render(request, 'prodctprices.html', {'producthistory':prices.order_by('-date')}).content.decode('utf-8')
+    })
+    
 
 def boncommandedetails(request, id):
 

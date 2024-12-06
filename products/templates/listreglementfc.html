@@ -1010,22 +1010,22 @@
     })
 
     // check for npiece existence
-    $('.npiecereglementclient').on('change', function(){
-        npiece=$(this).val()
-        console.log('check npiece', npiece)
-        $.get('/products/checknpiece', {
-            npiece:npiece,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function(data){
-                console.log(data)
-                if (data.exist){
-                    alertify.error('N° piece existe deja')
-                    $('.submitaddreglemntclientbtnfc').addClass('disabled')
-                }else{
-                    $('.submitaddreglemntclientbtnfc').removeClass('disabled')
-                }
-            })
-    })
+    // $('.npiecereglementclient').on('change', function(){
+    //     npiece=$(this).val()
+    //     console.log('check npiece', npiece)
+    //     $.get('/products/checknpiece', {
+    //         npiece:npiece,
+    //         csrfmiddlewaretoken: '{{ csrf_token }}'
+    //         }, function(data){
+    //             console.log(data)
+    //             if (data.exist){
+    //                 alertify.error('N° piece existe deja')
+    //                 $('.submitaddreglemntclientbtnfc').addClass('disabled')
+    //             }else{
+    //                 $('.submitaddreglemntclientbtnfc').removeClass('disabled')
+    //             }
+    //         })
+    // })
 
 
     $('.submitaddreglemntclientbtnfc').on('click', function(event){

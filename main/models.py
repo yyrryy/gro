@@ -461,6 +461,7 @@ class PaymentSupplier(models.Model):
     bank=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isoargh=models.BooleanField(default=False)
+    # we need somthin to track if the reglement
 class Notesrepresentant(models.Model):
     represent=models.ForeignKey('Represent', on_delete=models.SET_NULL, default=None, null=True)
     note=models.TextField()
