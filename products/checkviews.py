@@ -1095,11 +1095,11 @@ def supplierdevitoboncommand(request):
     devid=request.GET.get('devid')
     order=Devisupplier.objects.get(pk=devid)
     items=DeviItemsupplier.objects.filter(devi=order)
-    client=order.client
+    supplier=order.supplier
     ctx={
         'order':order,
         'items':items,
-        'sold':client.soldtotal,
+        # 'sold':supplier.soldtotal,
         #'receipt_no':receipt_no,
         #'clients':Client.objects.all(),
         'today':timezone.now().date(),
@@ -1107,7 +1107,7 @@ def supplierdevitoboncommand(request):
         'target':target
     }
 
-    return render(request, 'devitoboncommand.html', ctx)
+    return render(request, 'supplierdevitoboncommand.html', ctx)
 def suppliercreatedevi(request):
     target=request.POST.get('target')
     isfarah=False
@@ -1197,7 +1197,7 @@ def suppliercreateboncommand(request):
         isfarah=True
         year = timezone.now().strftime("%y")
         latest_receipt = Commandsupplier.objects.filter(
-            bon_no__startswith=f'FR-BC{year}'
+            bon_no__startswith=f'FR-FBC{year}'
         ).last()
         # latest_receipt = Devi.objects.filter(
         #     bon_no__startswith=f'FR-BC{year}'
@@ -1241,10 +1241,12 @@ def suppliercreateboncommand(request):
         isorgh=isorgh,
         user=request.user
     )
-    if devid is not None:
+    if not devid == '':
         devi=Devisupplier.objects.get(pk=devid)
         devi.generatedbc=True
         devi.bc=order
+        order.devi=devi
+        order.save()
         devi.save()
     # if len(json.loads(products))>0:
     with transaction.atomic():
@@ -1290,9 +1292,9 @@ def supplierdevidetails(request):
 def supplierboncommanddetails(request):
     id=request.GET.get('id')
     target=request.GET.get('target')
-    order=Command.objects.get(pk=id)
-    orderitems=CommandItem.objects.filter(command=order).order_by('product__name')
-    #reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    order=Commandsupplier.objects.get(pk=id)
+    orderitems=CommandItemsupplier.objects.filter(command=order).order_by('product__name')
+    #reglements=PaymentCliséentbl.objects.filter(bons__in=[order])
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
     ctx={
@@ -1302,24 +1304,24 @@ def supplierboncommanddetails(request):
         'target':target
         
     }
-    return render(request, 'boncommanddetails.html', ctx)
+    return render(request, 'supplierboncommanddetails.html', ctx)
 def supplierboncommandobl(request):
     target=request.GET.get('target')
     commandid=request.GET.get('commandid')
-    command=Command.objects.get(pk=commandid)
-    items=CommandItem.objects.filter(command=command)
-    client=command.client
+    command=Commandsupplier.objects.get(pk=commandid)
+    items=CommandItemsupplier.objects.filter(command=command)
+    supplier=command.supplier
     ctx={
-        'command':command,
+        'cmnd':command,
         'items':items,
-        'sold':client.soldtotal,
+        'sold':supplier.rest,
         #'receipt_no':receipt_no,
-        #'clients':Client.objects.all(),
+        #'suppliers':supplier.objects.all(),
         'today':timezone.now().date(),
         'target':target
     }
 
-    return render(request, 'genererbonlivraison.html', ctx)
+    return render(request, 'genererbonachat.html', ctx)
     # print('>>> target', target)
     # if target=='f':
     #     year = timezone.now().strftime("%y")
@@ -1601,17 +1603,42 @@ def facturemultiple(request):
         isfarah=isfarah
     )
     # if we have just one bon
-    if len(livraisons)==1:
-        print(">> here")
-        bon=livraisons[0]
-        bon.facture=facture
-        facture.total=livraisons[0].total
-        facture.bon=bon
+    # if len(livraisons)==1:
+    #     print(">> here")
+    #     bon=livraisons[0]
+    #     bon.facture=facture
+    #     facture.total=livraisons[0].total
+    #     facture.bon=bon
+    #     bon.isfacture=True
+    #     bon.save()
+    #     #get items of bon
+    #     items=Livraisonitem.objects.filter(bon=bon)
+    #     # create facture items
+    #     for i in items:
+    #         Outfacture.objects.create(
+    #             facture=facture,
+    #             remise=i.remise,
+    #             name=i.name,
+    #             ref=i.ref,
+    #             product=i.product,
+    #             qty=i.qty,
+    #             price=i.price,
+    #             total=i.total,
+    #             client_id=clientid,
+    #             date=date,
+    #             isfarah=isfarah
+    #         )
+    #     # sold facture
+    #     client.soldfacture+=bon.total
+    # else:
+        # iterate throu bons
+    for bon in livraisons:
+        total+=bon.total
         bon.isfacture=True
+        bon.facture=facture
         bon.save()
-        #get items of bon
+        # loop items of bon
         items=Livraisonitem.objects.filter(bon=bon)
-        # create facture items
         for i in items:
             Outfacture.objects.create(
                 facture=facture,
@@ -1625,35 +1652,10 @@ def facturemultiple(request):
                 client_id=clientid,
                 date=date,
                 isfarah=isfarah
-            )
-        # sold facture
-        client.soldfacture+=bon.total
-    else:
-        # iterate throu bons
-        for bon in livraisons:
-            total+=bon.total
-            bon.isfacture=True
-            bon.facture=facture
-            bon.save()
-            # loop items of bon
-            items=Livraisonitem.objects.filter(bon=bon)
-            for i in items:
-                Outfacture.objects.create(
-                    facture=facture,
-                    remise=i.remise,
-                    name=i.name,
-                    ref=i.ref,
-                    product=i.product,
-                    qty=i.qty,
-                    price=i.price,
-                    total=i.total,
-                    client_id=clientid,
-                    date=date,
-                    isfarah=isfarah
-                )    
-        facture.total=total
-        facture.bons.set(livraisons)
-        client.soldfacture+=total
+            )    
+    facture.total=total
+    facture.bons.set(livraisons)
+    client.soldfacture+=total
     facture.save()
     client.save()
     return JsonResponse({
@@ -1709,20 +1711,49 @@ def factureachatmultiple(request):
         date=date
     )
     # if we have just one bon
-    if len(livraisons)==1:
-        print(">> here")
-        bon=livraisons[0]
-        print('Bons', bon, bon.total)
-        bon.facture=facture
-        facture.total=bon.total
-        facture.bon=bon
-        bon.isfacture=True
-        bon.save()
-        facture.save()
+    # if len(livraisons)==1:
+    #     print(">> here")
+    #     bon=livraisons[0]
+    #     print('Bons', bon, bon.total)
+    #     bon.facture=facture
+    #     facture.total=bon.total
+    #     facture.bon=bon
+    #     bon.isfacture=True
+    #     bon.save()
+    #     facture.save()
 
-        #get items of bon
+    #     #get items of bon
+    #     items=Stockin.objects.filter(nbon=bon)
+    #     # create facture items
+    #     for i in items:
+    #         Outfactureachat.objects.create(
+    #             facture=facture,
+    #             remise1=i.remise1,
+    #             remise2=i.remise2,
+    #             remise3=i.remise3,
+    #             remise4=i.remise4,
+    #             name=i.name,
+    #             ref=i.ref,
+    #             product=i.product,
+    #             qty=i.quantity,
+    #             price=i.price,
+    #             total=i.total,
+    #             supplier_id=supplierid,
+    #             date=date,
+    #             isfarah=isfarah
+    #         )
+    #     # sold facture
+    #     #supplier.soldfacture+=bon.total
+    # else:
+    # iterate throu bons
+    for bon in livraisons:
+        total+=bon.total
+        bon.isfacture=True
+        bon.facture=facture
+        bon.save()
+        # loop items of bon
         items=Stockin.objects.filter(nbon=bon)
-        # create facture items
+        print('items in multiple', items)
         for i in items:
             Outfactureachat.objects.create(
                 facture=facture,
@@ -1739,38 +1770,9 @@ def factureachatmultiple(request):
                 supplier_id=supplierid,
                 date=date,
                 isfarah=isfarah
-            )
-        # sold facture
-        #supplier.soldfacture+=bon.total
-    else:
-        # iterate throu bons
-        for bon in livraisons:
-            total+=bon.total
-            bon.isfacture=True
-            bon.facture=facture
-            bon.save()
-            # loop items of bon
-            items=Stockin.objects.filter(nbon=bon)
-            print('items in multiple', items)
-            for i in items:
-                Outfactureachat.objects.create(
-                    facture=facture,
-                    remise1=i.remise1,
-                    remise2=i.remise2,
-                    remise3=i.remise3,
-                    remise4=i.remise4,
-                    name=i.name,
-                    ref=i.ref,
-                    product=i.product,
-                    qty=i.quantity,
-                    price=i.price,
-                    total=i.total,
-                    supplier_id=supplierid,
-                    date=date,
-                    isfarah=isfarah
-                )    
-        facture.total=total
-        facture.bons.set(livraisons)
+            )    
+    facture.total=total
+    facture.bons.set(livraisons)
     facture.save()
     supplier.save()
     return JsonResponse({

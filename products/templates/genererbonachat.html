@@ -110,7 +110,7 @@
             <tbody class="bonachatbody">
               {% for i in items %}
               <tr class="itemrow">
-                <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">{{i.ref}}</td>
+                <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, {{i.product.id}})">{{i.ref}}</td>
                 <td style="padding: 2px 0; font-size: 13px;" class="name text-start">{{i.name}}</td>
                 {% if target == 'f' %}
                 <td style="padding:px 0; font-size: 13px;">{{i.product.frbuyprice}}</td>
@@ -130,7 +130,7 @@
                 <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="{{i.remise3}}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
                 <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="{{i.remise4}}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
                 <td style="padding: 2px 0; font-size: 13px;" class="total">{{i.total}}</td>
-                <input type="hidden" name="productid" value="{{i.id}}">
+                <input type="hidden" name="productid" value="{{i.product.id}}">
                 
                 </tr>
               {% endfor %}
@@ -145,6 +145,57 @@
               </b>
           </div>
         </div>
+        <div class="inputsholder bg-white border mt-2">
+          <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglementsupp(event)">+</button>
+          <strong class="totalreglsupp">0.00</strong>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="me-2">
+                  <small>Mantant:</small> <br>
+
+              </div>
+              <div class="me-2">
+                  <small>N° piece:</small> <br>
+
+              </div>
+              <div class="me-2">
+                  <small>Mode Paiment:</small> <br>
+
+              </div>
+              <div class="me-2">
+                <small>Echeance:</small> <br>
+
+              </div>
+              <div class="me-2">
+                  <small>Bank:</small> <br>
+              </div>
+          </div>
+          <div class="reglements">
+              <div class="d-flex justify-content-between align-items-center mt-2">
+            
+                <div class="me-2">
+                    <input type="number" name="mantantreglementsupp" onchange="totalreglementsupp(event)" class="w-100" placeholder="Mantant">
+                </div>
+                <div class="me-2">
+                    <input type="text" name="npiecereglementsupp" class="w-100" placeholder="N° piece">
+                </div>
+                <div class="me-2">
+                    <select name="modereglementsupp" class="w-100" onchange="checkmodereglementsupp(event)">
+                        <option value="cheque">Cheque</option>
+                        <option value="effet">effet</option>
+                        <option value="espece">espece</option>
+                        <option value="verement">verement</option>
+                        <option value="versement">versement</option>
+                    </select>
+                </div>
+                <div class="me-2">
+                    <input type="date" value="{{today|date:'Y-m-d'}}" name="echeancereglementsupp" class="w-100">
+                </div>
+                <div class="me-2">
+                  <input type="text" name="bank" class="w-100" placeholder="Nom du bank">
+              </div>
+            </div>
+          </div>
+      </div>
     </div>
 </div>
 
@@ -450,11 +501,31 @@
         let datefacture = parentdiv.find('.datefacture').val()
         let mode = parentdiv.find('.mode').val()
         let totalbon=parseFloat(parentdiv.find('.grandtotalbonachat').text())
+        mantant=$('[name="mantantreglementsupp"]').map(function() {
+            return parseFloat(this.value);
+        }).get();
+        moderegl =$('[name="modereglementsupp"]').map(function() {
+            return this.value;
+        }).get();
+        npiece=$('[name="npiecereglementsupp"]').map(function() {
+            return this.value;
+        }).get();
+        echeance=$('[name="echeancereglementsupp"]').map(function() {
+            return this.value;
+        }).get();
+        bank=$('[name="bank"]').map(function() {
+            return this.value;
+        }).get();
         $('.loadingscreen').removeClass('d-none')
         $.ajax({
             url: "{% url 'products:addsupply' %}",
             type: 'POST',
             data: {
+              mantant:JSON.stringify(mantant),
+                moderegl:JSON.stringify(moderegl),
+                npiece:JSON.stringify(npiece),
+                echeance:JSON.stringify(echeance),
+                bank:JSON.stringify(bank),
                 'target':'{{target}}',
                 'mode': mode,
                 'totalbon': totalbon,

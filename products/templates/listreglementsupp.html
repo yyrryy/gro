@@ -769,20 +769,20 @@ function submitupdatereglementsupp(event){
     }
 
     // check for npiece existence
-    $('[name="npiecereglementsupp"]').on('input', function(){
-        npiece=$(this).val()
-        console.log('check npiece', npiece)
-        $.post('/products/checknpiece', {
-            npiece:npiece,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function(data){
-                console.log(data)
-                if (data.exist){
-                    alertify.error('N° piece existe deja')
-                    //$('[name="npiecereglementsupp"]').val('')
-                }
-            })
-    })
+    // $('[name="npiecereglementsupp"]').on('input', function(){
+    //     npiece=$(this).val()
+    //     console.log('check npiece', npiece)
+    //     $.post('/products/checknpiece', {
+    //         npiece:npiece,
+    //         csrfmiddlewaretoken: '{{ csrf_token }}'
+    //         }, function(data){
+    //             console.log(data)
+    //             if (data.exist){
+    //                 alertify.error('N° piece existe deja')
+    //                 //$('[name="npiecereglementsupp"]').val('')
+    //             }
+    //         })
+    // })
 
 
     $('.submitaddreglemntsuppbtn').on('click', function(event){
@@ -837,7 +837,7 @@ function submitupdatereglementsupp(event){
             return this.value;
         }).get();
         
-        selectedValues=parentdiv.find("input[name='bonsachattopay']:checked").map(function() {
+        selectedValues=parentdiv.find("input[name='bonstopay']:checked").map(function() {
             return this.value;
         }).get()
         selectedavoirs=parentdiv.find("input[name='avoirstopay']:checked").map(function() {
@@ -847,7 +847,7 @@ function submitupdatereglementsupp(event){
             return this.value;
         }).get()
         
-        console.log(supplierid, date, mantant, mode, npiece, echeance, selectedValues)
+        console.log(supplierid, date, mantant, mode, npiece, echeance, selectedValues, selectedavances, selectedavoirs)
         $.post('/products/reglebonsachat', {
             // bl or facture
             whattopay:whattopay,
@@ -868,6 +868,7 @@ function submitupdatereglementsupp(event){
                 ajaxpage('addlistreglementsupp', 'list reglemnts', '/products/listreglementsupp?target={{target}}')
                 alertify.success('Reglement ajouté')
             })
+    
     })
 
 </script>

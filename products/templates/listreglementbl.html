@@ -263,7 +263,7 @@
 
                         </select>
                         
-                        <select name="" id="" class="mode mt-2 form-control" onchange="getbons()">
+                        <select name="" id="" class="moderegl mt-2 form-control" onchange="getbons()">
                             <option value="bl">bl</option>
                             <option value="facture">facture</option>
                         </select>
@@ -1214,23 +1214,23 @@
     }
 
     // check for npiece existence
-    $('[name="npiece"]').on('input', function(){
-        npiece=$(this).val()
-        console.log('check npiece', npiece)
-        $.get('/products/checknpiece', {
-            npiece:npiece,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function(data){
-                console.log(data)
-                if (data.exist){
-                    alertify.error('N° piece existe deja')
-                    $('.submitaddreglemntclientbtn').addClass('disabled')
-                }
-                else{
-                    $('.submitaddreglemntclientbtn').removeClass('disabled')
-                }
-            })
-    })
+    // $('[name="npiece"]').on('input', function(){
+    //     npiece=$(this).val()
+    //     console.log('check npiece', npiece)
+    //     $.get('/products/checknpiece', {
+    //         npiece:npiece,
+    //         csrfmiddlewaretoken: '{{ csrf_token }}'
+    //         }, function(data){
+    //             console.log(data)
+    //             if (data.exist){
+    //                 alertify.error('N° piece existe deja')
+    //                 $('.submitaddreglemntclientbtn').addClass('disabled')
+    //             }
+    //             else{
+    //                 $('.submitaddreglemntclientbtn').removeClass('disabled')
+    //             }
+    //         })
+    // })
 
 
     $('.submitaddreglemntclientbtn').on('click', function(event){
@@ -1294,8 +1294,14 @@
         echeance=parentdiv.find('[name="echeance"]').map(function() {
             return this.value;
         }).get();
-
+        whattopay=parseFloat($('.whattopay').text())
+        if (whattopay<=0){
+            alertify.error('Mantant a payé doit etre superieur a 0')
+            return
+        }
         $.post('/products/reglebons', {
+            whattopay:whattopay,
+            moderegl:$('.moderegl').val(),
             clientid:clientid,
             target:'{{target}}',
             mantant:JSON.stringify(mantant),

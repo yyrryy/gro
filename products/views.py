@@ -743,6 +743,7 @@ def addsupply(request):
             product.frremise4=remise4
             product.frbuyprice=buyprice
             product.frnetbuyprice=netprice
+            print('>> addin qty')
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
             if isfacture:
                 product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
@@ -794,7 +795,7 @@ def addsupply(request):
         #product.coutmoyen=round(totalprices/totalqty, 2)
         product.qtycommande=0
         product.save()
-        totalamount=sum(mantant)
+        totalamount=sum(x if x is not None else 0 for x in mantant)
         if float(totalamount)>float(totalbon):
 
             print('>>> checkpoint')
@@ -814,18 +815,20 @@ def addsupply(request):
             diff=float(totalbon)-float(totalamount)
             bon.rest=diff
         bon.save()
-        for m, mod, np, ech, bk in zip(mantant, moderegl, npiece, echeance, bank):
-            PaymentSupplier.objects.create(
-                supplier_id=supplierid,
-                amount=m,
-                date=timezone.now(),
-                echeance=ech,
-                mode=mod,
-                npiece=np,
-                bank=bk,
-                isfarah=isfarah,
-                bon=bon
-            )
+        if totalamount>0:
+            for m, mod, np, ech, bk in zip(mantant, moderegl, npiece, echeance, bank):
+                PaymentSupplier.objects.create(
+                    supplier_id=supplierid,
+                    amount=m,
+                    date=timezone.now(),
+                    echeance=ech,
+                    mode=mod,
+                    npiece=np,
+                    bank=bk,
+                    isfarah=isfarah,
+                    bon=bon
+                )
+    
     return JsonResponse({
         'success':True
         #'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
@@ -2561,6 +2564,8 @@ def reglefactures(request):
 
 def reglebons(request):
     clientid=request.POST.get('clientid')
+    whattopay=request.POST.get('whattopay')
+    moderegl=request.POST.get('moderegl')
     target=request.POST.get('target')
     client=Client.objects.get(pk=clientid)
     bons=json.loads(request.POST.get('bons'))
@@ -2574,21 +2579,38 @@ def reglebons(request):
     # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
     echeance=json.loads(request.POST.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
-    livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    if moderegl=='bl':
+        livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    else:
+        Facture.objects.filter(pk__in=bons)
     avoirs=Avoirclient.objects.filter(pk__in=avoirs)
     avances=Avanceclient.objects.filter(pk__in=avances)
     avoirs.update(inreglement=True)
     avances.update(inreglement=True)
-    livraisons.update(ispaid=True)
     livraisons.update(statusreg='r0')
     totalmantant=sum(mantant)
     totalbons=livraisons.aggregate((Sum('total')))['total__sum'] or 0
-    if totalmantant>totalbons:
-        diff=totalmantant-totalbons
+    if totalmantant>whattopay:
+        livraisons.update(ispaid=True)
+        if moderegl=='facture':
+            for livraison in livraisons:
+                # Update 'ispaid' for related ManyToManyField (bons)
+                livraison.bons.update(ispaid=True)
+        diff=totalmantant-whattopay
         Avanceclient.objects.create(
             client_id=clientid,
             amount=diff,
-            date=timezone.now(),
+            date=timezone.now().date(),
+            isfarah=target=='f',
+            isorgh=target=='o'
+        )
+    if totalmantant==whattopay:
+        livraisons.update(ispaid=True)
+    if totalmantant<whattopay:
+        Avanceclient.objects.create(
+            client_id=clientid,
+            amount=totalmantant,
+            date=timezone.now().date(),
             isfarah=target=='f',
             isorgh=target=='o'
         )
@@ -3438,19 +3460,45 @@ def reglebonsachat(request):
     else:
         livraisons=Factureachat.objects.filter(pk__in=bons)
     avoirs=Avoirsupplier.objects.filter(pk__in=avoirs)
-    avances=Avancesupplier.objects.filter(pk__in=avoirs)
-    livraisons.update(ispaid=True)
+    avances=Avancesupplier.objects.filter(pk__in=avances)
+    print('>> ll', livraisons)
+    print('>> avances', avances)
+    print('>> avoirs', avoirs)
+    
     avoirs.update(inreglement=True)
     avances.update(inreglement=True)
     totalmantant=sum(mantant)
     totalbons=livraisons.aggregate(Sum('total'))['total__sum'] or 0
     if whattopay<totalmantant:
+        livraisons.update(ispaid=True)
+        if moderegl=='facture':
+            print('facture is paid', livraisons.values())
+            
+
+            for livraison in livraisons:
+                # Update 'ispaid' for related ManyToManyField (bons)
+                livraison.bons.update(ispaid=True)
         print('>> rel is ,ore than pay', totalmantant, whattopay)
-        diff=totalmantant-totalbons
+        diff=float(totalmantant-whattopay)
+        print('>>>>>>< deiff', diff)
         # create avance supp
         Avancesupplier.objects.create(
             supplier_id=supplierid,
             amount=diff,
+            date=date,
+            isfarah=isfarah,
+        )
+    if whattopay==totalmantant:
+        livraisons.update(ispaid=True)
+        if moderegl=='facture':
+            print('facture is paid', livraisons.values())
+            for livraison in livraisons:
+                # Update 'ispaid' for related ManyToManyField (bons)
+                livraison.bons.update(ispaid=True)
+    if whattopay>totalmantant:
+        Avancesupplier.objects.create(
+            supplier_id=supplierid,
+            amount=totalmantant,
             date=date,
             isfarah=isfarah,
         )

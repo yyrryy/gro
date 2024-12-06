@@ -115,11 +115,10 @@
               <!-- <button class="btn btn-sm" style="font-size: 10px; background: #f06623; color: white;" onclick="sortdownbl(event)">↓</button>  -->
             <!-- </div> -->
           </td>
-          <td style="width:10%;"  onclick="sorttable(event)">Client</td>
-          <td style="width:10%;" >Code client</td>
+          <td style="width:10%;"  onclick="sorttable(event)">Fournisseur</td>
           <td style="width:10%;"  onclick="intsorttable(event)">Total</td>
-          <td style="width:10%;"  onclick="sorttable(event)">Staus</td>
-          <td style="width:10%;"  onclick="sorttable(event)">Validation</td>
+          <td style="width:10%;"  onclick="sorttable(event)">Bon achat</td>
+          <td style="width:10%;"  onclick="sorttable(event)">N° Devis</td>
           <td style="width:15%;"  onclick="sorttable(event)">Notes</td>
           <td style="width:10%;"  onclick="sorttable(event)">Useer</td>
           <td style="width:10%;" ></td>
@@ -128,47 +127,26 @@
       <tbody class="listblbody">
         <!-- {% if order.generated %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%} {% if order.ispaid %} text-danger{% endif %} -->
         {% for order in bons %}
-          <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/boncommanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
+          <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/supplierboncommanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>
-            <td >{{ order.client.name }}</td>
-            <td >{{ order.client.code }}</td>
+            <td >{{ order.supplier.name }}</td>
             <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}
             </td>
             
             <td class="">
-              {% if order.ispaid %}
-              <div  style="text-align: center; background: lightgreen;">
-                Encaissé
-              </div>
-              
-
-              {% else %}
-
-                <div class="" style="text-align: center; background: yellow;">
-                  En attend
-                </div>
-                
-
+              {% if order.generatedbl %}
+              {{order.bl.nbon}}
               {% endif %}
             </td>
 
             <td class="">
-              {% if order.generated %}
-              <div  style="text-align: center; background: lightgreen;">
-                Valider
-              </div>
-              
-
-              {% else %}
-
-                <div class="" style="text-align: center; background: yellow;">
-                  No valider
-                </div>
-                
-
+              {% if order.devi %}
+              {{order.devi.bon_no}}
               {% endif %}
             </td>
+
+            
             
             <td>
               {% if order.note %} {{order.note}} {% endif %}

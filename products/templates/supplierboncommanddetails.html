@@ -5,25 +5,22 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    <!-- {{order.bc.generatedbl}} {{order.generatedbl}} -->
-    {% if not order.generatedbl and not order.bc.generatedbl %}
-    <button class="btn w-100 btn-success mb-2" onclick="ajaxpage('id', 'title', '/products/supplierdevitobl?devid={{order.id}}&&target={{target}}')">
-      Generer bon achat
-    </button>
-      {% if not order.generatedbc %}
-      <button class="btn w-100 btn-success" onclick="ajaxpage('id', 'title', '/products/supplierdevitoboncommand?devid={{order.id}}&&target={{target}}')">
-        Generer bon Commande
-      </button>
-      {% endif %}
-    {% else %}
-    Devis generé bon achat N°: <br> 
+    {% if order.devi and order.devi.generatedbl %}
     <div>
-
-      {{order.bl.nbon}}
-      {{order.bc.bl.nbon}}
+      <strong>
+        Devis est generé
+      </strong>
     </div>
+    {% elif not order.generatedbl %}
+    <button class="btn w-100 btn-success mb-2" onclick="ajaxpage('id', 'title', '/products/supplierboncommandobl?commandid={{order.id}}&&target={{target}}')">
+      Generer bon Achat
+    </button>
     {% endif %}
-    
+    <!-- {% if not order.generatedbc %}
+    <button class="btn w-100 btn-success" onclick="ajaxpage('id', 'title', '/products/devitoboncommand?devid={{order.id}}&&target={{target}}')">
+      Generer bon commande
+    </button>
+    {% endif %} -->
     
     <!-- <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
       Modifier
@@ -114,7 +111,7 @@
           </div>
           <h3>
               <b>
-                Devi
+                Bon de commande
               </b>
             </h3>
 
@@ -243,7 +240,7 @@
           </div>
           <h3>
               <b>
-                Devi
+                Bon de commane
               </b>
             </h3>
 
