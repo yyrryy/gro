@@ -224,6 +224,53 @@
                 </b>
             </div>
           </div>
+          <div class="reglementbonsholder mt-3 border position-relative">
+
+            <div class="inputsholder">
+                <!-- <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button> -->
+                <!-- <strong class="totalreglblfields">0.00</strong> -->
+                    <div class="row align-items-center">
+                          <div class="col-3">
+                              <small>Mantant:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>N° piece:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>Mode Paiment:</small> <br>
+
+                          </div>
+                          <div class="col-3">
+                              <small>Echeance:</small> <br>
+
+                          </div>
+                      </div>
+                    <div class="reglements">
+                        <div class="row align-items-center mt-2">
+                            <div class="col-3">
+                                <input type="number" name="mantantreglementclient" onchange="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
+                            </div>
+                            <div class="col-3">
+                                <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)">
+                                    <option value="cheque">Cheque</option>
+                                    <option value="effet">effet</option>
+                                    <option value="espece">espece</option>
+                                    <option value="verement">verement</option>
+                                    <option value="versement">versement</option>
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <input type="date" name="echeance" class="w-100 notempty echeancereglbl" value="{{today|date:'Y-m-d'}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
       </div>
   </div>
   {% endif %}
@@ -582,6 +629,10 @@
           let datebon = parentdiv.find('.datebon').val()
           let transport = parentdiv.find('.transport').val()
           let devid = parentdiv.find('.devid').val()
+          mantant=$('[name="mantantreglementclient"]').val()
+          mode=$('[name="modereglementclient"]').val()
+          npiece=$('[name="npiece"]').val()
+          echeance=$('[name="echeance"]').val()
           let cmndid = parentdiv.find('.cmndid').val()
           let orderno = parentdiv.find('.orderno').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
@@ -601,6 +652,10 @@
                   'transport':transport,
                   'datebon': datebon,
                   'devid': devid,
+                  'mantant': mantant,
+                  'mode': mode,
+                  'npiece': npiece,
+                  'echeance': echeance,
                   'cmndid': cmndid,
                   'orderno': orderno,
                   'products': JSON.stringify(products),

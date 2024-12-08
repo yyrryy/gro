@@ -65,7 +65,8 @@
                       Code/Client deja existe
                   </div>
                   <input type="text" name="clientcode" class="form-control mb-2 " placeholder="Code" value="{{lastcode}}">
-                  <input type="text" name="clientnameinp" class="form-control mb-2" placeholder="client">
+                  <input type="text" name="clientnameinp" class="form-control mb-2" placeholder="Nom STE">
+                  <input type="text" name="clientnamepersinp" class="form-control mb-2" placeholder="Nom contact">
                   <!-- <div class="mb-2">
                       <small>Representant</small>
                   <select name="clientrep" class="form-select">
@@ -79,9 +80,25 @@
                   <input type="number" name="clientplafon" class="form-control mb-2" placeholder="plafon">
                   <input type="number" name="clientphone2" class="form-control mb-2" placeholder="phone 2">
                   <input type="text" name="clientice" class="form-control mb-2" placeholder="ICE">
+                  <input type="text" name="clientrc" class="form-control mb-2" placeholder="RC">
+                  <input type="text" name="clientif" class="form-control mb-2" placeholder="IF">
+
+                  <small>Mode reglement:</small>
+                  <select name="modereglement" class="modereglement form-control mb-2">
+                    <option value="compte">En compte</option>
+                    <option value="espece">Contre espece</option>
+                    <option value="cheque">Contre cheque</option>
+                    <option value="effet">Contre effet</option>
+                    <option value="verement">Contre verement</option>
+                  </select>
+
                   <input type="text" name="clientcity" class="form-control mb-2" placeholder="Ville">
+                  <input type="number" name="clientsold" class="form-control mb-2" placeholder="Sold Initial">
+                  <input type="text" name="clientemail" class="form-control mb-2" placeholder="Email">
                   <input type="text" name="clientaddress" class="form-control mb-2" placeholder="Addresse">
                   <input type="text" name="clientregion" class="form-control mb-2" placeholder="Region">
+                  <small>Observation:</small>
+                  <textarea name="note" id="" cols="30" rows="10" class="note form-control"></textarea>
                   <!-- CHECK CODECLIENT IN UPDATE -->
                   <button class="btn btn-outline-success w-100 submitaddclientbtn">
                       Enregistrer
@@ -130,20 +147,14 @@
                       <td onclick="sorttable(event)">
                           Region
                       </td>
-                      <td onclick="sorttable(event)">
-                          Representant
-                      </td>
-                      {% if not facturesection %}
+                      
                       <!-- <td onclick="intsorttable(event)">
                           Sold total
                       </td> -->
                       <td onclick="intsorttable(event)">
-                          Sold Bl
+                          Sold
                       </td>
-                      {% endif %}
-                      <td onclick="intsorttable(event)">
-                          Sold Facture
-                      </td>
+                      
                       <td onclick="sorttable(event)">
                           ICE
                       </td>

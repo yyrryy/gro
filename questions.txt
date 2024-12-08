@@ -6,3 +6,5 @@ image of product when selected in select2
 when facture created, create also bl
 reglement avoir client in pyemnts to client table
 farah or orgh in bonsorti lines
+
+same inputs in suppliers like client, same table

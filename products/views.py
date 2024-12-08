@@ -841,10 +841,7 @@ def addbonlivraison(request):
     npiece=request.POST.get('npiece')
     echeance=request.POST.get('echeance')
     print('>> echeance', echeance, echeance=="")
-    if echeance=="":
-        echeance=None
-    else:
-        echeance=datetime.strptime(echeance, '%Y-%m-%d')
+    
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
@@ -947,6 +944,10 @@ def addbonlivraison(request):
         return JsonResponse({
             "success":True
         })
+    if echeance=="":
+        echeance=None
+    else:
+        echeance=datetime.strptime(echeance, '%Y-%m-%d')
     if float(mantant)>float(totalbon):
         diff=float(mantant)-float(totalbon)
         # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
@@ -1294,6 +1295,7 @@ def addclientdivers(request):
     name=request.GET.get('name')
     code=request.GET.get('code')
     city=request.GET.get('ville')
+    city=request.GET.get('ville')
     client=Client.objects.create(
         city=city,
         code=code,
@@ -1324,9 +1326,16 @@ def addclient(request):
     address=request.POST.get('clientaddress')
     code=request.POST.get('clientcode')
     city=request.POST.get('clientcity')
+    clientemail=request.POST.get('clientemail')
     ice=request.POST.get('clientice')
+    clientif=request.POST.get('clientif')
+    clientnamepersinp=request.POST.get('clientnamepersinp')
+    clientrc=request.POST.get('clientrc')
+    modereglement=request.POST.get('modereglement')
+    note=request.POST.get('note')
+    clientsold=request.POST.get('clientsold')
     region=request.POST.get('clientregion').lower().strip()
-    plafon=request.GET.get('clientplafon', 0)
+    plafon=request.POST.get('clientplafon', 0)
     if Client.objects.filter(Q(name=name) | Q(code=code)).exists():
         return JsonResponse({
             'success':False,
@@ -1355,7 +1364,13 @@ def addclient(request):
             phone2=phone2,
             address=address,
             diver=False,
-            soldbl=0.00,
+            soldbl=clientsold,
+            note=note,
+            modereglement=modereglement,
+            clientif=clientif,
+            clientrc=clientrc,
+            email=clientemail,
+            clientname=clientnamepersinp,
             soldfacture=0.00,
         )
         if target=="s":
@@ -4432,11 +4447,14 @@ def getlastsuppprice(request):
     print(id, 'rr', supplierid)
     price=0
     remise=0
+    print('isfarah', isfarah)
     prices=Stockin.objects.filter(product_id=id, supplier_id=supplierid, isfarah=isfarah)
     lastprice=prices.last()
     if lastprice:
         price=lastprice.price
         remise=lastprice.remise1
+    print('supp', Supplier.objects.get(pk=supplierid))
+    print('pdct', Produit.objects.get(pk=id))
     print("prices", prices, 'lastprice', lastprice)
     return JsonResponse({
         'price':price,

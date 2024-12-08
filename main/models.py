@@ -275,6 +275,7 @@ class Client(models.Model):
     clientfarah=models.BooleanField(default=False)
     clientorgh=models.BooleanField(default=False)
     # if client is for both societies
+    note=models.TextField(default=None, null=True, blank=True)
     clientsortie=models.BooleanField(default=False)
     represent=models.ForeignKey('Represent', on_delete=models.CASCADE, default=None, null=True, related_name="repclient")
     user = models.OneToOneField(User, on_delete=models.SET_NULL, default=None, null=True)
@@ -282,6 +283,10 @@ class Client(models.Model):
     clientname=models.CharField(max_length=200, null=True, default=None, blank=True)
     code=models.CharField(max_length=200, null=True, default=None)
     ice=models.CharField(max_length=200, null=True, default=None)
+    clientif=models.CharField(max_length=200, null=True, default=None)
+    clientrc=models.CharField(max_length=200, null=True, default=None)
+    modereglement=models.CharField(max_length=200, null=True, default=None)
+    email=models.CharField(max_length=200, null=True, default=None)
     city=models.CharField(max_length=200, null=True, default=None)
     region=models.CharField(max_length=200, null=True, default=None)
     total=models.FloatField(default=0.00, null=True, blank=True)
