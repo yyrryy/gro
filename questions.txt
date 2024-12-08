@@ -7,4 +7,24 @@ when facture created, create also bl
 reglement avoir client in pyemnts to client table
 farah or orgh in bonsorti lines
 
+
+
 same inputs in suppliers like client, same table
+edit bons
+mode regl add verement, versement, carte banquaire, echeance and date paimement
+//sidplay only what has been paid and checked in tables
+serie payment
+situation facture
+suivi facture
+date, N°fac, client, ice, mantant ttc, mantant ht, tva, mode reg, n piece, 
+//annuler bon, avoir with button annuler when seen details
+when annuler brign them in a separated list
+//list valider, when bon is paid and has facture
+avoir is valider when its in a reglement
+facture is valider when it's paid
+list valider for each
+rastaurer from validation
+facture some bons are paid
+cars of product
+equivalent, depo in add product, jeux, depo select
+bon achat add qty uniten qty jeux

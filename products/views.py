@@ -1675,10 +1675,10 @@ def listbonlivraison(request):
     # get only the last 100 orders of the current year
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
-        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(ispaid=True, isfacture=True).exclude(iscanceled=True).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).exclude(ispaid=True, isfacture=True).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
@@ -2409,14 +2409,14 @@ def getclientbons(request):
     # elif target=="f":
     print('>>> mode regl', moderegl)
     if moderegl=='bl':
-        bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
+        bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, iscanceled=False).order_by('date')[:50]
         
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
     else:
-        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
+        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, iscanceled=False).order_by('date')[:50]
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'

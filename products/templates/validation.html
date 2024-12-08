@@ -50,16 +50,7 @@
 
 <div class="bg-white shadow rounded">
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-    <div>
-      <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
-      <button class="btn border btnselect btn-dark active" style="
-      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target=f')">En attend</button>
-      <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonvalider()">Validé</button>
-      <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getcanceledbons()">Annulé</button>
-    </div>
+    
     <div>
       {{title}}
     </div>
@@ -122,6 +113,9 @@
     <table class="table table-bordered table-hover table-striped listbltable" style="font-size: 12px;" id="addbonlivraisonle">
       <thead style="position: sticky; top: 0;">
         <tr style="background: #676767; color: white;">
+          <td style="width: 1%;">
+            
+          </td>
           <td style="width: 8%;" onclick="sorttable(event)">N° bon</td>
           <td style="width: 8%;" class="">
             <div class="d-flex justify-content-between align-items-center">
@@ -148,7 +142,9 @@
       <tbody class="listblbody">
         {% for order in bons %}
           <tr class="ord bl-row " orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
-            
+            <td>
+              <input type="checkbox">
+            </td>
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>
             <td >{{ order.client.name }}</td>
@@ -202,7 +198,7 @@
               {% endif %}
             </td>
             <td class="d-flex">
-              <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
+              <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button>
               <button class="btn btn-sm bi bi-download" onclick="printlivraison('{{order.id}}')"></button>
             </td>
           </tr>
@@ -254,16 +250,9 @@
 
 
 <script>
-  function getcanceledbons(){
+  function getbonvalider(event){
     $('.listblbody').addClass('blurred')
-    $.get('/products/getcanceledbons?target={{target}}', (data)=>{
-      $('.listblbody').html(data.html)
-      $('.listblbody').removeClass('blurred')
-    })
-  }
-  function getbonvalider(){
-    $('.listblbody').addClass('blurred')
-    $.get('/products/getbonvalider?target={{target}}', (data)=>{
+    $.get('/products/getbonvalider', (data)=>{
       $('.listblbody').html(data.html)
       $('.listblbody').removeClass('blurred')
     })

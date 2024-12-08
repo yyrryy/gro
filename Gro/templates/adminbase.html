@@ -1036,6 +1036,16 @@ a .uil {
             // }
         })
       }
+      function cancelthis(id, target, url){
+        console.log(id, target)
+        $.get('/products/cancel'+target, {'id':id, 'target':target}, (data)=>{
+          if (data.success){
+            ajaxpage('maintab', 'Produits', url)
+          }else{
+            alertify.error(data.message)
+          }
+        })
+      }
       function ajaxpage(id, title, url){
         $(`#maintab`).html(
           `<div class="spinner-grow" role="status"></div>`

@@ -59,14 +59,14 @@ def duplicate(request):
 
 # ste1=Farah
 def ste1(request):
-    return render(request, 'fdashboard.html')
+    return render(request, 'fdashboard.html', {'target':'f'})
 
 # ste1=Farah
 def ste2(request):
-    return render(request, 'odashboard.html')
+    return render(request, 'odashboard.html', {'target':'o'})
 
 def pointdevente(request):
-    return render(request, 'pos.html')
+    return render(request, 'pos.html', {'target':'s'})
 
 def bonsortie(request):
     # get the last order_no
@@ -378,7 +378,7 @@ def farahhome(request):
     return render(request, 'farahhome.html', {'target':'f'})
 
 def orghhome(request):
-    return render(request, 'orghhome.html', {'target':'f'})
+    return render(request, 'orghhome.html', {'target':'o'})
 
 def clientsection(request):
     target=request.GET.get('target')
@@ -1797,3 +1797,90 @@ def achatfacture(request):
         'today':timezone.now()
     }
     return render(request, 'listfactureachat.html', ctx)
+
+def cancelbon(request):
+    id=request.GET.get('id')
+    target=request.GET.get('target')
+    print('>>> bon', id)
+    bon=Bonlivraison.objects.get(pk=id)
+    items=Livraisonitem.objects.filter(bon=bon)
+    for i in items:
+        product=i.product
+        if target=='f':
+            product.stocktotalfarah+=i.qty
+        else:
+            product.stocktotalorgh+=i.qty
+        product.save()
+    bon.iscanceled=True
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def rastorebon(request):
+    id=request.GET.get('id')
+    bon=Bonlivraison.objects.get(pk=id)
+    items=Livraisonitem.objects.filter(bon=bon)
+    for i in items:
+        product=i.product
+        if bon.isfarah:
+            product.stocktotalfarah-=i.qty
+        else:
+            product.stocktotalorgh-=i.qty
+        product.save()
+    bon.iscanceled=False
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def cancelfacture(request):
+    id=request.GET.get('id')
+    facture=Facture.objects.get(pk=id)
+    facture.iscanceled=True
+    return JsonResponse({
+        'success':True
+    })
+
+def cancelavoir(request):
+    id=request.GET.get('id')
+    avoir=Avoirclient.objects.get(pk=id)
+    avoir.iscanceled=True
+    return JsonResponse({
+        'success':True
+    })
+
+def getbonvalider(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    bons = Bonlivraison.objects.filter(isfarah=isfarah, isvalid=True).order_by('-bon_no')[:50]
+    print('>> bons', bons)
+    ctx={
+        'html':render(request, 'bllist.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
+        'total':0,
+    }
+    if bons:
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
+
+def getcanceledbons(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    bons = Bonlivraison.objects.filter(isfarah=isfarah, iscanceled=True).order_by('-bon_no')[:50]
+    print('>> bons', bons)
+    return JsonResponse({
+        'html':render(request, 'bllist.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
+        'total':round(bons.aggregate(Sum('total')).get('total__sum'), 2),
+    })
+
+def validation(request):
+    target=request.GET.get('target')
+    
+    ctx={
+        'title':'Validation',
+        #'boncommand':Order.objects.filter(isdelivered=False).exclude(note__icontains='Reliquat').count(),
+        #'depasser':depasser,
+        #'reps':Represent.objects.all(),
+        'target':target
+    }
+    return render(request, 'validation.html', ctx)

@@ -381,6 +381,8 @@ class Avancesupplier(models.Model):
 
 
 class Bonlivraison(models.Model):
+    isvalid=models.BooleanField(default=False)
+    iscanceled=models.BooleanField(default=False)
     order=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     #bon command
     command=models.ForeignKey('Command', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommand')
@@ -421,6 +423,7 @@ class Bonlivraison(models.Model):
         return self.bon_no
 
 class Facture(models.Model):
+    iscaceled=models.BooleanField(default=False)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, blank=True, null=True, related_name='bonofthisfacture')
@@ -647,6 +650,7 @@ class Livraisonitem(models.Model):
 
 
 class Avoirclient(models.Model):
+    iscaceled=models.BooleanField(default=False)
     date=models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     no = models.CharField(
         max_length=20, unique=True, blank=True, null=True
@@ -687,6 +691,7 @@ class Returned(models.Model):
     isorgh=models.BooleanField(default=False)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True, blank=True)
 class Avoirsupplier(models.Model):
+    iscaceled=models.BooleanField(default=False)
     date=models.DateTimeField(default=datetime.datetime.now, blank=True, null=True)
     no = models.CharField(
         max_length=20, unique=True, blank=True, null=True
@@ -1043,6 +1048,7 @@ class Sortieitem(models.Model):
         return f'{self.bon.bon_no} - {self.product.ref}'
 
 class Factureachat(models.Model):
+    iscaceled=models.BooleanField(default=False)
     facture_no=models.CharField(max_length=500, null=True, default=None)
     date = models.DateTimeField(default=None, blank=True, null=True)
     bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name='facturebons')
@@ -1051,6 +1057,7 @@ class Factureachat(models.Model):
     total=models.FloatField(default=0.00)
     tva=models.FloatField(default=0.00)
     ispaid=models.BooleanField(default=False)
+    isvalid=models.BooleanField(default=False)
     bon=models.ForeignKey(Itemsbysupplier, default=None, null=True, blank=True, on_delete=models.CASCADE, related_name='facturebon')
     supplier=models.ForeignKey(Supplier, default=None, blank=True, on_delete=models.CASCADE, related_name='supplieroffacture')
 

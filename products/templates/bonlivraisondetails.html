@@ -5,7 +5,7 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    {% if order.isfacture %}
+    <!-- {% if order.isfacture %}
     <button class="btn mt-2 w-100 bg-orange" onclick="degenerer(event, '{{order.id}}', 'bonl{{order.id}}', '/products/bonlivraisondetails/{{order.id}}')">
       Dégenerer Facture
     </button>
@@ -15,7 +15,7 @@
     {% if order.total == 0 %}
 
     {% endif %}
-    {% else %}
+    {% else %} -->
     {% if order.ispaid %}
     <p>
       Bon est reglé
@@ -24,11 +24,19 @@
     <!-- <button class="btn w-100 btn-success" onclick="ajaxpage('generatefacturetab{{order.id}}', 'Generer Fact.', '/products/validatebonsortie?bonid={{order.id}}')">
       Generer Bon sortie
     </button> -->
-    <!-- if it has bon sortie, dont diplay modifier -->
-    {% if i.bonsortie %}
+    <!-- if it has order sortie, dont diplay modifier -->
+    {% if order.iscanceled %}
+    <button>Rastaurer</button>
+    {%endif%}
+    {% if not order.ispaid or not order.isfacture %}
+      {% if not order.iscanceled %}
+      <button class="btn btn-danger" onclick="cancelthis('{{order.id}}', 'bon', '/products/bonlivraisondetails/{{order.id}}')">Anullé</button>
+      {% endif %}
+    {% endif %}
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
       Modifier
     </button>
+    {% if i.bonsortie %}
     {% endif %}
 
 
