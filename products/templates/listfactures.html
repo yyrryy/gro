@@ -195,9 +195,9 @@
 
       </div> -->
       <div class="d-flex flex-column">
-        <button class="btn btn-success" style="border-radius: 10px;" onclick="ajaxpage('addfacture', '+ Facture', '/products/facture?target={{target}}')">
+        <!-- <button class="btn btn-success" style="border-radius: 10px;" onclick="ajaxpage('addfacture', '+ Facture', '/products/facture?target={{target}}')">
           + Facture
-        </button>
+        </button> -->
         <!-- <button class="btn bi bi-download bg-white mt-2" style="border-radius: 10px;" onclick="$('.exportfcholder').css('top', '10vh')"></button> -->
       </div>
 
@@ -236,8 +236,7 @@
         </thead>
         <tbody class="listfcbody">
           {% for order in bons %}
-            <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}')"
-              style="{% if order.bon %} color: blue {% endif %}"
+            <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}')" mode="waiting"
             >
               <td>{{ order.facture_no }}</td>
               <td>{{ order.date|date:'d/m/Y' }}</td>
@@ -532,10 +531,10 @@
   }
   // let currentPagelistfc=1
   // let loadinglistfc = false;
-  function loadMorelistfc (year, startdate, enddate, term, comptable)  {
+  function loadMorelistfc (year, startdate, enddate, term, comptable, mode)  {
     console.log('term and page ubr', term, currentPagelistfc)
     loadinglistfc = true;
-    $.get(`/products/loadlistfc/?page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}`, (data)=>{
+    $.get(`/products/loadlistfc/?page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}&mode=${mode}&target={{target}}`, (data)=>{
 
       const tbody = $('.listfctable tbody');
       tbody.append(data.trs);
@@ -561,6 +560,7 @@
       const lastRow = document.querySelector('.fc-row:last-child');
       const lastRowOffset = lastRow.offsetTop + lastRow.clientHeight;
       let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      let mode=lastRow.getAttribute('mode')
       let startdate=$('.startdatelistfc').val()==""?0:$('.startdatelistfc').val()
       let enddate=$('.enddatelistfc').val()==""?0:$('.enddatelistfc').val()
       let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0
@@ -569,7 +569,7 @@
       if (containerBottom+900 >= lastRowOffset && !loadinglistfc) {
 
           currentPagelistfc++;
-          loadMorelistfc(year, startdate, enddate, term, comptable);
+          loadMorelistfc(year, startdate, enddate, term, comptable, mode);
       }
     };
 
@@ -658,7 +658,7 @@ $('.searchinputlistfactures').on("change", function() {
 
     }
     else{
-    $.get('/products/searchforlistfc', {'term':filterValue.trim(), 'year':year, 'startdate':$('.startdatelistfc').val(), 'enddate':$('.enddatelistfc').val()}, (data)=>{
+    $.get('/products/searchforlistfc', {'term':filterValue.trim(), 'year':year, 'startdate':$('.startdatelistfc').val(), 'enddate':$('.enddatelistfc').val(), 'target':'{{target}}'}, (data)=>{
       $(".facturestable tbody").html('')
       $(".facturestable tbody").html(data.trs)
       $('.totalfc').text(data.total)

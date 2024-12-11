@@ -22,6 +22,18 @@
     <link href="{% static 'css/tabulator.min.css'%}" rel="stylesheet" />
     <link rel="stylesheet" href="/static/css/datepicker.css">
     <style>
+      .btnselect.active{
+    background:white;
+    border-bottom: 2px solid white;
+    color: black;
+  }
+  .blink {
+  animation: blinker .6s cubic-bezier(.5, 0, 1, 1) infinite alternate;
+}
+@keyframes blinker {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
     button{
       border-bottom:5px solid black;
     }

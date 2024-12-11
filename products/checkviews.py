@@ -1866,6 +1866,10 @@ def validatebons(request):
     bons=json.loads(request.GET.get('bons'))
     if mode=='facture':
         livraisons=Facture.objects.filter(pk__in=bons)
+        for livraison in livraisons:
+            print("make bon valid", livraison.bons.all())
+            # Update 'ispaid' for related ManyToManyField (bons)
+            livraison.bons.all().update(isvalid=True)
     else:
         livraisons=Bonlivraison.objects.filter(pk__in=bons)
     livraisons.update(isvalid=True)

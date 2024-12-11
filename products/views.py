@@ -2416,7 +2416,7 @@ def getclientbons(request):
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
     else:
-        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, iscanceled=False).order_by('date')[:50]
+        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
@@ -2630,7 +2630,9 @@ def reglebons(request):
         livraisons.update(ispaid=True)
         livraisons.update(statusreg='r1')
         if moderegl=='facture':
+            print("make bon paid")
             for livraison in livraisons:
+                print("make bon paid", livraison.bons.all())
                 # Update 'ispaid' for related ManyToManyField (bons)
                 livraison.bons.all().update(ispaid=True)
         diff=totalmantant-whattopay
@@ -2642,6 +2644,12 @@ def reglebons(request):
             isorgh=target=='o'
         )
     if totalmantant==whattopay:
+        if moderegl=='facture':
+            print("make bon paid")
+            for livraison in livraisons:
+                print("make bon paid", livraison.bons.all())
+                # Update 'ispaid' for related ManyToManyField (bons)
+                livraison.bons.all().update(ispaid=True)
         livraisons.update(ispaid=True)
     if totalmantant<whattopay:
         Avanceclient.objects.create(
@@ -6797,52 +6805,14 @@ def loadlistfc(request):
 
 def searchforlistfc(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
     searchedterm=request.GET.get('term')
     startdate=request.GET.get('startdate') or '0'
     enddate=request.GET.get('enddate') or '0'
     print('>>', startdate, enddate)
     year=request.GET.get('year')
-    if(term==''):
-        bons=Facture.objects.all()[:50]
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div>
-                {'R0' if i.ispaid else 'N1' }
-
-                </div>
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-                </td>
-                <td class="text-danger">
-
-                </td>
-
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td>
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                </td>
-            </tr>
-            '''
-        return JsonResponse({
-            'trs':trs
-        })
-    print('>>>>term', term)
-
+    isfarah=target=='f'
+    
     # Split the term into individual words separated by '*'
     search_terms = term.split('+')
 
@@ -6865,12 +6835,12 @@ def searchforlistfc(request):
 
     if startdate=='0' and enddate=='0':
         print('>>>> search list fc, startdate and enddate are 0')
-        bons=Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no')[:50]
-        total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-facture_no')[:50]
+        total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     else:
-        bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no')[:50]
-        total=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-facture_no')[:50]
+        total=round(bons.order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     # if year=='0':
     #     bons=Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no')[:50]
@@ -6878,39 +6848,9 @@ def searchforlistfc(request):
     # else:
     #     bons=Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no')[:50]
     #     total=round(Facture.objects.filter(q_objects).filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
-    trs=''
-    for i in bons:
-        trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" term={searchedterm} year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                    <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                    <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                </td>
-                <td>
-                    {i.note}
-                </td>
-
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
+    
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
         'total':total,
 
     })
