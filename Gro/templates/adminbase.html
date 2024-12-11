@@ -998,6 +998,24 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function checksamefacture(event){
+        // Get the checkbox that triggered the event
+        const checkbox = event.target;
+
+    // Get the facture value of the clicked checkbox
+        const facture = checkbox.getAttribute('facture');
+
+        // If there is a facture attribute, toggle all checkboxes with the same facture
+        if (facture) {
+            // Find all checkboxes with the same facture attribute
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][facture="${facture}"]`);
+
+            // Set their checked state to match the clicked checkbox
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+        }
+      }
       function addscreen(url){
         $('.addscreen').removeClass('d-none')
         $.get(url, (data)=>{

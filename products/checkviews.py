@@ -1852,9 +1852,9 @@ def getbonstovalidate(request):
         })
     bons=Bonlivraison.objects.filter(iscanceled=False, isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah, isfacture=True).order_by('date')
     for i in bons:
-        # old code, if reglement is paid it's checked from here
-        # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-        trs+=f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        facture_info = f'facture={i.facture.facture_no}' if i.facture else ""
+        print('>>', facture_info)
+        trs += f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" {facture_info} onchange="checkreglementbox(event), checksamefacture(event)"></td></tr>'
     return JsonResponse({
         'bons':trs,
         'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
