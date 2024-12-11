@@ -1834,6 +1834,44 @@ def rastorebon(request):
         'success':True
     })
 
+def getbonstovalidate(request):
+    datefrom=request.GET.get('datefrom')
+    dateend=request.GET.get('dateend')
+    target=request.GET.get('target')
+    mode=request.GET.get('mode')
+    isfarah=target=='f'
+    print('isfarah', isfarah, 'target', target)
+    trs=''
+    if mode=='facture':
+        bons=Facture.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')
+        for i in bons:
+            trs+=f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        return JsonResponse({
+            'bons':trs,
+            'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+        })
+    bons=Bonlivraison.objects.filter(iscanceled=False, isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah, isfacture=True).order_by('date')
+    for i in bons:
+        # old code, if reglement is paid it's checked from here
+        # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
+        trs+=f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+    return JsonResponse({
+        'bons':trs,
+        'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+    })
+
+
+def validatebons(request):
+    mode=request.GET.get('mode')
+    bons=json.loads(request.GET.get('bons'))
+    if mode=='facture':
+        livraisons=Facture.objects.filter(pk__in=bons)
+    else:
+        livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    livraisons.update(isvalid=True)
+    return JsonResponse({
+        'success':True
+    })
 def cancelfacture(request):
     id=request.GET.get('id')
     facture=Facture.objects.get(pk=id)
@@ -1862,6 +1900,19 @@ def getbonvalider(request):
     if bons:
         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
+
+def getfacturevalider(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    factures = Facture.objects.filter(isfarah=isfarah, isvalid=True).order_by('-facture_no')[:50]
+    ctx={
+        'html':render(request, 'fclist.html', {'bons':factures, 'target':target}).content.decode('utf-8'),
+        'total':0,
+    }
+    if factures:
+        ctx['total']=round(factures.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
+
 
 def getcanceledbons(request):
     target=request.GET.get('target')

@@ -1675,10 +1675,10 @@ def listbonlivraison(request):
     # get only the last 100 orders of the current year
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
-        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(ispaid=True, isfacture=True).exclude(iscanceled=True).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(isvalid=True).exclude(iscanceled=True).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).exclude(ispaid=True, isfacture=True).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
@@ -1843,7 +1843,7 @@ def listfactures(request):
     year=timezone.now().strftime("%y")
     # get only the last 100 orders of the current year
     if target=='f':
-        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
+        bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FR-FC{year}'
         ).last()
@@ -1856,7 +1856,7 @@ def listfactures(request):
         else:
             receipt_no = f"FR-FC{year}000000001"
     else:
-        bons= Facture.objects.filter(date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
+        bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FC{year}'
         ).last()
@@ -3275,7 +3275,7 @@ def relevclientfc(request):
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=True, date__range=[startdate, enddate])
-    reglementsfc=PaymentClientfc.objects.filter(client_id=clientid, date__range=[startdate, enddate])
+    reglementsfc=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
 
     bons=Facture.objects.filter(client_id=clientid, date__range=[startdate, enddate])
 

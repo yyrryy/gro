@@ -26,8 +26,10 @@
                 <input type="number" class="form-control" name="minstockinadd" required>
             </div>
             <div class="col-3">
-                <small>Categorie</small><br>
-                <select name="categoryinadd" class="form-select select" style="width: 100%;" required>
+                <small>Categorie (*)</small><br>
+                <select name="categoryinadd" class="form-select select2" style="width: 100%;" required>
+                    <option value="">--</option>
+
                     {% for i in categories %}
                     <option value="{{i.id}}">
                         {{i.name}}
@@ -36,8 +38,8 @@
                 </select>
             </div>
             <div class="col-2">
-                <small>Marque</small> <br>
-                <select name="marqueinadd" class="form-select select" required style="width:100%;">
+                <small>Marque (*)</small> <br>
+                <select name="marqueinadd" class="form-select select2" required style="width:100%;">
                     <option value="">--</option>
                     {% for i in marques %}
                     <option value="{{i.id}}">
@@ -57,6 +59,10 @@
             <div class="col-2">
                 <small>Block</small>
                 <input type="text" class="form-control" name="blockinadd">
+            </div>
+            <div class="mt-2">
+                <small>Equivalents:</small>
+                <textarea class="form-control" name="equivinadd" style="height: 97px;"></textarea>
             </div>
         </div>
 
@@ -96,6 +102,7 @@
 
 {% block js %}
 <script>
+    $('.select2').select2()
     function addmark(event){
         event.preventDefault()
         var marque = $(event.target).prev().val()
@@ -113,7 +120,10 @@
             success: function(data){
                 if (data.success){
                     alertify.success('Marque ajoutée avec success')
+                    //$('[name="marqueinadd"]').append(`<option value="${data.id}">${marque}</option>`)
                     $('[name="marqueinadd"]').append(`<option value="${data.id}">${marque}</option>`)
+                    // Trigger Select2 to refresh and show the new option
+                    //$('[name="marqueinadd"]').trigger('change')
                     $(event.target).prev().val('')
                 }else{
                     alertify.error(data.error)
@@ -147,6 +157,9 @@
             }
         })
     }
+    $(document).on("keypress", ":input:not(textarea)", function(event) {
+        return event.keyCode != 13;
+    }); 
     $('.submitbtn').on('click', function(e) {
         e.preventDefault();
         if ($('[name="refinadd"]').val()=='' || $('[name="nameinadd"]').val()=='' || $('[name="marqueinadd"]').val()=='' || $('[name="categoryinadd"]').val()==''){

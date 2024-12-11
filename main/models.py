@@ -423,6 +423,7 @@ class Bonlivraison(models.Model):
         return self.bon_no
 
 class Facture(models.Model):
+    isvalid=models.BooleanField(default=False)
     iscaceled=models.BooleanField(default=False)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
