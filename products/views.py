@@ -299,6 +299,7 @@ def addoneproduct(request):
         logo=request.POST.get('logoinadd', None)
         image=request.FILES.get('imageinadd', None)
         sellprice=request.POST.get('sellpriceinadd') or 0
+        qtyjeu=request.POST.get('qtyjeuinadd') or 0
         supplier=request.POST.get('supplier') or None
         minstock=request.POST.get('minstockinadd') or 0
         buyprice=request.POST.get('buyprice') or 0
@@ -314,6 +315,7 @@ def addoneproduct(request):
         product=Produit.objects.create(
             ref=ref,
             name=name,
+            qtyjeu=qtyjeu,
             buyprice=buyprice,
             diametre=diametre,
             sellprice=sellprice,
@@ -465,13 +467,18 @@ def updateproduct(request):
     #         i.save()
     #         i.cart.total=newtotal
     #         i.cart.save()
-    equivalent=' '.join(i for i in request.POST.get('equivalent').split())
+    # equivalent=' '.join(i for i in request.POST.get('equivalent').split())
+    equivalent=request.POST.get('equivalent')
+    minstock=request.POST.get('minstock')
+    qtyjeu=request.POST.get('qtyjeu') or 0
     product.carlogos_id=logo
     if new=='on':
       product.isnew=True
     else:
       product.isnew=False
     product.near=near
+    product.minstock=minstock
+    product.qtyjeu=qtyjeu
     product.repsprice=json.dumps(selected_reps)
     product.equivalent=equivalent
     product.code=request.POST.get('updatecode')
@@ -1503,6 +1510,7 @@ def adminpage(request):
     return render(request, 'adminpage.html')
 
 def bonlivraisondetails(request, id):
+    target=request.GET.get('target')
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     print('orderitems', orderitems)
@@ -1514,7 +1522,8 @@ def bonlivraisondetails(request, id):
         'order':order,
         'orderitems':orderitems,
         'reglements':reglements,
-        'reps':Represent.objects.all()
+        'reps':Represent.objects.all(),
+        'target':target
     }
     return render(request, 'bonlivraisondetails.html', ctx)
 
@@ -1678,8 +1687,8 @@ def listbonlivraison(request):
         bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(isvalid=True).exclude(iscanceled=True).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')[:50]
-        total=Bonlivraison.objects.filter(isorgh=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
         'bons':bons,
@@ -2416,7 +2425,7 @@ def getclientbons(request):
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
     else:
-        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')[:50]
+        bons=Facture.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, ispaid=False).order_by('date')[:50]
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
@@ -2650,6 +2659,8 @@ def reglebons(request):
                 print("make bon paid", livraison.bons.all())
                 # Update 'ispaid' for related ManyToManyField (bons)
                 livraison.bons.all().update(ispaid=True)
+        # else:
+
         livraisons.update(ispaid=True)
     if totalmantant<whattopay:
         Avanceclient.objects.create(
@@ -4055,6 +4066,41 @@ def searchproductbonsortie(request):
         })
     return JsonResponse({'results': results})
 # regular search fro products
+def searchproductforbonachat(request):
+    term=request.GET.get('term')
+    target=request.GET.get('target')
+    search_terms = term.split('+')
+    print(search_terms)
+
+    # Create a list of Q objects for each search term and combine them with &
+    q_objects = Q()
+    for term in search_terms:
+        q_objects &= (
+            Q(ref__icontains=term) |
+            Q(name__icontains=term) |
+            Q(mark__name__icontains=term) |
+            Q(category__name__icontains=term) |
+            Q(equivalent__icontains=term) |
+            Q(diametre__icontains=term)|
+            Q(cars__icontains=term)
+        )
+    # check if term in product.ref or product.name
+    products=Produit.objects.filter(q_objects)
+    # check if term in product.ref or product.name
+
+    results=[]
+    for i in products:
+        results.append({
+            'id':f"{i.ref}§{i.name}§{i.frbuyprice if target=='f' else i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{i.qtyjeu}",
+            'text':f'{i.ref.upper()} - {i.name.upper()}',
+            'stock':i.stocktotalfarah if target=='f' else i.stocktotalorgh,
+            'stockfacture':i.stockfacturefarah if target=='f' else i.stocktotalorgh,
+            # return term to use it as adistinguisher
+            'term':term,
+            'target':target
+        })
+    return JsonResponse({'results': results})
+
 def searchproduct(request):
     term=request.GET.get('term')
     target=request.GET.get('target')
@@ -4092,16 +4138,18 @@ def searchproduct(request):
 
 
 def filterbldate(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     print(startdate, enddate)
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Bonlivraison.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
+    bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[:50]
     trs=''
     for i in bons:
         trs+=f'''
-        <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
+        <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}?target={target}')">
             <td>{ i.bon_no }</td>
             <td>{ i.date.strftime("%d/%m/%Y")}</td>
             <td>{ i.client.name }</td>
@@ -5920,6 +5968,8 @@ def loadlistachat(request):
 
 def loadlistbl(request):
     page = int(request.GET.get('page', 1))
+    target =request.GET.get('target')
+    isfarah=target=='f'
     year =request.GET.get('year')
     startdate =request.GET.get('startdate')
     enddate =request.GET.get('enddate')
@@ -5977,11 +6027,11 @@ def loadlistbl(request):
                 )
         print(startdate, enddate)
         if startdate=='0' and enddate=='0':
-            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[start:end]
-            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no')[start:end]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         else:
-            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
-            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         for i in bons:
             trs+=f'''
             <tr
@@ -6036,8 +6086,8 @@ def loadlistbl(request):
     if startdate != '0' and enddate != '0':
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
-        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
-        total=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
+        total=round(Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0, 2)
         for i in bons:
             trs+=f'''
             <tr
@@ -6090,11 +6140,11 @@ def loadlistbl(request):
             'has_more': len(bons) == per_page
         })
     if year=="0":
-        bons= Bonlivraison.objects.filter(date__year=thisyear).order_by('-bon_no')[start:end]
-        total=round(Bonlivraison.objects.filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons= Bonlivraison.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no')[start:end]
+        total=round(Bonlivraison.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
     else:
-        bons= Bonlivraison.objects.filter(date__year=year).order_by('-bon_no')[start:end]
-        total=round(Bonlivraison.objects.filter(date__year=year).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons= Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no')[start:end]
+        total=round(Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     for i in bons:
         trs+=f'''

@@ -41,7 +41,7 @@
       <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
       <button class="btn border btnselect btn-dark active" style="
-      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target=f')">En attend</button>
+      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target={{target}}')">En attend</button>
       <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonvalider()">Validé</button>
       <button class="btn border btnselect btn-dark" style="
@@ -135,7 +135,7 @@
       </thead>
       <tbody class="listblbody">
         {% for order in bons %}
-          <tr class="ord bl-row " orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
+          <tr class="ord bl-row" mode="waiting" orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}?target={{target}}&mode=waiting')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
             
             <td >{{ order.bon_no }}</td>
             <td >{{ order.date|date:'d/m/Y' }}</td>

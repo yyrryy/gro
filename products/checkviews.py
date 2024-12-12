@@ -1872,6 +1872,12 @@ def validatebons(request):
             livraison.bons.all().update(isvalid=True)
     else:
         livraisons=Bonlivraison.objects.filter(pk__in=bons)
+        for livraison in livraisons:
+            print("make facture valid", livraison.facture)
+            # Update 'ispaid' for related ManyToManyField (bons)
+            if livraison.facture.ispaid:
+                livraison.facture.isvalid=True
+                livraison.facture.save()
     livraisons.update(isvalid=True)
     return JsonResponse({
         'success':True
@@ -1898,7 +1904,7 @@ def getbonvalider(request):
     bons = Bonlivraison.objects.filter(isfarah=isfarah, isvalid=True).order_by('-bon_no')[:50]
     print('>> bons', bons)
     ctx={
-        'html':render(request, 'bllist.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
+        'html':render(request, 'bllist.html', {'bons':bons, 'target':target, "mode": 'valid'}).content.decode('utf-8'),
         'total':0,
     }
     if bons:

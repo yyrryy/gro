@@ -187,7 +187,7 @@
             bons:JSON.stringify(selectedValues),
         }, function(data){
             if (data.success){
-                ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target=f')
+                ajaxpage('addlistbonlivraison', 'tt', '/products/listbonlivraison?target={{target}}')
                 alertify.success('Bon validé')
             }
         })

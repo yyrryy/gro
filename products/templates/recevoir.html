@@ -40,7 +40,7 @@
                 <input type="text" name="ref" class="form-control searchref">
             </div> -->
             <div class="d-flex justify-content-between">
-                <div class="mb-3 col-5 ">
+                <div class="mb-3">
                     <select class="w-100 form-select resultsholderbonachat mb-2" id="my-select" style="width:100%;">
 
                     </select>
@@ -53,6 +53,10 @@
                             <input type="number" class="form-control" placeholder="Quantité" name="addqty">
                             <div class="addstock text-danger"></div>
                           </div>
+                          <!-- <div class="col-3">
+                            <input type="number" class="form-control" placeholder="Quantité jeux" name="addqtyjeu">
+                            <div class="addstock text-danger"></div>
+                          </div> -->
                           <div class="col-3">
                             <input type="number" class="form-control" placeholder="Prix" name="addprice">
                             <div class="addlastbuyprice text-danger"></div>
@@ -72,20 +76,23 @@
                           <div class="col-3">
                             <button class="btn bg-darkblue text-white" onclick="addrowbonachat(event)">Ajouter</button>
                           </div>
+                          <div class="col-3">
+                            <button class="btn bg-darkblue text-white addrowjeubtn" onclick="addrowbonachatjeu(event)">Ajouter jeux</button>
+                          </div>
                           <div class="col-12">
                             <input hidden readonly type="text" name="addname" class="form-control">
                           </div>
                           
                     </div>
                 </div>
-                <div>
+                <!-- <div>
                     <div class="d-flex">
                         <input type="file" class="form-control excelfile">
                         <button class="btn-success btn-sm" onclick="recevoirexcel(event)">
                             Import excel
                         </button>
                     </div>
-                </div>
+                </div> -->
             </div>
 
           <table class="table table-bordered" style="font-size: 12px;">
@@ -175,15 +182,122 @@
 </div>
 
 <script>
+  function addrowbonachatjeu(event){
+    let target=$(event.target)
+    parentdiv=target.parent().parent().parent().parent().parent()
+    // this reset the select2 value
+    // parentdiv.find('.resultsholderbonachat').val('').trigger('change')
+    // ids of products in bon stored in localstorage
+    let bonachatbody = parentdiv.find('.bonachatbody')
+    let addname=parentdiv.find('[name="addname"]')
+    let adddevise=parentdiv.find('[name="adddevise"]')
+    let addqty=parentdiv.find('[name="addqty"]')
+    let addprice=parentdiv.find('[name="addprice"]')
+    let addremise1=parentdiv.find('[name="addremise1"]')
+    let addremise2=parentdiv.find('[name="addremise2"]')
+    let addremise3=parentdiv.find('[name="addremise3"]')
+    let addremise4=parentdiv.find('[name="addremise4"]')
 
+    if (addqty.val()=='' || addprice.val()==''){
+      alertify.error('Veuillez remplir Qty ou prix')
+      return
+    }
+    var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = addname.attr('data').split('§');
+    pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat')) || []
+    
+    console.log(id, pdcts, pdcts.includes(id))
+    if (pdcts.includes(id)){
+      addqty.val('')
+      addname.val('')
+      addremise1.val('')
+      addremise2.val('')
+      addremise3.val('')
+      addremise4.val('')
+      addprice.val('')
+      adddevise.val('')
+      alertify.error('Ce produit est deja dans le bon')
+      return
+    }
+
+    // let netp1=(addprice.val()-(addprice.val()*addremise1.val()/100)
+    // (addprice.val()*addremise2.val()/100)-(addprice.val()*addremise3.val()/100)-(addprice.val()*addremise4.val()/100)).toFixed(2)
+    // // second methode
+    let netp1=(addprice.val()-(addprice.val()*addremise1.val()/100))
+    netp2=netp1-(netp1*addremise2.val()/100).toFixed(4)
+    netp3=netp2-(netp2*addremise3.val()/100).toFixed(4)
+    netp4=netp3-(netp3*addremise4.val()/100).toFixed(4)
+    console.log('netp1', netp1, netp2, netp3, netp4)
+    let addtotal=(addqty.val()*netp4).toFixed(2)
+    item={
+      'id':id,
+      'ref':ref,
+      'name':name,
+      'dp':dp,
+      // 'qty':addqty.val(),
+      'qty':qtyjeu,
+      'price':addprice.val(),
+      'remise1':addremise1.val(),
+      'remise2':addremise2.val(),
+      'remise3':addremise3.val(),
+      'remise4':addremise4.val(),
+      'total':addtotal
+    }
+    unitprice=addprice.val()/qtyjeu
+    pdcts.push(id)
+    localStorage.setItem('pdctsinbonachat', JSON.stringify(pdcts))
+    let tr = `
+    <tr class="itemrow">
+      <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
+      <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
+      <td style="paddingpx 0; font-size: 13px;">${dp}</td>
+      <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
+      <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${qtyjeu}" style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${unitprice}" step=0.01 style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
+      <input type="hidden" name="productid" value="${id}">
+      
+      </tr>
+      `
+      
+      bonachatbody.prepend(tr)
+      // delete selected option
+      addqty.val('')
+      addname.val('')
+      addremise1.val('')
+      addremise2.val('')
+      addremise3.val('')
+      addremise4.val('')
+      addprice.val('')
+      adddevise.val('')
+      totals=parentdiv.find('.total')
+      totalbon=parentdiv.find('.totalbon')
+      console.log('totalsn totalbon',totals, totalbon)
+      var totalSum = 0;
+      totals.each(function() {
+        totalSum += parseFloat($(this).text());
+      });
+    console.log('saving')
+    savetolocalstorage(item, totalSum, 'bonachat')
+    totalbon.text(totalSum.toFixed(2))
+    // parentdiv.find('.resultsholderbonachat').val('').trigger('change')
+    parentdiv.find('.resultsholderbonachat').select2('open')
+
+    // let selected = $('.resultsholderbonachat').find(':selected')
+    // selected.remove()
+  }
     $(function(){
       $('.resultsholderbonachat').select2({
         minimumInputLength: 1,
-        placeholder:'Chercher',
+        placeholder:'Chercher un produit',
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchproduct?target={{target}}',
+          url: '/products/searchproductforbonachat?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
@@ -369,7 +483,7 @@
         if ($(this).val()==''){
             return
         }
-        var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = $(this).val().split('§');
+        var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = $(this).val().split('§');
         let repswithprice=[]
         let addname=parentdiv.find('input[name="addname"]')
         // let addprice=parentdiv.find('input[name="addprice"]')
@@ -378,9 +492,9 @@
         parentdiv.find('.addstock').text('Stock: '+stock)
         // addqty.val('')
         // addremise.val(remise)
-        addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+        addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}§${qtyjeu}`)
         parentdiv.find('.addlastbuyprice').text('Dernier pr.ach. '+dp)
-
+        $('.addrowjeubtn').attr('qtyjeu', qtyjeu)
         // let selected = $(this).find(':selected')
         // selected.remove()
         // delect selected option

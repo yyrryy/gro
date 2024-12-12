@@ -40,7 +40,7 @@
       <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
       <button class="btn border btnselect btn-dark active" style="
-      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target=f')">En attend</button>
+      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target={{target}}')">En attend</button>
       <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getfacturevalider()">Validé</button>
     </div>
@@ -622,7 +622,7 @@
           'bons':JSON.stringify(selectedValues),
           'date':date
         })
-        ajaxpage('add', '+ Article', '/products/listfactures?target=f')
+        ajaxpage('add', '+ Article', '/products/listfactures?target={{target}}')
     })
 
 $('.filterfcdate').on('click', function(){

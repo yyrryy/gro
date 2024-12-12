@@ -2,7 +2,7 @@
     <div class="">
 
         <button class="btn w-100 collapsed border" type="button" data-toggle="collapse" data-target="#collapsevfc" aria-expanded="false" aria-controls="collapsevfc">
-            Validation Factures f
+            Validation Factures {{target}}
         </button>
 
         <div id="collapsevfc" class="collapse" aria-labelledby="headingOne" data-parent="#accordionreglvfc">
@@ -187,7 +187,7 @@
             bons:JSON.stringify(selectedValues),
             }, function(data){
                 if (data.success){
-                    ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target=f')
+                    ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target={{target}}')
                     alertify.success('Bon validé')
                 }
         })

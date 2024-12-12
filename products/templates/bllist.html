@@ -1,6 +1,6 @@
 {% load global_tags %}
 {% for order in bons %}
-    <tr class="ord bl-row " orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
+    <tr class="ord bl-row " mode="{{mode}}" orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}?target={{target}}&mode={{mode}}')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
             
       <td >{{ order.bon_no }}</td>
       <td >{{ order.date|date:'d/m/Y' }}</td>
