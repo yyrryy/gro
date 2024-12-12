@@ -228,21 +228,23 @@
     netp4=netp3-(netp3*addremise4.val()/100).toFixed(4)
     console.log('netp1', netp1, netp2, netp3, netp4)
     let addtotal=(addqty.val()*netp4).toFixed(2)
+    realqty=addqty.val()*qtyjeu
+    unitprice=addprice.val()/qtyjeu
     item={
       'id':id,
       'ref':ref,
       'name':name,
       'dp':dp,
       // 'qty':addqty.val(),
-      'qty':qtyjeu,
-      'price':addprice.val(),
+      'qty':realqty,
+      'price':unitprice,
       'remise1':addremise1.val(),
       'remise2':addremise2.val(),
       'remise3':addremise3.val(),
       'remise4':addremise4.val(),
       'total':addtotal
     }
-    unitprice=addprice.val()/qtyjeu
+    
     pdcts.push(id)
     localStorage.setItem('pdctsinbonachat', JSON.stringify(pdcts))
     let tr = `
@@ -252,7 +254,7 @@
       <td style="paddingpx 0; font-size: 13px;">${dp}</td>
       <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
       <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${qtyjeu}" style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${realqty}" style="height:23px; width:65px;"></td>
       <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${unitprice}" step=0.01 style="height:23px; width:65px;"></td>
       <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
       <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
