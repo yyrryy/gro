@@ -2261,24 +2261,33 @@ a .uil {
         console.log('ree from bon achat')
         let target = $(e.target)
         let tr = target.parent().parent()
-        let qty = tr.find('.qtybonachat').val()
-        let price = tr.find('.pricebonachat').val()
-        let remise = tr.find('.remisebonachat').val()
+        let qty = tr.find('.qty').val()
+        let price = tr.find('.price').val()
+        let remise1 = tr.find('.remise1').val()
+        let remise2 = tr.find('.remise2').val()
+        let remise3 = tr.find('.remise3').val()
+        let remise4 = tr.find('.remise4').val()
+        console.log(qty, price, remise1, remise2, remise3, remise4)
+        let netp1=(price-(price*remise1/100))
+        netp2=netp1-(netp1*remise2/100).toFixed(4)
+        netp3=netp2-(netp2*remise3/100).toFixed(4)
+        netp4=netp3-(netp3*remise4/100).toFixed(4)
+        console.log('netp1', netp1, netp2, netp3, netp4)
+        let totalvalue=(qty*netp4).toFixed(2)
         console.log(tr, qty, price)
         // net price will be prix achat
-        let netprice=price-(price*remise/100)
-        let total = tr.find('.totalbonachat')
-        let totalvalue=(netprice*qty).toFixed(2)
+        //let netprice=price-(price*remise/100)
+        let total = tr.find('.total')
         total.html(totalvalue)
         // let totalbon = parseFloat($('.totalbon').text())
         // totalbonvalue = totalbon+totalvalue
         // console.log(totalbon, totalvalue )
         // $('.totalbon').html(totalbonvalue)
         var totalSum = 0;
-        $('.totalbonachat').each(function() {
+        $('.total').each(function() {
             totalSum += parseFloat($(this).text());
         });
-        $('.grandtotalbonachat').text(totalSum.toFixed(2))
+        $('.totalbon').text(totalSum.toFixed(2))
         // let totalbonvalue = 0
         // $('.total').each(function(){
         //   totalbonvalue += parseFloat($(this).html())

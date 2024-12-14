@@ -254,12 +254,12 @@
       <td style="paddingpx 0; font-size: 13px;">${dp}</td>
       <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
       <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${realqty}" style="height:23px; width:65px;"></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${unitprice}" step=0.01 style="height:23px; width:65px;"></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonacaht(event)" name="qty" value="${realqty}" style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonacaht(event)" name="price" value="${unitprice}" step=0.01 style="height:23px; width:65px;"></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculatebonacaht(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculatebonacaht(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculatebonacaht(event)" name="remise" style="height:23px; width:65px;"></td></td>
+      <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculatebonacaht(event)" name="remise" style="height:23px; width:65px;"></td>
       <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
       <input type="hidden" name="productid" value="${id}">
       
@@ -438,12 +438,12 @@
         <td style="paddingpx 0; font-size: 13px;">${dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
         <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${addqty.val()}" style="height:23px; width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${addqty.val()}" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
         <input type="hidden" name="productid" value="${id}">
         
@@ -705,12 +705,12 @@
         <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>
         <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${item.devise}" style="width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculate(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculate(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise2}" class="calculate remise2" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise3}" class="calculate remise3" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td></td>
-        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise4}" class="calculate remise4" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise2}" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise3}" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise4}" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
         <input type="hidden" name="productid" value="${item.id}">
         

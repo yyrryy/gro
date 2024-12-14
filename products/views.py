@@ -4132,6 +4132,7 @@ def searchproduct(request):
             'stockfacture':i.stockfacturefarah if target=='f' else i.stocktotalorgh,
             # return term to use it as adistinguisher
             'term':term,
+            'image':i.image.url if i.image else "",
             'target':target
         })
     return JsonResponse({'results': results})

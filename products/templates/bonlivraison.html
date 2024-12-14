@@ -1,5 +1,8 @@
 
 <style>
+  .select2-results__option{
+    height: 10em;
+  }
     .autocomplete {
   position: relative;
   width: 300px; /* Adjust as needed */
@@ -500,25 +503,24 @@
             // Query parameters will be ?search=[term]&type=public
             return query;
           },
-          proccessresults: function (data) {
-              return {
-                results:data.results
-              }
-          },
+          // proccessresults: function (data) {
+          //     return {
+          //       results:data.results
+          //     }
+          // },
           cache:true
         },
         minimumInputLength: 1,
         placeholder:'Chercher Produits',
-        // templateResult: formatRepo,
-        // templateSelection: formatRepoSelection,
+        templateResult: formatRepo,
+        templateSelection: formatRepoSelection,
       });
         function formatRepo (repo) {
-          if (repo.loading) {
-            return repo.text;
-          }
+          
 
           var $container = $(
-            `<strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</div>`
+
+            `<div class="d-flex"><strong >${repo.text} ${repo.image}</strong> <img src="${repo.image}"></div>`
             );
 
 
@@ -569,7 +571,22 @@
         templateResult: formatRepo,
         templateSelection: formatRepoSelection,
       });
-        
+      function formatRepo (repo) {
+          
+
+          var $container = $(
+
+            `<div class="d-flex"><strong >${repo.text}</strong> <img src="${repo.image}" style="width: 20%;"></div>`
+            );
+
+
+
+            return $container;
+        }
+
+        function formatRepoSelection (repo) {
+          return repo.text;
+        }
       // if ($(this).val()==''||$('.repsselectsbl').val()==''){
       //   $.get('products/getclientrep/'+$(this).val(), function(data){
       //     console.log(data)
