@@ -243,12 +243,25 @@ def supplierspage(request):
 
 def addsupplier(request):
     name=request.POST.get('suppnameinp')
+    personalname=request.POST.get('supppersonalnameinp')
+    # dont di this error again
+    #image=request.POST.get('suppimageinp')
+    image = request.FILES.get('suppimageinp')
+    print('image>>', image)
     phone=request.POST.get('suppphone')
+    phone2=request.POST.get('suppphone2')
     address=request.POST.get('address')
+    note=request.POST.get('note')
+    sold=request.POST.get('sold') or 0
     Supplier.objects.create(
         name=name,
         phone=phone,
-        address=address
+        address=address,
+        image=image,
+        personalname=personalname,
+        phone2=phone2,
+        rest=sold,
+        note=note
     )
     ctx={
         'suppliers':Supplier.objects.all(),

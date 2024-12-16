@@ -196,10 +196,14 @@ class Attribute(models.Model):
 
 class Supplier(models.Model):
     name=models.CharField(max_length=500)
+    personalname=models.CharField(max_length=500, null=True)
     address=models.CharField(max_length=500, default=None, null=True, blank=True)
     phone=models.CharField(max_length=500, default=None, null=True, blank=True)
+    phone2=models.CharField(max_length=500, default=None, null=True, blank=True)
     total=models.FloatField(default=0.00)
     rest=models.FloatField(default=0.00)
+    image=models.ImageField(upload_to='supplierimages/', null=True, blank=True, default=None)
+    note=models.TextField(default=None, null=True)
     def __str__(self) -> str:
         return self.name
 

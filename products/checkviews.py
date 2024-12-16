@@ -1896,9 +1896,10 @@ def validatebons(request):
         for livraison in livraisons:
             print("make facture valid", livraison.facture)
             # Update 'ispaid' for related ManyToManyField (bons)
-            if livraison.facture.ispaid:
-                livraison.facture.isvalid=True
-                livraison.facture.save()
+            #if livraison.facture.ispaid:
+            livraison.facture.isvalid=True
+            livraison.facture.ispaid=True
+            livraison.facture.save()
     livraisons.update(isvalid=True)
     return JsonResponse({
         'success':True
@@ -1918,9 +1919,9 @@ def validatebonachat(request):
         for livraison in livraisons:
             print("make facture valid", livraison.facture.facture_no)
             # Update 'ispaid' for related ManyToManyField (bons)
-            if livraison.facture.ispaid:
-                livraison.facture.isvalid=True
-                livraison.facture.save()
+            livraison.facture.ispaid=True
+            livraison.facture.isvalid=True
+            livraison.facture.save()
     livraisons.update(isvalid=True)
     return JsonResponse({
         'success':True
