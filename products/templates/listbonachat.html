@@ -2,6 +2,24 @@
 {% load global_tags %}
 
 <div class="bg-white shadow rounded">
+  <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+    <div>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
+      <button class="btn border btnselect btn-dark active" style="
+      border-radius: 11px;" onclick="ajaxpage('addlistbonachat', 'tt', '/products/listbonachat?target={{target}}')">En attend</button>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonachatvalider()">Validé</button>
+      <!-- <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getcanceledbons()">Annulé</button> -->
+    </div>
+    <div>
+      {{title}}
+    </div>
+    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addlistbonachat', 'tt', '/products/listbonachat?target={{target}}')">↻</button>
+  </div>
+  {% include 'validationbachtaccodrion.html' %}
+
   <!-- <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('listbonachat')">x</button>
     <div>
@@ -22,11 +40,11 @@
       <button class="btn btn-sm bg-dark text-white filterachatdate">Filtrer</button>
 
     </div> -->
-    {% if not facturesection %}
+    <!-- {% if not facturesection %}
     <button class="btn btn-success" onclick="getachatfacture()">
       Factures
     </button>
-    {% endif %}
+    {% endif %} -->
     <div class="d-flex flex-column">
       <select name="yearsachat" class="populateyears" onchange="yeardatabachat()">
 
@@ -107,7 +125,7 @@
           <td style="width: 4%;"></td>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="listbachatbody">
         {% for order in bons %}
           <tr class="ord {% if loadmore %}achat-row{% endif %}" orderid="{{order.id}}" ondblclick="ajaxpage('bonachat{{order.id}}', 'Bon achat {{order.nbon}}', '/products/bonachatdetails/{{order.id}}?target={{target}}')">
             <td>{{ order.nbon }}</td>
@@ -175,6 +193,13 @@
 
 
 <script>
+  function getbonachatvalider(){
+    $('.listbachatbody').addClass('blurred')
+    $.get('/products/getbonachatvalider?target={{target}}', (data)=>{
+      $('.listbachatbody').html(data.html)
+      $('.listbachatbody').removeClass('blurred')
+    })
+  }
   populateyears()
   function yeardatabachat(){
     let year=$('[name="yearsachat"]').val()

@@ -37,10 +37,20 @@
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button> -->
     <div>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
+      <button class="btn border btnselect btn-dark active" style="
+      border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/achatfacture?target={{target}}')">En attend</button>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getfactureachatvalider()">Validé</button>
+    </div>
+    <div>
       {{title}}
     </div>
+    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/achatfacture?target={{target}}')">↻</button>
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistfactures', '/products/listfactures')">↻</button> -->
   </div>
+  {% include 'validationfcachataccodrion.html' %}
   <div class="accordion" id="accordionreglbl">
     <div class="">
 
@@ -316,7 +326,13 @@
 
 
 <script>
-
+  function getfactureachatvalider(){
+    $('.listfcbody').addClass('blurred')
+    $.get('/products/getfactureachatvalider?target={{target}}', (data)=>{
+      $('.listfcbody').html(data.html)
+      $('.listfcbody').removeClass('blurred')
+    })
+  }
   $(function(){
       $('.addreglementclientsbl').select2({
         minimumInputLength: 1,

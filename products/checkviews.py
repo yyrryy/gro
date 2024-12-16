@@ -1524,7 +1524,7 @@ def getclientbonsforfacture(request):
     for i in bons:
         # old code, if reglement is paid it's checked from here
         # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-        trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+        trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total} {"(Reglé)" if i.ispaid else ""}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
 
 
     return JsonResponse({
@@ -1569,6 +1569,10 @@ def facturemultiple(request):
     bons=json.loads(request.GET.get('bons'))
     year=timezone.now().strftime("%y")
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    # check if all bons are paid
+    allpaid = all(livraison.ispaid for livraison in livraisons)
+
+
     isfarah=False
 
     if target=='f':
@@ -1603,6 +1607,18 @@ def facturemultiple(request):
         isfarah=isfarah,
         date=date
     )
+    if allpaid:
+        print('>> all bons are paid')
+        facture.ispaid=True
+        facture.rest=0
+    else:
+        unpaid_bons = livraisons.filter(ispaid=False)
+
+        # Get the total amount for unpaid bons
+        total_unpaid = unpaid_bons.aggregate(total=Sum('total'))['total']
+        print('>> not all bons are paid²', total_unpaid)
+        facture.rest=total_unpaid
+    facture.save()
     # if we have just one bon
     # if len(livraisons)==1:
     #     print(">> here")
@@ -1673,6 +1689,8 @@ def factureachatmultiple(request):
     bons=json.loads(request.GET.get('bons'))
     year=timezone.now().strftime("%y")
     livraisons=Itemsbysupplier.objects.filter(pk__in=bons)
+    allpaid = all(livraison.ispaid for livraison in livraisons)
+    
     print('target', target, 'livraisons', livraisons, len(livraisons), len(livraisons)==1, 'date', date)
     isfarah=False
     
@@ -1711,42 +1729,18 @@ def factureachatmultiple(request):
         isfarah=isfarah,
         date=date
     )
-    # if we have just one bon
-    # if len(livraisons)==1:
-    #     print(">> here")
-    #     bon=livraisons[0]
-    #     print('Bons', bon, bon.total)
-    #     bon.facture=facture
-    #     facture.total=bon.total
-    #     facture.bon=bon
-    #     bon.isfacture=True
-    #     bon.save()
-    #     facture.save()
+    if allpaid:
+        print('>> all bons are paid')
+        facture.ispaid=True
+        facture.rest=0
+    else:
+        unpaid_bons = livraisons.filter(ispaid=False)
 
-    #     #get items of bon
-    #     items=Stockin.objects.filter(nbon=bon)
-    #     # create facture items
-    #     for i in items:
-    #         Outfactureachat.objects.create(
-    #             facture=facture,
-    #             remise1=i.remise1,
-    #             remise2=i.remise2,
-    #             remise3=i.remise3,
-    #             remise4=i.remise4,
-    #             name=i.name,
-    #             ref=i.ref,
-    #             product=i.product,
-    #             qty=i.quantity,
-    #             price=i.price,
-    #             total=i.total,
-    #             supplier_id=supplierid,
-    #             date=date,
-    #             isfarah=isfarah
-    #         )
-    #     # sold facture
-    #     #supplier.soldfacture+=bon.total
-    # else:
-    # iterate throu bons
+        # Get the total amount for unpaid bons
+        total_unpaid = unpaid_bons.aggregate(total=Sum('total'))['total']
+        print('>> not all bons are paid²', total_unpaid)
+        facture.rest=total_unpaid
+    facture.save()
     for bon in livraisons:
         total+=bon.total
         bon.isfacture=True
@@ -1786,9 +1780,9 @@ def achatfacture(request):
     target=request.GET.get('target')
     print('target', target)
     if target=='f':
-        facture=Factureachat.objects.filter(isfarah=True).order_by('-facture_no')
+        facture=Factureachat.objects.filter(isfarah=True, isvalid=False).order_by('-facture_no')
     else:
-        facture=Factureachat.objects.filter(isorgh=True).order_by('-facture_no')
+        facture=Factureachat.objects.filter(isorgh=True, isvalid=False).order_by('-facture_no')
     target=request.GET.get('target')
     ctx={
         'title':'List facture achat',
@@ -1842,6 +1836,7 @@ def getbonstovalidate(request):
     isfarah=target=='f'
     print('isfarah', isfarah, 'target', target)
     trs=''
+    print('mode>>', mode)
     if mode=='facture':
         bons=Facture.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')
         for i in bons:
@@ -1855,6 +1850,32 @@ def getbonstovalidate(request):
         facture_info = f'facture={i.facture.facture_no}' if i.facture else ""
         print('>>', facture_info)
         trs += f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" {facture_info} onchange="checkreglementbox(event), checksamefacture(event)"></td></tr>'
+    return JsonResponse({
+        'bons':trs,
+        'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+    })
+
+def getbonachattovalidate(request):
+    datefrom=request.GET.get('datefrom')
+    dateend=request.GET.get('dateend')
+    target=request.GET.get('target')
+    mode=request.GET.get('mode')
+    isfarah=target=='f'
+    print('isfarah', isfarah, 'target', target)
+    trs=''
+    if mode=='facture':
+        bons=Factureachat.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')
+        for i in bons:
+            trs+=f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        return JsonResponse({
+            'bons':trs,
+            'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+        })
+    bons=Itemsbysupplier.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah, isfacture=True).order_by('date')
+    for i in bons:
+        facture_info = f'facture={i.facture.facture_no}' if i.facture else ""
+        print('>>', facture_info)
+        trs += f'<tr class="blreglrow"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" {facture_info} onchange="checkreglementbox(event), checksamefacture(event)"></td></tr>'
     return JsonResponse({
         'bons':trs,
         'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
@@ -1882,6 +1903,30 @@ def validatebons(request):
     return JsonResponse({
         'success':True
     })
+
+def validatebonachat(request):
+    mode=request.GET.get('mode')
+    bons=json.loads(request.GET.get('bons'))
+    if mode=='facture':
+        livraisons=Factureachat.objects.filter(pk__in=bons)
+        for livraison in livraisons:
+            print("make bon valid", livraison.bons.all())
+            # Update 'ispaid' for related ManyToManyField (bons)
+            livraison.bons.all().update(isvalid=True)
+    else:
+        livraisons=Itemsbysupplier.objects.filter(pk__in=bons)
+        for livraison in livraisons:
+            print("make facture valid", livraison.facture.facture_no)
+            # Update 'ispaid' for related ManyToManyField (bons)
+            if livraison.facture.ispaid:
+                livraison.facture.isvalid=True
+                livraison.facture.save()
+    livraisons.update(isvalid=True)
+    return JsonResponse({
+        'success':True
+    })
+
+
 def cancelfacture(request):
     id=request.GET.get('id')
     facture=Facture.objects.get(pk=id)
@@ -1910,6 +1955,18 @@ def getbonvalider(request):
     if bons:
         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
+def getbonachatvalider(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    bons = Itemsbysupplier.objects.filter(isfarah=isfarah, isvalid=True).order_by('-nbon')[:50]
+    print('>> bons', bons)
+    ctx={
+        'html':render(request, 'bonachatlist.html', {'bons':bons, 'target':target, "mode": 'valid'}).content.decode('utf-8'),
+        'total':0,
+    }
+    if bons:
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
 
 def getfacturevalider(request):
     target=request.GET.get('target')
@@ -1917,6 +1974,18 @@ def getfacturevalider(request):
     factures = Facture.objects.filter(isfarah=isfarah, isvalid=True).order_by('-facture_no')[:50]
     ctx={
         'html':render(request, 'fclist.html', {'bons':factures, 'target':target}).content.decode('utf-8'),
+        'total':0,
+    }
+    if factures:
+        ctx['total']=round(factures.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
+
+def getfactureachatvalider(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    factures = Factureachat.objects.filter(isfarah=isfarah, isvalid=True).order_by('-facture_no')[:50]
+    ctx={
+        'html':render(request, 'fcachatlist.html', {'bons':factures, 'target':target}).content.decode('utf-8'),
         'total':0,
     }
     if factures:

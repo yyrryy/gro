@@ -222,6 +222,7 @@ class Itemsbysupplier(models.Model):
     facture=models.ForeignKey('Factureachat', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='factureofbonachat')
     ispaid=models.BooleanField(default=False)
     isfacture=models.BooleanField(default=False)
+    isvalid=models.BooleanField(default=False)
     def __str__(self) -> str:
         return f'{self.nbon} - {self.id}'
 
@@ -1050,6 +1051,7 @@ class Sortieitem(models.Model):
 
 class Factureachat(models.Model):
     iscaceled=models.BooleanField(default=False)
+    isvalid=models.BooleanField(default=False)
     facture_no=models.CharField(max_length=500, null=True, default=None)
     date = models.DateTimeField(default=None, blank=True, null=True)
     bons=models.ManyToManyField(Itemsbysupplier, default=None, blank=True, related_name='facturebons')
@@ -1057,11 +1059,11 @@ class Factureachat(models.Model):
     isorgh=models.BooleanField(default=False)
     total=models.FloatField(default=0.00)
     tva=models.FloatField(default=0.00)
+    rest=models.FloatField(default=0.00)
     ispaid=models.BooleanField(default=False)
     isvalid=models.BooleanField(default=False)
     bon=models.ForeignKey(Itemsbysupplier, default=None, null=True, blank=True, on_delete=models.CASCADE, related_name='facturebon')
     supplier=models.ForeignKey(Supplier, default=None, blank=True, on_delete=models.CASCADE, related_name='supplieroffacture')
-
 class Outfactureachat(models.Model):
     facture=models.ForeignKey(Factureachat, on_delete=models.CASCADE, default=None)
     total=models.FloatField(default=0.00)

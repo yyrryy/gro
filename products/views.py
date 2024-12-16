@@ -2418,8 +2418,8 @@ def getclientbons(request):
     # elif target=="f":
     print('>>> mode regl', moderegl)
     if moderegl=='bl':
-        bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, iscanceled=False).order_by('date')[:50]
-        
+        bons=Bonlivraison.objects.filter(ispaid=False, client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, iscanceled=False, isfacture=False).order_by('date')
+        #[:50]
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
@@ -2429,7 +2429,7 @@ def getclientbons(request):
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} {f"Total: {i.total} Rest=>" if i.rest>0 else ""}</td><td>{i.rest if i.rest>0 else i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
     #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
     avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
@@ -3333,9 +3333,9 @@ def listbonachat(request):
     target=request.GET.get('target')
     thisyear=timezone.now().year
     if target=='f':
-        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True).order_by('-date')[:50]
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True, isvalid=False).order_by('-date')[:50]
     elif target=='o':
-        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isorgh=True).order_by('-date')[:50]
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isorgh=True, isvalid=False).order_by('-date')[:50]
     ctx={
         'title':'List des bon achat',
         'bons':bons,
@@ -3474,14 +3474,14 @@ def getsuppbons(request):
     print('terget', request.POST.get('target'))
     trs=''
     if mode=="bl":
-        bons=Itemsbysupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend])
+        bons=Itemsbysupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend], isfacture=False)
         for i in bons:
             trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" onchange="checkreglementbox(event)"></td></tr>'
         
     else:
         bons=Factureachat.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend])
         for i in bons:
-            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} {f"Total: {i.total} Rest=>" if i.rest>0 else ""}</td><td>{i.rest if i.rest>0 else i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
     print('isfarah', isfarah)
     avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, date__range=[datestart, dateend])
     print('avoirs', avoirs)
@@ -3531,9 +3531,6 @@ def reglebonsachat(request):
     if whattopay<totalmantant:
         livraisons.update(ispaid=True)
         if moderegl=='facture':
-            print('facture is paid', livraisons.values())
-            
-
             for livraison in livraisons:
                 # Update 'ispaid' for related ManyToManyField (bons)
                 print('>> bons of facture', livraison.bons.all())
@@ -6323,58 +6320,58 @@ def searchforlistbl(request):
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     # we dont need this
-    if(term==''):
+    # if(term==''):
 
-        bons=Bonlivraison.objects.filter(date__year=thisyear)[:50]
-        total=round(Bonlivraison.objects.filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
-                <td>{ i.bon_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.total}</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldbl}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div>
-                {'R0' if i.ispaid else 'N1' }
+    #     bons=Bonlivraison.objects.filter(date__year=thisyear)[:50]
+    #     total=round(Bonlivraison.objects.filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    #     trs=''
+    #     for i in bons:
+    #         trs+=f'''
+    #         <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
+    #             <td>{ i.bon_no }</td>
+    #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #             <td>{ i.client.name }</td>
+    #             <td>{ i.client.code }</td>
+    #             <td>{ i.total}</td>
+    #             <td>{ i.client.region}</td>
+    #             <td>{ i.client.city}</td>
+    #             <td>{ i.client.soldbl}</td>
+    #             <td>{ i.salseman }</td>
+    #             <td class="d-flex justify-content-between">
+    #             <div>
+    #             {'R0' if i.ispaid else 'N1' }
 
-                </div>
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #             </div>
+    #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-                </td>
-                <td class="text-danger">
+    #             </td>
+    #             <td class="text-danger">
 
-                </td>
-                <td class="text-danger">
-                {'OUI' if i.isfacture else 'NON'}
+    #             </td>
+    #             <td class="text-danger">
+    #             {'OUI' if i.isfacture else 'NON'}
 
-                </td>
+    #             </td>
 
-                <td>
+    #             <td>
 
 
-                </td>
-                <td>
-                {i.note}
-                </td>
-                <td>
-                {i.modlvrsn}
-                </td>
-                <td class="d-flex">
-                  <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-                <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
-        return JsonResponse({
-            'trs':trs
-        })
+    #             </td>
+    #             <td>
+    #             {i.note}
+    #             </td>
+    #             <td>
+    #             {i.modlvrsn}
+    #             </td>
+    #             <td class="d-flex">
+    #               <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
+    #             <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
+    #             </td>
+    #         </tr>
+    #         '''
+    #     return JsonResponse({
+    #         'trs':trs
+    #     })
 
     # Split the term into individual words separated by '*'
     search_terms = term.split('+')
@@ -6383,95 +6380,27 @@ def searchforlistbl(request):
     # Create a list of Q objects for each search term and combine them with &
     q_objects = Q()
     for i in search_terms:
-
-            # if '-' in term:
-            #     date_range = term.split('-')
-            #     start_date = datetime.strptime(date_range[0].strip(), '%d/%m/%Y')
-            #     end_date = datetime.strptime(date_range[1].strip(), '%d/%m/%Y')
-            #     q_objects &= (Q(client__name__iregex=term) |
-            #         Q(salseman__name__iregex=term) |
-            #         Q(bon_no__iregex=term) |
-            #         Q(client__region__iregex=term)|
-            #         Q(client__city__iregex=term)|
-            #         Q(client__code__iregex=term)|
-            #         Q(total__iregex=term)|
-            #         Q(date__range=[start_date, end_date])
-            #     )
-            # else:
-            #     q_objects &= (Q(client__name__iregex=term) |
-            #         Q(salseman__name__iregex=term) |
-            #         Q(bon_no__iregex=term) |
-            #         Q(client__region__iregex=term)|
-            #         Q(client__city__iregex=term)|
-            #         Q(client__code__iregex=term)|
-            #         Q(total__iregex=term)
-            #     )
         q_objects &= (Q(client__name__iregex=i) |
-                Q(salseman__name__iregex=i) |
                 Q(bon_no__iregex=i) |
                 Q(client__region__iregex=i)|
                 Q(client__city__iregex=i)|
                 Q(client__code__iregex=i)|
                 Q(total__iregex=i)|
-                Q(commande__order_no__iregex=i)|
+                Q(command__bon_no__iregex=i)|
                 Q(statusreg__iregex=i)|
                 Q(note__iregex=i)
-
             )
-    print(startdate, enddate)
+    print(">> here 1",startdate, enddate)
     if startdate=='0' and enddate=='0':
         bons=Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[:50]
         total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
     else:
+        print(">> here 1²",startdate, enddate)
         bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
         total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-    trs=''
-    for i in bons:
-        trs+=f'''
-            <tr
-            style="background: {"lightgreen;" if i.isdelivered else ""} color:{"blue" if i.isfacture else ""} "
-            class="ord bl-row {"text-danger" if i.ispaid else ''}" term={term} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')"
-            >
-                <td>{ i.bon_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td style="color: blue;">{ i.total:.2f}</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldbl:.2f}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div>
-                {'R0' if i.ispaid else 'N1' }
-
-                </div>
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-                </td>
-                <td>
-                {'OUI' if i.isfacture else 'NON'}
-
-                </td>
-
-                <td>
-                    {i.commande.order_no if i.commande else '--'}
-                </td>
-                <td>
-                {i.note}
-                </td>
-                <td>
-                {i.modlvrsn}
-                </td>
-                <td class="d-flex">
-                    <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-                    <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
-
+    
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
     })
 
