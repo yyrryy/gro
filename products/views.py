@@ -4411,12 +4411,25 @@ def getreglementbl(request, id):
     trs=''
     for i in livraisons:
         trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+    ctx={
+        'reglement':reglement,
+        'avoirs':reglement.avoirs.all().order_by('date'),
+        'avances':reglement.avances.all().order_by('date'),
+        'bons':reglement.bons.all().order_by('date'),
+        'factures':reglement.factures.all().order_by('date'),
+    }
     return JsonResponse({
+        'html':render(request, 'updatereglebl.html', ctx).content.decode('utf-8')
+    })
+    return JsonResponse({
+
         'date':reglement.date.strftime('%Y-%m-%d'),
         'echance':reglement.echance.strftime('%Y-%m-%d') if reglement.echance else '',
         'mode':reglement.mode,
         'npiece':reglement.npiece,
         'bons':list(bons.values()),
+        'avoirs':render(request, 'avoirsofregl.html', {'avoirs':reglement.avoirs.all().order_by('date')}),
+        'avances':render(request, 'avancesofregl.html', {'avances':reglement.avances.all().order_by('date')}),
         'client':reglement.client.name,
         'clientid':reglement.client.id,
         'mantant':reglement.amount,

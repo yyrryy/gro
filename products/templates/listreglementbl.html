@@ -97,131 +97,15 @@
 </div>
 
 <div class="card">
-    <div class="border p-2 position-relative updatereglementbl position-fixed shadow rounded d-none" style="z-index: 999;overflow: scroll; height: 85vh;background: aliceblue;">
-        <button onclick="$(this).parent().addClass('d-none')">X</button>
-        <strong>
-            Modifier le reglement
-        </strong>
-        <div class="row">
+    <div class="border p-2 position-relative updatereglementbl position-fixed shadow rounded d-none" style="z-index: 999;overflow: scroll; height: 85vh;background: aliceblue; width: 85%;">
+        <button onclick="$(this).parent().addClass('d-none')" >X</button>
+        
+        <div class="row reglebldata">
 
-            <div class="col-3">
-                <div class="">
-                    <small>Date:</small> <br>
-                    <input type="date" name="" class="w-100 notempty mb-2">
-                </div><br>
-                
-                <input name="reglementid" hidden>
-                <small>Client: <span class="client"></span></small><br>
-                <small>Sold Bl Client: <span class="soldblinupdatereglbl text-danger" style="margin-left: 10px;"></span></small><br>
-                <!-- <div class="mt-5">
-                    <input type="password" class="passworddeletereglbl form-control">
-                    <button class="btn btn-danger deletereglblbtn w-100" reglid="" onclick="deletereglbl(event)">Supprimer</button>
-                </div> -->
-
-            </div>
-
-            <div class="reglementbonsholderinupdate col-9 border position-relative">
-
-                <div class="inputsholder">
-
-                    
-                    <div class="row align-items-center">
-                        <div class="col-4">
-                            <small>Mantant:</small> <br>
-                            <input type="number" name="mantant" class="w-100 notempty" placeholder="Mantant">
-                        </div>
-                        <div class="col-4">
-                            <small>N° piece:</small> <br>
-                            <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
-                        </div>
-                        <div class="col-4">
-                            <small>Mode Paiment:</small> <br>
-                            <select name="mode" class="w-100 notempty" onchange="checkmodereglement(event)">
-                                <option value="cheque">Cheque</option>
-                                <option value="effet">effet</option>
-                                <option value="espece">espece</option>
-                                <option value="avoir">avoir</option>
-                            </select>
-                        </div>
-                        <div class="col-4">
-                            <small>Echeance:</small> <br>
-                            <input type="date" name="echeance" class="w-100 notempty">
-                        </div>
-                        <div class="col-4">
-                            <small>Bank:</small> <br>
-                            <input type="text" name="bank" class="w-100">
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <div class="mb-2 mt-2">
-                    <div class="d-flex justify-content-between">
-                        <div>Bons </div>
-                        <div>
-                            <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistreglblupdate">
-                        </div>
-                    </div>
-                    <div style="max-height: 220px; overflow-y: scroll;" class="listupdatereglblholder">
-                        <table class="table table-bordered reglblupdate table-hover" style="font-size: 12px;">
-                            <thead style="position: sticky; top: 0;" class="bg-white">
-                                <tr>
-                                    <td>
-                                        Date
-                                    </td>
-                                    <td>
-                                        N° Bon
-                                    </td>
-
-                                    <td>
-                                        total
-                                    </td>
-                                    <td>
-                                        Status
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                            <thead style="position: sticky; bottom: 0;" class="bg-white">
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td>
-                                    </td>
-
-                                    <td class="totalblinupdatereglbl" style="background: yellowgreen;">
-                                    </td>
-                                    <td class="">
-
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-
-                        </table>
-                    </div>
-                    <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
-
-                    </select> -->
-                </div>
-                <button class="btn text-white w-100" onclick="submitupdatereglementbl(event)" style="background: #00538c;">
-                    Valider
-                </button>
-                <!-- <div class="mb-2">
-                    <small>Facture</small>
-                    <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
-
-                    </select>
-                </div>
-
-                <select name="addreglementfactures disabled" id="" class="select2 form-select " multiple="multiple">
-
-                </select> -->
-
-            </div>
+            
+            <!-- <button class="btn text-white w-100" onclick="submitupdatereglementbl(event)" style="background: #00538c;">
+                Valider
+            </button> -->
             <div class="mt-3">
                 {% csrf_token %}
 
@@ -309,7 +193,9 @@
                                                 <option value="cheque">Cheque</option>
                                                 <option value="effet">effet</option>
                                                 <option value="espece">espece</option>
-                                                <option value="avoir">avoir</option>
+                                                <option value="verement">verement</option>
+                                                <option value="versement">versement</option>
+                                                <option value="carte">carte banquaire</option>
                                             </select>
                                         </div>
                                         <div class="me-2">
@@ -517,6 +403,9 @@
     <div style="height: 62vh; overflow: scroll;" class="reglbltableholder mt-2">
       <table class="table table-bordered reglbltable text-center table-hover" style="font-size: 12px;">
           <thead style="position: sticky; top: 0;" class="bg-darkblue text-white">
+                <th>
+                    Serie
+                </th>
               <th onclick="sorttable(event)">
                   Type
               </th>
@@ -548,6 +437,9 @@
           <tbody>
                {% for i in reglements %}
                <tr class="reglbl-row" style={% if i.mode != 'espece' and i.echance == today %}"background: yellow;"{% elif i.mode != 'espece' and i.echance < today %}"color:red" {% endif %} >
+                    <td>
+                        REGL#{{i.id}}
+                    </td>
                      <td>
                           {{i.mode}} <br>
                           <!-- <select name="updatemodereglbl{{i.id}}" id=""></select> -->
@@ -611,6 +503,9 @@
                {% endfor %}
           </tbody>
           <thead style="background: white; position: sticky; bottom: 0;">
+            <th>
+
+            </th>
             <th>
 
             </th>
@@ -1075,46 +970,48 @@
         $('.deletereglblbtn').attr('reglid', reglementid)
         $('.updatereglementbl').removeClass('d-none')
         // get reglement data
-        date=$('.updatereglementbl').find('[name="date"]')
-        regid=$('.updatereglementbl').find('[name="reglementid"]').val(reglementid)
-        mantant=$('.updatereglementbl').find('[name="mantant"]')
-        client=$('.updatereglementbl').find('.client')
-        tbody=$('.updatereglementbl').find('tbody')
-        npiece=$('.updatereglementbl').find('[name="npiece"]')
-        mode=$('.updatereglementbl').find('[name="mode"]')
-        echeance=$('.updatereglementbl').find('[name="echeance"]')
+        // date=$('.updatereglementbl').find('[name="date"]')
+        // regid=$('.updatereglementbl').find('[name="reglementid"]').val(reglementid)
+        // mantant=$('.updatereglementbl').find('[name="mantant"]')
+        // client=$('.updatereglementbl').find('.client')
+        // tbody=$('.updatereglementbl').find('tbody')
+        // npiece=$('.updatereglementbl').find('[name="npiece"]')
+        // mode=$('.updatereglementbl').find('[name="mode"]')
+        // echeance=$('.updatereglementbl').find('[name="echeance"]')
 
-        tbody.html('')
+        // tbody.html('')
         console.log(date, mantant)
         // get regl data
         $.get('/products/getreglementbl/'+reglementid, {
 
             }, function(data){
-                $('.searchinputlistreglblupdate').attr('clientid', data.clientid)
-                $('.totalblinupdatereglbl').text(data.total)
-                $('.soldblinupdatereglbl').text((data.soldclient).toFixed(2))
-                $('.loadingscreen').addClass('d-none')
-                date.val(data.date)
-                mantant.val(data.mantant.toFixed(2))
-                client.text(data.client)
-                npiece.val(data.npiece)
-                mode.val(data.mode)
-                echeance.val(data.echance)
-                if (data.mode == "espece"){
-                    echeance.removeClass('notempty')
-                    npiece.removeClass('notempty')
-                }
-                // bons of this reglement
-                for (let i of data.bons){
-                    const date = new Date(i.date);
+                console.log(data)
+                $('.reglebldata').html(data.html)
+                // $('.searchinputlistreglblupdate').attr('clientid', data.clientid)
+                // $('.totalblinupdatereglbl').text(data.total)
+                // $('.soldblinupdatereglbl').text((data.soldclient).toFixed(2))
+                // $('.loadingscreen').addClass('d-none')
+                // date.val(data.date)
+                // mantant.val(data.mantant.toFixed(2))
+                // client.text(data.client)
+                // npiece.val(data.npiece)
+                // mode.val(data.mode)
+                // echeance.val(data.echance)
+                // if (data.mode == "espece"){
+                //     echeance.removeClass('notempty')
+                //     npiece.removeClass('notempty')
+                // }
+                // // bons of this reglement
+                // for (let i of data.bons){
+                //     const date = new Date(i.date);
 
-                    // Create formatted date string in the desired format "d/m/Y"
-                    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-                    tbody.append(`
-                    <tr style="background:#ddfaed" ><td>${formattedDate}</td><td>${i.bon_no}</td><td>${i.total.toFixed(2)}</td><td class="text-danger">${i.ispaid?"R0":"NR"}</td> <td><input type="checkbox" value="${i.id}" name="bonstopay" onchange="checkreglementbox(event)" checked></td></tr>
-                    `)
-                }
-                tbody.append(data.livraisons)
+                //     // Create formatted date string in the desired format "d/m/Y"
+                //     const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                //     tbody.append(`
+                //     <tr style="background:#ddfaed" ><td>${formattedDate}</td><td>${i.bon_no}</td><td>${i.total.toFixed(2)}</td><td class="text-danger">${i.ispaid?"R0":"NR"}</td> <td><input type="checkbox" value="${i.id}" name="bonstopay" onchange="checkreglementbox(event)" checked></td></tr>
+                //     `)
+                // }
+                // tbody.append(data.livraisons)
                 // all bons of this client
                 // for (let i of data.livraisons){
                 //     const date = new Date(i.date);

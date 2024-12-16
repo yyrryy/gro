@@ -13,20 +13,26 @@ annulé: when facture created, create also bl
 //when annuler brign them in a separated list
 //list valider, when bon is valid
 //equivalent in add product, jeux, depo select
+dispaly reglement supplier
+if achat is facture craete facture achat
+serie reglement supplier
+avances client and supplier
+anuler btn
 if facture paid or valid, dont' allow edit or allow it 
 same inputs in suppliers like client, same table
+//mode regl add verement, versement, carte banquaire, echeance and date paimement
 edit bons
-mode regl add verement, versement, carte banquaire, echeance and date paimement
 sidplay only what has been paid and checked in tables
 serie payment
+list avances both
 situation facture
 suivi facture
 date, N°fac, client, ice, mantant ttc, mantant ht, tva, mode reg, n piece, 
 avoir is valider when its in a reglement
 //facture is valider when it's paid
-list valider for each
+//list valider for each
 rastaurer from validation
-facture some bons are paid
+//facture some bons are paid
 cars of product
 depo in add product
-bon achat add qty uniten qty jeux
+//bon achat add qty uniten qty jeux
