@@ -1,6 +1,6 @@
 <div class="col-3">
     <strong>
-        PAYMENT N° REGL#{{reglement.id}} <button class="bi bi-download" onclick="printreglementclient('{{reglement.id}}')"></button>
+        PAYMENT N° REGLFOURN#{{reglement.id}} <button class="bi bi-download" onclick="printreglementsupplier('{{reglement.id}}')"></button>
     </strong>
     <div class="">
         <small>Date de reglement:</small> <br>
@@ -8,8 +8,8 @@
     </div><br>
     
     <input name="reglementid" hidden>
-    <small>Client: <strong class="client">{{reglement.client.name.upper}}</strong></small><br>
-    <!-- <small>Sold Bl Client: <span class="soldblinupdatereglbl text-danger" style="margin-left: 10px;">{{reglement.client.soldbl}}</span></small><br> -->
+    <small>Fournisseur: <strong class="supplier">{{reglement.supplier.name.upper}}</strong></small><br>
+    <!-- <small>Sold Bl Fournisseur: <span class="soldblinupdatereglbl text-danger" style="margin-left: 10px;">{{reglement.supplier.rest}}</span></small><br> -->
     <!-- <div class="mt-5">
         <input type="password" class="passworddeletereglbl form-control">
         <button class="btn btn-danger deletereglblbtn w-100" reglid="" onclick="deletereglbl(event)">Supprimer</button>
@@ -45,7 +45,7 @@
             </div>
             <div class="col-4">
                 <small>Echeance:</small> <br>
-                <input type="date" name="echeance" class="w-100 notempty" value="{{reglement.echance|date:'Y-m-d'}}">
+                <input type="date" name="echeance" class="w-100 notempty" value="{{reglement.echeance|date:'Y-m-d'}}">
             </div>
             <div class="col-4">
                 <small>Bank:</small> <br>

@@ -998,6 +998,17 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function removelocalstorage(target){
+        localStorage.removeItem('pdctsin'+target)
+        localStorage.removeItem(target)
+        localStorage.removeItem('total'+target)
+      }
+      function annulerbon(target, url){
+      localStorage.removeItem(target)
+      localStorage.removeItem('total'+target)
+      localStorage.removeItem('pdctsin'+target)
+      ajaxpage(target, 'Bons Sortie', url)
+    }
       function checksamefacture(event){
         // Get the checkbox that triggered the event
         const checkbox = event.target;

@@ -162,6 +162,9 @@
                 <button class="btn btn-success submitbonlivraison" style="border-radius: 10px;">
                       Valider
                 </button>
+                <button class="btn btn-danger" onclick="annulerbon('bonlivraisonfarah', '/products/listbonlivarison?target={{target}}')" style="border-radius: 10px;">
+                  Annuler
+                  </button>
                 <b class="totalbon text-danger totalbonlivraison">
                   0.00
                 </b>
@@ -278,9 +281,9 @@
                 $(event.target).parent().remove()
                 // remove id from localstorage
 
-                pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison'))
+                pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison{{target}}'))
                 pdcts.splice(pdcts.indexOf(id.toString()), 1)
-                localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+                localStorage.setItem('pdctsinbonlivraison{{target}}', JSON.stringify(pdcts))
                 // update total
                 let totalbon = parseFloat(parentdiv.find('.totalbonlivraison').text())
                 let totalrow = parseFloat($(event.target).parent().find('.total').text())
@@ -316,7 +319,7 @@
         }
         var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
         console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
-        pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison')) || []
+        pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison{{target}}')) || []
         console.log(id, pdcts, pdcts.includes(id))
         if (pdcts.includes(id)){
           parentdiv.find('.addstock').val('')
@@ -355,7 +358,7 @@
               return
             }
             pdcts.push(id)
-            localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+            localStorage.setItem('pdctsinbonlivraison{{target}}', JSON.stringify(pdcts))
             afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
             let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
             console.log(net)
@@ -405,7 +408,7 @@
             });
             
             console.log('saving items')
-            savetolocalstorage(item, totalSum, 'bonlivraison')
+            savetolocalstorage(item, totalSum, 'bonlivraisonfarah')
             parentdiv.find('.totalbon').text(totalSum.toFixed(2))
             parentdiv.find('.resultsholderbonlivraison').select2('open')
           }, function(){
@@ -418,7 +421,7 @@
         }
 
         pdcts.push(id)
-        localStorage.setItem('pdctsinbonlivraison', JSON.stringify(pdcts))
+        localStorage.setItem('pdctsinbonlivraison{{target}}', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
         console.log(afterremise)
         let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
@@ -659,8 +662,8 @@
       //}end else
 
     })
-    //localStorage.removeItem('pdctsinbonlivraison')
-    //localStorage.setItem('pdctsinbonlivraison', '[]')
+    //localStorage.removeItem('pdctsinbonlivraison{{target}}')
+    //localStorage.setItem('pdctsinbonlivraison{{target}}', '[]')
 
     $(document).ready(function(){
       $('.clientselectbl').select2('open')
@@ -850,7 +853,7 @@
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          //localStorage.setItem('pdctsinbonlivraison', '[]')
+          //localStorage.setItem('pdctsinbonlivraison{{target}}', '[]')
           data={
               'totalbon': totalbon,
               'clientid': clientid,
@@ -886,9 +889,7 @@
               success: function(data){
                 console.log('sent')
                   // remove list in localstorage
-                  localStorage.removeItem('pdctsinbonlivraison')
-                  localStorage.removeItem('bonlivraison')
-                  localStorage.removeItem('totalbonlivraison')
+                  removelocalstorage('bonlivraison{{target}}')
                   //deletetab('addbonlivraison')
                   ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
 

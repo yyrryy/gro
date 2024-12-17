@@ -161,7 +161,7 @@
                 <button class="btn btn-success submitbonsortie" style="border-radius: 10px;">
                       Valider
                 </button>
-                <button class="btn btn-danger" onclick="annulerbon()" style="border-radius: 10px;">
+                <button class="btn btn-danger" onclick="annulerbon('bonsortie', '/products/bonsortie?target=s')" style="border-radius: 10px;">
                   Annuler
                   </button>
                 <div>
@@ -265,12 +265,7 @@
         }
 
     })
-    function annulerbon(){
-      localStorage.removeItem('bonsortie')
-      localStorage.removeItem('totalbonsortie')
-      localStorage.removeItem('pdctsinbonsortie')
-      ajaxpage('bonsortie', 'Bons Sortie', '/products/bonsortie?target=s')
-    }
+    
     function removelinebl(event, id) {
           let parentdiv=$(event.target).parent().parent().parent().parent().parent().parent()
           clicksinbl++;

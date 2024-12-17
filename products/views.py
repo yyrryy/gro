@@ -4408,9 +4408,9 @@ def getreglementbl(request, id):
     # livraisons=Bonlivraison.objects.filter(client=reglement.client)
     #we need bons to calculate total bl
     bonstocalculate=Bonlivraison.objects.filter(client=reglement.client)
-    trs=''
-    for i in livraisons:
-        trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+    # trs=''
+    # for i in livraisons:
+    #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
     ctx={
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
@@ -5028,19 +5028,30 @@ def stock(request):
 
 def getreglementsupp(request, id):
     reglement=PaymentSupplier.objects.get(pk=id)
+    # ctx={
+    #     'title':'Reglement',
+    #     'reglement':reglement,
+    # }
+    # bons=reglement.bons.all()
+    # # bons without bons in reglement
+    # livraisons=Itemsbysupplier.objects.filter(supplier=reglement.supplier).exclude(pk__in=[bon.pk for bon in bons])
+    # # livraisons=Itemsbysupplier.objects.filter(supplier=reglement.supplier)
+    # #we need bons to calculate total bl
+    # bonstocalculate=Itemsbysupplier.objects.filter(supplier=reglement.supplier)
+    # trs=''
+    # for i in livraisons:
+    #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglementssupp.exists() else ""}" class="loadblinupdatereglsupp" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglementssupp.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="facturestopay" onchange="checkreglementbox(event)"></td></tr>'
+    
     ctx={
-        'title':'Reglement',
         'reglement':reglement,
+        'avoirs':reglement.avoirs.all().order_by('date'),
+        'avances':reglement.avances.all().order_by('date'),
+        'bons':reglement.bons.all().order_by('date'),
+        'factures':reglement.factures.all().order_by('date'),
     }
-    bons=reglement.bons.all()
-    # bons without bons in reglement
-    livraisons=Itemsbysupplier.objects.filter(supplier=reglement.supplier).exclude(pk__in=[bon.pk for bon in bons])
-    # livraisons=Itemsbysupplier.objects.filter(supplier=reglement.supplier)
-    #we need bons to calculate total bl
-    bonstocalculate=Itemsbysupplier.objects.filter(supplier=reglement.supplier)
-    trs=''
-    for i in livraisons:
-        trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglementssupp.exists() else ""}" class="loadblinupdatereglsupp" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglementssupp.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="facturestopay" onchange="checkreglementbox(event)"></td></tr>'
+    return JsonResponse({
+        'html':render(request, 'updatereglesupp.html', ctx).content.decode('utf-8')
+    })
     return JsonResponse({
         'date':reglement.date.strftime('%Y-%m-%d'),
         'echance':reglement.echeance.strftime('%Y-%m-%d') if reglement.echeance else '',
