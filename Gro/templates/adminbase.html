@@ -1172,6 +1172,7 @@ a .uil {
 
       }
       function savetolocalstorage(item, total, target){
+        console.log('>>target', target)
         // get the already existing
         let items = JSON.parse(localStorage.getItem(target)) || [];
         items.push(item);
