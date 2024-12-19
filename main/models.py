@@ -241,7 +241,7 @@ class Stockin(models.Model):
     ref=models.CharField(max_length=500, default='-', null=True, blank=True)
     name=models.CharField(max_length=500, default='-', null=True, blank=True)
     # to delete stock facture is stock in is facture
-    facture=models.BooleanField(default=False)
+    isfacture=models.BooleanField(default=False)
     # qtyofprice will be used to track qty of this price
     qtyofprice=models.IntegerField(default=0)
     remise1=models.FloatField(default=0.00, null=True, blank=
@@ -257,6 +257,7 @@ class Stockin(models.Model):
     nbon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
     isavoir=models.BooleanField(default=False)
     avoir=models.ForeignKey('Avoirclient', on_delete=models.CASCADE, default=None, null=True, blank=True)
+    
     def __str__(self) -> str:
         return f'{self.nbon} - {self.product}'
 
@@ -376,6 +377,7 @@ class Avancesupplier(models.Model):
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
     date = models.DateTimeField(default=None)
     bon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True)
+    facture=models.ForeignKey("Factureachat", on_delete=models.CASCADE, default=None, null=True)
     amount = models.FloatField()
     mode=models.CharField(max_length=10, default=None, null=True, blank=True)
     echeance=models.DateField(default=None, null=True, blank=True)
@@ -475,6 +477,9 @@ class PaymentSupplier(models.Model):
     bank=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isoargh=models.BooleanField(default=False)
+    # avoir fornisseur I5lls i bo lmahal
+    isavoir=models.BooleanField(default=False)
+    
     # we need somthin to track if the reglement
 class Notesrepresentant(models.Model):
     represent=models.ForeignKey('Represent', on_delete=models.SET_NULL, default=None, null=True)
@@ -512,6 +517,8 @@ class PaymentClientbl(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     issortie=models.BooleanField(default=False)
+    # payment given to client when avoir
+    isavoir=models.BooleanField(default=False)
 class Bonsregle(models.Model):
     payment=models.ForeignKey(PaymentClientbl, on_delete=models.CASCADE, default=None, null=True, blank=True)
     bon=models.ForeignKey('Bonlivraison', on_delete=models.CASCADE, default=None, null=True, blank=True)
@@ -682,9 +689,37 @@ class Avoirclient(models.Model):
     isorgh=models.BooleanField(default=False)
     # avoir selected in an rglement
     inreglement=models.BooleanField(default=False)
-    
+    # avoir can be paid to the client
+    ispaid=models.BooleanField(default=False)
+    rest= models.FloatField(default=0, blank=True, null=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
+# class Paymentavcl(models.Model):
+#     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
+#     date = models.DateTimeField(default=None)
+#     amount = models.FloatField(default=0.00)
+#     mode=models.CharField(max_length=10, default=None)
+#     # the name of the bank
+#     bank=models.CharField(max_length=100000, default=None, null=True, blank=True)
+#     amountofeachbon=models.CharField(max_length=100000, default=None, null=True, blank=True)
+#     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name="reglements")
+#     factures=models.ManyToManyField(Facture, default=None, blank=True, related_name="fcreglements")
+#     bonsortie=models.ManyToManyField('Bonsortie', default=None, blank=True, related_name="reglementsortie")
+#     avoirs=models.ManyToManyField('Avoirclient', default=None, blank=True, related_name="avoirsofreglement")
+#     avances=models.ManyToManyField(Avanceclient, default=None, blank=True, related_name="avancesofreglement")
+#     # mode: 0 bl, 1 facture
+#     echance=models.DateField(default=None, null=True, blank=True)
+#     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+#     # if the regelement is used to regle facture
+#     usedinfacture=models.BooleanField(default=False)
+#     # if regl is paid if it has echeaance
+#     ispaid=models.BooleanField(default=False)
+#     #refused means impyé
+#     refused=models.BooleanField(default=False)
+#     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='bonofreglement')
+#     isfarah=models.BooleanField(default=False)
+#     isorgh=models.BooleanField(default=False)
+#     issortie=models.BooleanField(default=False)
 
 class Returned(models.Model):
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
@@ -719,7 +754,9 @@ class Avoirsupplier(models.Model):
     isorgh=models.BooleanField(default=False)
     inreglement=models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
-
+    # avoir can be paid to the client
+    ispaid=models.BooleanField(default=False)
+    rest= models.FloatField(default=0, blank=True, null=True)
 class Returnedsupplier(models.Model):
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
     qty=models.IntegerField()
@@ -944,6 +981,7 @@ class Commandsupplier(models.Model):
     isorgh=models.BooleanField(default=False)
     generatedbl=models.BooleanField(default=False)
     bl=models.ForeignKey(Itemsbysupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommandsupplier')
+    facture=models.ForeignKey("Factureachat", on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofcommandsupplier')
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     #bc=models.ForeignKey(Boncommande, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     forsupplier=models.BooleanField(default=False)
@@ -981,6 +1019,8 @@ class Devisupplier(models.Model):
     isorgh=models.BooleanField(default=False)
     generatedbl=models.BooleanField(default=False)
     bl=models.ForeignKey(Itemsbysupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofdevisupplier')
+    # can be generated to be facture
+    facture=models.ForeignKey('Factureachat', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='bonofdevisupplier')
     generatedbc=models.BooleanField(default=False)
     bc=models.ForeignKey(Commandsupplier, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='commandofdevisupplier')
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)

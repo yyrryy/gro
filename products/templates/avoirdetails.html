@@ -1,4 +1,5 @@
 <div class="d-flex justify-content-between mb-5" style="position: sticky;top: 0; background: white;z-index: 999;">
+  <button class="bi bi-arrow-left" onclick="ajaxpage('addrecevoir', '+Achat', '/products/listavoirclient?target={{target}}')">LIST AVOIR FOURNISSEUR</button>
   <button class="btn btn-success" onclick="printavoir('{{avoir.id}}')">
     Telecharger
   </button>
@@ -7,11 +8,65 @@
     <button class="btn btn-info" onclick="updateavoirnote(event, '{{avoir.id}}')">+
     </button>
   </div>
+  {% if not ovoir.ispaid or not avoir.inreglement %}
   <button class="btn btn-danger" onclick="ajaxpage('addmodifieravoir{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoir/{{avoir.id}}')">
     Modifier
   </button>
+  {% endif %}
+  {% if reglement %}
+  <div class="accordion col-6" id="accordionreglbl">
+    <div class="">
 
+        <button class="btn btn-success w-100 border" type="button" data-toggle="collapse" data-target="#collapsereglbl" aria-expanded="true" aria-controls="collapsereglbl"
+        >
+            Reglement
+        </button>
 
+        <div id="collapsereglbl" class="collapse" aria-labelledby="headingOne" data-parent="#accordionreglbl">
+        <div class="card-body border shadow rounded">
+          <table class="table table-bordered">
+            <tr>
+              <td>
+                Serie
+              </td>
+              <td>
+                Mantant
+              </td>
+              <td>
+                mode
+              </td>
+              <td>
+                N° piece
+              </td>
+              <td>
+                Echeance
+              </td>
+            </tr>
+            {% for i in reglement %}
+            <tr>
+              <td>
+                #REGLFRN{{i.id}}
+              </td>
+              <td>
+                {{i.amount}}
+              </td>
+              <td>
+                {{i.mode}}
+              </td>
+              <td>
+                {{i.npiece}}
+              </td>
+              <td>
+                {{i.echeance}}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+            </div>
+        </div>
+        </div>
+  </div>
+  {% endif %}
 </div>
 <div id="printav{{avoir.id}}" style="position:relative;">
   {% for i in orderitems %}

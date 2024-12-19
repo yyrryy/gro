@@ -50,7 +50,7 @@
       </thead>
       <tbody class="listavclbody">
         {% for order in bons %}
-          <tr class="ord" orderid="{{order.code}}" ondblclick="ajaxpage('avoir{{order.id}}', 'avoir {{order.no}}', '/products/avoirdetails/{{order.id}}')">
+          <tr class="ord" orderid="{{order.code}}" ondblclick="ajaxpage('avoir{{order.id}}', 'avoir {{order.no}}', '/products/avoirdetails/{{order.id}}?target={{target}}')">
             <td>{{ order.no }}</td>
             <td>{{ order.date|date:'d/m/Y' }}</td>
             <td>{{ order.client.name }}</td>
@@ -58,9 +58,19 @@
             <td>{{ order.total}}</td>
             <td>{{ order.client.region }}</td>
             <td>{{ order.client.city }}</td>
-            {% if facturesection %}<td>{{ order.client.methodsoldfc|floatformat:2 }}</td>{% endif %}
             <td>{{ order.representant }}</td>
-            <td>{% if order.avoirfacture %} facture {% else %}  BL {% endif %} </td>
+            <td>
+              {% if order.ispaid %}
+              <div  style="text-align: center; background: lightgreen;">
+                Payé
+              </div>
+
+              {% elif order.inreglement %}
+              <div class="" style="text-align: center; background: rgb(179, 255, 0);">
+                Reglement
+              </div>
+              {% endif %}
+            </td>
             <td>{% if order.note %} {{ order.note }} {% endif %}</td>
           </tr>
         {% endfor %}

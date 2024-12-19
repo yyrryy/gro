@@ -1780,9 +1780,9 @@ def achatfacture(request):
     target=request.GET.get('target')
     print('target', target)
     if target=='f':
-        facture=Factureachat.objects.filter(isfarah=True, isvalid=False).order_by('-facture_no')
+        facture=Factureachat.objects.filter(isfarah=True, isvalid=False).order_by('-id')
     else:
-        facture=Factureachat.objects.filter(isorgh=True, isvalid=False).order_by('-facture_no')
+        facture=Factureachat.objects.filter(isorgh=True, isvalid=False).order_by('-id')
     target=request.GET.get('target')
     ctx={
         'title':'List facture achat',

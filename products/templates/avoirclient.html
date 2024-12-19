@@ -31,7 +31,7 @@
   <div class="">
          <div class="bg-white rounded shadow p-2 mb-3 dataavoircl d-flex justify-content-between">
             <div class="col-5">
-              <div class="mb-2">
+              <div class="mb-2" hidden>
                 <select name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectav">
                   <option value="bl">BL</option>
                   <option value="facture">Facture</option>
@@ -49,13 +49,14 @@
                 </div>
                 <div class="row">
                   <div class="mb-2 col-6">
+                    <input type="date" class="form-control datebon" name="datebon" placeholder="Date bon">
+                </div>
+                  <div class="mb-2 col-6">
                     <select name="client" id="" style="width:100%;" class="select2 clientselectavoir form-select notemptylivraison">
 
                     </select>
                 </div>
-                  <div class="mb-2 col-6">
-                      <input type="date" class="form-control datebon" name="datebon" placeholder="Date bon">
-                  </div>
+                  
                 </div>
                 <!--<div class="mb-2">
                     <input type="text" class="form-control orderno" name="orderno" value="{{receipt_no}}">
@@ -89,7 +90,8 @@
                 text-align: center;
                 background: #00800024;">Valider</button>
               </div>
-              <div class="col-12 tabeldata">
+              <div class="col-12 tabeldata" style="height: 11em;
+              overflow: scroll;">
                 
               </div>
               <div class="col-12">
@@ -126,9 +128,9 @@
                   <tr>
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">REF</td>
                       <td style="padding: 2px 0; font-size: 13px;">Article</td>
-                      <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr.</td>
-                      <td style="padding: 2px 0; font-size: 13px;">Stock</td>
-                      <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr. cli</td>
+                      <!-- <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr.</td> -->
+                      <!-- <td style="padding: 2px 0; font-size: 13px;">Stock</td> -->
+                      <!-- <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr. cli</td> -->
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Quantité</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix unit.</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise</td>
@@ -174,44 +176,31 @@
               <div class="inputsholder">
                   <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
                   <strong class="totalreglblfields">0.00</strong>
-                      <div class="row align-items-center">
-                            <div class="col-3">
+                      <div class="d-flex align-items-center justify-content-between">
+                            <div class="">
                                 <small>Mantant:</small> <br>
 
                             </div>
-                            <div class="col-3">
+                            <div class="">
                                 <small>N° piece:</small> <br>
 
                             </div>
-                            <div class="col-3">
+                            <div class="">
                                 <small>Mode Paiment:</small> <br>
 
                             </div>
-                            <div class="col-3">
-                                <small>Echeance:</small> <br>
+                            <div class="">
+                              <small>Echeance:</small> <br>
 
-                            </div>
+                          </div>
+                          <div class="">
+                            <small>Bank:</small> <br>
+
+                        </div>
                         </div>
                       <div class="reglements">
-                          <div class="row align-items-center mt-2">
-                              <div class="col-3">
-                                  <input type="number" name="mantantreglementclient" onchange="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
-                              </div>
-                              <div class="col-3">
-                                  <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
-                              </div>
-                              <div class="col-3">
-                                  <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)">
-                                      <option value="cheque">Cheque</option>
-                                      <option value="effet">effet</option>
-                                      <option value="espece">espece</option>
-                                      <option value="avoir">avoir</option>
-                                  </select>
-                              </div>
-                              <div class="col-3">
-                                  <input type="date" name="echeance" class="w-100 notempty echeancereglbl" value="{{today|date:'Y-m-d'}}">
-                              </div>
-                          </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2"><div class=""> <input type="number" name="mantantreglementclient" onkeyup="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant"></div><div class=""> <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece"></div><div class=""> <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)"><option value="cheque">Cheque</option><option value="effet">effet</option><option value="espece">espece</option><option value="avoir">avoir</option></select></div><div> <input type="date" name="echeance" class="w-100 notempty" value="${currentDate}"></div><div class="d-flex"><div><input type="text" name="bank" class="w-100" placeholder="Nom bank"></div>
+                        </div></div>
                       </div>
                   </div>
               </div>
@@ -227,13 +216,13 @@
       parentdiv=$('.bonlivraisonbody')
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
+        // <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp}</td>
+        // <td style="padding: 2px 0; font-size: 13px;" class="stock">${item.stock}</td>
+        // <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
         let tr = `
         <tr class="itemrow ${item.stock<=0? "text-danger":"" }" id=${item.id}>
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${item.id})">${item.ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
-            <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp}</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="stock">${item.stock}</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonlivraison', ${item.id})" name="remise" style="height:23px; width:100%;"></td>
@@ -338,12 +327,12 @@
         }
         let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(remise)/100))
         let addtotal=(parseFloat(addqty.val())*parseFloat(net)).toFixed(2)
+        // <td style="paddingpx 0; font-size: 13px;">${dp}</td>
+        // <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
         let tr = `
         <tr class="itemrow ${stock<=0? "text-danger":"" }">: 2
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="checkConsecutiveClicks(event)">${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
-            <td style="paddingpx 0; font-size: 13px;">${dp}</td>
-            <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
             
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event)" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
@@ -584,6 +573,24 @@
       })
 
       $('.submitavcl').on('click', (e)=>{
+        if (parseFloat($('.totalreglblfields').text())>parseFloat($('.totalbon').text())){
+          alertify.error('Total payement superieur au total bon')
+          return
+        }
+        var isAnyEmpty = $('.reglnotempty').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;
+            if (isAnyEmpty){
+              console.log('empties found')
+                let emptyInputs = $('.reglnotempty').filter(function() {
+                    return !this.value.trim();
+                });
+
+                // Add a red border to all empty input elements
+                alertify.error('Veuillez remplir tous les champs obligatoires')
+                emptyInputs.css('border', '1px solid red');
+                $('notempty').not(emptyInputs).css('border', '');
+                $(this).attr('disabled', false)
+                return 
+            }
         parentdiv=$(e.target).parent().parent().parent().parent()
         if (parentdiv.find('.clientselectavoir').val()==null || parentdiv.find('.datebon').val()=='' ){
             $('.dataavoircl').addClass('border border-danger')
@@ -643,6 +650,21 @@
           let transport = parentdiv.find('.transport').val()
           let orderno = parentdiv.find('.orderno').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
+          mantant=parentdiv.find('[name="mantantreglementclient"]').map(function() {
+              return parseFloat(this.value);
+          }).get();
+          mode=parentdiv.find('[name="modereglementclient"]').map(function() {
+              return this.value;
+          }).get();
+          npiece=parentdiv.find('[name="npiece"]').map(function() {
+              return this.value;
+          }).get();
+          bank=parentdiv.find('[name="bank"]').map(function() {
+              return this.value;
+          }).get();
+          echeance=parentdiv.find('[name="echeance"]').map(function() {
+              return this.value;
+          }).get();
           console.log(products)
           console.log(totalbon)
           console.log('sending')
@@ -665,13 +687,18 @@
               url: "{% url 'products:addavoirclient' %}",
               type: 'POST',
               data:{
+                'mantant':JSON.stringify(mantant),
+                'mode':JSON.stringify(mode),
+                'npiece':JSON.stringify(npiece),
+                'echeance':JSON.stringify(echeance),
+                'bank':JSON.stringify(bank),
                 'target': '{{target}}',
                 'totalbon': totalbon,
                 'clientid': clientid,
                 'repid':repid,
                 'transport':transport,
                 'datebon': datebon,
-                'mode': mode,
+                // 'mode': mode,
                 'orderno': orderno,
                 'products': JSON.stringify(products),
                 'csrfmiddlewaretoken': '{{csrf_token}}'

@@ -349,7 +349,7 @@ def addoneproduct(request):
             isactive=False,
             farahref='fr-'+ref
         )
-        
+
         # req.get('http://serverip/products/addoneproduct', {
         #     'ref':ref,
         #     'name':name,
@@ -683,68 +683,56 @@ def addsupply(request):
     totalbon=request.POST.get('totalbon')
     isfarah=target=='f'
     print('>>>>>>', 'target', target, 'devid', devid, 'cmndid', cmndid, 'nbon', nbon, 'datebon', datebon, 'datefacture', datefacture, 'isfacture', isfacture, 'totalbon', totalbon, 'supplierid', supplierid, 'products', products)
-    tva=0
-    if isfacture:
-        tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
+    
 
     supplier=Supplier.objects.get(pk=supplierid)
-    # print(f'''
-    #     bon achat N°: {nbon}
-    #     date facture: {datefacture}
-    #     date reception: {datebon}
-    #     fournisseur: {supplier.name}
-    #     sold fournisseur: {float(supplier.rest)+float(totalbon)}
-    #     isfacure: {isfacture}
-    #     tva: {tva}
-    # ''')
-    # for i in json.loads(products):
-    #     qty=int(i['qty'])
-    #     devise=0 if i['devise']=='' else i['devise']
-    #     product=Produit.objects.get(pk=i['productid'])
-    #     remise=0 if i['remise']=='' else int(i['remise'])
-    #     buyprice=0 if i['price']=='' else i['price']
-    #     netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
-
-    #     print(f'''
-    #         produit: {product.ref}
-    #         nouvau prix achat: {netprice}
-    #         devise: {devise}
-    #         'qty': {qty}
-    #     ''')
-    #     if isfacture:
-    #         print('add stock facture: ', int(product.stockfacture)+int(i['qty']))
-    #     print('addstocktotal ', int(product.stocktotal)+int(i['qty']))
-
     supplier.rest=float(supplier.rest)+float(totalbon)
     supplier.save()
-    bon=Itemsbysupplier.objects.create(
-        isfarah=True if target=='f' else False,
-        isorgh=True if target=='o' else False,
-        supplier_id=supplierid,
-        total=totalbon,
-        date=datebon,
-        nbon=nbon,
-        isfacture=isfacture,
-        tva=tva,
-        dateentree=datefacture
-    )
+    tva=0
+    if isfacture:
+        print('>> creating facture')
+        facture=Factureachat.objects.create(
+            facture_no=nbon,
+            supplier_id=supplierid,
+            isfarah=isfarah,
+            date=datefacture,
+            total=totalbon
+        )
+        tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
+    else:
+        bon=Itemsbysupplier.objects.create(
+            isfarah=True if target=='f' else False,
+            isorgh=True if target=='o' else False,
+            supplier_id=supplierid,
+            total=totalbon,
+            date=datefacture,
+            nbon=nbon,
+        )
     if not devid == "":
         devi=Devisupplier.objects.get(pk=devid)
         devi.generatedbl=True
-        devi.bl=bon
-        devi.save()
+        if isfacture:
+            devi.facture=facture
+            devi.save()
+        else:
+            devi.bl=bon
+            devi.save()
     if not cmndid == "":
         cmnd=Commandsupplier.objects.get(pk=cmndid)
         cmnd.generatedbl=True
-        cmnd.bl=bon
-        cmnd.save()
+        if isfacture:
+            cmnd.facture=facture
+            cmnd.save()
+        else:
+            cmnd.bl=bon
+            cmnd.save()
     for i in json.loads(products):
         product=Produit.objects.get(pk=i['productid'])
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         remise2=0 if i['remise2']=='' else int(i['remise2'])
         remise3=0 if i['remise3']=='' else int(i['remise3'])
         remise4=0 if i['remise4']=='' else int(i['remise4'])
-        
+
         buyprice=0 if i['price']=='' else i['price']
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
@@ -785,29 +773,48 @@ def addsupply(request):
             if isfacture:
                 product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
         # recodrd remise 1, 2, 3, 4
-        
+
         #product.isnew=True
         print('creating', product.ref)
-        Stockin.objects.create(
-            date=datebon,
-            product=product,
-            quantity=i['qty'],
-            price=i['price'],
-            ref=i['ref'],
-            name=i['name'],
-            remise1=remise1,
-            remise2=remise2,
-            remise3=remise3,
-            remise4=remise4,
-            # remise=remise,
-            qtyofprice=i['qty'],
-            total=i['total'],
-            supplier_id=supplierid,
-            nbon=bon,
-            facture=isfacture,
-            isfarah=target=='f',
-            isorgh=target=='o'
-        )
+        if isfacture:
+            Outfactureachat.objects.create(
+                facture=facture,
+                price=i['price'],
+                ref=i['ref'],
+                name=i['name'],
+                remise1=remise1,
+                remise2=remise2,
+                remise3=remise3,
+                remise4=remise4,
+                # remise=remise,
+                qty=i['qty'],
+                total=i['total'],
+                supplier_id=supplierid,
+                
+            )
+        else:
+            Stockin.objects.create(
+                date=datebon,
+                product=product,
+                quantity=i['qty'],
+                price=i['price'],
+                ref=i['ref'],
+                name=i['name'],
+                remise1=remise1,
+                remise2=remise2,
+                remise3=remise3,
+                remise4=remise4,
+                # remise=remise,
+                qtyofprice=i['qty'],
+                total=i['total'],
+                supplier_id=supplierid,
+                
+                nbon=bon,
+                isfacture=isfacture,
+                isfarah=target=='f',
+                isorgh=target=='o'
+            )
+        
     # # update cout moyen, it will be calculated by deviding total prices by total qty
 
         # totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
@@ -816,39 +823,41 @@ def addsupply(request):
         product.qtycommande=0
         product.save()
         totalamount=sum(x if x is not None else 0 for x in mantant)
-        if float(totalamount)>float(totalbon):
+        if float(totalamount)==float(totalbon):
+            if isfacture:
+                facture.ispaid=True
+                facture.save()
+            else: 
+                bon.ispaid=True
+                bon.save()
 
-            print('>>> checkpoint')
-            diff=float(totalamount)-float(totalbon)
-            Avancesupplier.objects.create(
-                supplier_id=supplierid,
-                amount=diff,
-                bon=bon,
-                date=timezone.now().date(),
-                isfarah=isfarah,
-            )
-            print('>>> checkpoint after avance')
-            bon.ispaid=True
-        elif float(totalamount)==float(totalbon):
-            bon.ispaid=True
         else:
             diff=float(totalbon)-float(totalamount)
-            bon.rest=diff
-        bon.save()
+            if isfacture:
+                facture.rest=diff 
+                facture.save()
+            else: 
+                bon.rest=diff
+                bon.save()
+
         if totalamount>0:
             for m, mod, np, ech, bk in zip(mantant, moderegl, npiece, echeance, bank):
-                PaymentSupplier.objects.create(
-                    supplier_id=supplierid,
-                    amount=m,
-                    date=timezone.now(),
-                    echeance=ech,
-                    mode=mod,
-                    npiece=np,
-                    bank=bk,
-                    isfarah=isfarah,
-                    bon=bon
-                )
-    
+                if m is not None:
+                    p=PaymentSupplier.objects.create(
+                        supplier_id=supplierid,
+                        amount=m,
+                        date=timezone.now(),
+                        echeance=ech,
+                        mode=mod,
+                        npiece=np,
+                        bank=bk,
+                        isfarah=isfarah,
+                    )
+                    if isfacture:
+                        p.set.facture([facture])
+                    else:
+                        p.set.bons([bon])
+
     return JsonResponse({
         'success':True
         #'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
@@ -861,7 +870,7 @@ def addbonlivraison(request):
     npiece=request.POST.get('npiece')
     echeance=request.POST.get('echeance')
     print('>> echeance', echeance, echeance=="")
-    
+
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
@@ -881,7 +890,7 @@ def addbonlivraison(request):
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
     client.save()
-    
+
     # get the last bon no
     year = timezone.now().strftime("%y")
     isfarah=target=='f'
@@ -1073,7 +1082,7 @@ def addfacture(request):
     client.save()
     tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
     year = timezone.now().strftime("%y")
-    
+
     print('>>>>>>>',latest_receipt)
     facture=Facture.objects.create(
         facture_no=receipt_no,
@@ -1325,7 +1334,7 @@ def addclientdivers(request):
         soldbl=0.00,
         diver=True
     )
-    
+
     if target=='f':
         client.clientfarah=True
     elif target=='s':
@@ -1560,6 +1569,7 @@ def facturedetails(request, id):
     return render(request, 'facturedetails.html', ctx)
 
 def supplierfacturedetails(request, id):
+    target=request.GET.get('target')
     order=Factureachat.objects.get(pk=id)
     orderitems=Outfactureachat.objects.filter(facture=order).order_by('product__name')
     # split the orderitems into chunks of 10 items
@@ -1567,18 +1577,19 @@ def supplierfacturedetails(request, id):
     orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
 
     ctx={
-        'title':f'Facture {order.facture_no}',
+        'title':f'Facture achat {order.facture_no}',
         'facture':order,
         'orderitems':orderitems,
         'tva':order.tva,
         'ttc':order.total,
+        'target':target,
         'ht':round(order.total-order.tva, 2),
-        'reps':Represent.objects.all()
     }
-    return render(request, 'facturedetails.html', ctx)
+    return render(request, 'supplierfacturedetails.html', ctx)
 
 
 def avoirdetails(request, id):
+    target=request.GET.get('target')
     order=Avoirclient.objects.get(pk=id)
     orderitems=Returned.objects.filter(avoir=order)
     # split the orderitems into chunks of 10 items
@@ -1587,12 +1598,15 @@ def avoirdetails(request, id):
     ctx={
         'title':f'avoir {order.no}',
         'avoir':order,
-        'orderitems':orderitems,
+        'target':target,
+        'reglement':PaymentClientbl.objects.filter(avoirs__id=order.id),
+        'orderitems':orderitems
 
     }
     return render(request, 'avoirdetails.html', ctx)
 
 def avoirsuppdetails(request, id):
+    target=request.GET.get('target')
     order=Avoirsupplier.objects.get(pk=id)
     orderitems=Returnedsupplier.objects.filter(avoir=order)
     # split the orderitems into chunks of 10 items
@@ -1600,8 +1614,10 @@ def avoirsuppdetails(request, id):
     orderitems=[orderitems[i:i+36] for i in range(0, len(orderitems), 36)]
     ctx={
         'title':f'avoir {order.no}',
+        'target':target,
         'avoir':order,
         'orderitems':orderitems,
+        'reglement':PaymentSupplier.objects.filter(avoirs__id=order.id)
     }
     return render(request, 'avoirsuppdetails.html', ctx)
 
@@ -1646,7 +1662,7 @@ def getclientprice(request):
             price=clientprice.price
             remise=clientprice.remise
 
-            
+
     return JsonResponse({
         'price':price,
         'remise':remise,
@@ -1833,7 +1849,7 @@ def exportfc(request):
 
 def listavoirclient(request):
     isfarah=request.GET.get('target')=='f'
-    bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-date')[:50]
+    bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-id')[:50]
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Avoir Client',
@@ -1847,7 +1863,7 @@ def listavoirclient(request):
 def listavoirsupplier(request):
     print('>>>>>>',)
     target=request.GET.get('target')
-    bons= Avoirsupplier.objects.filter(date__year=thisyear, isfarah=target=="f").order_by('-date')
+    bons= Avoirsupplier.objects.filter(date__year=thisyear, isfarah=target=="f").order_by('-id')
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
@@ -2444,8 +2460,8 @@ def getclientbons(request):
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} {f"Total: {i.total} Rest=>" if i.rest>0 else ""}</td><td>{i.rest if i.rest>0 else i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
     #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
-    avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
-    avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')[:50]
+    avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False, ispaid=False).order_by('date')
+    avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')
 
     # else:
     #     if moderegl=='bl':
@@ -2460,7 +2476,7 @@ def getclientbons(request):
     #             # old code, if reglement is paid it's checked from here
     #             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
     #             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
-        
+
     #     avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
     #     avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=False, inreglement=False).order_by('date')[:50]
     # totalbons=bons.aggregate
@@ -2944,13 +2960,21 @@ def avoirclient(request):
 
 
 def addavoirclient(request):
+    mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    
     target=request.POST.get('target')
     clientid=request.POST.get('clientid')
     repid=request.POST.get('repid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
-    mode=request.POST.get('mode')
-    isfacture=True if mode=='facture' else False
+    # mode=request.POST.get('mode')
+    # isfacture=True if mode=='facture' else False
     # orderno
     #orderno=request.POST.get('orderno')
     datebon=request.POST.get('datebon')
@@ -2978,7 +3002,7 @@ def addavoirclient(request):
             receipt_no = f"AV{year}/{latest_receipt_no + 1}"
         except:
             receipt_no = f"AV{year}/1"
-    print(receipt_no, clientid, repid, totalbon, datebon, isfacture)
+    print(receipt_no, clientid, repid, totalbon, datebon)
     try:
 
         avoir=Avoirclient.objects.create(
@@ -2987,7 +3011,7 @@ def addavoirclient(request):
             representant_id=repid,
             total=totalbon,
             date=datebon,
-            avoirfacture=isfacture,
+            # avoirfacture=isfacture,
             isfarah=isfarah,
             isorgh=isorgh
         )
@@ -3012,12 +3036,33 @@ def addavoirclient(request):
                 isorgh=isorgh
             )
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
-        # if isfacture:
-        #     client.soldfacture=round(float(client.soldfacture)-float(totalbon), 2)
-        # else:
         client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
-
         client.save()
+        if len(mantant)>0:
+            totalamount=sum([i for i in mantant if i is not None])
+            print('totalamount', totalamount)
+            if float(totalamount)==float(totalbon):
+                avoir.ispaid=True
+            else:
+                diff=round(float(totalbon)-float(totalamount), 2)
+                avoir.rest=diff
+            avoir.save()
+            for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+                if m is not None:
+                    regl=PaymentClientbl.objects.create(
+                        client_id=clientid,
+                        amount=m,
+                        #today
+                        date=timezone.now().date(),
+                        echance=ech,
+                        bank=bk,
+                        mode=mod,
+                        npiece=np,
+                        isfarah=target=='f',
+                        isorgh=target=='o',
+                        isavoir=True
+                    )
+                    regl.avoirs.set([avoir])
     except Exception as e:
         return JsonResponse({
             'success':False,
@@ -3064,6 +3109,13 @@ def avoirsupplier(request):
 
 
 def addavoirsupp(request):
+    mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    
     isfarah=request.POST.get('target')=="f"
     supplierid=request.POST.get('supplierid')
     products=request.POST.get('products')
@@ -3111,7 +3163,32 @@ def addavoirsupp(request):
                 total=i['total'],
                 isfarah=isfarah
             )
-
+    print(">>> len, amounr",len(mantant), mantant)
+    if len(mantant)>0:
+            totalamount=sum([i for i in mantant if i is not None])
+            print('totalamount', totalamount)
+            if float(totalamount)==float(totalbon):
+                avoir.ispaid=True
+            elif totalamount>0:
+                diff=float(totalbon)-float(totalamount)
+                avoir.rest=diff
+            avoir.save()
+            for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+                print(m)
+                if m is not None:
+                    regl=PaymentSupplier.objects.create(
+                        supplier_id=supplierid,
+                        amount=m,
+                        #today
+                        date=timezone.now().date(),
+                        echeance=ech,
+                        bank=bk,
+                        mode=mod,
+                        npiece=np,
+                        isfarah=isfarah,
+                        isavoir=True
+                    )
+                    regl.avoirs.set([avoir])
 
     # increment it
     return JsonResponse({
@@ -3465,7 +3542,7 @@ def updatebonachat(request):
                 quantity=qty,
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
-                facture=isfacture
+                isfacture=isfacture
             )
             totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
             totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
@@ -3490,7 +3567,7 @@ def getsuppbons(request):
         bons=Itemsbysupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend], isfacture=False)
         for i in bons:
             trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" onchange="checkreglementbox(event)"></td></tr>'
-        
+
     else:
         bons=Factureachat.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend])
         for i in bons:
@@ -3536,7 +3613,7 @@ def reglebonsachat(request):
     print('>> ll', livraisons)
     print('>> avances', avances)
     print('>> avoirs', avoirs)
-    
+
     avoirs.update(inreglement=True)
     avances.update(inreglement=True)
     totalmantant=sum(mantant)
@@ -3643,14 +3720,14 @@ def laodjournalachat(request):
     })
 
 def journalachatfc(request):
-    items=Stockin.objects.filter(facture=True, date__year=thisyear)[:50]
-    print('>>>>>>>>>>', round(Stockin.objects.filter(facture=True, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2),)
+    items=Stockin.objects.filter(isfacture=True, date__year=thisyear)[:50]
+    print('>>>>>>>>>>', round(Stockin.objects.filter(isfacture=True, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2),)
     ctx={
         'title':'Journal Achat Facture',
         'items':items,
         'today':timezone.now().date(),
-        'total':round(Stockin.objects.filter(facture=True, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2),
-        'totalqty':round(Stockin.objects.filter(facture=True, date__year=thisyear).aggregate(Sum('quantity'))['quantity__sum'] or 0, 2),
+        'total':round(Stockin.objects.filter(isfacture=True, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2),
+        'totalqty':round(Stockin.objects.filter(isfacture=True, date__year=thisyear).aggregate(Sum('quantity'))['quantity__sum'] or 0, 2),
     }
     return render(request, 'journalachatfc.html', ctx)
 
@@ -3662,7 +3739,7 @@ def loadjournalachatfc(request):
 
     start = (page - 1) * per_page
     end = page * per_page
-    products = Stockin.objects.filter(facture=True)[start:end]
+    products = Stockin.objects.filter(isfacture=True)[start:end]
     trs=''
     for i in products:
         trs+=f'''
@@ -4058,7 +4135,7 @@ def loadjournalventefc(request):
         'totalqty':Outfacture.objects.filter(date__year=thisyear).aggregate(Sum('qty'))['qty__sum'] or 0,
     })
 
-# product search selects2 for bon sortie, 
+# product search selects2 for bon sortie,
 def searchproductbonsortie(request):
     # get url pams
     term=request.GET.get('term').lower().strip()
@@ -4542,7 +4619,7 @@ def getlastsuppprice(request):
         # 'facture':lastprice.facture,
         'table':render(request, 'prodctprices.html', {'producthistory':prices.order_by('-date')}).content.decode('utf-8')
     })
-    
+
 
 def boncommandedetails(request, id):
 
@@ -5041,7 +5118,7 @@ def getreglementsupp(request, id):
     # trs=''
     # for i in livraisons:
     #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglementssupp.exists() else ""}" class="loadblinupdatereglsupp" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglementssupp.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="facturestopay" onchange="checkreglementbox(event)"></td></tr>'
-    
+
     ctx={
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
@@ -5651,7 +5728,7 @@ def searchproductsforstock(request):
     # Remove non-alphanumeric characters and convert to lowercase
 
     if not '+' in term:
-        
+
         # check if term in product.ref or product.name
         products=Produit.objects.filter(ref__istartswith=term)
 
@@ -5682,7 +5759,7 @@ def searchproductsforstock(request):
                 # term = ''.join(char for char in term if char.isalnum())
                 q_objects &= (Q(ref__icontains=term) | Q(coderef__icontains=term) | Q(name__icontains=term) | Q(category__name__icontains=term) |  Q(mark__name__icontains=term) |  Q(equivalent__icontains=term)  |  Q(refeq1__icontains=term) |  Q(refeq2__icontains=term)  |  Q(block__icontains=term) | Q(refeq3__icontains=term) | Q(refeq4__icontains=term) | Q(sellprice__icontains=term)  | Q(buyprice__icontains=term)  | Q(cars__icontains=term)  | Q(diametre__icontains=term))
             products=Produit.objects.filter(q_objects)[:50]
-        
+
     return JsonResponse({
         'trs':render(request, 'stocktrs.html', {
             'products':products,
@@ -6435,7 +6512,7 @@ def searchforlistbl(request):
         print(">> here 1²",startdate, enddate)
         bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
         total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-    
+
     return JsonResponse({
         'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
@@ -6829,7 +6906,7 @@ def searchforlistfc(request):
     print('>>', startdate, enddate)
     year=request.GET.get('year')
     isfarah=target=='f'
-    
+
     # Split the term into individual words separated by '*'
     search_terms = term.split('+')
 
@@ -6865,7 +6942,7 @@ def searchforlistfc(request):
     # else:
     #     bons=Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no')[:50]
     #     total=round(Facture.objects.filter(q_objects).filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
-    
+
     return JsonResponse({
         'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
         'total':total,
