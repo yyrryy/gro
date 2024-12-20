@@ -368,6 +368,7 @@ class Avanceclient(models.Model):
     mode=models.CharField(max_length=10, default=None, null=True)
     echeance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+    bank=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     # avance selected in an rglement
@@ -382,6 +383,7 @@ class Avancesupplier(models.Model):
     mode=models.CharField(max_length=10, default=None, null=True, blank=True)
     echeance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
+    bank=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     inreglement=models.BooleanField(default=False)

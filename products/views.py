@@ -2398,6 +2398,101 @@ def listreglementbl(request):
 
     return render(request, 'listreglementbl.html', ctx)
 
+def listavances(request):
+    target=request.GET.get('target')
+    if target=="f":
+        avances=Avanceclient.objects.filter(isfarah=True).order_by('-id')[:50]
+    elif target=="o":
+        avances=Avanceclient.objects.filter(isorgh=True).order_by('-id')[:50]
+    else:
+        avances=Avanceclient.objects.filter(issortie=True).order_by('-id')[:50]
+    print('lenreg', len(avances))
+    ctx={
+        'title':'List des avances CL BL',
+        'avances':avances,
+        'today':timezone.now().date(),
+        'target':target,
+    }
+    if avances:
+        ctx['total']=round(Avanceclient.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+
+    return render(request, 'listavances.html', ctx)
+
+def addavanceclient(request):
+    clientid=request.GET.get('clientid')
+    target=request.GET.get('target')
+    mantant=json.loads(request.GET.get('mantant'))
+    bank=json.loads(request.GET.get('bank'))
+    mode=json.loads(request.GET.get('mode'))
+    npiece=json.loads(request.GET.get('npiece'))
+    # date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.GET.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    print("clientid", clientid, "target", target, "mantant", mantant, "bank",bank, "mode", mode, "npiece", npiece, "echeance", echeance,)
+    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+        Avanceclient.objects.create(
+            client_id=clientid,
+            amount=m,
+            #today
+            date=timezone.now().date(),
+            echeance=ech,
+            bank=bk,
+            mode=mod,
+            npiece=np,
+            isfarah=target=='f',
+            isorgh=target=='o'
+        )
+    return JsonResponse({
+        'success':True
+    })
+    
+def addavancesupplier(request):
+    supplierid=request.GET.get('supplierid')
+    target=request.GET.get('target')
+    mantant=json.loads(request.GET.get('mantant'))
+    bank=json.loads(request.GET.get('bank'))
+    mode=json.loads(request.GET.get('mode'))
+    npiece=json.loads(request.GET.get('npiece'))
+    # date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.GET.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+        Avancesupplier.objects.create(
+            supplier_id=supplierid,
+            amount=m,
+            #today
+            date=timezone.now().date(),
+            echeance=ech,
+            bank=bk,
+            mode=mod,
+            npiece=np,
+            isfarah=target=='f',
+            isorgh=target=='o'
+        )
+    return JsonResponse({
+        'success':True
+    })
+    
+
+def supplierlistavances(request):
+    target=request.GET.get('target')
+    if target=="f":
+        avances=Avancesupplier.objects.filter(isfarah=True).order_by('-id')[:50]
+    elif target=="o":
+        avances=Avancesupplier.objects.filter(isorgh=True).order_by('-id')[:50]
+    else:
+        avances=Avancesupplier.objects.filter(issortie=True).order_by('-id')[:50]
+    print('avaavva', len(avances))
+    ctx={
+        'title':'List des avances CL BL',
+        'avances':avances,
+        'today':timezone.now().date(),
+        'target':target,
+    }
+    if avances:
+        ctx['total']=round(Avancesupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+
+    return render(request, 'supplierlistavances.html', ctx)
 
 def listreglementsupp(request):
     target=request.GET.get('target')
