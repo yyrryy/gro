@@ -21,7 +21,8 @@ padding: 0;
 margin: 0;
 }
 </style>
-<div class="text-white rounded h3 text-center" style="background: #1a6a9b;">
+<div class="d-flex text-white rounded h3 text-center" style="background: #1a6a9b;">
+  <button class="bi bi-arrow-left" onclick="ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')"></button>
   <div>
     {{title}}
   </div>
@@ -41,9 +42,9 @@ margin: 0;
 
                   </select>
               </div>
-              <div class="mb-2">
+              <div hidden class="mb-2">
                   <small>Representant:</small>
-                  <select name="representant" id="" style="width:100%;" class="select2 repsselectslivraison{{livraison.id}} form-select notemptylivraison{{livraison.id}}">
+                  <select name="representant" id="" style="width:100%;" class="select2 repsselectslivraison{{livraison.id}} form-select">
                       <option value="{{livraison.salseman.id}}">{{livraison.salseman.name}}</option>
                       {% for i in commercials %}
                       <option value="{{i.id}}">{{i.name}}</option>
@@ -55,7 +56,7 @@ margin: 0;
 
                   <input type="date" class="form-control datebonlivraison{{livraison.id}}" name="datebonlivraison{{livraison.id}}" value="{{livraison.date|date:'Y-m-d'}}" placeholder="Date bon">
               </div>
-              <div class="mb-2">
+              <div hidden class="mb-2">
                 <small>N° Bon:</small>
                   <input type="text" class="form-control ordernolivraison{{livraison.id}}" name="ordernolivraison{{livraison.id}}" value="{{livraison.bon_no}}">
               </div>
@@ -525,7 +526,7 @@ margin: 0;
 
     $('.submitbonlivraison{{livraison.id}}').on('click', (e)=>{
       let parentdiv=$(e.target).parent().parent().parent().parent()
-      if ($('.repsselectslivraison{{livraison.id}}').val()=='' || $('.datebonlivraison{{livraison.id}}').val()=='' || $('.ordernolivraison{{livraison.id}}').val()==''){
+      if ($('.datebonlivraison{{livraison.id}}').val()=='' || $('.ordernolivraison{{livraison.id}}').val()==''){
           parentdiv.find('.data').addClass('border border-danger')
           return
       }
@@ -576,33 +577,26 @@ margin: 0;
             products.push(product)
         })
         let clientid = $('.clientselectlivraison{{livraison.id}}').val()?$('.clientselectlivraison{{livraison.id}}').val():'{{livraison.client.id}}'
-        let repid = $('.repsselectslivraison{{livraison.id}}').val()
+        // let repid = $('.repsselectslivraison{{livraison.id}}').val()
         let datebon = $('.datebonlivraison{{livraison.id}}').val()
         let transport = $('.transportlivraison{{livraison.id}}').val()
         let note = $('.notelivraison{{livraison.id}}').val()
-        let orderno = $('.ordernolivraison{{livraison.id}}').val()
+        // let orderno = $('.ordernolivraison{{livraison.id}}').val()
         let totalbon=parseFloat($('.totalbonlivraison{{livraison.id}}').text())
         $('.loadingscreen').removeClass('d-none').addClass('d-flex')
-        $.get('/products/checklivraisonno', {'no':orderno, 'id':'{{livraison.id}}'}, (data)=>{
-          if (data.exist){
-            $('.loadingscreen').removeClass('d-flex').addClass('d-none')
-            $('.submitbonlivraison{{livraison.id}}').removeClass('disabled')
-            alertify.error('CE NUMERO EST DEJA EXISTE')
-          }
-          else{
-
-            $.ajax({
+        $.ajax({
               url: "{% url 'products:updatebonlivraison' %}",
               type: 'POST',
               data: {
+                'target':'{{target}}',
                 'bonid': '{{livraison.id}}',
                 'totalbon': totalbon,
                 'clientid': clientid,
-                'repid':repid,
+                // 'repid':repid,
                 'transport':transport,
                 'note':note,
                 'datebon': datebon,
-                'orderno': orderno,
+                // 'orderno': orderno,
                 'products': JSON.stringify(products),
                 'csrfmiddlewaretoken': '{{csrf_token}}'
               },
@@ -612,12 +606,22 @@ margin: 0;
                 alertify.success('Bon livraison modifié')
                 // delerte this tab
                 deletetab('modifierlivraison{{livraison.id}}')
-                ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison')
+                ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison?target={{target}}')
 
                 }
             })
-          }
-        })
+            // check if orderno is already exist -old code you can edit bon no'
+        // $.get('/products/checklivraisonno', {'no':orderno, 'id':'{{livraison.id}}'}, (data)=>{
+        //   if (data.exist){
+        //     $('.loadingscreen').removeClass('d-flex').addClass('d-none')
+        //     $('.submitbonlivraison{{livraison.id}}').removeClass('disabled')
+        //     alertify.error('CE NUMERO EST DEJA EXISTE')
+        //   }
+        //   else{
+
+            
+        //   }
+        // })
     })
     $('.searchbonlivraisoncreation{{livraison.id}}').on("keyup", function() {
   var value = $(this).val().toLowerCase();

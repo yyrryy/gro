@@ -572,10 +572,12 @@
       })
 
       $('.submitfacture').on('click', (e)=>{
+        let clientid = parentdiv.find('.clientselectfacture').val()
+        let datebon = parentdiv.find('.datebonfacture').val()
         parentdiv=$(e.target).parent().parent().parent().parent()
-        if (parentdiv.find('.clientselectfacture').val()==''){
-            parentdiv.find('.data').addClass('border border-danger')
-            return
+        if (parentdiv.find('.clientselectfacture').val()=='' || datebon==""){
+          parentdiv.find('.data').addClass('border border-danger')
+          return
         }
         parentdiv.find('.data').removeClass('border border-danger')
         // check if .itemrow is exist
@@ -623,8 +625,7 @@
               }
               products.push(product)
           })
-          let clientid = parentdiv.find('.clientselectfacture').val()
-          let datebon = parentdiv.find('.datebonfacture').val()
+          
           let transport = parentdiv.find('.transport').val()
           let note = parentdiv.find('.note').val()
           //let orderno = parentdiv.find('.orderno').val()

@@ -13,11 +13,16 @@ annulé: when facture created, create also bl
 //when annuler brign them in a separated list
 //list valider, when bon is valid
 //equivalent in add product, jeux, depo select
-dispaly reglement supplier
+//dispaly reglement supplier
+//serie reglement supplier
 if achat is facture craete facture achat
-serie reglement supplier
 avances client and supplier
-anuler btn
+anuler btn avoir
+anuler btn facture
+anuler btn bonachat
+payment avoir client
+payment avoir supplier
+avoir client payment lower than total to test rest, if rest display only rest in reglement
 if facture paid or valid, dont' allow edit or allow it 
 same inputs in suppliers like client, same table
 //mode regl add verement, versement, carte banquaire, echeance and date paimement
@@ -36,3 +41,19 @@ rastaurer from validation
 cars of product
 depo in add product
 //bon achat add qty uniten qty jeux
+
+
+
+
+
+
+listbl
+ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')"
+
+factures
+ajaxpage('add', '+ Article', '/products/listfactures?target={{target}}')"
+
+avoirclient
+ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target={{target}}')
+
+avoirsupp

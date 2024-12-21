@@ -303,6 +303,9 @@
             <th onclick="sorttable(event)">
                 Banque
             </th>
+            <th onclick="sorttable(event)">
+                Status
+            </th>
               <th onclick="sorttable(event)">
                   N° Bons
               </th>
@@ -340,6 +343,13 @@
                      </td>
                      <td>
                         {{i.bank.upper}}
+                   </td>
+                   <td>
+                    {% if i.inreglement %}
+                    <div class="" style="text-align: center; background: rgb(179, 255, 0);">
+                        Reglement
+                    </div>
+                    {% endif %}
                    </td>
                      <td class="d-flex justify-content-between">
                         <div class="accordion" id="accordionbons{{i.id}}">

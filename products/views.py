@@ -1310,7 +1310,7 @@ def addcommercial(request):
 def checkcodeclient(request):
     code=request.GET.get('code')
     name=request.GET.get('name')
-    print(Client.objects.filter(Q(name=name) | Q(code=code)))
+    print(Client.objects.filter(Q(name=name) | Q(code=code)).exists())
     if Client.objects.filter(Q(name=name) | Q(code=code)).exists():
         return JsonResponse({
             'exist':True
@@ -1365,7 +1365,9 @@ def addclient(request):
     clientsold=request.POST.get('clientsold')
     region=request.POST.get('clientregion').lower().strip()
     plafon=request.POST.get('clientplafon', 0)
-    if Client.objects.filter(Q(name=name) | Q(code=code)).exists():
+    isfarah=target=='f'
+    if Client.objects.filter(Q(name=name) | Q(code=code), clientfarah=isfarah).exists():
+        print('>>> client exists', Client.objects.filter(Q(name=name) | Q(code=code), clientfarah=isfarah))
         return JsonResponse({
             'success':False,
             'error':'Code ou Nom exist deja'
@@ -1414,6 +1416,7 @@ def addclient(request):
             'success':True
         })
     except Exception as e:
+        print('>>', e)
         return JsonResponse({
             'success':False,
             'error':e
@@ -1649,18 +1652,19 @@ def getclientprice(request):
     remise=0
 
     # try:
-    if mode=='bl':
-        producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
-        clientprice=producthistory.last()
-        if clientprice:
-            price=clientprice.price
-            remise=clientprice.remise
-    else:
-        producthistory=Outfacture.objects.filter(client_id=clientid, product_id=pdctid)
-        clientprice=producthistory.last()
-        if clientprice:
-            price=clientprice.price
-            remise=clientprice.remise
+    producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
+    print('producthistory', producthistory)
+    clientprice=producthistory.last()
+    if clientprice:
+        price=clientprice.price
+        remise=clientprice.remise
+    # if mode=='bl':
+    # else:
+    #     producthistory=Outfacture.objects.filter(client_id=clientid, product_id=pdctid)
+    #     clientprice=producthistory.last()
+    #     if clientprice:
+    #         price=clientprice.price
+    #         remise=clientprice.remise
 
 
     return JsonResponse({
@@ -2176,9 +2180,11 @@ def degenerer(request):
     })
 
 def modifierlivraison(request, id):
+    target=request.GET.get('target')
     livraison=Bonlivraison.objects.get(pk=id)
     items=Livraisonitem.objects.filter(bon=livraison, isfacture=False)
     ctx={
+        'target':target,
         'title':'Modifier '+livraison.bon_no,
         'livraison':livraison,
         'items':items,
@@ -2228,6 +2234,7 @@ def updatebonlivraison(request):
     livraison=Bonlivraison.objects.get(pk=id)
     client=Client.objects.get(pk=request.POST.get('clientid'))
     totalbon=request.POST.get('totalbon')
+    target=request.POST.get('target')
     transport=request.POST.get('transport')
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
@@ -2252,16 +2259,19 @@ def updatebonlivraison(request):
     livraison.modlvrsn=transport
     livraison.client=client
     livraison.note=note
-    livraison.salseman_id=request.POST.get('repid')
+    # livraison.salseman_id=request.POST.get('repid')
     livraison.total=totalbon
     livraison.date=datebon
-    livraison.bon_no=request.POST.get('orderno')
+    # livraison.bon_no=request.POST.get('orderno')
     livraison.save()
     items=Livraisonitem.objects.filter(bon=livraison)
     # update this items
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
-        product.stocktotal=int(product.stocktotal)+int(i.qty)
+        if target=='f':
+            product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
         product.save()
         i.delete()
 
@@ -2279,8 +2289,10 @@ def updatebonlivraison(request):
 
         qty=int(i['qty'])
         product=Produit.objects.get(pk=i['productid'])
-        product.stocktotal=int(product.stocktotal)-qty
-
+        if target=='f':
+            product.stocktotalfarah=int(product.stocktotalfarah)-qty
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)-qty
         product.save()
 
         # create new livraison items
@@ -2293,7 +2305,9 @@ def updatebonlivraison(request):
             qty=qty,
             price=i['price'],
             total=i['total'],
-            date=datebon
+            date=datebon,
+            isfarah=target=='f',
+            client=client
         )
 
     return JsonResponse({
@@ -2420,8 +2434,13 @@ def listavances(request):
 
 def addavanceclient(request):
     clientid=request.GET.get('clientid')
+    client=Client.objects.get(pk=clientid)
+    
     target=request.GET.get('target')
     mantant=json.loads(request.GET.get('mantant'))
+    client.soldtotal-=sum(mantant)
+    client.soldbl-=sum(mantant)
+    client.save()
     bank=json.loads(request.GET.get('bank'))
     mode=json.loads(request.GET.get('mode'))
     npiece=json.loads(request.GET.get('npiece'))
@@ -2448,8 +2467,11 @@ def addavanceclient(request):
     
 def addavancesupplier(request):
     supplierid=request.GET.get('supplierid')
+    supplier=Supplier.objects.get(pk=supplierid)
     target=request.GET.get('target')
     mantant=json.loads(request.GET.get('mantant'))
+    supplier.rest-=sum(mantant)
+    supplier.save()
     bank=json.loads(request.GET.get('bank'))
     mode=json.loads(request.GET.get('mode'))
     npiece=json.loads(request.GET.get('npiece'))
@@ -3133,8 +3155,8 @@ def addavoirclient(request):
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
         client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
         client.save()
-        if len(mantant)>0:
-            totalamount=sum([i for i in mantant if i is not None])
+        totalamount=sum([i for i in mantant if i is not None])
+        if totalamount>0:
             print('totalamount', totalamount)
             if float(totalamount)==float(totalbon):
                 avoir.ispaid=True
@@ -3363,6 +3385,7 @@ def relevclient(request):
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate])
+    avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate])
     reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
     bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
@@ -3374,6 +3397,7 @@ def relevclient(request):
     releve = chain(*[
     ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
+    ((avance, 'avanceclient') for avance in avances),
     ((reglementbl, 'PaymentClientbl') for reglementbl in reglementsbl),
     ])
 

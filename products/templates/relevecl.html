@@ -81,6 +81,8 @@
 
                         {% elif v.1 == 'Avoirclient' %}
                         Avoir {{v.0.no}}<br>
+                        {% elif v.1 == 'avanceclient' %}
+                        AVANCECL{{v.0.id}}<br>
                         {% endif %}
                         {% endfor %}
                     </td>
@@ -99,6 +101,10 @@
                         <br>
 
                         {% elif v.1 == 'Avoirclient' %}
+                        <span class="debitsoldbl">
+                        </span>
+                        <br>
+                        {% elif v.1 == 'avanceclient' %}
                         <span class="debitsoldbl">
                         </span>
                         <br>
@@ -121,6 +127,11 @@
                         {% elif v.1 == 'Avoirclient' %}
                         <span class="creditsoldbl">
                             {{v.0.total|floatformat:2|intspace}}
+                        </span>
+                        <br>
+                        {% elif v.1 == 'avanceclient' %}
+                        <span class="creditsoldbl">
+                            {{v.0.amount|floatformat:2|intspace}}
                         </span>
                         <br>
                         {% endif %}

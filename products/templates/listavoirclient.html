@@ -43,7 +43,6 @@
           <td style="width: 5%;">Region</td>
           <td style="width: 5%;">Ville</td>
           {% if facturesection %}<td style="width: 5%;">Solde</td>{% endif %}
-          <td style="width: 5%;">Repr</td>
           <td style="width: 5%;">status</td>
           <td style="width: 5%;">Note</td>
         </tr>
@@ -58,7 +57,6 @@
             <td>{{ order.total}}</td>
             <td>{{ order.client.region }}</td>
             <td>{{ order.client.city }}</td>
-            <td>{{ order.representant }}</td>
             <td>
               {% if order.ispaid %}
               <div  style="text-align: center; background: lightgreen;">
@@ -75,20 +73,7 @@
           </tr>
         {% endfor %}
       </tbody>
-      <thead style="background: white; position: sticky; bottom: 0; z-index: 99;">
-        <tr>
-          <td style="width: 8%;"></td>
-          <td style="width: 8%;"></td>
-          <td style="width: 12%;"></td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%; background: yellowgreen;" class="totalbons">{{total|floatformat:2}}</td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%;"></td>
-        </tr>
-      </thead>
+      
       <!-- <tfoot>
         <tr>
           <td>N° bon</td>
