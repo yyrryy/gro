@@ -213,7 +213,7 @@
         }
         products.push(product)
     })
-    var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printbarcode?products='+JSON.stringify(products), '', 'width=900,height=900');
+    var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printbarcode?target={{target}}&products='+JSON.stringify(products), '', 'width=900,height=900');
 
     myWindow.focus();
 

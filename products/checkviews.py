@@ -2054,7 +2054,6 @@ def printbarcode(request):
             buffer.close()
         barcodes.append(thisbarcodes)
         # if achat means the request is coming from bon achat, date will be today
-    print('>> barcodes', barcodes)
     return render(request, 'barcode.html', {
         'barcodes': barcodes,
     })
