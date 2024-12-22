@@ -99,6 +99,7 @@
                 background: #00800024;">Valider</button>
               </div>
               <input hidden readonly type="text" name="addname" class="form-control">
+              {% include 'accordionqtyprice.html' %}
             </div>
 
 
@@ -222,6 +223,18 @@
   </div>
 
   <script>
+    function getqtyprice(){
+      console.log('getqtyprice')
+      $.get('/products/getqtyprice',
+      {
+        'target':'{{target}}',
+        'id':$('.resultsholderbonlivraison').val()
+      },
+      function(data){
+        console.log(data)
+        $('.producthistory').html(data)
+      })
+    }
     $(function(){
 
       $('.clientselectbl').select2({
@@ -523,7 +536,7 @@
 
           var $container = $(
 
-            `<div class="d-flex"><strong >${repo.text} ${repo.image}</strong> <img src="${repo.image}"></div>`
+            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
             );
 
 
@@ -579,7 +592,7 @@
 
           var $container = $(
 
-            `<div class="d-flex"><strong >${repo.text}</strong> <img src="${repo.image}" style="width: 20%;"></div>`
+            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
             );
 
 
@@ -727,6 +740,15 @@
           let addremise=$(this).parent().parent().find('input[name="addremise"]')
           let addqty=$(this).parent().parent().find('input[name="addqty"]')
           console.log('qty of change',addqty)
+          $.get('/products/getqtyprice',
+            {
+              'target':'{{target}}',
+              'id':id
+            },
+            function(data){
+              console.log(data)
+              $('.producthistory').html(data)
+            })
           $(this).parent().parent().find('.addstock').text(stock)
           $(this).parent().parent().find('.addstockfacture').text(stockfacture)
           addqty.val('')

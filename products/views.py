@@ -3,6 +3,7 @@ from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysuppl
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
+import qrcode
 # import Count
 from django.contrib.auth.models import User
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
@@ -604,7 +605,15 @@ def cacelcommand(request):
 
 def recevoir(request):
     target=request.GET.get('target')
-    return render(request, 'recevoir.html', {'title':"Bon d'achat", 'suppliers':Supplier.objects.all(), 'today':timezone.now().date(), "target":target})
+    isfarah=target=='f'
+    lastid=Itemsbysupplier.objects.last()
+    if lastid:
+        lastid=lastid.id
+    else:
+        lastid=1
+    bonno=f'BA{timezone.now().strftime("%y")}{lastid}'
+    print('>>>>>>', bonno)
+    return render(request, 'recevoir.html', {'title':"Bon d'achat", 'suppliers':Supplier.objects.all(), 'today':timezone.now().date(), "target":target, 'bonno':bonno})
 
 def bonlivraison(request):
     # get the last order_no
@@ -743,7 +752,7 @@ def addsupply(request):
                 actualtotal=float(product.frbuyprice)*float(product.stocktotalfarah)
                 totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
-                product.coutmoyen=pondire
+                product.frcoutmoyen=pondire
                 product.save()
             product.frremise1=remise1
             product.frremise2=remise2
@@ -753,6 +762,8 @@ def addsupply(request):
             product.frnetbuyprice=netprice
             print('>> addin qty')
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+            product.frsellprice=buyprice
+            product.frremisesell=remise1
             if isfacture:
                 product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
         else:
@@ -770,51 +781,39 @@ def addsupply(request):
             product.buyprice=buyprice
             product.netbuyprice=netprice
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+            product.sellprice=buyprice
+            product.remisesell=remise1
+        
             if isfacture:
                 product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
         # recodrd remise 1, 2, 3, 4
-
+        product.save()
         #product.isnew=True
         print('creating', product.ref)
+        st=Stockin.objects.create(
+            date=datebon,
+            product=product,
+            quantity=i['qty'],
+            price=i['price'],
+            ref=i['ref'],
+            name=i['name'],
+            remise1=remise1,
+            remise2=remise2,
+            remise3=remise3,
+            remise4=remise4,
+            # remise=remise,
+            qtyofprice=i['qty'],
+            total=i['total'],
+            supplier_id=supplierid,
+            isfacture=isfacture,
+            isfarah=target=='f',
+            isorgh=target=='o'
+        )
         if isfacture:
-            Outfactureachat.objects.create(
-                facture=facture,
-                price=i['price'],
-                ref=i['ref'],
-                name=i['name'],
-                remise1=remise1,
-                remise2=remise2,
-                remise3=remise3,
-                remise4=remise4,
-                # remise=remise,
-                qty=i['qty'],
-                total=i['total'],
-                supplier_id=supplierid,
-                
-            )
+            st.facture=facture
         else:
-            Stockin.objects.create(
-                date=datebon,
-                product=product,
-                quantity=i['qty'],
-                price=i['price'],
-                ref=i['ref'],
-                name=i['name'],
-                remise1=remise1,
-                remise2=remise2,
-                remise3=remise3,
-                remise4=remise4,
-                # remise=remise,
-                qtyofprice=i['qty'],
-                total=i['total'],
-                supplier_id=supplierid,
-                
-                nbon=bon,
-                isfacture=isfacture,
-                isfarah=target=='f',
-                isorgh=target=='o'
-            )
-        
+            st.nbon=bon
+        st.save()
     # # update cout moyen, it will be calculated by deviding total prices by total qty
 
         # totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
@@ -1362,9 +1361,9 @@ def addclient(request):
     clientrc=request.POST.get('clientrc')
     modereglement=request.POST.get('modereglement')
     note=request.POST.get('note')
-    clientsold=request.POST.get('clientsold')
+    clientsold=request.POST.get('clientsold') or 0
     region=request.POST.get('clientregion').lower().strip()
-    plafon=request.POST.get('clientplafon', 0)
+    plafon=request.POST.get('clientplafon') or 0
     isfarah=target=='f'
     if Client.objects.filter(Q(name=name) | Q(code=code), clientfarah=isfarah).exists():
         print('>>> client exists', Client.objects.filter(Q(name=name) | Q(code=code), clientfarah=isfarah))
@@ -1936,7 +1935,7 @@ def activerproduct(request):
         'categories':Category.objects.all(),
         'marques':Mark.objects.all(),
         'suppliers':Supplier.objects.all(),
-        'entries':Stockin.objects.filter(product=product),
+        'entries':Stockin.objects.filter(product=product, qtyofprice__gt=0),
         'sorties':Orderitem.objects.filter(product=product),
     }
     # req.get('http://serverip/products/activerproduct', {
@@ -1966,6 +1965,56 @@ def desactiverproduct(request):
     # })
     return JsonResponse({
         'html':render(request, 'viewoneproduct.html', ctx).content.decode('utf-8')
+    })
+
+
+def generate_qrcode(request):
+    id=request.GET.get('id')
+    target=request.GET.get('target')
+    product=Produit.objects.get(pk=id)
+    qr_text = (
+        123
+    )
+
+    # Generate the QR Code
+    qr = qrcode.QRCode(
+        version=1,  # Controls the size of the QR code
+        error_correction=qrcode.constants.ERROR_CORRECT_H,  # High error correction
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_text)
+    qr.make(fit=True)
+
+    # Save QR Code to a BytesIO buffer
+    buffer = BytesIO()
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(buffer, format="PNG")
+
+    # Convert image to Base64
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+
+    # Determine date
+    lastachat = StockIn.objects.filter(product=product).last()
+    if achat:
+        date = datetime.today().strftime('%m%y')
+    else:
+        date = lastachat.reciept.date.strftime('%m%y') if lastachat and lastachat.reciept else '-'
+
+    # Dynamic text for display
+    text = (
+        f"{product.category.name.upper()} {product.ref.split()[0].upper()} "
+        f"{product.mark.name.upper()} {price}/{date} {product.car}"
+    )
+
+    # Render the template with the QR code and additional data
+    return render(request, 'products/barcode.html', {
+        'barcodes': qr_code_base64,
+        'text': text,
+        'product': product,
+        'date': date,
+        'price': price,
     })
 
 def generatefacture(request, id):
@@ -4297,7 +4346,7 @@ def searchproductforbonachat(request):
     results=[]
     for i in products:
         results.append({
-            'id':f"{i.ref}§{i.name}§{i.frbuyprice if target=='f' else i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{i.qtyjeu}",
+            'id':f"{i.ref}§{i.name}§{i.frbuyprice if target=='f' else i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.frsellprice if target=='f' else i.sellprice}§{i.frremisesell if target=='f' else i.remisesell}§{i.prixnet}§{i.representprice}§{i.qtyjeu}",
             'text':f'{i.ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah if target=='f' else i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah if target=='f' else i.stocktotalorgh,
@@ -4332,7 +4381,7 @@ def searchproduct(request):
     results=[]
     for i in products:
         results.append({
-            'id':f"{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}",
+            'id':f"{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.frsellprice if target=='f' else i.sellprice}§{i.frremisesell if target=='f' else i.remisesell}§{i.prixnet}§{i.representprice}",
             'text':f'{i.ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah if target=='f' else i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah if target=='f' else i.stocktotalorgh,
@@ -10064,3 +10113,9 @@ def grouper(request):
     return JsonResponse({
     'success':True
     })
+def getqtyprice(request):
+    target=request.GET.get('target')
+    id=request.GET.get('id')
+    isfarah=target=='f'
+    histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0).order_by('id')
+    return render(request, 'qtyprice.html', {'history':histyory})

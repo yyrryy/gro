@@ -1,0 +1,28 @@
+
+{% load global_tags %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+            <th>Remise</th>
+            <th>Remise2</th>
+            <th>Remise3</th>
+            <th>Remise4</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in history %}
+        <tr>
+            <td>{{ i.date|date:'d/m/Y' }}</td>
+            <td>{{ i.qtyofprice }}</td>
+            <td>{{ i.price }}</td>
+            <td>{{ i.remise1 }}</td>
+            <td>{{ i.remise2 }}</td>
+            <td>{{ i.remise3 }}</td>
+            <td>{{ i.remise4 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

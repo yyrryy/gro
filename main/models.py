@@ -77,11 +77,14 @@ class Produit(models.Model):
     frremise3= models.FloatField(default=None, null=True, blank=True)
     frremise4= models.FloatField(default=None, null=True, blank=True)
     frnetbuyprice= models.FloatField(default=None, null=True, blank=True)
-    supplier=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='supplier')
-    sellprice=models.FloatField(default=None, null=True, blank=True)
     sellpricebrut=models.FloatField(default=None, null=True, blank=True)
+    supplier=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='supplier')
     coutmoyen=models.FloatField(default=None, null=True, blank=True)
-    remise=models.IntegerField(default=35, null=True, blank=True)
+    frcoutmoyen=models.FloatField(default=None, null=True, blank=True)
+    sellprice=models.FloatField(default=None, null=True, blank=True)
+    remisesell=models.IntegerField(default=35, null=True, blank=True)
+    frsellprice=models.FloatField(default=None, null=True, blank=True)
+    frremisesell=models.IntegerField(default=35, null=True, blank=True)
     stockinitial=models.IntegerField(default=0, null=True, blank=True)
     #checkprice= models.FloatField(default=None, null=True, blank=True)
     prixnet=models.FloatField(default=None, null=True, blank=True)
@@ -257,7 +260,8 @@ class Stockin(models.Model):
     nbon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
     isavoir=models.BooleanField(default=False)
     avoir=models.ForeignKey('Avoirclient', on_delete=models.CASCADE, default=None, null=True, blank=True)
-    
+    facture=models.ForeignKey('Factureachat', on_delete=models.CASCADE, default=None, null=True, blank=True)
+   
     def __str__(self) -> str:
         return f'{self.nbon} - {self.product}'
 

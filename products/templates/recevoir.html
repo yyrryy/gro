@@ -16,7 +16,7 @@
             {% endfor %}
           </select>
 
-          <input name="nbonachat" class="form-control mt-2 nbonachat" style="width:100%;" placeholder="N° Bon">
+          <input name="nbonachat" class="form-control mt-2 nbonachat" style="width:100%;" placeholder="N° Bon" value="{{bonno}}">
           <small class="mt-5">Date de Reception</small>
           <input type="date" name="datebonachat" class="form-control datebonachat" placeholder="Date de Bon" value="{{today|date:'Y-m-d'}}">
           <small class="mt-5">Date Facture</small>
@@ -94,7 +94,7 @@
                     </div>
                 </div> -->
             </div>
-
+            <button onclick="printbarcode()">Borcode</button>
           <table class="table table-bordered" style="font-size: 12px;">
             <thead style="background: rgb(254, 196, 144);">
                 <tr class="p-0">
@@ -182,6 +182,28 @@
 </div>
 
 <script>
+  function printbarcode(){
+    products=[]
+    let product = {
+        'qty': qty,
+        'name': name,
+        'ref': ref,
+        'price': price,
+        'remise1': remise1,
+        'remise2': remise2,
+        'remise3': remise3,
+        'remise4': remise4,
+        'productid': productid,
+        'total': total,
+        'devise':devise
+      }
+    products.push(product)
+    $.get('/products/printbarcode', {
+      'products': JSON.stringify(products),
+    }, function(data){
+      console.log(data)
+    })
+  }
   function addrowbonachatjeu(event){
     let target=$(event.target)
     parentdiv=target.parent().parent().parent().parent().parent()

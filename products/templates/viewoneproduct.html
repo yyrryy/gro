@@ -90,7 +90,11 @@
                                     Cout Moyen
                                 </td>
                                 <td>
+                                    {% if target == "f" %}
+                                    {{product.frcoutmoyen|floatformat:2}}
+                                    {% else %}
                                     {{product.coutmoyen|floatformat:2}}
+                                    {% endif %}
                                 </td>
                             </tr>
                             <tr>
@@ -98,28 +102,63 @@
                                     Prix Achat
                                 </td>
                                 <td>
+                                    {% if target == "f" %}
+                                    {{product.frbuyprice|floatformat:2}}
+                                    {% else %}
                                     {{product.buyprice|floatformat:2}}
+                                    {% endif %}
+                                    
                                 </td>
                             </tr>
                             <tr>
                                 <td>Remise 1</td>
-                                <td>{{product.remise1}}</td>
+                                <td>
+                                    {% if target == "f" %}
+                                    {{product.frremise1}}
+                                    {% else %}
+                                    {{product.remise1}}
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <td>Remise 2</td>
-                                <td>{{product.remise2}}</td>
+                                <td>
+                                    {% if target == "f" %}
+                                    {{product.frremise2}}
+                                    {% else %}
+                                    {{product.remise2}}
+                                    {% endif %}
+                                </td>
                             </tr><tr>
                                 <td>Remise 3</td>
-                                <td>{{product.remise3}}</td>
+                                <td>
+                                    {% if target == "f" %}
+                                    {{product.frremise3}}
+                                    {% else %}
+                                    {{product.remise3}}
+                                    {% endif %}
+                                </td>
                             </tr><tr>
                                 <td>Remise 4</td>
-                                <td>{{product.remise4}}</td>
+                                <td>
+                                    {% if target == "f" %}
+                                    {{product.frremise4}}
+                                    {% else %}
+                                    {{product.remise4}}
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <td>Prix achat net</td>
-                                <td>{{product.netbuyprice}}</td>
+                                <td>
+                                    {% if target == "f" %}
+                                    {{product.frnetbuyprice|floatformat:2}}
+                                    {% else %}
+                                    {{product.netbuyprice|floatformat:2}}
+                                    {% endif %}
+                                </td>
                             </tr>
-                            <tr>
+                            <!-- <tr>
 
                                 <td>
                                     Prix Vente net
@@ -127,7 +166,7 @@
                                 <td>
                                     {{product.prixnet|floatformat:2}}
                                 </td>
-                            </tr>
+                            </tr> -->
                             <tr>
                                 {% if target == "f" %}
                                 <td>
@@ -545,17 +584,16 @@
                           </tr>
                           {% for entry in product.stockin_set.all %}
                           {% endfor %}
+                          <!-- 
+                            {% if not entry.isinventaire %} onclick="ajaxpage('bonachat{{entry.nbon.id}}', 'Bon achat {{entry.nbon.nbon}}', '/products/bonachatdetails/{{entry.nbon.id}}')" {%endif%}
+                          -->
                             {% for entry in entries %}
-                            <tr {% if not entry.isinventaire %} onclick="ajaxpage('bonachat{{entry.nbon.id}}', 'Bon achat {{entry.nbon.nbon}}', '/products/bonachatdetails/{{entry.nbon.id}}')" {%endif%}>
+                            <tr >
                                 <td>
                                     {{entry.date|date:"d/m/Y"}}
                                 </td>
                                 <td>
-                                    {% if entry.nbon %}
-                                    {% if entry.nbon.isfacture %}FC - {% else %}BL - {% endif %}{{entry.nbon.nbon}}
-                                    {% else %}
-                                    Inventaire
-                                    {% endif %}
+                                    {% if entry.isfacture %}FC - {{entry.facture.facture_no}}{% else %}BL - {{entry.nbon.nbon}}{% endif %}
                                 </td>
                                 <td>
                                     {{entry.supplier.name}}
