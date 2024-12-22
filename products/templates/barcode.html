@@ -45,11 +45,11 @@
         {% for barcode in barcodes %}
 
             {% for i in  barcode%}
-                <div class="label">
+                <div class="label" style="display: flex;flex-direction: column;">
                     <div>Réf: {{i.0}}</div>
-                    <div>{{i.1}}</div>
-                    <div>{{i.2}}</div>
-                    <img class="barcode-img" src="data:image/png;base64,{{i.3}}" alt="Barcode" style="margin-top: -9px;">
+                    <div style="height: 5.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
+                    <div style="font-size: 10px;">{{i.2|floatformat:-2}}</div>
+                    <img class="barcode-img" src="data:image/png;base64,{{i.3}}" alt="Barcode" style="margin-top: auto;">
                     <!-- <div style="font-size: 12px; padding-left: 17px; margin-top: -5px;">{{text}}</div> -->
                     <!-- <div style="font-size: 12px;">{{text}}</div> -->
                 </div>

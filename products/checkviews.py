@@ -2034,6 +2034,7 @@ def printbarcode(request):
         price=i['price']
         net=int(price)-(int(price)*int(remise1)/100)
         price=round(net*2, 2)
+        price=str(price).replace('.', '')
         qty=i['qty']
         print(ref)
         # # List to hold the barcodes in base64 format
