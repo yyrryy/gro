@@ -16,10 +16,9 @@
         /* Define label size based on your thermal printer */
         .label {
              /* 20% for 5 items per row with gap */
-            min-width: 38mm; /* Adjust to match your label size */
+            min-width: 36mm; /* Adjust to match your label size */
             height: 21.2mm; /* Adjust to match your label size */
-            overflow: hidden;
-            display: flex;
+            
             /* display: flex;
             flex-direction: column;
             align-items: center; */
@@ -31,7 +30,6 @@
         .barcode-img {
             width: 100%;
             height: auto;
-            margin-top: 2px;
         }
 
         /* Hide everything except the barcodes when printing */
@@ -44,11 +42,15 @@
     <div class="print-area" style="padding: 10mm;flex-wrap: wrap;">
         <!-- Example: Loop over barcode images -->
         {% for barcode in barcodes %}
+
             {% for i in  barcode%}
-                <div class="label" style="border:1px solid;">
-                    <img class="barcode-img" src="data:image/png;base64,{{ i }}" alt="Barcode" style="margin-top: -9px;">
+                <div class="label">
+                    <div>Réf: {{i.0}}</div>
+                    <div>{{i.1}}</div>
+                    <div>{{i.2}}</div>
+                    <img class="barcode-img" src="data:image/png;base64,{{i.3}}" alt="Barcode" style="margin-top: -9px;">
                     <!-- <div style="font-size: 12px; padding-left: 17px; margin-top: -5px;">{{text}}</div> -->
-                    <div style="font-size: 12px;">{{text}}</div>
+                    <!-- <div style="font-size: 12px;">{{text}}</div> -->
                 </div>
             {% endfor %}
         {% endfor %}

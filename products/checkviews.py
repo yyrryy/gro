@@ -2029,6 +2029,11 @@ def printbarcode(request):
             ref='fr-'+i['ref']
         else:
             ref=i['ref']
+        name=i['name']
+        remise1=0 if i['remise1']=='' else int(i['remise1'])
+        price=i['price']
+        net=int(price)-(int(price)*int(remise1)/100)
+        price=round(net*2, 2)
         qty=i['qty']
         print(ref)
         # # List to hold the barcodes in base64 format
@@ -2051,7 +2056,7 @@ def printbarcode(request):
 
             # Convert the image to base64 and append it to the list
             barcode_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            thisbarcodes.append(barcode_base64)
+            thisbarcodes.append([ref.replace('fr-', ''), name, price, barcode_base64])
             buffer.close()
         barcodes.append(thisbarcodes)
         # if achat means the request is coming from bon achat, date will be today
