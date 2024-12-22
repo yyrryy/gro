@@ -9,10 +9,14 @@
             margin: 0;
             padding: 0;
         }
-        
+        .print-area {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        }
         /* Define label size based on your thermal printer */
         .label {
-            width: 38mm; /* Adjust to match your label size */
+             /* 20% for 5 items per row with gap */
+            min-width: 38mm; /* Adjust to match your label size */
             height: 21.2mm; /* Adjust to match your label size */
             overflow: hidden;
             display: flex;
@@ -37,7 +41,7 @@
 </head>
 <body>
 
-    <div class="print-area" style="display: flex; padding: 10mm;">
+    <div class="print-area" style="padding: 10mm;flex-wrap: wrap;">
         <!-- Example: Loop over barcode images -->
         {% for barcode in barcodes %}
             {% for i in  barcode%}
