@@ -303,8 +303,8 @@ def updatesupplier(request):
 
 def addoneproduct(request):
     target=request.POST.get('target')
+    isfarah=target=='f'
     try:
-
         ref=request.POST.get('refinadd').lower().strip()
         name=request.POST.get('nameinadd').strip()
         category=request.POST.get('categoryinadd')
@@ -332,8 +332,10 @@ def addoneproduct(request):
             qtyjeu=qtyjeu,
             buyprice=buyprice,
             diametre=diametre,
-            sellprice=sellprice,
-            remise=remise,
+            stocktotalfarah=0,
+            stocktotalorgh=0,
+            stockfacturefarah=0,
+            stockfactureorgh=0,
             prixnet=netprice,
             representprice=representprice,
             minstock=minstock,
@@ -350,7 +352,13 @@ def addoneproduct(request):
             isactive=False,
             farahref='fr-'+ref
         )
-
+        if isfarah:
+            product.frsellprice=sellprice
+            product.frremisesell=remise
+        else:
+            product.sellprice=sellprice
+            product.remisesell=remise
+        product.save()
         # req.get('http://serverip/products/addoneproduct', {
         #     'ref':ref,
         #     'name':name,
