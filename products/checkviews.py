@@ -2030,6 +2030,7 @@ def printbarcode(request):
         else:
             ref=i['ref']
         qty=i['qty']
+        print(ref)
         # # List to hold the barcodes in base64 format
         target_width_mm = 25
         mm_to_inches = 25.4

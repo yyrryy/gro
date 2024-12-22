@@ -223,6 +223,53 @@
   </div>
 
   <script>
+    const charToNumberMap = {
+            '&': '1',
+            'é': '2',
+            '"': '3',
+            "'": '4',
+            '(': '5',
+            '-': '6',
+            'è': '7',
+            '_': '8',
+            'ç': '9',
+            'à': '0',
+            'a': 'q',
+            'z': 'w',
+            'w': 'z',
+            'q': 'a',
+            'm': ',',
+
+        };
+
+        let barcode = '';
+        let typingTimer;
+
+        // Convert character to corresponding number if mapped
+        function convertCharToNumber(char) {
+            return charToNumberMap[char] || char;
+        }
+
+        // Listen for keydown events on the document level
+        $(document).on('keydown', function(event) {
+            if (typingTimer) clearTimeout(typingTimer);
+
+            if (event.which === 13) {  // Enter key detected
+                if (barcode) {
+                    console.log('Barcode:', barcode);
+                    barcode = ''; // Reset the barcode after processing
+                }
+            } else {
+                // Accumulate characters, converting to numbers if mapped
+                const key = event.key.toLowerCase();
+                barcode += convertCharToNumber(key);
+
+                // Reset barcode if no keys are pressed within a certain time
+                typingTimer = setTimeout(() => {
+                    barcode = '';
+                }, 100);  // Adjust timeout as needed to filter unintended keystrokes
+            }
+        });
     function getqtyprice(){
       console.log('getqtyprice')
       $.get('/products/getqtyprice',
