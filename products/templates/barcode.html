@@ -15,6 +15,7 @@
         }
         /* Define label size based on your thermal printer */
         .label {
+            text-align: center;
              /* 20% for 5 items per row with gap */
             min-width: 36mm; /* Adjust to match your label size */
             height: 21.2mm; /* Adjust to match your label size */
@@ -39,7 +40,7 @@
 </head>
 <body>
 
-    <div class="print-area" style="padding: 10mm;flex-wrap: wrap;">
+    <div class="print-area" style="padding: 10mm;">
         <!-- Example: Loop over barcode images -->
         {% for barcode in barcodes %}
 
