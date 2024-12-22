@@ -183,26 +183,60 @@
 
 <script>
   function printbarcode(){
-    products=[]
-    let product = {
-        'qty': qty,
-        'name': name,
-        'ref': ref,
-        'price': price,
-        'remise1': remise1,
-        'remise2': remise2,
-        'remise3': remise3,
-        'remise4': remise4,
-        'productid': productid,
-        'total': total,
-        'devise':devise
-      }
-    products.push(product)
-    $.get('/products/printbarcode', {
-      'products': JSON.stringify(products),
-    }, function(data){
-      console.log(data)
+    trs=parentdiv.find('.bonachatbody tr')
+    let products = []
+    trs.each(function(){
+        let tr = $(this)
+        let qty = tr.find('.qty').val()
+        let name = tr.find('.name').text()
+        let total = tr.find('.total').text()
+        let ref = tr.find('.ref').text()
+        let devise = tr.find('.devise').val()
+        let price = tr.find('.price').val()
+        let remise1 = tr.find('.remise1').val()
+        let remise2 = tr.find('.remise2').val()
+        let remise3 = tr.find('.remise3').val()
+        let remise4 = tr.find('.remise4').val()
+        let productid = tr.find('input[name="productid"]').val()
+        let product = {
+            'qty': qty,
+            'name': name,
+            'ref': ref,
+            'price': price,
+            'remise1': remise1,
+            'remise2': remise2,
+            'remise3': remise3,
+            'remise4': remise4,
+            'productid': productid,
+            'total': total,
+            'devise':devise
+        }
+        products.push(product)
     })
+    var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printbarcode?products='+JSON.stringify(products), '', 'width=900,height=900');
+
+    myWindow.focus();
+
+    myWindow.addEventListener('load', function() {
+    console.log('New window loaded.');
+
+    // Wait for 5 seconds before printing
+    setTimeout(function() {
+    try {
+      myWindow.print();
+      console.log('Print command issued.');
+      myWindow.close();
+      console.log('New window closed.');
+    } catch (e) {
+      console.error('Failed to print and close the window:', e);
+    }
+    }, 300);
+  }, false);
+    // $.get('/products/printbarcode', {
+    //   'products': JSON.stringify(products),
+    // }, function(data){
+    //   console.log(data)
+    // })
   }
   function addrowbonachatjeu(event){
     let target=$(event.target)

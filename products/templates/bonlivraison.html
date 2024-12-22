@@ -231,7 +231,6 @@
         'id':$('.resultsholderbonlivraison').val()
       },
       function(data){
-        console.log(data)
         $('.producthistory').html(data)
       })
     }
@@ -316,7 +315,6 @@
   function addrowbonlivraison(event){
         let target=$(event.target)
         parentdiv=target.parent().parent().parent().parent()
-        console.log(parentdiv)
         // this reset the select2 value
         // $('.resultsholderbonlivraison').val('').trigger('change')
         // ids of products in bon stored in localstorage
@@ -331,9 +329,7 @@
           return
         }
         var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
-        console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
         pdcts=JSON.parse(localStorage.getItem('pdctsinbonlivraison{{target}}')) || []
-        console.log(id, pdcts, pdcts.includes(id))
         if (pdcts.includes(id)){
           parentdiv.find('.addstock').val('')
           parentdiv.find('.addstockfacture').val('')
@@ -348,7 +344,6 @@
         }
 
         // here is the case if qty is greater than stock
-        console.log(addqty.val(), stock)
         
         if (parseInt(addqty.val())>parseInt(stock)){
           console.log('qty', addqty.val(), 'stock', stock, 'qty > stock', addqty>stock)
@@ -436,9 +431,7 @@
         pdcts.push(id)
         localStorage.setItem('pdctsinbonlivraison{{target}}', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
-        console.log(afterremise)
         let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
-        console.log(net)
         let addtotal=(parseFloat(addqty.val())*parseFloat(net)).toFixed(2)
         let tr = `
         <tr class="itemrow ${stock<=0? "text-danger":"" }">: 2
@@ -746,7 +739,6 @@
               'id':id
             },
             function(data){
-              console.log(data)
               $('.producthistory').html(data)
             })
           $(this).parent().parent().find('.addstock').text(stock)
@@ -788,7 +780,8 @@
                 }
               }
             })
-
+            console.log('>>> addprice', addprice, 'sellprice', sellprice)
+            addprice.val(sellprice)
           console.log('getting client price')
           $.ajax({
               url: "{% url 'products:getclientprice' %}",
@@ -800,7 +793,7 @@
                   'csrfmiddlewaretoken': '{{csrf_token}}'
               },
               success: function(data){
-                console.log(data.price)
+                
                 parentdiv.find('.addclientprice').text((data.price).toFixed(2))
               }
             })
@@ -872,8 +865,7 @@
           let transport = parentdiv.find('.transport').val()
           let note = parentdiv.find('.note').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
-          console.log(products)
-          console.log(totalbon)
+          
           console.log('sending')
           //localStorage.setItem('pdctsinbonlivraison{{target}}', '[]')
           data={
@@ -886,8 +878,7 @@
               'products': JSON.stringify(products),
               'csrfmiddlewaretoken': '{{csrf_token}}'
           },
-          console.log(data)
-          console.log(products)
+          
           $.ajax({
               url: "{% url 'products:addbonlivraison' %}",
               type: 'POST',

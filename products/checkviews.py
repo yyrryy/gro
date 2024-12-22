@@ -6,7 +6,10 @@ from datetime import datetime, date, timedelta
 from django.utils import timezone
 import json
 from django.db import transaction
-
+import barcode
+from barcode.writer import ImageWriter
+from io import BytesIO
+import base64
 today = timezone.now().date()
 thisyear=timezone.now().year
 
@@ -2015,3 +2018,43 @@ def validation(request):
         'target':target
     }
     return render(request, 'validation.html', ctx)
+
+def printbarcode(request):
+    products=json.loads(request.GET.get('products'))
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    barcodes = []
+    for i in products:
+        if isfarah:
+            ref='fr-'+i['ref']
+        else:
+            ref=i['ref']
+        qty=i['qty']
+        # # List to hold the barcodes in base64 format
+        target_width_mm = 25
+        mm_to_inches = 25.4
+        barcode_width_inches = target_width_mm / mm_to_inches
+        code_class = barcode.get_barcode_class('code128')
+        # Generate barcodes for the specified quantity
+        thisbarcodes=[]
+        for _ in range(int(qty)):
+            buffer = BytesIO()
+            barcode_instance = code_class(ref, writer=ImageWriter())
+            options = {
+                'write_text': False,
+                'dpi': 300,           # Adjust module width for precision
+                #'module_width': barcode_width_inches,
+                'module_height': 0.8,
+            }
+            barcode_instance.write(buffer, options)
+
+            # Convert the image to base64 and append it to the list
+            barcode_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            thisbarcodes.append(barcode_base64)
+            buffer.close()
+        barcodes.append(thisbarcodes)
+        # if achat means the request is coming from bon achat, date will be today
+    print('>> barcodes', barcodes)
+    return render(request, 'barcode.html', {
+        'barcodes': barcodes,
+    })
