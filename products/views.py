@@ -4671,6 +4671,7 @@ def getreglementbl(request, id):
         'bons':reglement.bons.all().order_by('date'),
         'factures':reglement.factures.all().order_by('date'),
     }
+    print('>>>', reglement)
     return JsonResponse({
         'html':render(request, 'updatereglebl.html', ctx).content.decode('utf-8')
     })

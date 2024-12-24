@@ -15,6 +15,8 @@ annulé: when facture created, create also bl
 //equivalent in add product, jeux, depo select
 //dispaly reglement supplier
 //serie reglement supplier
+display reglement >> display avance as saisie not as table
+pay avoir as and display it as minus
 if achat is facture craete facture achat
 avances client and supplier
 anuler btn avoir

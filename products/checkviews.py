@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat
 from django.http import JsonResponse, HttpResponse
+import qrcode
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
 from datetime import datetime, date, timedelta
 from django.utils import timezone
@@ -2044,22 +2045,42 @@ def printbarcode(request):
         code_class = barcode.get_barcode_class('code128')
         # Generate barcodes for the specified quantity
         thisbarcodes=[]
+        # for _ in range(int(qty)):
+        #     buffer = BytesIO()
+        #     barcode_instance = code_class(ref, writer=ImageWriter())
+        #     options = {
+        #         'write_text': False,
+        #         'dpi': 300,           # Adjust module width for precision
+        #         #'module_width': barcode_width_inches,
+        #         'module_height': 0.8,
+        #     }
+        #     barcode_instance.write(buffer, options)
+
+        #     # Convert the image to base64 and append it to the list
+        #     barcode_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        #     thisbarcodes.append([ref, name, price, barcode_base64])
+        #     buffer.close()
+        # barcodes.append(thisbarcodes)
         for _ in range(int(qty)):
             buffer = BytesIO()
-            barcode_instance = code_class(ref, writer=ImageWriter())
-            options = {
-                'write_text': False,
-                'dpi': 300,           # Adjust module width for precision
-                #'module_width': barcode_width_inches,
-                'module_height': 0.8,
-            }
-            barcode_instance.write(buffer, options)
+            qr = qrcode.QRCode(
+                version=1,  # Controls the size of the QR code
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=0,
+            )
+            qr.add_data(ref)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill='black', back_color='white')
+            img.save(buffer, format="PNG")
 
             # Convert the image to base64 and append it to the list
-            barcode_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            thisbarcodes.append([ref.replace('fr-', ''), name, price, barcode_base64])
+            qr_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            thisbarcodes.append([ref, name, price, qr_base64])
             buffer.close()
         barcodes.append(thisbarcodes)
+        
         # if achat means the request is coming from bon achat, date will be today
     return render(request, 'barcode.html', {
         'barcodes': barcodes,

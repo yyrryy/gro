@@ -70,7 +70,7 @@
 
 </div>
 <div class="mb-2 mt-2 row">
-    <div class="col-4">
+    <div class="col-6">
         <div class="d-flex justify-content-between">
             <div>Bons </div>
             <div>
@@ -132,7 +132,7 @@
             </table>
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-6">
         <div>Avoirs </div>
         <div style="max-height: 220px; overflow-y: scroll;" class="listupdatereglblholder">
             <table class="table table-bordered reglblupdate table-hover" style="font-size: 12px;">
@@ -173,47 +173,66 @@
         </div>
     </div>
     
-    <div class="col-4">
-        <div>Avances </div>
-        <div style="max-height: 220px; overflow-y: scroll;" class="listupdatereglblholder">
-            <table class="table table-bordered reglblupdate table-hover" style="font-size: 12px;">
-                <thead style="position: sticky; top: 0;" class="bg-white">
-                    <tr>
-                        <td>
-                            Date
-                        </td>
-                        <td>
-                            N°
-                        </td>
-
-                        <td>
-                            total
-                        </td>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in avances %}
-                    <tr>
-                        <td>
-                            {{i.date|date:'d/m/Y'}}
-                        </td>
-                        <td>
-                            AVANCE#{{i.id}}
-                        </td>
-                        <td>
-                            {{i.amount}}
-                        </td>
-                        
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                
-            </table>
-        </div>
-    </div>
+    
     
     <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
 
     </select> -->
+</div>
+<div class="">
+    <div>Avances </div>
+    <div style="max-height: 220px; overflow-y: scroll;" class="listupdatereglblholder">
+        <table class="table table-bordered reglblupdate table-hover" style="font-size: 12px;">
+            <thead style="position: sticky; top: 0;" class="bg-white">
+                <tr>
+                    <td>
+                        N°
+                    </td>
+                    <td>
+                        Date
+                    </td>
+
+                    <td>
+                        mantant
+                    </td>
+                    <td>
+                        N° piece
+                    </td>
+                    <td>
+                        Mode
+                    </td>
+                    <td>
+                        Echeance
+                    </td>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in avances %}
+                <tr>
+                    <td>
+                        AVANCECL#{{i.id}}
+                    </td>
+                    <td>
+                        {{i.date|date:'d/m/Y'}}
+                    </td>
+                    <td>
+                        {{i.amount}}
+                    </td>
+                    <td>
+                        {{i.npiece}}
+                    </td>
+                    <td>
+                        {{i.mode}}
+                    </td>
+                    <td>
+                        {{i.echeance}}
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+            
+        </table>
+    </div>
 </div>
