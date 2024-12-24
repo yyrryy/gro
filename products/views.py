@@ -324,7 +324,7 @@ def addoneproduct(request):
         block=request.POST.get('blockinadd') or ''
         equivalent=request.POST.get('equivinadd') or ''
         cars=request.POST.getlist('carsinadd') or ''
-        netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
+        #netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
         # create product
         product=Produit.objects.create(
             ref=ref,
@@ -473,7 +473,7 @@ def updateproduct(request):
     selected_reps = request.POST.getlist('updatereps')
     remise=request.POST.get('remise')
     sellprice=request.POST.get('sellprice')
-    netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
+    #netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
     product=Produit.objects.get(pk=productid)
     # if float(sellprice) != float(product.sellprice):
     #     print('price changed')
@@ -514,7 +514,7 @@ def updateproduct(request):
     product.sellprice=sellprice
     product.remise=remise
     product.farahref='fr-'+ref
-    product.prixnet=netprice
+    #product.prixnet=netprice
     product.name=request.POST.get('name')
     product.cars=json.dumps(request.POST.getlist('cars'))
     product.ref=ref

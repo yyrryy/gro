@@ -40,15 +40,15 @@
 </head>
 <body>
 
-    <div class="print-area" style="padding: 10mm;">
+    <div class="print-area" style="padding:10mm 10mm 10mm 11mm;">
         <!-- Example: Loop over barcode images -->
         {% for barcode in barcodes %}
 
             {% for i in  barcode%}
-                <div class="label d-flex justify-content-between align-items-center px-2">
+                <div class="label d-flex justify-content-between px-2">
                     <div>
                         <div>{{i.0}}</div>
-                        <div style="height: 5.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
+                        <div style="height: 11.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
                         <div style="font-size: 10px;">{{i.2|floatformat:-2}}</div>
                     </div>
                     <div class="col-4">
