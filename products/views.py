@@ -422,7 +422,7 @@ def viewoneproduct(request, id):
         stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
     # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
-    avoirs=Returned.objects.filter(product=product)
+    avoirs=Stockin.objects.filter(product=product)
     qtyin=stockin.aggregate(Sum('quantity'))['quantity__sum'] or 0
     qtyavoir=avoirs.aggregate(Sum('qty'))['qty__sum'] or 0
     releve = chain(*[
@@ -938,6 +938,7 @@ def addbonlivraison(request):
         bon_no=receipt_no,
         note=note,
         isfarah=isfarah,
+        isorgh=isorgh,
         user=request.user
     )
     if not comndid == "":
@@ -1601,7 +1602,7 @@ def supplierfacturedetails(request, id):
 def avoirdetails(request, id):
     target=request.GET.get('target')
     order=Avoirclient.objects.get(pk=id)
-    orderitems=Returned.objects.filter(avoir=order)
+    orderitems=Stockin.objects.filter(avoir=order)
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+36] for i in range(0, len(orderitems), 36)]
@@ -2253,7 +2254,7 @@ def modifierlivraison(request, id):
 
 def modifieravoir(request, id):
     avoir=Avoirclient.objects.get(pk=id)
-    items=Returned.objects.filter(avoir=avoir)
+    items=Stockin.objects.filter(avoir=avoir)
     ctx={
         'avoir':avoir,
         'items':items,
@@ -2459,7 +2460,7 @@ def listreglementbl(request):
         reglements=PaymentClientbl.objects.filter(client__clientsortie=True).order_by('-id')[:50]
     print('lenreg', len(reglements))
     ctx={
-        'title':'List des reglements CL BL',
+        'title':'List des reglements CL BL' +target,
         'reglements':reglements,
         'today':timezone.now().date(),
         'target':target,
@@ -2947,7 +2948,8 @@ def reglebons(request):
             mode=mod,
             npiece=np,
             isfarah=target=='f',
-            isorgh=target=='o'
+            isorgh=target=='o',
+            issortie=target=='s'
         )
         if moderegl=='bl':
             regl.bons.set(livraisons)
@@ -3199,7 +3201,7 @@ def addavoirclient(request):
             if isorgh:
                 product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
             product.save()
-            Returned.objects.create(
+            Stockin.objects.create(
                 avoir=avoir,
                 product=product,
                 qty=i['qty'],
@@ -3238,11 +3240,11 @@ def addavoirclient(request):
                     )
                     regl.avoirs.set([avoir])
     except Exception as e:
+        print('>>error av cl:', e)
         return JsonResponse({
             'success':False,
             'eorro':e
         })
-        print('>>error av cl:', e)
 
     # increment it
     return JsonResponse({
@@ -4320,7 +4322,7 @@ def searchproductbonsortie(request):
     results=[]
     for i in products:
         results.append({
-            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remise}§{i.prixnet}§{i.representprice}§{term}',
+            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}',
             'text':f'{i.ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah,
             'stockfacture':i.stockfacturefarah,
@@ -5625,11 +5627,13 @@ def etatfcclients(request):
 
 def updatebonavoir(request):
     id=request.POST.get('bonid')
+    target=request.POST.get('target')
+    isfarah=target=='f'
     avoir=Avoirclient.objects.get(pk=id)
     client=Client.objects.get(pk=request.POST.get('clientid'))
     # we need avoir n° cause delete avoir will delete id, id is used in avoir n°
     avoirno=avoir.no
-    avoiritems=Returned.objects.filter(avoir=avoir)
+    avoiritems=Stockin.objects.filter(avoir=avoir)
     totalbon=request.POST.get('totalbon')
     newmode=request.POST.get('mode')
     isfacture=True if newmode=='facture' else False
@@ -5686,12 +5690,15 @@ def updatebonavoir(request):
             client.soldbl=round(float(client.soldbl)- float(totalbon), 2)
         client.save()
         print('new', client.soldtotal)
-    items=Returned.objects.filter(avoir=avoir)
+    items=Stockin.objects.filter(avoir=avoir)
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
-        product.stocktotal=int(product.stocktotal)-int(i.qty)
-        if avoir.avoirfacture:
-            product.stockfacture=int(product.stockfacture)-int(i.qty)
+        if isfarah:
+            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+        # if avoir.avoirfacture:
+        #     product.stockfacture=int(product.stockfacture)-int(i.qty)
         product.save()
         i.delete()
     avoir.client=client
@@ -5715,17 +5722,23 @@ def updatebonavoir(request):
     with transaction.atomic():
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
-            product.stocktotal=int(product.stocktotal)+int(i['qty'])
-            if isfacture:
-                product.stockfacture=int(product.stockfacture)+int(i['qty'])
+            if isfarah:
+                product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+            else:
+                product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
+            # if isfacture:
+            #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
             product.save()
-            Returned.objects.create(
+            Stockin.objects.create(
                 avoir=avoir,
                 product=product,
                 qty=i['qty'],
                 remise=i['remise'],
                 price=i['price'],
                 total=i['total'],
+                isavoir=True,
+                isfarah=isfarah,
+                qtyofprice=i['qty']
             )
 
     return JsonResponse({
@@ -9565,7 +9578,7 @@ def getpdctouts(request):
     product=Produit.objects.filter(ref=ref).first()
     stockout=Livraisonitem.objects.filter(product=product, isfacture=False)
     stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True)
-    avoirs=Returned.objects.filter(product=product)
+    avoirs=Stockin.objects.filter(product=product)
 
     totalqtyavoirs=avoirs.aggregate(Sum('qty'))['qty__sum'] or 0
     totalavoirs=avoirs.aggregate(Sum('total'))['total__sum'] or 0
@@ -9613,7 +9626,7 @@ def getpdctouts(request):
         client_name = item[0].bon.client.name if item[1] == 0 else item[0].facture.client.name
         client_id = item[0].bon.client.id if item[1] == 0 else item[0].facture.client.id
         client_quantities[client_name] += item[0].qty
-        #client_quantities[client_name][1] = Returned.objects.filter(avoir__client_id=client_id, product=product).aggregate(Sum('qty'))['qty__sum'] or 0
+        #client_quantities[client_name][1] = Stockin.objects.filter(avoir__client_id=client_id, product=product).aggregate(Sum('qty'))['qty__sum'] or 0
         #client_data[client_name]['quantity'] += item[0].qty
 
     print('>>>>>> client_quantities', client_avoirs)

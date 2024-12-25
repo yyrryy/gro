@@ -2,11 +2,20 @@
 
 {% block content %}
 <div class="tabsholder expended" style="width: 100%;">
-  <div class="px-2 d-flex justify-content-between border-bottom align-items-center bg-success text-white align-items-center">
-    <div>
-      <button class="bi bi-list btn btn-dark"></button>
-      <div class="btn p-2 text-white text-center sectionbtn active position-relative" onclick="getsection(event, 'Farah', '/products/farahhome')">
-        F
+  <div class="px-2 d-flex justify-content-between border-bottom align-items-center bg-danger text-white align-items-center">
+    <div class="d-flex">
+      <div class="dropdown show">
+        <a class="btn border dropdown-toggle bg-white" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        </a>
+  
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <a class="dropdown-item" href="/products/ste1" >FARAH</a>
+          <a class="dropdown-item text-success" href="/products/ste2" >ORGH</a>
+          <a class="dropdown-item" href="/products/pointdevente" >Point de vente</a>
+        </div>
+      </div>
+      <div class="btn p-2 text-white text-center sectionbtn active position-relative" onclick="getsection(event, 'orgh', '/products/orghhome')">
+        ORGH
       </div>
       
     </div>

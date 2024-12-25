@@ -223,64 +223,6 @@
   </div>
 
   <script>
-    const charToNumberMap = {
-            '&': '1',
-            'é': '2',
-            '"': '3',
-            "'": '4',
-            '(': '5',
-            '-': '6',
-            'è': '7',
-            '_': '8',
-            'ç': '9',
-            'à': '0',
-            'a': 'q',
-            'z': 'w',
-            'w': 'z',
-            'q': 'a',
-            ',': 'm',
-
-        };
-
-        let barcode = '';
-        let typingTimer;
-
-        // Convert character to corresponding number if mapped
-        function convertCharToNumber(char) {
-            return charToNumberMap[char] || char;
-        }
-
-        // Listen for keydown events on the document level
-        $(document).on('keydown', function(event) {
-            if (typingTimer) clearTimeout(typingTimer);
-
-            if (event.which === 13) {  // Enter key detected
-                if (barcode) {
-                    console.log('Barcode:', barcode);
-                    barcode = ''; // Reset the barcode after processing
-                }
-            } else {
-                // Accumulate characters, converting to numbers if mapped
-                const key = event.key.toLowerCase();
-                barcode += convertCharToNumber(key);
-
-                // Reset barcode if no keys are pressed within a certain time
-                typingTimer = setTimeout(() => {
-                    barcode = '';
-                }, 100);  // Adjust timeout as needed to filter unintended keystrokes
-            }
-        });
-    function getqtyprice(){
-      console.log('getqtyprice')
-      $.get('/products/getqtyprice',
-      {
-        'target':'{{target}}',
-        'id':$('.resultsholderbonlivraison').val()
-      },
-      function(data){
-        $('.producthistory').html(data)
-      })
-    }
     $(function(){
 
       $('.clientselectbl').select2({
@@ -327,6 +269,123 @@
         }
 
     })
+    charToNumberMap = {
+            '&': '1',
+            'é': '2',
+            '"': '3',
+            "'": '4',
+            '(': '5',
+            '-': '6',
+            'è': '7',
+            '_': '8',
+            'ç': '9',
+            'à': '0',
+            'a': 'q',
+            'z': 'w',
+            'w': 'z',
+            'q': 'a',
+            ',': 'm',
+            ')': '-'
+
+        };
+
+    // let barcode = '';
+    // let typingTimer;
+
+    // Convert character to corresponding number if mapped
+    function convertCharToNumber(char) {
+        return charToNumberMap[char] || char;
+    }
+
+    // Listen for keydown events on the document level
+    $(document).on('keydown', (function() {
+      let barcode = '';
+      let typingTimer;
+
+      return function(event) {
+          if (typingTimer) clearTimeout(typingTimer);
+
+          if (event.which === 13) {  // Enter key detected
+            clientid = $('.clientselectbl').val()
+            if (clientid==null){
+              alertify.error('Veuillez choisir un client')
+              return
+            }
+              if (barcode) {
+                // get the product with the ref in the qrcode
+                $.get('products/barcodepdct', {'ref':barcode, 'target':'{{target}}'}, (data)=>{
+
+                  var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = data.data.split('§')
+                  // add val to select2
+                  $('.resultsholderbonlivraison').append(new Option(`${ref} - ${name}`, id, true, true))
+                  let repswithprice=[]
+                  let addname=$('input[name="addname"]')
+                  let addprice=$('input[name="addprice"]')
+                  let addremise=$('input[name="addremise"]')
+                  let addqty=$('input[name="addqty"]')
+                  console.log('qty of change',addqty)
+                  $.get('/products/getqtyprice',
+                  {
+                    'target':'{{target}}',
+                    'id':id
+                  },
+                  function(data){
+                    $('.producthistory').html(data)
+                  })
+                  $('.addstock').text(stock)
+                  $('.addstockfacture').text(stockfacture)
+                  addqty.val('')
+                  addprice.val(sellprice)
+                  addremise.val(remise)
+                  addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+                  addprice.val(sellprice)
+                  console.log('getting client price')
+                  $.ajax({
+                    url: "{% url 'products:getclientprice' %}",
+                    type: 'POST',
+                    data: {
+                        'target':'bl',
+                        'id': id,
+                        'clientid': $('.clientselectbl').val(),
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function(data){
+                      
+                      $('.addclientprice').text((data.price).toFixed(2))
+                    }
+                  })
+                })
+
+                    
+                  console.log('Barcode:', barcode);
+                  barcode = ''; // Reset the barcode after processing
+              }
+          } 
+          else {
+            // Accumulate characters, converting to numbers if mapped
+            const key = event.key.toLowerCase();
+            barcode += convertCharToNumber(key);
+
+            // Reset barcode if no keys are pressed within a certain time
+            typingTimer = setTimeout(() => {
+              barcode = '';
+            }, 100);  // Adjust timeout as needed to filter unintended keystrokes
+          }
+      }
+      })());
+
+    function getqtyprice(){
+      console.log('getqtyprice')
+      $.get('/products/getqtyprice',
+      {
+        'target':'{{target}}',
+        'id':$('.resultsholderbonlivraison').val()
+      },
+      function(data){
+        $('.producthistory').html(data)
+      })
+    }
+    
     function removelinebl(event, id) {
           let parentdiv=$(event.target).parent().parent().parent().parent().parent().parent()
           clicksinbl++;
@@ -794,41 +853,7 @@
           addprice.val(sellprice)
           addremise.val(remise)
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
-          // we are getting ere list of reps that have price
-          $.ajax({
-              url: "{% url 'products:getrepswithprice' %}",
-              type: 'POST',
-              data: {
-                  'id': id,
-
-                  'csrfmiddlewaretoken': '{{csrf_token}}'
-              },
-              success: function(data){
-                addqty.focus()
-                repswithprice=data.repswithprice
-                let repid=$('.repsselectsbl').val()
-                if (repswithprice.includes(repid)){
-                  console.log('rep with remise')
-                  // uin rep we only need remise
-                  // if (representprice==0){
-                  //   addprice.val(sellprice)
-                  //
-                  // }else{
-                  //   addprice.val(representprice)
-                  // }
-                  if (data.representremise==0){
-                    addremise.val(remise)
-                  }else{
-                    addremise.val(data.representremise)
-                  }                }
-                else{
-                  //addprice.val(sellprice)
-                  addremise.val(remise)
-                }
-              }
-            })
-            console.log('>>> addprice', addprice, 'sellprice', sellprice)
-            addprice.val(sellprice)
+          addprice.val(sellprice)
           console.log('getting client price')
           $.ajax({
               url: "{% url 'products:getclientprice' %}",

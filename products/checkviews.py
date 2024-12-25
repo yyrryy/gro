@@ -177,7 +177,8 @@ def addbonsortie(request):
             amount=payment,
             date=date.today(),
             mode='espece',
-            npiece=f'Paiement de bon de sortie {order.bon_no}'
+            npiece=f'Paiement de bon de sortie {order.bon_no}',
+            issortie=True
         )
         if float(payment)<float(totalbon):
             order.rest=round(float(totalbon)-float(payment), 2)
@@ -2030,6 +2031,7 @@ def printbarcode(request):
             ref='fr-'+i['ref']
         else:
             ref=i['ref']
+        print('>>> ref', ref)
         name=i['name']
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         price=i['price']
@@ -2084,4 +2086,12 @@ def printbarcode(request):
         # if achat means the request is coming from bon achat, date will be today
     return render(request, 'barcode.html', {
         'barcodes': barcodes,
+    })
+
+def barcodepdct(request):
+    ref=request.GET.get('ref').lower()
+    target=request.GET.get('target')
+    product=Produit.objects.get(ref=ref)
+    return JsonResponse({
+        'data':f"{product.ref}§{product.name}§{product.buyprice}§{product.stocktotalfarah if target=='f' else product.stocktotalorgh}§{product.stockfacturefarah if target=='f' else product.stocktotalorgh}§{product.id}§{product.frsellprice if target=='f' else product.sellprice}§{product.frremisesell if target=='f' else product.remisesell}§{product.prixnet}§{product.representprice}",
     })
