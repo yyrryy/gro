@@ -7,7 +7,10 @@
     </button>
     {% if not order.generated %}
     <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
-      Valider Bon sortie
+      Valider Bon sortie (prix bon sortie)
+    </button>
+    <button class="btn w-100 btn-success mt-2" onclick="validatebonsortieproductprice(event, '{{order.id}}')">
+      Valider Bon sortie (prix de produit)
     </button>
     {% endif %}
     {% if not order.ispaid %}

@@ -2528,7 +2528,8 @@ def addavanceclient(request):
             mode=mod,
             npiece=np,
             isfarah=target=='f',
-            isorgh=target=='o'
+            isorgh=target=='o',
+            issortie=target=='s'
         )
     return JsonResponse({
         'success':True
@@ -2628,13 +2629,19 @@ def getclientbons(request):
     trs=''
     isfarah=target=='f'
     if target=='s':
+        avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=isfarah, inreglement=False, ispaid=False).order_by('date')
+        avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
         bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, generated=False).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
         for i in bons:
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
         return JsonResponse({
             'bons':trs,
-            
+            'avoirs':render(request, 'avoirsbl.html', {'avoirs':avoir}).content.decode('utf-8'),
+            'avances':render(request, 'avancesbl.html', {'avances':avance}).content.decode('utf-8'),
+            # 'total':total,
+            'totalavoirs':round(avoir.aggregate(Sum('total')).get('total__sum') or 0, 2),
+            'totalavances':round(avance.aggregate(Sum('amount')).get('amount__sum') or 0, 2),
             # 'total':total,
             'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2),
             'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
@@ -2895,68 +2902,6 @@ def reglebons(request):
             isfarah=target=='f',
             isorgh=target=='o'
         )
-    # for i in livraisons:
-    #     if i.rest>0:
-    #         livraisonstotals=round(livraisonstotals+i.rest, 2)
-    #     else:
-    #         livraisonstotals=round(livraisonstotals+i.total, 2)
-
-    # print(totalmantant, livraisonstotals, mantant, mode, npiece, echeance)
-
-    # # update client sold
-    # # case1: 5000==5000:
-    # amountofeachbon=[]
-    # if totalmantant==livraisonstotals:
-    #     print('case1')
-    #     livraisons.update(ispaid=True)
-    #     livraisons.update(rest=0)
-    #     for i in livraisons:
-    #         amountofeachbon.append(i.total)
-    # # case2: 5000>4500:
-    # if totalmantant>livraisonstotals:
-    #     print('case2')
-    #     diff=totalmantant-livraisonstotals
-    #     livraisons.update(ispaid=True)
-    #     livraisons.update(rest=0)
-    #     for i in livraisons:
-    #         amountofeachbon.append(i.total)
-    #     # else:
-    #     #     livraisons.update(ispaid=True)
-    #     # sub diff from client ref
-    # # case3: 5000<6000:
-    # if totalmantant<livraisonstotals:
-    #     print('case3')
-    #     amount=totalmantant
-    #     for i in livraisons:
-    #         if amount<=0:
-    #             break
-    #         else:
-    #             if i.rest>0:
-    #                 if amount>=i.rest:
-    #                     i.rest=0
-    #                     i.ispaid=True
-    #                     i.save()
-    #                     amount-=i.rest
-    #                     amountofeachbon.append(amount)
-    #                 else:
-
-    #                     i.rest=round(i.rest-amount, 2)
-    #                     i.save()
-    #                     amountofeachbon.append(i.rest)
-    #                     break
-    #             else:
-    #                 if amount>=i.total:
-    #                     amount-=i.total
-    #                     i.ispaid=True
-    #                     i.save()
-    #                     amountofeachbon.append(amount)
-    #                 else:
-    #                     i.rest=round(i.total-amount, 2)
-    #                     amountofeachbon.append(amount)
-    #                     i.save()
-    #                     break
-    #     print('rest of amount', amount)
-
 
     for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
         regl=PaymentClientbl.objects.create(
@@ -2976,6 +2921,93 @@ def reglebons(request):
             regl.bons.set(livraisons)
         else:
             regl.factures.set(livraisons)
+        regl.avoirs.set(avoirs)
+        regl.avances.set(avances)
+        # for i in livraisons:
+        #     Bonsregle.objects.create(
+        #         payment=regl,
+        #         bon=i,
+        #         amount=m
+        #     )
+
+    client.soldtotal=round(float(client.soldtotal)-float(totalmantant), 2)
+    client.soldbl=round(float(client.soldbl)-float(totalmantant), 2)
+    client.save()
+    return JsonResponse({
+        "success":True
+    })
+
+
+def reglebonsortie(request):
+    clientid=request.POST.get('clientid')
+    whattopay=float(request.POST.get('whattopay'))
+    print('>> whatt', whattopay)
+    moderegl=request.POST.get('moderegl')
+    target=request.POST.get('target')
+    client=Client.objects.get(pk=clientid)
+    bons=json.loads(request.POST.get('bons'))
+    avoirs=json.loads(request.POST.get('avoirs'))
+    avances=json.loads(request.POST.get('avances'))
+    mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    print('bons', bons, 'avoirs', avoirs, 'avances', avances)
+    # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
+    livraisons=Bonsortie.objects.filter(pk__in=bons)
+    
+    avoirs=Avoirclient.objects.filter(pk__in=avoirs)
+    avances=Avanceclient.objects.filter(pk__in=avances)
+    avoirs.update(inreglement=True)
+    avances.update(inreglement=True)
+    totalmantant=sum(mantant)
+    totalbons=livraisons.aggregate((Sum('total')))['total__sum'] or 0
+    # if totalmantant>whattopay:
+    #     livraisons.update(ispaid=True)
+    #     livraisons.update(statusreg='r1')
+    #     if moderegl=='facture':
+    #         print("make bon paid")
+    #         for livraison in livraisons:
+    #             print("make bon paid", livraison.bons.all())
+    #             # Update 'ispaid' for related ManyToManyField (bons)
+    #             livraison.bons.all().update(ispaid=True)
+    #     diff=totalmantant-whattopay
+    #     Avanceclient.objects.create(
+    #         client_id=clientid,
+    #         amount=diff,
+    #         date=timezone.now().date(),
+    #         isfarah=target=='f',
+    #         isorgh=target=='o'
+    #     )
+    # if totalmantant==whattopay:
+        
+
+    livraisons.update(ispaid=True)
+    # if totalmantant<whattopay:
+    #     Avanceclient.objects.create(
+    #         client_id=clientid,
+    #         amount=totalmantant,
+    #         date=timezone.now().date(),
+    #         isfarah=target=='f',
+    #         isorgh=target=='o'
+    #     )
+
+    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+        regl=PaymentClientbl.objects.create(
+            client_id=clientid,
+            amount=m,
+            #today
+            date=timezone.now().date(),
+            echance=ech,
+            bank=bk,
+            mode=mod,
+            npiece=np,
+            issortie=True
+        )
+        regl.bonsortie.set(livraisons)
+        
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
         # for i in livraisons:
@@ -3179,6 +3211,7 @@ def addavoirclient(request):
     client=Client.objects.get(pk=clientid)
     isfarah=False
     isorgh=False
+    issortie=False
     year = timezone.now().strftime("%y")
     if target=="f":
         isfarah=True
@@ -3190,7 +3223,7 @@ def addavoirclient(request):
             receipt_no = f"FR-AV{year}/{latest_receipt_no + 1}"
         except:
             receipt_no = f"FR-AV{year}/1"
-    else:
+    elif target=='o':
         isorgh=True
         prefix = f'AV{year}'
         try:
@@ -3199,6 +3232,15 @@ def addavoirclient(request):
             receipt_no = f"AV{year}/{latest_receipt_no + 1}"
         except:
             receipt_no = f"AV{year}/1"
+    else:
+        issortie=True
+        prefix = f'SO-AV{year}'
+        try:
+            avoirclients = Avoirclient.objects.filter(no__startswith=prefix).last()
+            latest_receipt_no = int(avoirclients.no.split('/')[1])
+            receipt_no = f"SO-AV{year}/{latest_receipt_no + 1}"
+        except:
+            receipt_no = f"SO-AV{year}/1"
     print(receipt_no, clientid, repid, totalbon, datebon)
     try:
 
@@ -3210,7 +3252,8 @@ def addavoirclient(request):
             date=datebon,
             # avoirfacture=isfacture,
             isfarah=isfarah,
-            isorgh=isorgh
+            isorgh=isorgh,
+            issortie=issortie
         )
 
         for i in json.loads(products):
@@ -4685,20 +4728,26 @@ def updatereglesupp(request):
 
 def getreglementbl(request, id):
     reglement=PaymentClientbl.objects.get(pk=id)
-    bons=reglement.bons.all().order_by('date')
+    print('>>>>', reglement.issortie)
+    if reglement.issortie:
+        bons=reglement.bonsortie.all().order_by('date')
+        livraisons=Bonsortie.objects.filter(client=reglement.client).exclude(pk__in=[bon.pk for bon in bons]).order_by('date')[:50]
+    else:
+        bons=reglement.bons.all().order_by('date')
+        livraisons=Bonlivraison.objects.filter(client=reglement.client).exclude(pk__in=[bon.pk for bon in bons]).order_by('date')[:50]
     # bons without bons in reglement
-    livraisons=Bonlivraison.objects.filter(client=reglement.client).exclude(pk__in=[bon.pk for bon in bons]).order_by('date')[:50]
     # livraisons=Bonlivraison.objects.filter(client=reglement.client)
     #we need bons to calculate total bl
     bonstocalculate=Bonlivraison.objects.filter(client=reglement.client)
     # trs=''
     # for i in livraisons:
     #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+    print('>> d', bons)
     ctx={
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
         'avances':reglement.avances.all().order_by('date'),
-        'bons':reglement.bons.all().order_by('date'),
+        'bons':bons,
         'factures':reglement.factures.all().order_by('date'),
     }
     print('>>>', reglement)

@@ -229,7 +229,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-3">
                                             <small>Mantant:</small> <br>
-                                            <input onchange="totalreglementfc(event)" type="number" name="mantantreglementclientfc" class="w-100 notempty" placeholder="Mantant">
+                                            <input oninput="totalreglementfc(event)" type="number" name="mantantreglementclientfc" class="w-100 notempty" placeholder="Mantant">
                                         </div>
                                         <div class="col-3">
                                             <small>N° piece:</small> <br>
@@ -585,7 +585,7 @@
 
         // Format the date as "yyyy-mm-dd"
         var currentDate = yyyy + '-' + mm + '-' + dd;
-        parentdiv.append(`<div class="row align-items-center mt-2"><div class="col-3"> <input onchange="totalreglementfc(event)" type="number" name="mantantreglementclientfc" class="w-100 notempty" placeholder="Mantant"></div><div class="col-3"> <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece"></div><div class="col-3"> <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)"><option value="cheque">Cheque</option><option value="effet">effet</option><option value="espece">espece</option><option value="avoir">avoir</option></select></div><div class="col-3 d-flex"> <input type="date" name="echeance" class="w-100 notempty" value="${currentDate}"><button class="btn btn-sm bg-danger" onclick="removereglrowfc(event)"></button></div></div>`)
+        parentdiv.append(`<div class="row align-items-center mt-2"><div class="col-3"> <input oninput="totalreglementfc(event)" type="number" name="mantantreglementclientfc" class="w-100 notempty" placeholder="Mantant"></div><div class="col-3"> <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece"></div><div class="col-3"> <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)"><option value="cheque">Cheque</option><option value="effet">effet</option><option value="espece">espece</option><option value="avoir">avoir</option></select></div><div class="col-3 d-flex"> <input type="date" name="echeance" class="w-100 notempty" value="${currentDate}"><button class="btn btn-sm bg-danger" onclick="removereglrowfc(event)"></button></div></div>`)
     }
 
     function yeardatareglfc(){

@@ -183,7 +183,7 @@
                                 <div class="reglements">
                                     <div class="d-flex align-items-center mt-2">
                                         <div class="me-2">
-                                            <input type="number" name="mantantreglementclient" onchange="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
+                                            <input type="number" name="mantantreglementclient" oninput="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant">
                                         </div>
                                         <div class="me-2">
                                             <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece">
@@ -1135,7 +1135,6 @@
             return this.value;
         }).get()
         
-        $(this).addClass('disabled')
         clientid=parentdiv.find('[name="addreglementclientsbl"]').val()
         mantant=parentdiv.find('[name="mantantreglementclient"]').map(function() {
             return parseFloat(this.value);
@@ -1153,7 +1152,7 @@
             return this.value;
         }).get();
         date=parentdiv.find('[name="datereglementclientbl"]').val()
-
+        
         bons=parentdiv.find('[name="addreglementbons"]').map(function() {
             return this.value;
         }).get();
@@ -1161,11 +1160,14 @@
             return this.value;
         }).get();
         whattopay=parseFloat($('.whattopay').text())
-        if (whattopay<=0){
-            alertify.error('Mantant a payé doit etre superieur a 0')
+        totalregl=parseFloat($('.totalreglblfields').text())
+        console.log('>>', !whattopay==totalregl)
+        if (whattopay!=totalregl){
+            alertify.error('Mantant a payé doit etre egale a mantant total')
             return
         }
-        $.post('/products/reglebons', {
+        $(this).addClass('disabled')
+        $.post("/products/{%if target == 's' %}reglebonsortie{%else%}reglebons{%endif%}", {
             whattopay:whattopay,
             moderegl:$('.moderegl').val(),
             clientid:clientid,

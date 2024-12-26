@@ -381,6 +381,90 @@ def validatebonsortie(request):
     bon.save()
     return JsonResponse({'success': True})
 
+def validatebonsortieproductprice(request):
+    year = timezone.now().strftime("%y")
+    bonid = request.GET.get('bonid')
+    
+    bon = Bonsortie.objects.get(pk=bonid)
+    bonpaid=bon.ispaid
+    items = Sortieitem.objects.filter(bon=bon)
+    totalfarah, totalorgh = 0, 0
+    farahitems, orghitems = [], []
+    
+    # Prepare Livraisonitems
+    for i in items:
+        product = i.product
+        item_total = float(i.total)
+        
+        livraison_data = {
+            'total': item_total,
+            'qty': i.qty,
+            
+            'name': i.name,
+            'product': product,
+            'client': i.client,
+            'date': date.today()
+        }
+
+        if i.isfarah:
+            totalfarah += product.frsellprice*int(i.qty)
+            livraison_data['ref']=i.ref.replace('(FR) ', ''),
+            livraison_data['isfarah'] = True
+            livraison_data['price'] = product.frsellprice
+            farahitems.append(Livraisonitem(**livraison_data))
+        else:
+            totalfarah += product.sellprice*int(i.qty)
+            livraison_data['ref']=i.ref.replace('(OR) ', ''),
+            livraison_data['isorgh'] = True
+            livraison_data['price'] = product.sellprice
+            orghitems.append(Livraisonitem(**livraison_data))
+    
+    # Helper function to generate Bonlivraison
+    def create_bonlivraison(prefix, total, items, is_farah):
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'{prefix}{year}'
+        ).last()
+        
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"{prefix}{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"{prefix}{year}000000001"
+        
+        bon_data = {
+            'total': total,
+            'date': timezone.now(),
+            'bon_no': receipt_no,
+            'note': bon.note,
+            'bonsortie':bon,
+            # make created bon paid if the original bon is paid
+            #'ispaid':bonpaid
+        }
+        
+        if is_farah:
+            bon_data['isfarah'] = True
+            # the client of the bon created will always be the first client
+            bon_data['client'] = Client.objects.get(code='CF-1')
+        else:
+            bon_data['isorgh'] = True
+            bon_data['client'] = Client.objects.get(code='CO-1')
+        
+        new_bon = Bonlivraison.objects.create(**bon_data)
+        
+        for item in items:
+            item.bon = new_bon
+            item.save()
+    
+    # Create Bonlivraison for farah items
+    if farahitems:
+        create_bonlivraison('FR-BL', totalfarah, farahitems, is_farah=True)
+    
+    # Create Bonlivraison for orgh items
+    if orghitems:
+        create_bonlivraison('BL', totalorgh, orghitems, is_farah=False)
+    bon.generated=True
+    bon.save()
+    return JsonResponse({'success': True})
 
 def farahhome(request):
     return render(request, 'farahhome.html', {'target':'f'})
@@ -540,10 +624,14 @@ def getclientpricesortie(request):
     target=request.POST.get('target')
     term=request.POST.get('term')
     product=Produit.objects.get(pk=pdctid)
+    frbuyprice=product.frbuyprice
+    frremise=product.frremise1
+    buyprice=product.buyprice
+    remise=product.remise1
     price=0
     remise=0
-    buyprice=product.frbuyprice if 'fr' in term else product.buyprice
-    remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
+    # buyprice=product.frbuyprice if 'fr' in term else product.buyprice
+    # remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
     try:
             clientprice=Sortieitem.objects.filter(client_id=clientid, product_id=pdctid).last()
             price=clientprice.price
@@ -551,15 +639,19 @@ def getclientpricesortie(request):
             return JsonResponse({
                 'price':price,
                 'remise':remise,
-                'buyprice':buyprice,
-                'remisebuyprice':remisebuyprice
+                'frbuyprice':frbuyprice,
+                'frremise':frremise,
+                'orbuyprice':buyprice,
+                'orremise':remise,
             })
     except:
         return JsonResponse({
             'price':0,
             'remise':0,
+            'frbuyprice':frbuyprice,
+            'frremise':frremise,
             'buyprice':buyprice,
-            'remisebuyprice':remisebuyprice
+            'remise':remise,
         })
     #if target=='bl':
     #    try:

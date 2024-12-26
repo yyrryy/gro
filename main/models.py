@@ -375,6 +375,7 @@ class Avanceclient(models.Model):
     bank=models.CharField(max_length=50, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    issortie=models.BooleanField(default=False)
     # avance selected in an rglement
     inreglement=models.BooleanField(default=False)
 
@@ -693,6 +694,8 @@ class Avoirclient(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    issortie=models.BooleanField(default=False)
+
     # avoir selected in an rglement
     inreglement=models.BooleanField(default=False)
     # avoir can be paid to the client

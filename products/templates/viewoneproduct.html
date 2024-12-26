@@ -504,10 +504,12 @@
                             <textarea type="text" class="form-control mb-3" name="equivalent" value="" style="height: 15em">{{product.equivalent}}</textarea>
                             <small for="name">Voitures.</small>
                             <textarea type="text" class="form-control mb-3" name="cars" value="" style="height: 15em">{{product.cars}}</textarea>
+                            {% if not target == 's' %}
                             <button class="border btn btn-success mt-2 w-100" style="    position: sticky;
                             bottom: 0;" onclick="updateproductdata(event, '{{product.id}}')">
                                 Enregistrer
                             </button>
+                            {% endif %}
                         </form>
 
 

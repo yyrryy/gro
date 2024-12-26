@@ -84,7 +84,7 @@
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Prix" name="addprice">
                 <div class="addclientprice text-danger"></div>
-                <div class="addbuyprice text-danger"></div>
+                <div class="addbyuprice text-danger"></div>
               </div>
               <div class="col-3">
                 <input type="number" class="form-control" placeholder="Remise" name="addremise">
@@ -763,7 +763,7 @@
               success: function(data){
                 console.log(data)
                 parentdiv.find('.addclientprice').html((`${data.price} (${data.remise}%)`))
-                $('.addbyuprice').html(`pr. achat: ${data.buyprice} (${data.remisebuyprice}%)`)
+                $('.addbyuprice').html(`pr. achat farah: ${data.frbuyprice}(${data.frremise}%) <br> pr. achat orgh: ${data.orbuyprice}(${data.orremise}%)`)
               }
             })
 
