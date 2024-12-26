@@ -352,7 +352,8 @@ def validatebonsortie(request):
             'bon_no': receipt_no,
             'note': bon.note,
             'bonsortie':bon,
-            'ispaid':bonpaid
+            # make created bon paid if the original bon is paid
+            #'ispaid':bonpaid
         }
         
         if is_farah:
