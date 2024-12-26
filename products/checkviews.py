@@ -180,13 +180,14 @@ def addbonsortie(request):
             npiece=f'Paiement de bon de sortie {order.bon_no}',
             issortie=True
         )
-        if float(payment)<float(totalbon):
-            order.rest=round(float(totalbon)-float(payment), 2)
-        if float(payment)==float(totalbon):
-            order.ispaid=True
-        order.save()
-    
-
+    if float(payment)<float(totalbon):
+        order.rest=round(float(totalbon)-float(payment), 2)
+    if float(payment)==float(totalbon):
+        order.ispaid=True
+    order.save()
+    client.soldtotal=round(float(client.soldtotal)-float(payment), 2)
+    client.soldbl=round(float(client.soldbl)-float(payment), 2)
+    client.save()
     # increment it
     return JsonResponse({
         "success":True
@@ -301,7 +302,7 @@ def validatebonsortie(request):
     bonid = request.GET.get('bonid')
     
     bon = Bonsortie.objects.get(pk=bonid)
-    
+    bonpaid=bon.ispaid
     items = Sortieitem.objects.filter(bon=bon)
     totalfarah, totalorgh = 0, 0
     farahitems, orghitems = [], []
@@ -350,7 +351,8 @@ def validatebonsortie(request):
             'date': timezone.now(),
             'bon_no': receipt_no,
             'note': bon.note,
-            'bonsortie':bon
+            'bonsortie':bon,
+            'ispaid':bonpaid
         }
         
         if is_farah:
@@ -2023,6 +2025,9 @@ def validation(request):
 
 def printbarcode(request):
     products=json.loads(request.GET.get('products'))
+    supplierid=request.GET.get('supplierid')
+    date=request.GET.get('date')
+    date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
     isfarah=target=='f'
     barcodes = []
@@ -2035,16 +2040,13 @@ def printbarcode(request):
         name=i['name']
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         price=i['price']
-        net=int(price)-(int(price)*int(remise1)/100)
+        net=float(price)-(float(price)*int(remise1)/100)
         price=round(net*2, 2)
-        price=str(price).replace('.', '')
+        #price=str(price).replace('.', '')
         qty=i['qty']
-        print(ref)
+        print('>>>', supplierid, date)
         # # List to hold the barcodes in base64 format
-        target_width_mm = 25
-        mm_to_inches = 25.4
-        barcode_width_inches = target_width_mm / mm_to_inches
-        code_class = barcode.get_barcode_class('code128')
+        
         # Generate barcodes for the specified quantity
         thisbarcodes=[]
         # for _ in range(int(qty)):
@@ -2068,7 +2070,7 @@ def printbarcode(request):
             qr = qrcode.QRCode(
                 version=1,  # Controls the size of the QR code
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
+                box_size=8,
                 border=0,
             )
             qr.add_data(ref)
@@ -2076,10 +2078,11 @@ def printbarcode(request):
 
             img = qr.make_image(fill='black', back_color='white')
             img.save(buffer, format="PNG")
-
+            # get 2 digits of price %2
+            
             # Convert the image to base64 and append it to the list
             qr_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            thisbarcodes.append([ref, name, price, qr_base64])
+            thisbarcodes.append([ref, name, f"{price:.2f}".replace('.', ''), qr_base64, supplierid, date])
             buffer.close()
         barcodes.append(thisbarcodes)
         

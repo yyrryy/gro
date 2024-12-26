@@ -98,6 +98,7 @@
                 background: #00800024;">Valider</button>
               </div>
               <input hidden readonly type="text" name="addname" class="form-control">
+              {% include 'accordionqtyprice.html' %}
             </div>
 
 
@@ -736,6 +737,14 @@
           addprice.val(sellprice)
           addremise.val(remise)
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+          $.get('/products/getqtyprice',
+            {
+              'target':'s',
+              'id':id
+            },
+            function(data){
+              $('.producthistory').html(data)
+          })
           $('.addstock').text('Stock farah: '+stocktotalfarah)
           $('.addstockfacture').text('Stock orgh: '+stocktotalorgh)
           // we are getting ere list of reps that have price

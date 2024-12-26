@@ -32,7 +32,7 @@ margin: 0;
 <div class="">
        <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
           <div class="col-5">
-            <select name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectav{{avoir.id}}">
+            <select name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectav{{avoir.id}}" hidden>
 
 
               <option value="bl">BL</option>
@@ -45,9 +45,9 @@ margin: 0;
 
                   </select>
               </div>
-              <div class="mb-2">
+              <div class="mb-2" hidden>
                   <small>Representant:</small>
-                  <select name="representant" id="" style="width:100%;" class="select2 repsselectsavoir{{avoir.id}} form-select notemptyavoir{{avoir.id}}">
+                  <select name="representant" id="" style="width:100%;" class="select2 repsselectsavoir{{avoir.id}} form-select">
                       <option value="{{avoir.representant.id}}">{{avoir.representant.name}}</option>
                       {% for i in commercials %}
                       <option value="{{i.id}}">{{i.name}}</option>
@@ -59,7 +59,7 @@ margin: 0;
 
                   <input type="date" class="form-control datebonavoir{{avoir.id}}" name="datebonavoir{{avoir.id}}" value="{{avoir.date|date:'Y-m-d'}}" placeholder="Date bon">
               </div>
-              <div class="mb-2">
+              <div class="mb-2" hidden>
                 <small>N° avoir:</small>
                   <input type="text" class="form-control ordernoavoir{{avoir.id}}" name="ordernoavoir{{avoir.id}}" value="{{avoir.no}}">
               </div>
@@ -160,9 +160,9 @@ margin: 0;
                   <td>{{i.product.buyprice}}</td>
                   <td>{{i.product.stocktotal}}</td>
                   <td class="clientprice">{{i.clientprice}}</td>
-                  <td><input type="number" class="calculate qty" onkeyup="calculate(event)" name="qty" value="{{i.qty}}"></td>
+                  <td><input type="number" class="calculate qty" onkeyup="calculate(event)" name="qty" value="{{i.quantity}}"></td>
                   <td><input type="number" class="calculate price" onkeyup="calculate(event)" name="price" value="{{i.price}}"></td>
-                  <td><input type="number" class="calculate remise" onkeyup="calculate(event)" name="remise" value="{{i.remise}}"></td>
+                  <td><input type="number" class="calculate remise" onkeyup="calculate(event)" name="remise" value="{{i.remise1}}"></td>
                   <!-- <td>{{i.product.prixnet}}</td> -->
                   <td class="total">{{i.total}}</td>
                   <input type="hidden" name="productid" value="{{i.product.id}}">
@@ -412,7 +412,7 @@ margin: 0;
 
     $('.submitbonavoir{{avoir.id}}').on('click', (e)=>{
       let parentdiv=$(e.target).parent().parent().parent().parent()
-      if ($('.repsselectsavoir{{avoir.id}}').val()=='' || $('.datebonavoir{{avoir.id}}').val()=='' || $('.ordernoavoir{{avoir.id}}').val()==''){
+      if ($('.datebonavoir{{avoir.id}}').val()==''){
           parentdiv.find('.data').addClass('border border-danger')
           return
       }
@@ -476,6 +476,7 @@ margin: 0;
             url: "{% url 'products:updatebonavoir' %}",
             type: 'POST',
             data: {
+              'target':'{{target}}',
               'bonid': '{{avoir.id}}',
               'totalbon': totalbon,
               'clientid': clientid,
@@ -491,7 +492,7 @@ margin: 0;
                 alertify.success('Bon avoir modifié')
                 // delerte this tab
                 deletetab('addmodifieravoir{{avoir.id}}')
-                ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient')
+                ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient?target={{target}}')
               }
               else{
                 alertify.error('ERROR')

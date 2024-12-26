@@ -323,7 +323,7 @@ def addoneproduct(request):
         code=request.POST.get('codeinadd') or ''
         block=request.POST.get('blockinadd') or ''
         equivalent=request.POST.get('equivinadd') or ''
-        cars=request.POST.getlist('carsinadd') or ''
+        cars=request.POST.get('carsinadd') or ''
         #netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
         # create product
         product=Produit.objects.create(
@@ -336,11 +336,10 @@ def addoneproduct(request):
             stocktotalorgh=0,
             stockfacturefarah=0,
             stockfactureorgh=0,
-            prixnet=netprice,
             representprice=representprice,
             minstock=minstock,
             equivalent=equivalent,
-            cars=json.dumps(cars),
+            cars=cars,
             category_id=category,
             supplier_id=supplier,
             mark_id=mark,
@@ -396,10 +395,11 @@ def addoneproduct(request):
 
 def viewoneproduct(request, id):
     target=request.GET.get('target')
+    isfarah=target=='f'
     product=Produit.objects.get(pk=id)
-    stockin=Stockin.objects.filter(product=product)
-    outbl=Livraisonitem.objects.filter(product=product, isfacture=False).aggregate(Sum('qty'))['qty__sum'] or 0
-    outfacture=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).aggregate(Sum('qty'))['qty__sum'] or 0
+    stockin=Stockin.objects.filter(product=product, isfarah=isfarah, isavoir=False)
+    outbl=Livraisonitem.objects.filter(product=product, isfacture=False, isfarah=isfarah).aggregate(Sum('qty'))['qty__sum'] or 0
+    #outfacture=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).aggregate(Sum('qty'))['qty__sum'] or 0
     if target=='f':
         revbl=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
         revfacture=Outfacture.objects.filter(product=product, isfarah=True).aggregate(Sum('total'))['total__sum'] or 0
@@ -409,7 +409,7 @@ def viewoneproduct(request, id):
     else:
         revbl=Livraisonitem.objects.filter(product=product, isfacture=False).aggregate(Sum('total'))['total__sum'] or 0
         revfacture=Outfacture.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
-    totalout=outbl+outfacture
+    totalout=outbl
     totalrev=round(revbl+revfacture, 2)
     if target=='f':
         stockout=Livraisonitem.objects.filter(product=product, isfarah=True, isfacture=False).order_by('-id')
@@ -422,9 +422,9 @@ def viewoneproduct(request, id):
         stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
     # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
-    avoirs=Stockin.objects.filter(product=product)
+    avoirs=Stockin.objects.filter(product=product, isavoir=True)
     qtyin=stockin.aggregate(Sum('quantity'))['quantity__sum'] or 0
-    qtyavoir=avoirs.aggregate(Sum('qty'))['qty__sum'] or 0
+    qtyavoir=avoirs.aggregate(Sum('quantity'))['quantity__sum'] or 0
     releve = chain(*[
     ((outbl, 'outbl') for outbl in stockout),
     ((outfc, 'outfc') for outfc in stockoutfc),
@@ -459,6 +459,8 @@ def viewoneproduct(request, id):
 
 def updateproduct(request):
     ref=request.POST.get('ref').lower().strip()
+    target=request.POST.get('target')
+    isfarah=target=='f'
     productid=request.POST.get('productid')
     product=Produit.objects.filter(ref=ref).exclude(pk=productid).first()
     if product:
@@ -471,8 +473,8 @@ def updateproduct(request):
     near=True if  request.POST.get('nearswitch') == 'on' else False
     logo=request.POST.get('updatepdctlogo', None)
     selected_reps = request.POST.getlist('updatereps')
-    remise=request.POST.get('remise')
-    sellprice=request.POST.get('sellprice')
+    remise=request.POST.get('remise') or 0
+    sellprice=request.POST.get('sellprice') or 0
     #netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
     product=Produit.objects.get(pk=productid)
     # if float(sellprice) != float(product.sellprice):
@@ -491,6 +493,7 @@ def updateproduct(request):
     #         i.cart.save()
     # equivalent=' '.join(i for i in request.POST.get('equivalent').split())
     equivalent=request.POST.get('equivalent')
+    cars=request.POST.get('cars')
     minstock=request.POST.get('minstock')
     qtyjeu=request.POST.get('qtyjeu') or 0
     product.carlogos_id=logo
@@ -503,6 +506,7 @@ def updateproduct(request):
     product.qtyjeu=qtyjeu
     product.repsprice=json.dumps(selected_reps)
     product.equivalent=equivalent
+    product.cars=cars
     product.code=request.POST.get('updatecode')
     # product.refeq1=request.POST.get('refeq1').strip()
     # product.refeq2=request.POST.get('refeq2').strip()
@@ -511,12 +515,17 @@ def updateproduct(request):
     # product.coderef=request.POST.get('updatecoderef')
     # product.representprice=request.POST.get('updaterepprice') or 0
     # product.representremise=request.POST.get('updaterepremise') or 0
-    product.sellprice=sellprice
-    product.remise=remise
+    if isfarah:
+        product.frsellprice=sellprice
+        product.frremisesell=remise
+    else:
+        product.sellprice=sellprice
+        product.remisesell=remise
+    
     product.farahref='fr-'+ref
     #product.prixnet=netprice
     product.name=request.POST.get('name')
-    product.cars=json.dumps(request.POST.getlist('cars'))
+    # product.cars=json.dumps(request.POST.getlist('cars'))
     product.ref=ref
     product.category_id=request.POST.get('category')
     product.mark_id=request.POST.get('marque')
@@ -2253,9 +2262,11 @@ def modifierlivraison(request, id):
     return render(request, 'modifierlivraison.html', ctx)
 
 def modifieravoir(request, id):
+    target=request.GET.get('target')
     avoir=Avoirclient.objects.get(pk=id)
     items=Stockin.objects.filter(avoir=avoir)
     ctx={
+        'target':target,
         'avoir':avoir,
         'items':items,
         'commercials':Represent.objects.all(),
@@ -2616,9 +2627,19 @@ def getclientbons(request):
     print('>> target', target)
     trs=''
     isfarah=target=='f'
-    # if target=='s':
-    #     bons=Bonsortie.objects.filter(client_id=clientid).order_by('date')[:50]
-    #     total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+    if target=='s':
+        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, generated=False).order_by('date')[:50]
+        total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        for i in bons:
+            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        return JsonResponse({
+            'bons':trs,
+            
+            # 'total':total,
+            'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2),
+            'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
+            
+        })
     # elif target=="f":
     print('>>> mode regl', moderegl)
     if moderegl=='bl':
@@ -3204,12 +3225,13 @@ def addavoirclient(request):
             Stockin.objects.create(
                 avoir=avoir,
                 product=product,
-                qty=i['qty'],
-                remise=0 if i['remise']=="" else i['remise'],
+                quantity=i['qty'],
+                remise1=0 if i['remise']=="" else i['remise'],
                 price=0 if i['price']=="" else i['price'],
                 total=i['total'],
                 isfarah=isfarah,
-                isorgh=isorgh
+                isorgh=isorgh,
+                date=datebon
             )
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
         client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
@@ -3438,6 +3460,8 @@ def sendrelevclient(request):
 
 def relevclient(request):
     clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
+    isfarah=target=='f'
     client=Client.objects.get(pk=clientid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
@@ -3446,7 +3470,10 @@ def relevclient(request):
     avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate])
     avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate])
     reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
-    bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
+    if target=="s":
+        bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
+    else:
+        bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
     # sold=round(totaldebit-totalcredit, 2)
@@ -3555,6 +3582,7 @@ def sendrelevclientfc(request):
         }).content.decode('utf-8')
     })
 def relevclientfc(request):
+    clientid=request.POST.get('clientid')
     clientid=request.POST.get('clientid')
     client=Client.objects.get(pk=clientid)
     startdate=request.POST.get('datefrom')
@@ -5694,20 +5722,20 @@ def updatebonavoir(request):
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
         if isfarah:
-            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.quantity)
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.quantity)
         # if avoir.avoirfacture:
         #     product.stockfacture=int(product.stockfacture)-int(i.qty)
         product.save()
         i.delete()
     avoir.client=client
-    avoir.representant_id=request.POST.get('repid')
+    #avoir.representant_id=request.POST.get('repid')
     avoir.total=totalbon
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
     avoir.date=datebon
-    avoir.no=request.POST.get('orderno')
+    #avoir.no=request.POST.get('orderno')
     if isfacture:
         avoir.avoirfacture=True
         #client.soldbl=5
@@ -5723,22 +5751,23 @@ def updatebonavoir(request):
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+                product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
             else:
-                product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
+                product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
             # if isfacture:
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
             product.save()
             Stockin.objects.create(
                 avoir=avoir,
                 product=product,
-                qty=i['qty'],
-                remise=i['remise'],
+                quantity=i['qty'],
+                remise1=i['remise'],
                 price=i['price'],
                 total=i['total'],
                 isavoir=True,
                 isfarah=isfarah,
-                qtyofprice=i['qty']
+                qtyofprice=i['qty'],
+                date=datebon
             )
 
     return JsonResponse({
@@ -10137,7 +10166,11 @@ def grouper(request):
     })
 def getqtyprice(request):
     target=request.GET.get('target')
+    print(">>target", target)
     id=request.GET.get('id')
     isfarah=target=='f'
-    histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0).order_by('id')
+    if target=='s':
+        histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0).order_by('id')
+    else:
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0).order_by('id')
     return render(request, 'qtyprice.html', {'history':histyory})

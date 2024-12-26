@@ -502,6 +502,8 @@
                             </div> -->
                             <small for="name">Ref equiv.</small>
                             <textarea type="text" class="form-control mb-3" name="equivalent" value="" style="height: 15em">{{product.equivalent}}</textarea>
+                            <small for="name">Voitures.</small>
+                            <textarea type="text" class="form-control mb-3" name="cars" value="" style="height: 15em">{{product.cars}}</textarea>
                             <button class="border btn btn-success mt-2 w-100" style="    position: sticky;
                             bottom: 0;" onclick="updateproductdata(event, '{{product.id}}')">
                                 Enregistrer
@@ -822,6 +824,7 @@
         ref.removeClass('border-danger')
         var formData = new FormData($(`#updatepdct${id}`)[0]);
         formData.append('stock', `stocktotal${id}`);
+        formData.append('target', '{{target}}');
         console.log(formData)
         $.ajax({
             type: 'POST',
@@ -831,10 +834,9 @@
             contentType: false,
             success:((data)=>{
                 if(data.success){
-                    alertify.success('Modifier dans le server');
+                    alertify.success('Modifier');
 
-                    deletetab('addpdct{{product.id}}')
-                    ajaxpage('addpducts', 'Articles', '/products/stock')
+                    ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
                 }else{
                     alertify.error(data.error)
                 }

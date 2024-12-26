@@ -256,7 +256,7 @@ class Stockin(models.Model):
     remise4=models.FloatField(default=0.00, null=True, blank=
     True)
     total=models.FloatField(default=0.00)
-    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None)
+    supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
     nbon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
     isavoir=models.BooleanField(default=False)
     avoir=models.ForeignKey('Avoirclient', on_delete=models.CASCADE, default=None, null=True, blank=True)

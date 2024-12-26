@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between mb-5" style="position: sticky;top: 0; background: white;z-index: 999;">
-  <button class="bi bi-arrow-left" onclick="ajaxpage('addrecevoir', '+Achat', '/products/listavoirclient?target={{target}}')">LIST AVOIR FOURNISSEUR</button>
+  <button class="bi bi-arrow-left" onclick="ajaxpage('addrecevoir', '+Achat', '/products/listavoirclient?target={{target}}')">LIST AVOIR CLIENTS</button>
   <button class="btn btn-success" onclick="printavoir('{{avoir.id}}')">
     Telecharger
   </button>
@@ -9,7 +9,7 @@
     </button>
   </div>
   {% if not ovoir.ispaid or not avoir.inreglement %}
-  <button class="btn btn-danger" onclick="ajaxpage('addmodifieravoir{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoir/{{avoir.id}}')">
+  <button class="btn btn-danger" onclick="ajaxpage('addmodifieravoir{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoir/{{avoir.id}}?target={{target}}')">
     Modifier
   </button>
   {% endif %}
@@ -133,7 +133,7 @@
                       <br>
                       {% endfor %}
                     </td>
-                    <td>
+                    <td style="white-space: nowrap;">
                       {% for v in i %}
                         {{v.product.name.upper}}
                         <br>
@@ -141,7 +141,7 @@
                   </td>
                   <td class="text-center">
                     {% for v in i %}
-                    {{v.qty}}
+                    {{v.quantity}}
                     <br>
                     {% endfor %}
                   </td>
@@ -153,7 +153,7 @@
                   </td>
                   <td class="text-center">
                     {% for v in i %}
-                    {{v.remise}}%
+                    {{v.remise1}}%
                     <br>
                     {% endfor %}
                   </td>
@@ -255,7 +255,7 @@
               <br>
               {% endfor %}
             </td>
-            <td>
+            <td style="white-space: nowrap;">
               {% for v in i %}
                 {{v.product.name.upper}}
                 <br>
@@ -263,7 +263,7 @@
           </td>
           <td class="text-center">
             {% for v in i %}
-            {{v.qty}}
+            {{v.quantity}}
             <br>
             {% endfor %}
           </td>
@@ -275,7 +275,7 @@
           </td>
           <td class="text-center">
             {% for v in i %}
-            {{v.remise}}%
+            {{v.remise1}}%
             <br>
             {% endfor %}
           </td>

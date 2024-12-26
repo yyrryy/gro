@@ -223,6 +223,7 @@
   </div>
 
   <script>
+    readingqrcode=true
     $(function(){
 
       $('.clientselectbl').select2({
@@ -307,7 +308,7 @@
 
           if (event.which === 13) {  // Enter key detected
             clientid = $('.clientselectbl').val()
-            if (clientid==null){
+            if (clientid==null && readingqrcode){
               alertify.error('Veuillez choisir un client')
               return
             }
