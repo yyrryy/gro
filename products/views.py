@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Config
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -29,6 +29,9 @@ import uuid
 today = timezone.now().date()
 thisyear=timezone.now().year
 
+#initiating config
+if not Config.objects.exists():
+    Config.objects.create()
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
@@ -2929,6 +2932,8 @@ def reglebons(request):
             regl.bons.set(livraisons)
         else:
             regl.factures.set(livraisons)
+            regl.usedinfacture=True
+            regl.save()
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
         # for i in livraisons:
@@ -3934,6 +3939,8 @@ def reglebonsachat(request):
             regl.bons.set(livraisons)
         else:
             regl.factures.set(livraisons)
+            regl.usedinfacture=True
+            regl.save()
 
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)

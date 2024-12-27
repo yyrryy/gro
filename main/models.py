@@ -485,6 +485,7 @@ class PaymentSupplier(models.Model):
     bank=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isoargh=models.BooleanField(default=False)
+    usedinfacture=models.BooleanField(default=False)
     # avoir fornisseur I5lls i bo lmahal
     isavoir=models.BooleanField(default=False)
     
@@ -1137,3 +1138,9 @@ class Outfactureachat(models.Model):
     isorgh=models.BooleanField(default=False)
 
 
+class Config(models.Model):
+    caissesortie=models.FloatField(default=0.00)
+    caissefarah=models.FloatField(default=0.00)
+    caisseorgh=models.FloatField(default=0.00)
+    bankfarah=models.FloatField(default=0.00)
+    bankorgh=models.FloatField(default=0.00)

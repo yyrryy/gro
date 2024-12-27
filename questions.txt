@@ -40,7 +40,7 @@ avoir is valider when its in a reglement
 //list valider for each
 rastaurer from validation
 //facture some bons are paid
-cars of product
+//cars of product
 depo in add product
 //bon achat add qty uniten qty jeux
 

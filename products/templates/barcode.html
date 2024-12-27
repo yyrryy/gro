@@ -45,18 +45,21 @@
         {% for barcode in barcodes %}
 
             {% for i in  barcode%}
-                <div class="label d-flex justify-content-between border position-relative">
+                <!-- <div class="label d-flex justify-content-between border position-relative"> -->
+                <div class="label px-2">
                     <!-- <div class="label d-flex justify-content-between border position-relative"> -->
-                    <div>
-                        <div>{{i.0}}</div>
-                        <div style="height: 10.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
-                        <div style="font-size: 10px;">FRN{{i.4}}000{{i.2|floatformat:-2}}.{{i.5}}</div>
+                    <div class="d-flex justify-content-between align-items-center"  style="font-size: 10px;">
+                        <strong>{{i.0}}</strong>
+                        <div>S{{i.4}}00{{i.2|floatformat:-2}}.{{i.5}}</div>
                     </div>
-
-                    <!-- <div class="col-4"> -->
-                    <div style="position: absolute; top: 0;right: 0;">
+                    <div class="d-flex justify-content-between align-items-center">
+                    <div style="">
                         <img class="barcode-img" src="data:image/png;base64,{{i.3}}" alt="Barcode" style="margin-top: auto;">
                     </div>
+                    <div style="height: 10.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
+                    </div>
+                    <!-- <div class="col-4"> -->
+                    <!-- <div style="position: absolute; top: 0;right: 0; width: 30%;"> -->
                     <!-- <div style="font-size: 12px; padding-left: 17px; margin-top: -5px;">{{text}}</div> -->
                     <!-- <div style="font-size: 12px;">{{text}}</div> -->
                 </div>

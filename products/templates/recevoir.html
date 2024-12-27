@@ -256,7 +256,7 @@
       return
     }
     var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = addname.attr('data').split('§');
-    pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat')) || []
+    pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{target}}')) || []
     
     console.log(id, pdcts, pdcts.includes(id))
     if (pdcts.includes(id)){
@@ -299,7 +299,7 @@
     }
     
     pdcts.push(id)
-    localStorage.setItem('pdctsinbonachat', JSON.stringify(pdcts))
+    localStorage.setItem('pdctsinbonachat{{target}}', JSON.stringify(pdcts))
     let tr = `
     <tr class="itemrow">
       <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
@@ -337,7 +337,7 @@
         totalSum += parseFloat($(this).text());
       });
     console.log('saving')
-    savetolocalstorage(item, totalSum, 'bonachat')
+    savetolocalstorage(item, totalSum, 'bonachat{{target}}')
     totalbon.text(totalSum.toFixed(2))
     // parentdiv.find('.resultsholderbonachat').val('').trigger('change')
     parentdiv.find('.resultsholderbonachat').select2('open')
@@ -405,9 +405,9 @@
                 $(event.target).parent().remove()
                 // remove id from localstorage
 
-                pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat'))
+                pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{target}}'))
                 pdcts.splice(pdcts.indexOf(id.toString()), 1)
-                localStorage.setItem('pdctsinbonachat', JSON.stringify(pdcts))
+                localStorage.setItem('pdctsinbonachat{{target}}', JSON.stringify(pdcts))
                 // update total
                 let totalbon = parseFloat(parentdiv.find('.totalbon').text())
                 let totalrow = parseFloat($(event.target).parent().find('.total').text())
@@ -444,7 +444,7 @@
         return
       }
       var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
-      pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat')) || []
+      pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{target}}')) || []
       
       console.log(id, pdcts, pdcts.includes(id))
       if (pdcts.includes(id)){
@@ -483,7 +483,7 @@
         'total':addtotal
       }
       pdcts.push(id)
-      localStorage.setItem('pdctsinbonachat', JSON.stringify(pdcts))
+      localStorage.setItem('pdctsinbonachat{{target}}', JSON.stringify(pdcts))
       let tr = `
       <tr class="itemrow">
         <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
@@ -521,7 +521,7 @@
           totalSum += parseFloat($(this).text());
         });
       console.log('saving')
-      savetolocalstorage(item, totalSum, 'bonachat')
+      savetolocalstorage(item, totalSum, 'bonachat{{target}}')
       totalbon.text(totalSum.toFixed(2))
       // parentdiv.find('.resultsholderbonachat').val('').trigger('change')
       parentdiv.find('.resultsholderbonachat').select2('open')
@@ -531,7 +531,7 @@
 
     }
 
-    //localStorage.removeItem('pdctsinbonachat')
+    //localStorage.removeItem('pdctsinbonachat{{target}}')
     $('.resultsholderbonachat').on('change', function(){
           let parentdiv=$(this).parent().parent()
 
@@ -683,7 +683,7 @@
                 'csrfmiddlewaretoken': '{{csrf_token}}'
             },
             success: function(data){
-                localStorage.removeItem('pdctsinbonachat')
+                localStorage.removeItem('pdctsinbonachat{{target}}')
                 localStorage.removeItem('bonachat')
                 localStorage.removeItem('totalbonachat')
                 $('.loadingscreen').addClass('d-none')
@@ -749,7 +749,7 @@
     // }
 
     $(document).ready(function(){
-      pdcts=JSON.parse(localStorage.getItem('bonachat')) || []
+      pdcts=JSON.parse(localStorage.getItem('bonachat{{target}}')) || []
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
         $('.bonachatbody').prepend(`<tr class="itemrow">
@@ -768,7 +768,7 @@
         <input type="hidden" name="productid" value="${item.id}">
         
         </tr>`)}
-      $('.totalbon').text(localStorage.getItem('totalbonachat') || '0.00')
+      $('.totalbon').text(localStorage.getItem('totalbonachat{{target}}') || '0.00')
     $('.searchref').focus()
     $('.searchref').on('keyup', ()=>{
         let ref = $('.searchref').val()
