@@ -237,6 +237,7 @@ class Stockin(models.Model):
     # WE NEED to distinguish between to societies
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    issortie=models.BooleanField(default=False)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
     date=models.DateField()
     quantity=models.IntegerField()

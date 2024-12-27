@@ -575,8 +575,8 @@
       })
 
       $('.submitavcl').on('click', (e)=>{
-        if (parseFloat($('.totalreglblfields').text())!=parseFloat($('.totalbon').text())){
-          alertify.error('Total payement doit etre egale au total bon')
+        if (parseFloat($('.totalreglblfields').text())>parseFloat($('.totalbon').text())){
+          alertify.error('Total payement superieur au total bon')
           return
         }
         var isAnyEmpty = $('.reglnotempty').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;

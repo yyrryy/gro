@@ -325,12 +325,12 @@ def validatebonsortie(request):
 
         if i.isfarah:
             totalfarah += item_total
-            livraison_data['ref']=i.ref.replace('(FR) ', ''),
+            livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
             farahitems.append(Livraisonitem(**livraison_data))
         else:
             totalorgh += item_total
-            livraison_data['ref']=i.ref.replace('(OR) ', ''),
+            livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
             orghitems.append(Livraisonitem(**livraison_data))
     
@@ -408,13 +408,13 @@ def validatebonsortieproductprice(request):
 
         if i.isfarah:
             totalfarah += product.frsellprice*int(i.qty)
-            livraison_data['ref']=i.ref.replace('(FR) ', ''),
+            livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
             livraison_data['price'] = product.frsellprice
             farahitems.append(Livraisonitem(**livraison_data))
         else:
             totalfarah += product.sellprice*int(i.qty)
-            livraison_data['ref']=i.ref.replace('(OR) ', ''),
+            livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
             livraison_data['price'] = product.sellprice
             orghitems.append(Livraisonitem(**livraison_data))
@@ -624,12 +624,13 @@ def getclientpricesortie(request):
     target=request.POST.get('target')
     term=request.POST.get('term')
     product=Produit.objects.get(pk=pdctid)
-    frbuyprice=product.frbuyprice
-    frremise=product.frremise1
-    buyprice=product.buyprice
-    remise=product.remise1
+    frbuyprice=product.frbuyprice or 0
+    frremise=product.frremise1 or 0
+    buyprice=product.buyprice or 0
+    remiseofbuyorice=product.remise1 or 0
     price=0
     remise=0
+    print(frbuyprice, frremise, buyprice, remiseofbuyorice, '>>>', target)
     # buyprice=product.frbuyprice if 'fr' in term else product.buyprice
     # remisebuyprice=product.frremise1 if 'fr' in term else product.remise1
     try:
@@ -642,7 +643,7 @@ def getclientpricesortie(request):
                 'frbuyprice':frbuyprice,
                 'frremise':frremise,
                 'orbuyprice':buyprice,
-                'orremise':remise,
+                'orremise':remiseofbuyorice,
             })
     except:
         return JsonResponse({
@@ -650,8 +651,8 @@ def getclientpricesortie(request):
             'remise':0,
             'frbuyprice':frbuyprice,
             'frremise':frremise,
-            'buyprice':buyprice,
-            'remise':remise,
+            'orbuyprice':buyprice,
+            'orremise':remiseofbuyorice,
         })
     #if target=='bl':
     #    try:

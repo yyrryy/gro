@@ -16,7 +16,7 @@
         {% for i in history %}
         <tr>
             <td>{{ i.date|date:'d/m/Y' }}</td>
-            <td>{{ i.qtyofprice }}</td>
+            <td>{{ i.qtyofprice }} ({% if i.isfarah %}FR {% else %}OR{%endif%}) </td>
             <td>{{ i.price }}</td>
             <td>{{ i.remise1 }}</td>
             <td>{{ i.remise2 }}</td>

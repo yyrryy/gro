@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -1661,7 +1661,8 @@ def getclientprice(request):
     clientid=request.POST.get('clientid')
     mode=request.POST.get('mode')
     inavoir=request.POST.get('inavoir')=='true'
-    isfarah=request.POST.get('target')=='f'
+    target=request.POST.get('target')
+    isfarah=target=='f'
     product=Produit.objects.get(pk=pdctid)
     client=Client.objects.get(pk=clientid)
     print('>>>>',request.POST.get('target'), client.name, product.ref, isfarah, mode, inavoir)
@@ -1669,7 +1670,10 @@ def getclientprice(request):
     remise=0
 
     # try:
-    producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
+    if target=='s':
+        producthistory=Sortieitem.objects.filter(client_id=clientid, product_id=pdctid)
+    else:
+        producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
     print('producthistory', producthistory)
     clientprice=producthistory.last()
     if clientprice:
@@ -1869,14 +1873,18 @@ def exportfc(request):
 
 
 def listavoirclient(request):
-    isfarah=request.GET.get('target')=='f'
-    bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-id')[:50]
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    if target=='s':
+        bons= Avoirclient.objects.filter(date__year=thisyear, issortie=True).order_by('-id')[:50]
+    else:
+        bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-id')[:50]
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Avoir Client',
         'bons':bons,
         'total':total,
-        'target':request.GET.get('target')
+        'target':target
     }
     return render(request, 'listavoirclient.html', ctx)
 
@@ -2629,7 +2637,7 @@ def getclientbons(request):
     trs=''
     isfarah=target=='f'
     if target=='s':
-        avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=isfarah, inreglement=False, ispaid=False).order_by('date')
+        avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False, ispaid=False).order_by('date')
         avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
         bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, generated=False).order_by('date')[:50]
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
@@ -3186,6 +3194,16 @@ def avoirclient(request):
         }
     return render(request, 'avoirclient.html', ctx)
 
+def avoirclientinpointvente(request):
+    target=request.GET.get('target')
+    ctx={
+            'title':'Avoir client point de vente',
+            'target':target,
+            # 'commercials':Represent.objects.all(),
+            #'receipt_no':receipt_no
+        }
+    return render(request, 'avoirclientinpointvente.html', ctx)
+
 
 
 def addavoirclient(request):
@@ -3266,6 +3284,7 @@ def addavoirclient(request):
                 product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
             product.save()
             Stockin.objects.create(
+                isavoir=True,
                 avoir=avoir,
                 product=product,
                 quantity=i['qty'],
@@ -3274,6 +3293,7 @@ def addavoirclient(request):
                 total=i['total'],
                 isfarah=isfarah,
                 isorgh=isorgh,
+                issortie=issortie,
                 date=datebon
             )
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
@@ -3301,6 +3321,7 @@ def addavoirclient(request):
                         npiece=np,
                         isfarah=target=='f',
                         isorgh=target=='o',
+                        issortie=target=='s',
                         isavoir=True
                     )
                     regl.avoirs.set([avoir])
@@ -4395,8 +4416,9 @@ def searchproductbonsortie(request):
         results.append({
             'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}',
             'text':f'{i.ref.upper()} - {i.name.upper()}',
-            'stock':i.stocktotalfarah,
+            'stock':i.stocktotalfarah+i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah,
+            'image':i.image.url if i.image else "",
             # return term to use it as adistinguisher
             'term':term
         })
@@ -10219,7 +10241,7 @@ def getqtyprice(request):
     id=request.GET.get('id')
     isfarah=target=='f'
     if target=='s':
-        histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0).order_by('id')
+        histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0, isavoir=False).order_by('id')
     else:
-        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0).order_by('id')
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0, isavoir=False).order_by('id')
     return render(request, 'qtyprice.html', {'history':histyory})

@@ -522,8 +522,8 @@
         },
         minimumInputLength: 3,
         placeholder:'Chercher Produits',
-        // templateResult: formatRepo,
-        // templateSelection: formatRepoSelection,
+        templateResult: formatRepo,
+        templateSelection: formatRepoSelection,
       });
         function formatRepo (repo) {
           if (repo.loading) {
@@ -531,7 +531,7 @@
           }
 
           var $container = $(
-            `<strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</div>`
+            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
             );
 
 
@@ -542,6 +542,7 @@
         function formatRepoSelection (repo) {
           return repo.text;
         }
+      
       }//end else
 
     })
@@ -584,6 +585,24 @@
         templateResult: formatRepo,
         templateSelection: formatRepoSelection,
       });
+      function formatRepo (repo) {
+          if (repo.loading) {
+            return repo.text;
+          }
+
+          var $container = $(
+            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
+            );
+
+
+
+            return $container;
+        }
+
+        function formatRepoSelection (repo) {
+          return repo.text;
+        }
+      
         
       // if ($(this).val()==''||$('.repsselectsbl').val()==''){
       //   $.get('products/getclientrep/'+$(this).val(), function(data){
