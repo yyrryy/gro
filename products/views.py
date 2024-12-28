@@ -29,9 +29,7 @@ import uuid
 today = timezone.now().date()
 thisyear=timezone.now().year
 
-#initiating config
-if not Config.objects.exists():
-    Config.objects.create()
+
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():

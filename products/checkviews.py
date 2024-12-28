@@ -63,6 +63,9 @@ def duplicate(request):
 
 # ste1=Farah
 def ste1(request):
+    #initiating config
+    if not Config.objects.exists():
+        Config.objects.create()
     return render(request, 'fdashboard.html', {'target':'f'})
 
 # ste1=Farah
