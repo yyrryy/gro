@@ -1140,7 +1140,9 @@ class Outfactureachat(models.Model):
 
 class Config(models.Model):
     caissesortie=models.FloatField(default=0.00)
+    banksortie=models.FloatField(default=0.00)
     caissefarah=models.FloatField(default=0.00)
     caisseorgh=models.FloatField(default=0.00)
     bankfarah=models.FloatField(default=0.00)
     bankorgh=models.FloatField(default=0.00)
+    
