@@ -904,9 +904,7 @@ def addbonlivraison(request):
     print('>>', "clientid", clientid, "repid", repid, "products", products, "totalbon", totalbon, "devid", devid, "comndid", comndid, "transport", transport, "note", note, "datebon", datebon, "target", target)
     client=Client.objects.get(pk=clientid)
     print('cleint', client, 'soldtotal', client.soldtotal, 'totalbon', totalbon)
-    client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
-    client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
-    client.save()
+    
 
     # get the last bon no
     year = timezone.now().strftime("%y")
@@ -983,6 +981,9 @@ def addbonlivraison(request):
                 date=datebon,
                 isfarah=isfarah
             )
+    client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
+    client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
+    client.save()
     if mantant=="":
         return JsonResponse({
             "success":True

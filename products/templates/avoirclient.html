@@ -575,7 +575,7 @@
       })
 
       $('.submitavcl').on('click', (e)=>{
-        if (parseFloat($('.totalreglblfields').text())!=parseFloat($('.totalbon').text())){
+        if (parseFloat($('.totalreglblfields').text())>0 && parseFloat($('.totalreglblfields').text())!=parseFloat($('.totalbon').text())){
           alertify.error('Total payement doit etre egale au total bon')
           return
         }

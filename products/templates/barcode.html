@@ -19,7 +19,7 @@
              /* 20% for 5 items per row with gap */
             min-width: 38mm; /* Adjust to match your label size */
             height: 21.2mm; /* Adjust to match your label size */
-            
+            overflow: hidden;
             /* display: flex;
             flex-direction: column;
             align-items: center; */
@@ -48,15 +48,16 @@
                 <!-- <div class="label d-flex justify-content-between border position-relative"> -->
                 <div class="label px-2">
                     <!-- <div class="label d-flex justify-content-between border position-relative"> -->
-                    <div class="d-flex justify-content-between align-items-center"  style="font-size: 10px;">
+                    <div class=""  style="font-size: 10px;">
                         <strong>{{i.0}}</strong>
                         <div>S{{i.4}}00{{i.2|floatformat:-2}}.{{i.5}}</div>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                    <div style="">
+                    <div class="d-flex">
+                    <!-- <div class="d-flex justify-content-between align-items-center"> -->
+                    <div class="col-4">
                         <img class="barcode-img" src="data:image/png;base64,{{i.3}}" alt="Barcode" style="margin-top: auto;">
                     </div>
-                    <div style="height: 10.23mm; overflow: hidden; font-size: 10px;">{{i.1}}</div>
+                    <div style="font-size: 10px; margin-left: 3px;">{{i.1}}</div>
                     </div>
                     <!-- <div class="col-4"> -->
                     <!-- <div style="position: absolute; top: 0;right: 0; width: 30%;"> -->
