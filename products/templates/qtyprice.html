@@ -5,6 +5,7 @@
         <tr>
             <th>Date</th>
             <th>Quantité</th>
+            <th></th>
             <th>Prix</th>
             <th>Remise</th>
             <th>Remise2</th>
@@ -16,7 +17,10 @@
         {% for i in history %}
         <tr>
             <td>{{ i.date|date:'d/m/Y' }}</td>
-            <td>{{ i.qtyofprice }} ({% if i.isfarah %}FR {% else %}OR{%endif%}) </td>
+            <td class="qtyofprice" id="{{i.id}}">{{ i.qtyofprice }} </td>
+            <td>
+                ({% if i.isfarah %}FR {% else %}OR{%endif%})
+            </td>
             <td>{{ i.price }}</td>
             <td>{{ i.remise1 }}</td>
             <td>{{ i.remise2 }}</td>

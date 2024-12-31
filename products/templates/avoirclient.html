@@ -159,7 +159,10 @@
             </table>
             <div class="d-flex justify-content-between">
                 <button class="btn btn-success submitavcl" style="border-radius: 10px;">
-                      Valider
+                  Valider
+                </button>
+                <button class="btn btn-danger" onclick="annulerbon('avoircl{{target}}', '/products/listavoirclient?target={{target}}')">
+                  Annuler
                 </button>
                 <b class="totalbon text-danger">
                   0.00
@@ -213,8 +216,8 @@
 
     $(document).ready(function(){
       // get products from localstorage
-      pdcts=JSON.parse(localStorage.getItem('avoircl')) || []
-      total=localStorage.getItem('totalavoircl') || 0
+      pdcts=JSON.parse(localStorage.getItem('avoircl{{target}}')) || []
+      total=localStorage.getItem('totalavoircl{{target}}') || 0
       parentdiv=$('.bonlivraisonbody')
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
@@ -306,7 +309,7 @@
         }
         var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
         console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
-        pdcts=JSON.parse(localStorage.getItem('pdctsinavoircl')) || []
+        pdcts=JSON.parse(localStorage.getItem('pdctsinavoircl{{target}}')) || []
         console.log(id, pdcts, pdcts.includes(id))
         if (pdcts.includes(id)){
           addqty.val('')
@@ -320,7 +323,7 @@
         }
 
         pdcts.push(id)
-        localStorage.setItem('pdctsinavoircl', JSON.stringify(pdcts))
+        localStorage.setItem('pdctsinavoircl{{target}}', JSON.stringify(pdcts))
         if (addremise.val()==""){
           remise=0
         }
@@ -372,7 +375,7 @@
         totals.each(function() {
             totalSum += parseFloat($(this).text());
         });
-        savetolocalstorage(item, totalSum, 'avoircl')
+        savetolocalstorage(item, totalSum, 'avoircl{{target}}')
         totalbon.text(totalSum.toFixed(2))
         $('.avoirclproducts ').select2('open')
 
@@ -619,7 +622,7 @@
           //       $(this).attr('disabled', false)
           //       return
           //   }
-          localStorage.removeItem('pdctsinavoircl')
+          localStorage.removeItem('pdctsinavoircl{{target}}')
           parentdiv.find('.submitavcl').addClass('disabled')
           trs=parentdiv.find('.bonlivraisonbody tr')
           let products = []
@@ -670,7 +673,6 @@
           console.log(products)
           console.log(totalbon)
           console.log('sending')
-          localStorage.setItem('pdctsinbonlivraison', '[]')
           data={
               'totalbon': totalbon,
               'clientid': clientid,
@@ -708,9 +710,9 @@
               success: function(data){
                 $('.loadingscreen').addClass('d-none')
                 if (data.success){
-                  localStorage.removeItem('avoircl')
-                  localStorage.removeItem('pdctsinavoircl')
-                  localStorage.removeItem('totalavoircl')
+                  localStorage.removeItem('avoircl{{target}}')
+                  localStorage.removeItem('pdctsinavoircl{{target}}')
+                  localStorage.removeItem('totalavoircl{{target}}')
                   alertify.success('Bon avoir creé')
                   ajaxpage('avoircl', 'AvoirCL', '/products/listavoirclient?target={{target}}')
                 }else{

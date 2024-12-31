@@ -120,6 +120,12 @@
               <button class="btn btn-success submitbon">
                     Valider
               </button>
+              <button class="btn btn-danger" onclick="annulerbon('bonachat{{target}}', '/products/listbonachat?target={{target}}')">
+                Annuler
+              </button>
+              <button class="btn btn-info">
+                TVA
+              </button>
               <b class="grandtotalbonachat text-danger totalbon">
                 0.00
               </b>
@@ -684,9 +690,8 @@
                 'csrfmiddlewaretoken': '{{csrf_token}}'
             },
             success: function(data){
-                localStorage.removeItem('pdctsinbonachat{{target}}')
-                localStorage.removeItem('bonachat')
-                localStorage.removeItem('totalbonachat')
+              removelocalstorage('bonachat{{target}}')
+                
                 $('.loadingscreen').addClass('d-none')
                 ajaxpage('listbonachat', 'list achat', '/products/listbonachat?target={{target}}')
                 alertify.success('Bon acaht valider')

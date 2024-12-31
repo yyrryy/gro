@@ -29,7 +29,7 @@ margin: 0;
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addmodifierbonachat{{bon.id}}')">x</button>
 
 </div>
-{% if bon.ispaid or bon.rest > 0 %}
+{% if bon.ispaid%}
 <div class="alert alert-success">
   <b>Ce bon est payé ou avance</b>
 </div>
@@ -74,7 +74,7 @@ margin: 0;
 
             </div>
             <div class="col-3">
-              <input type="number" class="form-control" placeholder="Devise" name="adddevise">
+              <input hidden type="number" class="form-control" placeholder="Devise" name="adddevise">
 
             </div>
             <div class="col-3">
@@ -127,10 +127,13 @@ margin: 0;
                       <td style="padding: 2px 0; font-size: 13px;">Article</td>
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">Dernier Pr.</td>
                       <td style="padding: 2px 0; font-size: 13px;">Stock</td>
-                      <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Devise</td>
+                      <!-- <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Devise</td> -->
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Quantité</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix unit.</td>
-                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise1</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise2</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise3</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise4</td>
                       <!-- <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix Net</td> -->
                       <td style="padding: 2px 0; font-size: 13px;">Total</td>
                   </tr>
@@ -143,12 +146,15 @@ margin: 0;
                     <td class="name">{{i.product.name}}</td>
                     <td>{{i.product.buyprice}}</td>
                     <td>{{i.product.stocktotal}}</td>
-                    <td>
+                    <!-- <td>
                       <input style="width:65px;" type="text" value="{{i.devise}}" class="devise">
-                    </td>
-                    <td><input style="width:65px;" type="number" class="calculate qty" onkeyup="calculate(event)" name="qty" value="{{i.quantity}}"></td>
-                    <td><input style="width:65px;" type="number" class="calculate price" onkeyup="calculate(event)" name="price" value="{{i.price}}"></td>
-                    <td><input style="width:65px;" type="number" class="calculate remise" onkeyup="calculate(event)" name="remise" value="{{i.remise}}"></td>
+                    </td> -->
+                    <td><input style="width:65px;" type="number" class="calculate qty" onkeyup="calculatebonachat(event)" name="qty" value="{{i.quantity}}"></td>
+                    <td><input style="width:65px;" type="number" class="calculate price" onkeyup="calculatebonachat(event)" name="price" value="{{i.price}}"></td>
+                    <td><input style="width:65px;" type="number" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise1}}"></td>
+                    <td><input style="width:65px;" type="number" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise2}}"></td>
+                    <td><input style="width:65px;" type="number" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise3}}"></td>
+                    <td><input style="width:65px;" type="number" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise4}}"></td>
                     <!-- <td>{{i.product.prixnet}}</td> -->
                     <td class="total">{{i.total|floatformat:2}}</td>
                     <input type="hidden" name="productid" value="{{i.product.id}}">
@@ -249,10 +255,10 @@ margin: 0;
           <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
           <td style="paddingpx 0; font-size: 13px;">${dp}</td>
           <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
-          <td style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
-          <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptybonachat" onkeyup="calculate(event)" name="qty" value="${addqty.val()}" style="height:23px; width:65px;"></td>
-          <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptybonachat" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
-          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event)" name="remise" style="height:23px; width:65px;"></td>
+          <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptybonachat" onkeyup="calculatebonachat(event)" name="qty" value="${addqty.val()}" style="height:23px; width:65px;"></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptybonachat" onkeyup="calculatebonachat(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
           <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
           <input type="hidden" name="productid" value="${id}">
 
@@ -472,9 +478,9 @@ margin: 0;
     //                     <option value="depot">Depot</option>
     //                 </select>
     //             </td>
-    //             <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event)" name="qty"></td>
-    //             <td><input type="number" class="form-control calculate price" onkeyup="calculate(event)" name="price"></td>
-    //             <td><input type="number" class="form-control calculate remise" onkeyup="calculate(event)" name="remise"></td>
+    //             <td><input type="number" class="form-control calculate qty" onkeyup="calculatebonachat(event)" name="qty"></td>
+    //             <td><input type="number" class="form-control calculate price" onkeyup="calculatebonachat(event)" name="price"></td>
+    //             <td><input type="number" class="form-control calculate remise" onkeyup="calculatebonachat(event)" name="remise"></td>
     //             <td class="total"></td>
     //             <input type="hidden" name="productid" value="${id}">
     //             <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
@@ -498,8 +504,8 @@ margin: 0;
     //         <td>${name}</td>
     //         <td>${stock}</td>
 
-    //         <td><input type="number" class="form-control calculate qty" onkeyup="calculate(event)" name="qty"></td>
-    //         <td><input type="number" class="form-control calculate price" onkeyup="calculate(event)" name="price"></td>
+    //         <td><input type="number" class="form-control calculate qty" onkeyup="calculatebonachat(event)" name="qty"></td>
+    //         <td><input type="number" class="form-control calculate price" onkeyup="calculatebonachat(event)" name="price"></td>
     //         <td class="total"></td>
     //         <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
     //     </tr>

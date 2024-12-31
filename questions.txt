@@ -42,8 +42,11 @@ rastaurer from validation
 //facture some bons are paid
 //cars of product
 depo in add product
-//bon achat add qty uniten qty jeux
+//bon achat add qty uniten qty j
+eux
+annuleer bnts
 
+btn tva bon achat
 
 
 
@@ -59,3 +62,6 @@ avoirclient
 ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target={{target}}')
 
 avoirsupp
+
+list bn achat
+ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target={{target}}')
