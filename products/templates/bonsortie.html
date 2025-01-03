@@ -529,9 +529,9 @@
           if (repo.loading) {
             return repo.text;
           }
-
+          console.log('>>> repo', repo)
           var $container = $(
-            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
+            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <div><img src="${repo.image}" style="width:13%;">${repo.mark}</div></div>`
             );
 
 
@@ -590,10 +590,10 @@
             return repo.text;
           }
 
+          console.log('>>> repo', repo)
           var $container = $(
-            `<div class="d-flex justify-content-between align-items-center"><strong style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <img src="${repo.image}" style="width:13%;"></div>`
+            `<div class="row"><strong class="col-10" style="color:${repo.stock>0?"blue":"red"};">${repo.text}</strong> <div class="col-2"><img src="${repo.image}" style="width:100%;">${repo.mark}</div></div>`
             );
-
 
 
             return $container;

@@ -4425,6 +4425,7 @@ def searchproductbonsortie(request):
             'stock':i.stocktotalfarah+i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah,
             'image':i.image.url if i.image else "",
+            'mark':i.mark.name if i.mark else "",
             # return term to use it as adistinguisher
             'term':term
         })
@@ -4497,6 +4498,7 @@ def searchproduct(request):
             # return term to use it as adistinguisher
             'term':term,
             'image':i.image.url if i.image else "",
+            'mark':i.mark.name if i.mark else "",
             'target':target
         })
     return JsonResponse({'results': results})

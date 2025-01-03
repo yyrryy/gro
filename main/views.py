@@ -1,7 +1,7 @@
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
-from .models import Category, Client, Order, Orderitem, Produit, Client, Mark, Represent, Bonlivraison, Ordersnotif, Connectedusers, Promotion, Refstats, Cart, Cartitems, Notavailable, wishlist, Wich, Notification, Repcart, Repcartitem
+from .models import Category, Client, Order, Orderitem, Produit, Client, Mark, Represent, Bonlivraison, Ordersnotif, Connectedusers, Promotion, Refstats, Cart, Cartitems, Notavailable, wishlist, Wich, Notification, Repcart, Repcartitem, Config
 # import pandas as pd
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login, logout
@@ -861,8 +861,8 @@ def productsmarks(request, id):
 @user_passes_test(isadmin, login_url='main:loginpage')
 @login_required(login_url='main:loginpage')
 def system(request):
-    client_ip = request.META.get('REMOTE_ADDR')
-    print('>>>>>>>>>', client_ip)
+    if not Config.objects.exists():
+        Config.objects.create()
     ctx={
         'title':'Dashboard',
         # 'orders':Order.objects.filter(date__date=datetime.date.today()).count(),
