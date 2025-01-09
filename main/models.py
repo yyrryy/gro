@@ -167,6 +167,11 @@ class Produit(models.Model):
             return 100*(self.prixnet-self.buyprice)/self.prixnet
         except:
             return 0
+    def frgetpercentage(self):
+        try:
+            return 100*(self.prixnet-self.buyprice)/self.prixnet
+        except:
+            return 0
     def getequivalent(self):
         if self.equivalent:
             if '+' in self.equivalent:

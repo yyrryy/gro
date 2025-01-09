@@ -1,21 +1,31 @@
 {% for i in products %}
-
-<tr class="productsbrand{{i.mark.id}}">
-  <td><img src="{% if i.image %}{{i.image.url}} {% endif %}" style="width: 50%;"></td>
-  <td>{{i.ref.upper}}</td>
-  <td>{{i.name.upper}}</td>
-  <td style="color: #ff6409;
-  font-weight: bold;">
-  {{i.stocktotalfarah}}
- </td>
- <td style="color: #ff6409;
-  font-weight: bold;">
-  {{i.stocktotalorgh}}
- </td>
-  <td style="color:blue;font-weight: bold;">{{i.sellprice}}</td>
-  <td>
-    {{i.mark.name.upper}}
-  </td>  
-  </tr>
-
-{% endfor %}
+                <!--
+                -->
+                <!-- style="background:{% if not i.isactive %}#f3d6d694;{% endif %}" -->
+                <tr 
+                
+                data-product-id="{{ i.id }}" class="product-row ">
+                    <td style="padding: 5px; font-weight: bold;" class="pe-2">
+                        <img src="{% if i.image %}{{i.image.url}}{% endif %}" style="width: 55%;" alt="">
+                    </td>
+                    <td style="padding: 5px; font-weight: bold;">
+                      {{i.ref.upper}}
+                  </td>
+                  <td style="padding: 5px; font-weight: bold;">
+                    {{i.name.upper}}
+                </td>
+                <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
+                  {{i.stocktotalfarah}} ({{i.frsellprice}}DH)
+              </td>
+                <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
+                  {{i.stocktotalorgh}} ({{i.sellprice}}DH)
+              </td>
+                
+                    
+                    
+                    <td style="padding: 5px; font-weight: bold;">
+                      {{i.mark.name}}
+                  </td>
+                  
+                </tr>
+              {% endfor %}

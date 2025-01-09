@@ -379,12 +379,12 @@
                                 
                                 <div class="col-3">
                                     <small>Remise</small>
-                                    <input type="text" class="form-control mb-3" name="remise" value="{{product.remise}}">
+                                    <input type="text" class="form-control mb-3" name="remise" value="{%if isfarah%}{{product.frremisesell}}{%else%}{{product.remisesell}}{%endif%}">
                                 </div>
 
                                 <div class="col-3">
                                     <small for="name">Prix vente brut</small>
-                                    <input type="text" class="form-control mb-3"name="sellprice" value="{{product.sellprice}}">
+                                    <input type="text" class="form-control mb-3"name="sellprice" value="{%if isfarah%}{{product.frsellprice}}{%else%}{{product.sellprice}}{%endif%}">
                                 </div>
                                 <div class="col-3">
                                     <small for="name">block</small>

@@ -98,21 +98,14 @@
                 <td style="width: 9%"  onclick="sorttable(event)">Ref</td>
                 <td style="width:30%;"  onclick="sorttable(event)">Designation</td>
                 <td  onclick="intsorttable(event)">Prix achat</td>
-                <td  onclick="intsorttable(event)">Prix vente</td>
-                <td  onclick="intsorttable(event)">Remise</td>
-                <td  onclick="intsorttable(event)">Prix net</td>
+                <td  onclick="intsorttable(event)">Remise achat</td>
+                <td  onclick="intsorttable(event)">Prix Vente</td>
+                <td  onclick="intsorttable(event)">Remise Vente</td>
                 <td  onclick="sorttable(event)">Stock</td>
-                <td class="text-center"  onclick="sorttable(event)">Q</td>
-                <td  onclick="sorttable(event)">Diametre</td>
                 <td class=""  onclick="sorttable(event)">block</td>
-                <td  onclick="sorttable(event)">Code</td>
                 <td  onclick="sorttable(event)">Coutmoyen</td>
-                <td  onclick="sorttable(event)">Ref 1</td>
-                <td  onclick="sorttable(event)">Ref 2</td>
-                <td  onclick="sorttable(event)">Ref 3</td>
                 <td  onclick="sorttable(event)">Marque</td>
-                <td  onclick="sorttable(event)">order</td>
-                <td></td>
+                <!-- <td>%</td> -->
               </tr>
             </thead>
             <tbody class="product-table-body">
@@ -132,87 +125,53 @@
                     </td>
 
                     <td style="padding: 5px; font-weight: bold;" class="text-center prachat">
-                       {% if i.buyprice %} {{i.buyprice|floatformat:2}} {% else %} 0 {% endif %}
+                      {%if isfarah%}{{i.frbuyprice}}{%else%}{{i.buyprice}}{%endif%}
                     </td>
                     <td style="padding: 5px; font-weight: bold;" class="text-center">
-                       {% if i.sellprice %} {{i.sellprice|floatformat:2}} {% else %} 0 {% endif %}
+                      {%if isfarah%}{{i.frremise1}}{%else%}{{i.remise1}}{%endif%}
                     </td>
                     <td style="padding: 5px; font-weight: bold; font-size: 14px; color: var(--orange);" class="text-center">
-                        {{i.remise}}
+                      {%if isfarah%}{{i.frsellprice}}{%else%}{{i.sellprice}}{%endif%}
                     </td>
                     <td style="padding: 5px; font-weight: bold;" class="text-center">
-                        {{i.prixnet|floatformat:2}}
+                      {%if isfarah%}{{i.frremisesell}}{%else%}{{i.remisesell}}{%endif%}
                     </td>
                     <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
-                        {% if target == 'f' %} {{i.stocktotalfarah}} {% else %} {{i.stocktotalorgh}} {% endif %}
+                        {% if isfarah %} {{i.stocktotalfarah}} {% else %} {{i.stocktotalorgh}} {% endif %}
                     </td>
-                    <td style="padding: 5px; font-weight: bold;" class="text-center stockfacture" style="color: blue;">
-                      <span class="stockfacture invisible">
-                        {% if target == 'f' %} {{i.stockfacturefarah}} {% else %} {{i.stockfactureorgh}} {% endif %}
-                      </span>
-                  </td>
+                    
 
-                    <td style="padding: 5px; font-weight: bold;">
-                      {{i.diametre}}
-                  </td>
+                    
                     <td style="padding: 5px; font-weight: bold;" class="text-success">
                       {{i.block}}
                   </td>
-                  <td style="padding: 5px; font-weight: bold;">
-                    {{i.coderef}}
-                  </td>
+                  
                   <td style="padding: 5px; font-weight: bold;" class="text-danger">
                     {%if i.coutmoyen%}{{i.coutmoyen}}{%endif%}
                 </td>
-                    <td style="padding: 5px; font-weight: bold;">
-                        {{i.getequivalent.0}}
-                    </td>
-                    <td style="padding: 5px; font-weight: bold;">
-                        {{i.getequivalent.1}}
-                    </td>
-                    <td style="padding: 5px; font-weight: bold;">
-                        {{i.getequivalent.2}}
-                    </td>
+                   
                     <td style="padding: 5px; font-weight: bold;">
                       {{i.mark.name}}
                   </td>
-                  <td style="padding: 5px; font-weight: bold;" class="text-danger">
-                    {{i.code}}
-                </td>
+                  
 
 
-                <td style="padding: 5px; font-weight: bold;" class="text-danger">
-                  <span class="percentage invisible">
+                <!-- <td style="padding: 5px; font-weight: bold;" class="text-danger">
+                  <span class="percentage">
+                    {% if isfarah %}
+                    {{i.frgetpercentage|floatformat:2}}
+                    {% else %}
                     {{i.getpercentage|floatformat:2}}
+                    {% endif %}
                   </span>
-                </td>
+                </td> -->
 
                 </tr>
               {% endfor %}
 
 
             </tbody>
-            <tfoot style="background: rgb(231, 231, 231); position: sticky; bottom: 0;" class="tfootlistproduct">
-              <tr>
-
-                <td></td>
-                <td class="text-end text-center" style="background: yellowgreen;">B</td>
-                <td class="totalprachstock text-center" style="background: yellowgreen;">{{totalbuyprice}}</td>
-                <td></td>
-                <td class="text-end text-center" style="background: yellowgreen;">F</td>
-                <td class="totalprachstockfc text-center" style="background: yellowgreen;">{{totalprixnet}} </td>
-                <td class="totalstock text-danger text-center" style="background: yellowgreen;">{{stocktotal}}</td>
-                <td class="totalstockfacture text-center" style="background: yellowgreen;color: blue;">{{stockfacture}}</td>
-                <td></td>
-                <td></td>
-                <td class="text-success"></td>
-                <td></td>
-                <td></td>
-                <td>
-                </td>
-                <td></td>
-              </tr>
-            </tfoot>
+            
         </table>
       </div>
 

@@ -24,7 +24,7 @@ margin: 0;
 
 <div class="text-white rounded d-flex justify-content-between" style="background: #1a6a9b;">
   <div>
-    {{title}}
+    {{title}} {{target}}dd
   </div>
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addmodifierbonachat{{bon.id}}')">x</button>
 
@@ -384,7 +384,10 @@ margin: 0;
             let name = tr.find('.name').text()
             let ref = tr.find('.ref').text()
             let price = tr.find('.price').val()
-            let remise = tr.find('.remise').val()
+            let remise1 = tr.find('.remise1').val()
+            let remise2 = tr.find('.remise2').val()
+            let remise3 = tr.find('.remise3').val()
+            let remise4 = tr.find('.remise4').val()
             let devise= tr.find('.devise').val()
             let total = tr.find('.total').text()
             let productid = tr.find('input[name="productid"]').val()
@@ -393,8 +396,10 @@ margin: 0;
                 'name': name,
                 'ref': ref,
                 'price': price,
-                'remise': remise,
-                'devise': devise,
+                'remise1': remise1,
+                'remise2': remise2,
+                'remise3': remise3,
+                'remise4': remise4,
                 'total': total,
                 'productid': productid,
             }
@@ -423,6 +428,7 @@ margin: 0;
             url: "{% url 'products:updatebonachat' %}",
             type: 'POST',
             data: {
+              'target':'{{target}}',
                 'bonid': '{{bon.id}}',
                 'totalbon': totalbon,
                 'datebon': datebon,

@@ -67,6 +67,7 @@
                 <input type="number" name="suppphone2" class="form-control mb-2" placeholder="phone2">
                 <input type="text" name="address" class="form-control mb-2" placeholder="Addresse">
                 <input type="text" name="sold" class="form-control mb-2" placeholder="Sold initial">
+                <input type="text" name="suppice" class="form-control mb-2" placeholder="ICE">
                 <small>Observation</small>
                 <textarea name="note" class="form-control" style="height: 5em;"></textarea>
                 <button class="btn btn-outline-success w-100 submitaddsupplierbtn">
@@ -85,6 +86,12 @@
                         Fournisseur
                     </th>
                     <th>
+                        Code
+                    </th>
+                    <th>
+                        Ville
+                    </th>
+                    <th>
                         phone
                     </th>
                     <th>
@@ -101,6 +108,8 @@
                         </td>
                         <!-- onclick="ajaxpage('supp{{i.id}}', 'Fournisseur: {{i.name}}', '/products/supplier/{{i.id}}')" -->
                         <td >{% if i.image %}<img src="{{i.image.url}}" style="width: 20%;" alt="">{% endif %} {{i.name}}</td>
+                        <td>#S{{i.id}}</td>
+                        <td>{{i.city}}</td>
                         <td>{{i.phone}}</td>
                         <td>{{i.rest|floatformat:2}}</td>
                     </tr>
@@ -181,8 +190,11 @@
             processData: false,
             contentType: false,
             success:((data)=>{
-                console.log('ajaxpage')
-                ajaxpage('ee', 'rr', '/products/supplierspage?target={{target}}')
+                if (data.success){
+                    ajaxpage('ee', 'rr', '/products/supplierspage?target={{target}}')
+                }else{
+                    alertify.error('Erreur')
+                }
             })
         })
     })

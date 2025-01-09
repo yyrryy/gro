@@ -9,7 +9,7 @@
     </button>
     {% if not bon.ispaid %}
     {% if not bon.ismanual %}
-    <button class="btn w-100 btn-success" onclick="ajaxpage('addmodifierbonachat{{bon.id}}', 'Modifier Bon achat {{bon.nbon}}', '/products/modifierbonachat/{{bon.id}}')">
+    <button class="btn w-100 btn-success" onclick="ajaxpage('addmodifierbonachat{{bon.id}}', 'Modifier Bon achat {{bon.nbon}}', '/products/modifierbonachat/{{bon.id}}?target={{target}}')">
       Modifier
     </button>
     <button class="btn w-100 btn-danger" onclick="deletebonachat('{{bon.id}}')">

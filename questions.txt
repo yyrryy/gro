@@ -48,7 +48,7 @@ annuleer bnts
 
 btn tva bon achat
 
-
+avoir should add to qtyofprice
 
 
 

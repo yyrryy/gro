@@ -245,6 +245,10 @@ def supplierspage(request):
 
 def addsupplier(request):
     name=request.POST.get('suppnameinp')
+    if Supplier.objects.filter(name=name).exists():
+        return JsonResponse({
+            'success':False
+        })
     personalname=request.POST.get('supppersonalnameinp')
     # dont di this error again
     #image=request.POST.get('suppimageinp')
@@ -317,7 +321,6 @@ def addoneproduct(request):
         qtyjeu=request.POST.get('qtyjeuinadd') or 0
         supplier=request.POST.get('supplier') or None
         minstock=request.POST.get('minstockinadd') or 0
-        buyprice=request.POST.get('buyprice') or 0
         remise=request.POST.get('remiseinadd') or 0
         diametre=request.POST.get('diametreinadd') or ''
         representprice=request.POST.get('repprice') or None
@@ -331,8 +334,15 @@ def addoneproduct(request):
             ref=ref,
             name=name,
             qtyjeu=qtyjeu,
-            buyprice=buyprice,
+            buyprice=0,
+            remise1=0,
+            frbuyprice=0,
+            frremise1=0,
             diametre=diametre,
+            frsellprice=sellprice,
+            frremisesell=remise,
+            sellprice=sellprice,
+            remisesell=remise,
             stocktotalfarah=0,
             stocktotalorgh=0,
             stockfacturefarah=0,
@@ -436,6 +446,7 @@ def viewoneproduct(request, id):
     # Sort the items by date
     outs = sorted(releve, key=lambda item: item[0].date)
     ctx={
+        'isfarah':isfarah,
         'thisproductreliquat':thisproductreliquat,
         'outs':outs,
         'title':'Detail de '+product.ref,
@@ -964,9 +975,25 @@ def addbonlivraison(request):
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
+                thisqty=int(i['qty'])
                 product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, isavoir=False).order_by('id')
+                for pr in prices:
+                    if not thisqty==0 and pr.qtyofprice<=thisqty:
+                        thisqty-=pr.qtyofprice
+                        pr.qtyofprice=0
+                        pr.save()
+
+
             else:
+                thisqty=int(i['qty'])
                 product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, isavoir=False)
+                for pr in prices:
+                    if not thisqty==0 and pr.qtyofprice<=thisqty:
+                        thisqty-=pr.qtyofprice
+                        pr.qtyofprice=0
+                        pr.save()
             product.save()
             Livraisonitem.objects.create(
                 bon=order,
@@ -3726,6 +3753,7 @@ def listboncommnd(request):
     return render(request, 'listboncommnd.html', ctx)
 
 def bonachatdetails(request, id):
+    target=request.GET.get('target')
     bon=Itemsbysupplier.objects.get(pk=id)
     items=Stockin.objects.filter(nbon=bon)
     payments=PaymentSupplier.objects.filter(bons__in=[bon])
@@ -3736,24 +3764,31 @@ def bonachatdetails(request, id):
         'bon':bon,
         'items':items,
         'payments':payments,
-        'orderitems':orderitems
+        'orderitems':orderitems,
+        'target':target
     }
     return render(request, 'bonachatdetails.html', ctx)
 
 def modifierbonachat(request, id):
+    target=request.GET.get('target')
+    print('>>', target)
     bon=Itemsbysupplier.objects.get(pk=id)
     items=Stockin.objects.filter(nbon=bon)
     ctx={
         'title':'Modifier bon achat',
         'bon':bon,
         'items':items,
-        'suppliers':Supplier.objects.all()
+        'suppliers':Supplier.objects.all(),
+        'target':target
     }
     return render(request, 'modifierbonachat.html', ctx)
 
 
 def updatebonachat(request):
     id=request.POST.get('bonid')
+    target=request.POST.get('target')
+    print('>>> target', target)
+    isfarah=target=='f'
     bon=Itemsbysupplier.objects.get(pk=id)
     bon.date=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d')
     bon.nbon=request.POST.get('orderno')
@@ -3780,10 +3815,13 @@ def updatebonachat(request):
     for i in items:
         product=i.product
         print('removing from total')
-        product.stocktotal=int(product.stocktotal)-int(i.quantity)
-        if bon.isfacture:
-            print('removing from facture')
-            product.stockfacture=int(product.stockfacture)-int(i.quantity)
+        if isfarah:
+            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.quantity)
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.quantity)
+        # if bon.isfacture:
+        #     print('removing from facture')
+        #     product.stockfacture=int(product.stockfacture)-int(i.quantity)
         product.save()
         i.delete()
 
@@ -3800,29 +3838,46 @@ def updatebonachat(request):
             qty=0 if i['qty']=="" else int(i['qty'])
             product=Produit.objects.get(pk=i['productid'])
             print('>>>>>>>adding total')
-            product.stocktotal=int(product.stocktotal)+qty
-            if isfacture:
-                print('>>>>>>>adding fc')
-                product.stockfacture=int(product.stockfacture)+qty
+            if isfarah:
+                product.stocktotalfarah=int(product.stocktotalfarah)+qty
+            else:
+                product.stocktotalorgh=int(product.stocktotalorgh)+qty
+            # if isfacture:
+            #     print('>>>>>>>adding fc')
+            #     product.stockfacture=int(product.stockfacture)+qty
             #product.save()
             # create new livraison items
             Stockin.objects.create(
                 nbon=bon,
                 supplier=supplier,
-                remise=0 if i['remise']=="" else i['remise'],
-                devise=0 if i['devise']=="" else i['devise'],
+                remise1=0 if i['remise1']=="" else i['remise1'],
+                remise2=0 if i['remise2']=="" else i['remise2'],
+                remise3=0 if i['remise3']=="" else i['remise3'],
+                remise4=0 if i['remise4']=="" else i['remise4'],
                 product=product,
                 date=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d'),
                 quantity=qty,
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
-                isfacture=isfacture
+                qtyofprice=qty,
+                isfarah=isfarah
             )
             totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
             totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
             print(totalprices, totalqty)
-            product.coutmoyen=round(totalprices/totalqty, 2)
-            product.buyprice=0 if i['price']=="" else i['price']
+            #product.coutmoyen=round(totalprices/totalqty, 2)
+            if isfarah:
+                product.frbuyprice=0 if i['price']=="" else i['price']
+                product.frremise1=0 if i['remise1']=="" else i['remise1']
+                product.frremise2=0 if i['remise2']=="" else i['remise2']
+                product.frremise3=0 if i['remise3']=="" else i['remise3']
+                product.frremise4=0 if i['remise4']=="" else i['remise4']
+            else:
+                product.buyprice=0 if i['price']=="" else i['price']
+                product.remise1=0 if i['remise1']=="" else i['remise1']
+                product.remise2=0 if i['remise2']=="" else i['remise2']
+                product.remise3=0 if i['remise3']=="" else i['remise3']
+                product.remise4=0 if i['remise4']=="" else i['remise4']
             product.save()
 
     return JsonResponse({
@@ -5377,7 +5432,9 @@ def stock(request):
     target=request.GET.get('target')
     categories=Category.objects.all()
     products=Produit.objects.all()[:50]
-    ctx={'categories':categories,
+    ctx={
+        'categories':categories,
+        'isfarah':target=='f',
         'title':'Liste des Articles',
         'products':products,
         'target':target
@@ -6213,17 +6270,16 @@ def loadstock(request):
         #         </tr>
         #     '''
         return JsonResponse({
-            'trs':render(request, 'stocktrs.html', {'products':products, 'target':target}).content.decode('utf-8'),
+            'trs':render(request, 'stocktrs.html', {'products':products, 'target':target, 'isfarah':target=="f"}).content.decode('utf-8'),
             'has_more': len(products) == per_page,
             'target':target
         })
     else:
         print('>>>>>>>>>>>>', term=='0')
 
-        regex_search_term = term.replace('+', '*')
 
         # Split the term into individual words separated by '*'
-        search_terms = regex_search_term.split('*')
+        search_terms = term.split('+')
         print(search_terms)
 
         # Create a list of Q objects for each search term and combine them with &
@@ -6233,71 +6289,10 @@ def loadstock(request):
 
                 q_objects &= (Q(ref__iregex=term) | Q(name__iregex=term) | Q(category__name__iregex=term) |  Q(mark__name__iregex=term))
         products=Produit.objects.filter(q_objects)[start:end]
-        #trs=''
-        # for i in products:
-        #     trs+=f'''
-        #     <tr ondblclick="ajaxpage('addpdct{i.id}', 'Produit {i.ref}', '/products/viewoneproduct/{i.id}')"
-        #         style="background:{'#f3d6d694;' if not i.isactive else '' }"
-        #             data-product-id="{ i.id }" class="product-row ">
-        #             <td style="padding: 5px; font-weight: bold;" >
-        #                 {i.ref.upper()}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;">
-        #                 {i.name}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-center prachat">
-        #                 {i.buyprice if i.buyprice else 0}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold; font-size: 14px; color: var(--orange);" class="text-center">
-        #                 {i.sellprice}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-center">
-        #                 {i.remise}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-center">
-        #                 {i.prixnet}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-center text-danger stock">
-        #                 {i.stocktotal}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-center stockfacture" style="color: blue;">
-        #                 <span class="stockfacture invisible">{i.stockfacture}</span>
-        #             </td>
-
-        #             <td style="padding: 5px; font-weight: bold;">
-        #                 {i.diametre}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-success">
-        #                 {i.block}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;">
-        #                 {i.coderef}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;">
-        #               {i.getequivalent()[0] if i.getequivalent() else ''}
-        #           </td>
-        #           <td style="padding: 5px; font-weight: bold;">
-        #               {i.getequivalent()[1] if i.getequivalent() else ''}
-
-        #           </td>
-        #           <td style="padding: 5px; font-weight: bold;">
-        #               {i.getequivalent()[2] if i.getequivalent() else ''}
-
-        #           </td>
-
-        #             <td style="padding: 5px; font-weight: bold;">
-        #                 {i.mark}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;"  class="text-danger">
-        #                 {i.code}
-        #             </td>
-        #             <td style="padding: 5px; font-weight: bold;" class="text-danger"><span class="percentage invisible"> {round(i.getpercentage(), 2)}</span></td>
-        #         </tr>
-        #     '''
         return JsonResponse({
-            'trs':render(request, 'stocktrs.html', {'products':products}).content.decode('utf-8'),
+            'trs':render(request, 'stocktrs.html', {'products':products, 'isfarah':target=='f'}).content.decode('utf-8'),
             'has_more': len(products) == per_page,
-            'farah':farah
+            
         })
 
 def loadlistachat(request):
@@ -10249,7 +10244,7 @@ def getqtyprice(request):
     id=request.GET.get('id')
     isfarah=target=='f'
     if target=='s':
-        histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0, isavoir=False).order_by('id')
+        histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0).order_by('id')
     else:
-        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0, isavoir=False).order_by('id')
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0).order_by('id')
     return render(request, 'qtyprice.html', {'history':histyory})
