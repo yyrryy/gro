@@ -97,6 +97,7 @@ margin: 0;
             <div class="col-12">
               <input hidden readonly type="text" name="addname" class="form-control">
             </div>
+            {% include 'accordionqtyprice.html' %}
           </div>
 
 
@@ -502,14 +503,21 @@ margin: 0;
 
             }
           })
-
+          $.get('/products/getqtyprice',
+            {
+              'target':'{{target}}',
+              'id':id
+            },
+            function(data){
+              $('.producthistory').html(data)
+            })
         console.log('getting client price')
         $.ajax({
             url: "{% url 'products:getclientprice' %}",
             type: 'POST',
             data: {
-              'target':'bl',
                 'id': id,
+                'target':'{{target}}',
                 'clientid': parentdiv.find('.clientselectlivraison{{livraison.id}}').val()?parentdiv.find('.clientselectlivraison{{livraison.id}}').val():'{{livraison.client.id}}',
                 'csrfmiddlewaretoken': '{{csrf_token}}'
             },

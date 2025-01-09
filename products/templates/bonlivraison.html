@@ -345,7 +345,7 @@
                     url: "{% url 'products:getclientprice' %}",
                     type: 'POST',
                     data: {
-                        'target':'bl',
+                        'target':'{{target}}',
                         'id': id,
                         'clientid': $('.clientselectbl').val(),
                         'csrfmiddlewaretoken': '{{csrf_token}}'

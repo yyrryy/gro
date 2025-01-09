@@ -481,10 +481,6 @@ def updateproduct(request):
             'error':'Ref exist deja'
             })
     image=request.FILES.get('image') or None
-    new=request.POST.get('switch')
-    near=True if  request.POST.get('nearswitch') == 'on' else False
-    logo=request.POST.get('updatepdctlogo', None)
-    selected_reps = request.POST.getlist('updatereps')
     remise=request.POST.get('remise') or 0
     sellprice=request.POST.get('sellprice') or 0
     #netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
@@ -506,20 +502,12 @@ def updateproduct(request):
     # equivalent=' '.join(i for i in request.POST.get('equivalent').split())
     equivalent=request.POST.get('equivalent')
     cars=request.POST.get('cars')
-    minstock=request.POST.get('minstock')
+    minstock=request.POST.get('minstock') or 0
     qtyjeu=request.POST.get('qtyjeu') or 0
-    product.carlogos_id=logo
-    if new=='on':
-      product.isnew=True
-    else:
-      product.isnew=False
-    product.near=near
     product.minstock=minstock
     product.qtyjeu=qtyjeu
-    product.repsprice=json.dumps(selected_reps)
     product.equivalent=equivalent
     product.cars=cars
-    product.code=request.POST.get('updatecode')
     # product.refeq1=request.POST.get('refeq1').strip()
     # product.refeq2=request.POST.get('refeq2').strip()
     # product.refeq3=request.POST.get('refeq3').strip()
@@ -977,7 +965,7 @@ def addbonlivraison(request):
             if isfarah:
                 print('>>> we are in farah')
                 product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, isavoir=False, product=product).order_by('id')
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product).order_by('id')
                 thisqty=int(i['qty'])
                 for pr in prices:
                     print('>> qty', thisqty, pr.product.ref)
@@ -998,7 +986,7 @@ def addbonlivraison(request):
             else:
                 thisqty=int(i['qty'])
                 product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, isavoir=False, product=product)
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product)
                 for pr in prices:
                     if not thisqty<=0:
                         print('>> qty is not 0')
@@ -1720,6 +1708,8 @@ def getclientprice(request):
     # try:
     if target=='s':
         producthistory=Sortieitem.objects.filter(client_id=clientid, product_id=pdctid)
+    # elif target=='f':
+    #     producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=True)
     else:
         producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
     print('producthistory', producthistory)
@@ -2394,9 +2384,18 @@ def updatebonlivraison(request):
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
         if target=='f':
+            print('>>> deleting old bon items')
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+            st=Stockin.objects.filter(isfarah=True, product=product).last()
+            st.qtyofprice=st.qtyofprice+int(i.qty)
+            st.save()
+            
         else:
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
+            st=Stockin.objects.filter(isfarah=False, product=product).last()
+            st.qtyofprice=st.qtyofprice+int(i.qty)
+            st.save()
+            
         product.save()
         i.delete()
 
@@ -2416,8 +2415,41 @@ def updatebonlivraison(request):
         product=Produit.objects.get(pk=i['productid'])
         if target=='f':
             product.stocktotalfarah=int(product.stocktotalfarah)-qty
+            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product).order_by('id')
+            thisqty=int(i['qty'])
+            for pr in prices:
+                print('>> qty', thisqty, pr.product.ref)
+                if not thisqty<=0:
+                    print('>> qty is not 0')
+                    if pr.qtyofprice<=thisqty:
+                        thisqty=thisqty-int(pr.qtyofprice)
+                        pr.qtyofprice=0
+                    else:
+                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        thisqty=0
+                    pr.save()
+                else:
+                    print('>> qty', thisqty, pr.product.ref, 'breaking')
+                    break
         else:
             product.stocktotalorgh=int(product.stocktotalorgh)-qty
+            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product).order_by('id')
+
+            thisqty=int(i['qty'])
+            for pr in prices:
+                print('>> qty', thisqty, pr.product.ref)
+                if not thisqty<=0:
+                    print('>> qty is not 0')
+                    if pr.qtyofprice<=thisqty:
+                        thisqty=thisqty-int(pr.qtyofprice)
+                        pr.qtyofprice=0
+                    else:
+                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        thisqty=0
+                    pr.save()
+                else:
+                    print('>> qty', thisqty, pr.product.ref, 'breaking')
+                    break
         product.save()
 
         # create new livraison items
@@ -3344,7 +3376,8 @@ def addavoirclient(request):
                 isfarah=isfarah,
                 isorgh=isorgh,
                 issortie=issortie,
-                date=datebon
+                date=datebon,
+                qtyofprice=i['qty']
             )
         client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
         client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
@@ -5922,7 +5955,7 @@ def updatebonavoir(request):
                 isavoir=True,
                 isfarah=isfarah,
                 qtyofprice=i['qty'],
-                date=datebon
+                date=datebon,
             )
 
     return JsonResponse({
