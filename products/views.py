@@ -975,25 +975,44 @@ def addbonlivraison(request):
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
-                thisqty=int(i['qty'])
+                print('>>> we are in farah')
                 product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, isavoir=False).order_by('id')
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, isavoir=False, product=product).order_by('id')
+                thisqty=int(i['qty'])
                 for pr in prices:
-                    if not thisqty==0 and pr.qtyofprice<=thisqty:
-                        thisqty-=pr.qtyofprice
-                        pr.qtyofprice=0
+                    print('>> qty', thisqty, pr.product.ref)
+                    if not thisqty<=0:
+                        print('>> qty is not 0')
+                        if pr.qtyofprice<=thisqty:
+                            thisqty=thisqty-int(pr.qtyofprice)
+                            pr.qtyofprice=0
+                        else:
+                            pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                            thisqty=0
                         pr.save()
+                    else:
+                        print('>> qty', thisqty, pr.product.ref, 'breaking')
+                        break
 
 
             else:
                 thisqty=int(i['qty'])
                 product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, isavoir=False)
+                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, isavoir=False, product=product)
                 for pr in prices:
-                    if not thisqty==0 and pr.qtyofprice<=thisqty:
-                        thisqty-=pr.qtyofprice
-                        pr.qtyofprice=0
+                    if not thisqty<=0:
+                        print('>> qty is not 0')
+                        if pr.qtyofprice<=thisqty:
+                            thisqty=thisqty-int(pr.qtyofprice)
+                            pr.qtyofprice=0
+                        else:
+                            pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                            thisqty=0
                         pr.save()
+                    else:
+                        print('>> breaking')
+                        break
+                    
             product.save()
             Livraisonitem.objects.create(
                 bon=order,
