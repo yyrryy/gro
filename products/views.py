@@ -2513,8 +2513,8 @@ def listreglementbl(request):
         'today':timezone.now().date(),
         'target':target,
     }
-    if reglements:
-        ctx['total']=round(PaymentClientbl.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+    # if reglements:
+    #     ctx['total']=round(PaymentClientbl.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
 
     return render(request, 'listreglementbl.html', ctx)
 
