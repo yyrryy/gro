@@ -831,6 +831,13 @@ a .uil {
 </head>
 
 <body>
+  <!-- overlay for data holder -->
+  <div class="d-flex overlaydata d-none" style="height: 100vh; overflow-y: scroll; position: fixed; background: #0000004c; width: 100vw; z-index: 99999;">
+    <div class="col-3" onclick="$('.overlaydata').addClass('d-none')"></div>
+    <div class="col-9 bg-white p-2 dataholder" style="height: 100vh; overflow-y: scroll;">
+      Test
+    </div>
+   </div>
   <div class="w-70 shadow position-fixed bg-white border p-2 addscreen d-none" style="top: 0; right: 0; z-index: 99; height: 100vh; overflow-y: scroll;">
     <button class="btn btn-danger" onclick="$('.addscreen').addClass('d-none')">X</button>
     <div class="addscreenhtml">
@@ -933,6 +940,8 @@ a .uil {
       </div>
     </div>
   </div>
+
+  
   <!-- <div>
               <span class="connectednbr">0</span>
               Connecté
@@ -2364,6 +2373,7 @@ a .uil {
     }
 
     const populatesuppfields=(id)=>{
+      $('.overlaydata').removeClass('d-none')
           $.ajax({
               url: "{% url 'products:getsupplierdata' %}",
               type: "post",
@@ -2372,10 +2382,11 @@ a .uil {
                   'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
               success: function (data) {
-                  $('input[name="pname"]').val(data.name);
-                  $('input[name="pphone"]').val(data.phone);
-                  $('input[name="paddress"]').val(data.address);
-                  $('input[name="pid"]').val(data.id);
+                $('.dataholder').html(data)
+                  // $('input[name="pname"]').val(data.name);
+                  // $('input[name="pphone"]').val(data.phone);
+                  // $('input[name="paddress"]').val(data.address);
+                  // $('input[name="pid"]').val(data.id);
               },
               error: function (data) {
                   console.log(data);

@@ -280,12 +280,13 @@ def addsupplier(request):
 def getsupplierdata(request):
     id=request.POST.get('id')
     supplier=Supplier.objects.get(pk=id)
-    return JsonResponse({
-        'name':supplier.name,
-        'phone':supplier.phone,
-        'address':supplier.address,
-        'id':supplier.id
-    })
+    return render(request, 'editsupplier.html', {'supplier':supplier})
+    # return JsonResponse({
+    #     'name':supplier.name,
+    #     'phone':supplier.phone,
+    #     'address':supplier.address,
+    #     'id':supplier.id
+    # })
 
 
 def updatesupplier(request):
@@ -621,14 +622,20 @@ def cacelcommand(request):
     })
 
 def recevoir(request):
+    from random import randint
     target=request.GET.get('target')
     isfarah=target=='f'
-    lastid=Itemsbysupplier.objects.last()
-    if lastid:
-        lastid=lastid.id
+    # lastid=Itemsbysupplier.objects.last()
+    # if lastid:
+    #     lastid=lastid.id
+    # else:
+    #     lastid=1
+    if isfarah:
+        bonno=f'FR-BA{timezone.now().strftime("%y")}{"".join(str(randint(0, 9)) for i in range(6))}'
+
     else:
-        lastid=1
-    bonno=f'BA{timezone.now().strftime("%y")}{lastid}'
+        bonno=f'BA{timezone.now().strftime("%y")}{"".join(str(randint(0, 9)) for i in range(6))}'
+
     print('>>>>>>', bonno)
     return render(request, 'recevoir.html', {'title':"Bon d'achat", 'suppliers':Supplier.objects.all(), 'today':timezone.now().date(), "target":target, 'bonno':bonno})
 

@@ -65,9 +65,22 @@
                 <input type="text" name="supppersonalnameinp" class="form-control mb-2" placeholder="Nom contact">
                 <input type="number" name="suppphone" class="form-control mb-2" placeholder="phone">
                 <input type="number" name="suppphone2" class="form-control mb-2" placeholder="phone2">
-                <input type="text" name="address" class="form-control mb-2" placeholder="Addresse">
                 <input type="text" name="sold" class="form-control mb-2" placeholder="Sold initial">
                 <input type="text" name="suppice" class="form-control mb-2" placeholder="ICE">
+                <input type="text" name="supplierrc" class="form-control mb-2" placeholder="RC">
+                <input type="text" name="supplierif" class="form-control mb-2" placeholder="IF">
+                <small>Mode reglement:</small>
+                  <select name="modereglement" class="modereglement form-control mb-2">
+                    <option value="compte">En compte</option>
+                    <option value="espece">Contre espece</option>
+                    <option value="cheque">Contre cheque</option>
+                    <option value="effet">Contre effet</option>
+                    <option value="verement">Contre verement</option>
+                  </select>
+
+                  <input type="text" name="suppliercity" class="form-control mb-2" placeholder="Ville">
+                  <input type="text" name="supplieremail" class="form-control mb-2" placeholder="Email">
+                  <input type="text" name="supplieraddress" class="form-control mb-2" placeholder="Addresse">
                 <small>Observation</small>
                 <textarea name="note" class="form-control" style="height: 5em;"></textarea>
                 <button class="btn btn-outline-success w-100 submitaddsupplierbtn">
@@ -102,7 +115,7 @@
                     {% for i in suppliers %}
                     <tr>
                         <td>
-                            <button class="btn editsuppbtn border" id="{{i.id}}" data-toggle="modal" data-target="#editsuppmodal" onclick="populatesuppfields({{i.id}})">
+                            <button class="btn editsuppbtn border" id="{{i.id}}" onclick="populatesuppfields('{{i.id}}')">
                                 ✐{{i.id}}
                             </button>
                         </td>
