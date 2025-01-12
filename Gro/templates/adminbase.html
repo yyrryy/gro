@@ -1447,16 +1447,16 @@ a .uil {
       console.log('New window loaded.');
 
       // Wait for 5 seconds before printing
-      // setTimeout(function() {
-      //   try {
-      //     myWindow.print();
-      //     console.log('Print command issued.');
-      //     myWindow.close();
-      //     console.log('New window closed.');
-      //   } catch (e) {
-      //     console.error('Failed to print and close the window:', e);
-      //   }
-      // }, 1000); // 1000 milliseconds = 1 seconds
+      setTimeout(function() {
+        try {
+          myWindow.print();
+          console.log('Print command issued.');
+          myWindow.close();
+          console.log('New window closed.');
+        } catch (e) {
+          console.error('Failed to print and close the window:', e);
+        }
+      }, 1000); // 1000 milliseconds = 1 seconds
     }, false);
   }
 
