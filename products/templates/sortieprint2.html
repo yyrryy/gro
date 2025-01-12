@@ -8,7 +8,7 @@
     <style>
       @media print {
          .livraison-holder {
-             height: 14.8cm; /* Slightly less than the maximum printable height */
+             height: 14cm; /* Slightly less than the maximum printable height */
              width: 10.5cm; /* Full width of A4 */
              border: 1px solid black; /* For debugging and visibility */
              page-break-after: always; /* Ensures each div starts on a new page */
@@ -43,12 +43,12 @@
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm; page-break-before: always;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between" style="margin-top:2em; font-size: 10px;">
+        <div class="d-flex justify-content-between" style="font-size: 10px;">
           <b>
                 Bon de Sortie
               </b>
@@ -162,12 +162,12 @@
 
     {% else %}
     <!-- other pages -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: cm; page-break-before: always;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: cm;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between" style="margin-top:2em; font-size: 10px;">
+        <div class="d-flex justify-content-between" style="font-size: 10px;">
           <b>
                 Bon de Sortie
               </b>
