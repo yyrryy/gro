@@ -1175,11 +1175,11 @@ a .uil {
         function formatRepoSelection (repo) {
           return repo.text;
         }
-      function populateavoir(event, price, remise){
+      function populateavoir(event, price, remise, bonid){
         console.log('>> ddd')
         $('[name="addprice"]').val(price);
         $('[name="addremise"]').val(remise);
-
+        $('[name="addbonid"]').val(bonid);
       }
       function savetolocalstorage(item, total, target){
         console.log('>>target', target)
@@ -1413,17 +1413,33 @@ a .uil {
 
     })
     $('.connectedholder').on('mouseleave', ()=>{$('.connectedusersbar').addClass('collapsed'); $('#collapsconnected').removeClass('show')})
-    function printlivraison(bonid){
-       /*var printContents = document.getElementById(divName).innerHTML;
-       var originalContents = document.body.innerHTML;
-       document.body.innerHTML = printContents;
-       $('.blitems').css({'font-size': '15px','font-family':'serif'})
-       $("table > tbody > tr > td").css({'padding':'5px', 'border-bottom':'0px', 'border-top':'0px'});
-       //  $('body').addClass('d-flex flex-column vh-100 p-3')
-       window.print();
-       document.body.innerHTML = originalContents;*/
+  function printlivraison(bonid){
        url = window.location.pathname.split( '/' );[0]
        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/bonlivraisonprint/'+bonid, '', 'width=900,height=900');
+
+        myWindow.focus();
+
+        myWindow.addEventListener('load', function() {
+      console.log('New window loaded.');
+
+      // Wait for 5 seconds before printing
+      setTimeout(function() {
+        try {
+          myWindow.print();
+          console.log('Print command issued.');
+          myWindow.close();
+          console.log('New window closed.');
+        } catch (e) {
+          console.error('Failed to print and close the window:', e);
+        }
+      }, 1000); // 1000 milliseconds = 1 seconds
+    }, false);
+  }
+
+
+  function printsortie2(bonid){
+       url = window.location.pathname.split( '/' );[0]
+       var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/sortieprint2/'+bonid, '', 'width=900,height=900');
 
         myWindow.focus();
 
@@ -2372,13 +2388,14 @@ a .uil {
         // totalbon.html(totalbonvalue)
     }
 
-    const populatesuppfields=(id)=>{
+    const populatesuppfields=(id, target)=>{
       $('.overlaydata').removeClass('d-none')
           $.ajax({
               url: "{% url 'products:getsupplierdata' %}",
               type: "post",
               data: {
                   'id':id,
+                  'target':target,
                   'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
               success: function (data) {

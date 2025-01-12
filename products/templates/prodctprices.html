@@ -18,7 +18,7 @@
             <td>{{ product.qty }}{{ product.quantity }}</td>
             <td>{{ product.price }}</td>
             <td>{{ product.remise }}{{ product.remise1 }}%</td>
-            <td><button class="btn btn-sm" onclick="populateavoir(event, '{{ product.price }}', '{{ product.remise }}{{ product.remise1 }}')">^</button></td>
+            <td><button class="btn btn-sm" onclick="populateavoir(event, '{{ product.price }}', '{% if isfarah %}{{ product.frremise1 }}{% else %}{{ product.remise1 }}{% endif %}', '{{product.bon.id}}')">^</button></td>
         </tr>
         {% endfor %}
     </tbody>

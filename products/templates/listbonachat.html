@@ -121,7 +121,6 @@
           <td style="width: 5%;" onclick="intsorttable(event)">Total</td>
           <td style="width: 5%;" onclick="sorttable(event)">Facture</td>
           <td style="width: 5%;" onclick="sorttable(event)">Staus</td>
-          <td style="width: 5%;" onclick="intsorttable(event)">Solde fourn.</td>
           <td style="width: 4%;"></td>
         </tr>
       </thead>
@@ -147,7 +146,7 @@
                 </div> 
               {% endif %}
             </td>
-            <td>{{ order.supplier.rest|floatformat:2|intspace }}</td>
+            <!-- <td>{{ order.supplier.rest|floatformat:2|intspace }}</td> -->
             
             <td>
               <button class="btn bi bi-download" onclick="printbonachat('{{order.id}}')"></button>

@@ -97,6 +97,7 @@
               <div class="col-12">
                 <input hidden readonly type="text" name="addname" class="form-control">
               </div>
+              <input type="text" hidden name="addbonid">
 
             </div>
 
@@ -300,6 +301,7 @@
         let addname=parentdiv.find('[name="addname"]')
         let addqty=parentdiv.find('[name="addqty"]')
         let addprice=parentdiv.find('[name="addprice"]')
+        let addbonid=parentdiv.find('[name="addbonid"]')
         let addremise=parentdiv.find('[name="addremise"]')
         let priceclient=parentdiv.find('.addclientprice ').text()
         // >>> in avoir it's ok if empty
@@ -345,6 +347,7 @@
             <td style="padding: 2px 0; font-size: 13px;">${netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
+            <input type="hidden" name="bonid" value="${addbonid.val()}">
 
         </tr>
         `
@@ -361,7 +364,8 @@
           'representprice': representprice,
           'qty': addqty.val(),
           'price': addprice.val(),
-          'total': addtotal
+          'total': addtotal,
+          'bonid':addbonid.val()
         }
         bonachatbody.prepend(tr)
         // delete selected option
@@ -636,6 +640,7 @@
               let total = tr.find('.total').text()
               let clientprice= tr.find('.clientprice').text()
               let productid = tr.find('input[name="productid"]').val()
+              let bonid = tr.find('input[name="bonid"]').val()
               let product = {
                   'qty': qty,
                   'name': name,
@@ -644,6 +649,7 @@
                   'remise': remise,
                   'total': total,
                   'productid': productid,
+                  'bonid': bonid,
                   'clientprice':clientprice
               }
               products.push(product)

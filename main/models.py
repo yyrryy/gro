@@ -60,6 +60,7 @@ class Produit(models.Model):
     qtyjeu=models.IntegerField(default=0, null=True, blank=True)
     name=models.CharField(max_length=500, null=True)
     block=models.CharField(max_length=500, null=True, default=None)
+    unite=models.CharField(max_length=500, null=True, default=None)
     # code = classement
     code=models.CharField(max_length=500, null=True)
     coderef=models.CharField(max_length=500, null=True, default=None)
@@ -243,6 +244,7 @@ class Itemsbysupplier(models.Model):
     ispaid=models.BooleanField(default=False)
     isfacture=models.BooleanField(default=False)
     isvalid=models.BooleanField(default=False)
+    user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     def __str__(self) -> str:
         return f'{self.nbon} - {self.id}'
 
@@ -409,6 +411,8 @@ class Avancesupplier(models.Model):
 
 
 class Bonlivraison(models.Model):
+    # track history prices whenavoir or modifier bon, restore qty of qtyprice
+    pricesofout=models.TextField(default=None, blank=True, null=True)
     isvalid=models.BooleanField(default=False)
     iscanceled=models.BooleanField(default=False)
     order=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
@@ -443,7 +447,7 @@ class Bonlivraison(models.Model):
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
     # payments of this bon
     payment=models.FloatField(default=0.00)
-
+    benifice=models.FloatField(default=0.00)
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)
@@ -1118,6 +1122,7 @@ class Sortieitem(models.Model):
         return f'{self.bon.bon_no} - {self.product.ref}'
 
 class Factureachat(models.Model):
+    user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     iscaceled=models.BooleanField(default=False)
     isvalid=models.BooleanField(default=False)
     facture_no=models.CharField(max_length=500, null=True, default=None)

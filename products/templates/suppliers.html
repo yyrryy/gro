@@ -66,6 +66,7 @@
                 <input type="number" name="suppphone" class="form-control mb-2" placeholder="phone">
                 <input type="number" name="suppphone2" class="form-control mb-2" placeholder="phone2">
                 <input type="text" name="sold" class="form-control mb-2" placeholder="Sold initial">
+                <input type="number" name="supplierplafon" class="form-control mb-2" placeholder="Plafon">
                 <input type="text" name="suppice" class="form-control mb-2" placeholder="ICE">
                 <input type="text" name="supplierrc" class="form-control mb-2" placeholder="RC">
                 <input type="text" name="supplierif" class="form-control mb-2" placeholder="IF">
@@ -115,7 +116,7 @@
                     {% for i in suppliers %}
                     <tr>
                         <td>
-                            <button class="btn editsuppbtn border" id="{{i.id}}" onclick="populatesuppfields('{{i.id}}')">
+                            <button class="btn editsuppbtn border" id="{{i.id}}" onclick="populatesuppfields('{{i.id}}', '{{target}}')">
                                 ✐{{i.id}}
                             </button>
                         </td>

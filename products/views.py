@@ -256,9 +256,17 @@ def addsupplier(request):
     print('image>>', image)
     phone=request.POST.get('suppphone')
     phone2=request.POST.get('suppphone2')
-    address=request.POST.get('address')
+    address=request.POST.get('supplieraddress')
+    city=request.POST.get('suppliercity')
+    email=request.POST.get('supplieremail')
     note=request.POST.get('note')
     sold=request.POST.get('sold') or 0
+    ice=request.POST.get('suppice')
+    suppif=request.POST.get('supplierif')
+    rc=request.POST.get('supplierrc')
+    plafon=request.POST.get('supplierplafon')
+    modereglement=request.POST.get('modereglement')
+    print('>> name', name, 'phone', phone, 'address', address, 'image', image, 'personalname', personalname, 'phone2', phone2, 'rest', sold, 'note', note, 'city', city, 'email', email, 'ice', ice, 'suppif', suppif, 'rc', rc, 'modereglement', modereglement, 'plafon', plafon)
     Supplier.objects.create(
         name=name,
         phone=phone,
@@ -267,7 +275,15 @@ def addsupplier(request):
         personalname=personalname,
         phone2=phone2,
         rest=sold,
-        note=note
+        note=note,
+        city=city,
+        email=email,
+        ice=ice,
+        suppif=suppif,
+        rc=rc,
+        modereglement=modereglement,
+        plafon=plafon,
+
     )
     ctx={
         'suppliers':Supplier.objects.all(),
@@ -279,8 +295,9 @@ def addsupplier(request):
 
 def getsupplierdata(request):
     id=request.POST.get('id')
+    target=request.POST.get('target')
     supplier=Supplier.objects.get(pk=id)
-    return render(request, 'editsupplier.html', {'supplier':supplier})
+    return render(request, 'editsupplier.html', {'supplier':supplier, 'target':target})
     # return JsonResponse({
     #     'name':supplier.name,
     #     'phone':supplier.phone,
@@ -314,6 +331,7 @@ def addoneproduct(request):
         ref=request.POST.get('refinadd').lower().strip()
         name=request.POST.get('nameinadd').strip()
         category=request.POST.get('categoryinadd')
+        unite=request.POST.get('unite')
         commercialsprix=request.POST.get('commercialsprix') or "[]"
         mark=request.POST.get('marqueinadd') or None
         logo=request.POST.get('logoinadd', None)
@@ -343,6 +361,7 @@ def addoneproduct(request):
             frsellprice=sellprice,
             frremisesell=remise,
             sellprice=sellprice,
+            unite=unite,
             remisesell=remise,
             stocktotalfarah=0,
             stocktotalorgh=0,
@@ -697,6 +716,7 @@ def searchref(request):
     })
 
 def addsupply(request):
+    user=request.user
     supplierid=request.POST.get('supplierid')
     mantant=json.loads(request.POST.get('mantant'))
     moderegl=json.loads(request.POST.get('moderegl'))
@@ -725,6 +745,7 @@ def addsupply(request):
     if isfacture:
         print('>> creating facture')
         facture=Factureachat.objects.create(
+            user=user,
             facture_no=nbon,
             supplier_id=supplierid,
             isfarah=isfarah,
@@ -734,6 +755,7 @@ def addsupply(request):
         tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
     else:
         bon=Itemsbysupplier.objects.create(
+            user=user,
             isfarah=True if target=='f' else False,
             isorgh=True if target=='o' else False,
             supplier_id=supplierid,
@@ -766,18 +788,23 @@ def addsupply(request):
         remise3=0 if i['remise3']=='' else int(i['remise3'])
         remise4=0 if i['remise4']=='' else int(i['remise4'])
 
-        buyprice=0 if i['price']=='' else i['price']
+        buyprice=i['price']
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
         if target=='f':
             # calcul pondiré, stock needs to be more than 0
             if product.stocktotalfarah>0:
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
-                actualtotal=float(product.frbuyprice)*float(product.stocktotalfarah)
-                totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
+                actualtotal=0
+                remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True)
+                for i in remainingstock:
+                    actualtotal+=float(i.price)*float(i.qtyofprice)
+                
+                totalprices=round((float(i['qty'])*buyprice)+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.frcoutmoyen=pondire
                 product.save()
+            product.frcoutmoyen=buyprice
             product.frremise1=remise1
             product.frremise2=remise2
             product.frremise3=remise3
@@ -793,11 +820,15 @@ def addsupply(request):
         else:
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
-                actualtotal=float(product.buyprice)*float(product.stocktotalorgh)
+                actualtotal=0
+                remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
+                for i in remainingstock:
+                    actualtotal+=float(i.price)*float(i.qtyofprice)
                 totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
+            product.coutmoyen=buyprice
             product.remise1=remise1
             product.remise2=remise2
             product.remise3=remise3
@@ -893,7 +924,6 @@ def addbonlivraison(request):
     npiece=request.POST.get('npiece')
     echeance=request.POST.get('echeance')
     print('>> echeance', echeance, echeance=="")
-
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
@@ -904,6 +934,7 @@ def addbonlivraison(request):
     comndid=request.POST.get('cmndid')
     # orderno
     transport=request.POST.get('transport')
+
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
@@ -967,6 +998,7 @@ def addbonlivraison(request):
         cmnd.save()
     print('>>>>>>', len(json.loads(products))>0)
     with transaction.atomic():
+        pricesofout=[]
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
@@ -981,9 +1013,11 @@ def addbonlivraison(request):
                         if pr.qtyofprice<=thisqty:
                             thisqty=thisqty-int(pr.qtyofprice)
                             pr.qtyofprice=0
+                            pricesofout.append([pr.id])
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
                             thisqty=0
+                            pricesofout.append([pr.id])
                         pr.save()
                     else:
                         print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -1000,9 +1034,11 @@ def addbonlivraison(request):
                         if pr.qtyofprice<=thisqty:
                             thisqty=thisqty-int(pr.qtyofprice)
                             pr.qtyofprice=0
+                            pricesofout.append([pr.id])
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
                             thisqty=0
+                            pricesofout.append([pr.id])
                         pr.save()
                     else:
                         print('>> breaking')
@@ -1022,6 +1058,8 @@ def addbonlivraison(request):
                 date=datebon,
                 isfarah=isfarah
             )
+    order.pricesofout=pricesofout
+    order.save()
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
     client.save()
@@ -1718,6 +1756,7 @@ def getclientprice(request):
     # elif target=='f':
     #     producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=True)
     else:
+        print('>> farah clientprice', clientid, pdctid, isfarah)
         producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
     print('producthistory', producthistory)
     clientprice=producthistory.last()
@@ -1736,7 +1775,7 @@ def getclientprice(request):
     return JsonResponse({
         'price':price,
         'remise':remise,
-        'table':render(request, 'prodctprices.html', {'producthistory':producthistory.order_by('-date')}).content.decode('utf-8')
+        'table':render(request, 'prodctprices.html', {'producthistory':producthistory.order_by('-date'), 'isfarah':isfarah}).content.decode('utf-8')
     })
     # except Exception as e:
     #     print('error', e)
@@ -3303,7 +3342,6 @@ def addavoirclient(request):
     # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
     echeance=json.loads(request.POST.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
-    
     target=request.POST.get('target')
     clientid=request.POST.get('clientid')
     repid=request.POST.get('repid')
@@ -3369,6 +3407,21 @@ def addavoirclient(request):
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
             if isfarah:
                 product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+                prices=Stockin.objects.filter(product=product, isfarah=True)
+                bonid=i['bonid']
+                if bonid:
+                    bon=Bonlivraison.objects.get(pk=bonid)
+                    prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
+                    ## finish this prices
+                    for i in prices:
+                        pass
+                # if prices.exists():
+                #     thisqty=int(i['qty'])
+                #     for p in prices:
+                #         if thisqty==0:
+                #             break
+                #         if p.qtyofprice<p:
+                #             p.quantity+=thisqty
             if isorgh:
                 product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
             product.save()
@@ -9491,6 +9544,18 @@ def bonlivraisonprint(request, id):
         'reps':Represent.objects.all()
     }
     return render(request, 'bonlivraisonprint.html', ctx)
+
+def sortieprint2(request, id):
+    order=Bonsortie.objects.get(pk=id)
+    orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
+    ctx={
+        'title':f'Bon de Sortie {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems
+    }
+    return render(request, 'sortieprint2.html', ctx)
 
 def boncmndprint(request, id):
     order=Order.objects.get(pk=id)

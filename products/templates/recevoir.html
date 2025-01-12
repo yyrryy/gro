@@ -17,8 +17,8 @@
           </select>
 
           <input name="nbonachat" class="form-control mt-2 nbonachat" style="width:100%;" placeholder="N° Bon" value="{{bonno}}">
-          <small class="mt-5">Date de Reception</small>
-          <input type="date" name="datebonachat" class="form-control datebonachat" placeholder="Date de Bon" value="{{today|date:'Y-m-d'}}">
+          <small class="mt-5" hidden>Date de Reception</small>
+          <input hidden type="date" name="datebonachat" class="form-control datebonachat" placeholder="Date de Bon" value="{{today|date:'Y-m-d'}}">
           <small class="mt-5">Date Facture</small>
           <input type="date" name="datefacture" class="form-control datefacture" placeholder="Date de Bon" value="">
           <select name="mode" class="form-select mt-2 mode">

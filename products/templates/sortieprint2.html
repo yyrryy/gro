@@ -1,101 +1,54 @@
 {% load global_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Example</title>
+    <style>
+      @media print {
+         .livraison-holder {
+             height: 14.8cm; /* Slightly less than the maximum printable height */
+             width: 10.5cm; /* Full width of A4 */
+             border: 1px solid black; /* For debugging and visibility */
+             page-break-after: always; /* Ensures each div starts on a new page */
+             box-sizing: border-box; /* Include padding and border in the element's total width and height */
+         }
 
-<div class="row">
-  <div class="col-3 bg-white rounded">
-    <button class="btn w-100 btn-primary mb-2" onclick="printsortie('{{order.id}}')">
-      Imprimer
-    </button>
-    {% if not order.generated %}
-    <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
-      Valider Bon sortie (prix bon sortie)
-    </button>
-    <button class="btn w-100 btn-success mt-2" onclick="validatebonsortieproductprice(event, '{{order.id}}')">
-      Valider Bon sortie (prix de produit)
-    </button>
-    {% endif %}
-    {% if not order.ispaid %}
-    <button class="btn w-100 btn-info" onclick="paybonsortie(event, '{{order.id}}')">
-      Payé
-    </button>
-    {% endif %}
-    <!-- <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
-      Modifier
-    </button> -->
+         /* Reset margins and paddings for printing */
+         body {
+             margin: 0;
+             padding: 0;
+         }
+         td > div{
+           margin:4px;
+         }
 
+         /* Optional: If you need to adjust margins more precisely */
+         @page {
+             margin: 0; /* Remove any default margins */
+         }
+     }
+    </style>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquerySpellingNumber.js"></script>
+    <link href="/static/css/minified.css" rel="stylesheet" />
+</head>
+<body>
 
-    <!-- <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">
-      Entette
-    </button> -->
-
-    <!-- <strong class="mt-2">Transport</strong>
-    <div class="d-flex">
-      <input value="{{order.modlvrsn}}">
-      <button onclick="updatetransportbl(event, '{{order.id}}')">+</button>
-    </div> -->
-    <strong class="mt-2">Note</strong>
-    <div class="d-flex">
-      <input value="{% if order.note %}{{order.note}}{% endif %}">
-      <button onclick="updatenotebs(event, '{{order.id}}')">+</button>
-    </div>
-    <!-- <strong class="mt-2">Reprenant</strong>
-    <div class="d-flex">
-      <select>
-        <option value="{{order.salseman.id}}">{{order.salseman.name}}</option>
-        {% for i in reps %}
-        <option value="{{i.id}}">{{i.name}}</option>
-        {% endfor %}
-      </select>
-      <button onclick="updaterepbl(event, '{{order.id}}')">+</button>
-    </div> 
-    <strong>Reglements:</strong>
-    {% for i in reglements %}
-    <table style="border-color: black;" class="table table-bordered mb-2" style="font-size: 12px;">
-      <tr>
-        <td style="background: #e1e7ff;">Date</td>
-        <td>{{i.date|date:"d/m/Y"}}</td>
-      </tr>
-      <tr>
-        <td style="background: #e1e7ff;">Montant</td>
-        <td>{{i.amount|floatformat:2}}</td>
-      </tr>
-
-      <tr>
-        <td style="background: #e1e7ff;">Mode</td>
-        <td>{{i.mode}}</td>
-      </tr>
-      <tr>
-        <td style="background: #e1e7ff;">N° piece</td>
-        <td>{{i.npiece}}</td>
-      </tr>
-      <tr>
-        <td style="background: #e1e7ff;">Echeance</td>
-        <td>{{i.echance|date:"d/m/Y"}}</td>
-      </tr>
-    </table> 
-    {% endfor %} 
-    {% if order.rest > 0 %}
-    Rest: {{order.rest|floatformat:2}}
-    {% endif %} -->
-  </div>
+  <div id="printbl{{order.id}}" class="bonbody position-relative">
 
 
-  <div id="printbl{{order.id}}" class="bonbody col-9 position-relative">
-
-
-    {% if order.total == 0 and order.isfacture %}
-    <div class="alert alert-success">
-      <b>Tous produit de ce bon ont eté generé</b>
-    </div>
-    {%endif%}
+    
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
-    <div class="d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
+    <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
           <div class="">
 
               <div>
@@ -112,7 +65,6 @@
             </h3>
 
           <div style="width: 15em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <div>Client</div>
             <div>{{order.client.name.upper}}</div>
             <div>{{order.client.code.upper}}</div>
             <div>{{order.client.city.upper}}</div>
@@ -137,9 +89,8 @@
           <thead style="background: #c9c9c967; font-size: 10px;
         font-weight: 800;" class="text-center">
             <tr>
-              <td style="">Ref</td>
-              <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
+              <td style="width:53%;">Designation</td>
               <td style="width: 7%;">P.U</td>
               <td style="width: 5%;">Rem</td>
               <td style="width: 13%;">Mantant</td>
@@ -147,27 +98,21 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 190mm;white-space: nowrap;">
+              <td class="text-center" style="height: 13cm;">
+                {% for v in i %}
+
+                {{v.qty}}
+                <br>
+                {% endfor %}
+            </td>
+              <td style="white-space: nowrap; padding:3px">
                   {% for v in i %}
 
-                  {{v.ref.upper}}
+                  {{v.product.category.name.upper}}
                   <br>
                   {% endfor %}
               </td>
-              <td style="white-space: nowrap;">
-                  {% for v in i %}
-
-                  {{v.name.upper|slice:'45'}}
-                  <br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  {% for v in i %}
-
-                  {{v.qty}}
-                  <br>
-                  {% endfor %}
-              </td>
+              
               <td class="text-center">
                   {% for v in i %}
 
@@ -195,11 +140,12 @@
 
         </table>
         <!-- footer total -->
-        <div
-        style="width: 8em;
-        float: right;">
+        <div class="d-flex justify-content-between">
+          <small>
+            page: {{forloop.counter}}/{{orderitems|length}}
+          </small>
           <div class="text-center d-flex justify-content-between" style="background: #aeaeae8c;
-          font-size: 13px;">
+          font-size: 13px; width:14em;">
             <div>Total</div>
             <div style="font-size: 16px; margin-right: 13px;">
               <strong>
@@ -210,21 +156,19 @@
 
 
         </div>
-        <small>
-          page: {{forloop.counter}}/{{orderitems|length}}
-        </small>
+
       </div>
     </div>
 
 
     {% else %}
     <!-- other pages -->
-    <div class="d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
+    <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between mt-3">
+        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
           <div class="">
 
               <div>
@@ -236,12 +180,11 @@
           </div>
           <h3>
               <b>
-                Bon de {% if bonsortie %}Sortie{% else %}Livraison{% endif %}
+                Bon de Sortie
               </b>
             </h3>
 
           <div style="width: 15em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <div>Client</div>
             <div>{{order.client.name.upper}}</div>
             <div>{{order.client.code.upper}}</div>
             <div>{{order.client.city.upper}}</div>
@@ -263,12 +206,11 @@
           visibility: hidden;
           ">
         <table class="table table-bordered blitems" style="font-size: 13px; font-family: serif; border-color: black;">
-          <thead style="background: #c9c9c980; font-size: 10px;
+          <thead style="background: #c9c9c967; font-size: 10px;
         font-weight: 800;" class="text-center">
             <tr>
-              <td style="">Ref</td>
-              <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
+              <td style="width:53%;">Designation</td>
               <td style="width: 7%;">P.U</td>
               <td style="width: 5%;">Rem</td>
               <td style="width: 13%;">Mantant</td>
@@ -276,27 +218,21 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 150mm;white-space: nowrap;">
+              <td class="text-center" style="height: 13cm;">
+                {% for v in i %}
+
+                {{v.qty}}
+                <br>
+                {% endfor %}
+            </td>
+              <td style="white-space: nowrap; padding:3px">
                   {% for v in i %}
 
-                  {{v.ref.upper}}
-                  <br>
-                  {% endfor %}
-                  </td>
-                <td style="white-space: nowrap;">
-                  {% for v in i %}
-
-                  {{v.name.upper|slice:'45'}}
-                  <br>
-                  {% endfor %}
-              </td>
-              <td class="text-center">
-                  {% for v in i %}
-
-                  {{v.qty}}
+                  {{v.product.category.name.upper}}
                   <br>
                   {% endfor %}
               </td>
+              
               <td class="text-center">
                   {% for v in i %}
 
@@ -341,45 +277,7 @@
 
 
 <script>
-  $(function(){
 
-      $('.clientselectchangeinbl').select2({
-        minimumInputLength: 1,
-        placeholder:'Chercher',
-        ajax: {
-          type:'get',
-          dataType: 'json',
-          url: '/products/searchclient',
-          data: function (params) {
-            var query = {
-              term: params.term,
-            }
-            // Query parameters will be ?search=[term]&type=public
-            return query;
-          },
-          proccessresults: function (data) {
-              return {
-                results:data.results
-              }
-          },
-          cache:true
-        }
-      });
-
-    })
-  $('.clientselectchangeinbl').on('change', function(){
-    let oldclient='{{order.client.id}}'
-    let total='{{order.total}}'
-    console.log('updateclient for bon', oldclient, $(this).val(), total)
-    $.get('/products/changeclientbl', {'oldclient': oldclient, 'newclient':$(this).val(), 'total':total, 'orderid':'{{order.id}}'}, (data)=>{
-      updatetab('bonl{{order.id}}', '/products/bonlivraisondetails/{{order.id}}')
-    })
-  })
-  function hidetettebl(){
-    $('.bllogo').css('visibility', 'visible')
-    $('.bgbl').css('visibility', 'visible')
-  }
-  $('#download-frame').remove()
 
   function livraison(divName){
          var printContents = document.getElementById(divName).innerHTML;
@@ -393,3 +291,5 @@
 
     }
   </script>
+</body>
+</html>
