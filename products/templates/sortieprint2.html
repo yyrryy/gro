@@ -36,14 +36,14 @@
 </head>
 <body>
 
-  <div id="printbl{{order.id}}" class="bonbody position-relative">
+  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 29.7; width: 21;">
 
 
     
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm;margin:auto;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
@@ -162,7 +162,7 @@
 
     {% else %}
     <!-- other pages -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: cm;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm; margin:auto;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
