@@ -43,12 +43,12 @@
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
-    <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm; page-break-before: always;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm; page-break-before: always;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
+        <div class="d-flex justify-content-between" style="margin-top:2cm;">
           <div class="">
 
               <div>
@@ -98,7 +98,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 13cm;">
+              <td class="text-center" style="height: 10.5cm;">
                 {% for v in i %}
 
                 {{v.qty}}
@@ -163,12 +163,12 @@
 
     {% else %}
     <!-- other pages -->
-    <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm; page-break-before: always;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: cm; page-break-before: always;">
       <!-- header -->
       <div class="">
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
-        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
+        <div class="d-flex justify-content-between" style="margin-top:2cm;">
           <div class="">
 
               <div>
@@ -218,7 +218,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 13cm;">
+              <td class="text-center" style="height: 10.5cm;">
                 {% for v in i %}
 
                 {{v.qty}}
