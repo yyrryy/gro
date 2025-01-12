@@ -198,7 +198,12 @@
                 <div>
                   Rest: <strong class="rest"></strong>
                 </div>
-                
+                <div class="form-check">
+                  <input class="form-check-input remisecheck" type="checkbox" value="" id="remisecheck">
+                  <label class="form-check-label" for="remisecheck">
+                    Remise
+                  </label>
+                </div>
               </div>
 
 
@@ -876,6 +881,7 @@
               url: "{% url 'products:addbonsortie' %}",
               type: 'POST',
               data: {
+                'remise':$('.remisecheck').is(':checked'),
                 'car':$('.cars').val(),
                   'totalbon': totalbon,
                   'clientid': clientid,

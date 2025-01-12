@@ -228,8 +228,11 @@
                     $('.existerror').removeClass('d-none');
                     $('.submitbtn').addClass('disabled');
                 } else {
+                    console.log(data)
                     $('.existerror').addClass('d-none');
                     $('.submitbtn').removeClass('disabled');
+                    $('[name=nameinadd]').val(data.name)
+                    $('[name=equivinadd]').val(data.equiv)
                 }
             }
         });

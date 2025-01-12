@@ -1076,6 +1076,7 @@ class DeviItemsupplier(models.Model):
 
 
 class Bonsortie(models.Model):
+    remise=models.BooleanField(default=False)
     paidamount=models.FloatField(default=0.00)
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     bonlivraison=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='blofbon')

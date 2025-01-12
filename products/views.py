@@ -220,13 +220,16 @@ def updatemarque(request):
 def checkref(request):
     ref=request.POST.get('ref').lower().strip()
     product=Produit.objects.filter(ref=ref)
-    print(ref)
+    notavailable=Notavailable.objects.get(ref=ref)
+    print(ref, notavailable)
     if product:
         return JsonResponse({
             'exist':True
         })
     return JsonResponse({
-        'exist':False
+        'exist':False,
+        'name':notavailable.name,
+        'equiv':notavailable.equiv,
     })
 
     # print(ref, category, product)

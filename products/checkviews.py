@@ -107,6 +107,8 @@ def addbonsortie(request):
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     car=request.POST.get('car')
+    remise=request.POST.get('remise')=='true'
+    print('>>>', remise)
     #repid=request.POST.get('repid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
@@ -140,6 +142,7 @@ def addbonsortie(request):
     else:
         receipt_no = f"BS{year}000000001"
     order=Bonsortie.objects.create(
+        remise=remise,
         client_id=clientid,
         total=totalbon,
         date=datebon,
@@ -187,15 +190,16 @@ def addbonsortie(request):
     #         issortie=True
     #     )
     if float(payment)<float(totalbon):
-        order.rest=round(float(totalbon)-float(payment), 2)
-        Avanceclient.objects.create(
-            client_id=clientid,
-            amount=payment,
-            #today
-            date=timezone.now().date(),
-            npiece=f'Avance de bon de sortie {order.bon_no}',
-            issortie=True
-        )
+        if not remise:
+            order.rest=round(float(totalbon)-float(payment), 2)
+            Avanceclient.objects.create(
+                client_id=clientid,
+                amount=payment,
+                #today
+                date=timezone.now().date(),
+                npiece=f'Avance de bon de sortie {order.bon_no}',
+                issortie=True
+            )
     if float(payment)==float(totalbon):
         order.ispaid=True
         PaymentClientbl.objects.create(
