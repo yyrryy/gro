@@ -66,6 +66,11 @@
                 <div class="mb-2 col-4">
                     <input type="text" class="form-control note" name="note" placeholder="Note">
                 </div>
+                <select id="cars" name="cars" class="select2 cars">
+                  {% for i in cars %}
+                  <option value="{{i.name}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
             </div>
 
             <div class="col-7 row productsholder d-none">
@@ -203,6 +208,7 @@
   </div>
 
   <script>
+    $('.select2').select2()
     function paymentbon(){
       let total = parseFloat($('.totalbonsortie').text())
       let payment = parseFloat($('.payment').val())
@@ -870,6 +876,7 @@
               url: "{% url 'products:addbonsortie' %}",
               type: 'POST',
               data: {
+                'car':$('.cars').val(),
                   'totalbon': totalbon,
                   'clientid': clientid,
                   'repid':repid,

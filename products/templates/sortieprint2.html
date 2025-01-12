@@ -49,9 +49,14 @@
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
         <div class="d-flex justify-content-between" style="font-size: 10px;">
-          <b>
-                Bon de Sortie
-              </b>
+          <div class="">
+            <b>
+              Bon de Sortie
+            </b>
+            <div>
+              {{order.car}}-{{order.note}}
+            </div>
+          </div>
           <div class="">
 
               <div>
@@ -84,7 +89,7 @@
           top: 5em;
           visibility: hidden;
           ">
-        <table class="table table-bordered blitems" style="font-size: 10px; font-family: serif; border-color: black;">
+        <table class="table table-bordered blitems" style="font-size: 13px; font-family: serif; border-color: black;">
           <thead style="background: #c9c9c967; font-size: 10px;
         font-weight: 800;" class="text-center">
             <tr>
@@ -152,13 +157,15 @@
               </strong>
             </div>
           </div>
-
+          
 
         </div>
 
       </div>
+      <p>
+        عدم تجاوز أسبوع لإرجاع البضاعة و شكرا
+      </p>
     </div>
-
 
     {% else %}
     <!-- other pages -->
@@ -169,9 +176,14 @@
         <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
 
         <div class="d-flex justify-content-between" style="font-size: 10px;">
-          <b>
-                Bon de Sortie
-              </b>
+          <div class="">
+            <b>
+              Bon de Sortie
+            </b>
+            <div>
+              {{order.car}}-{{order.note}}
+            </div>
+          </div>
 
           <div class="">
 
@@ -205,7 +217,7 @@
           top: 5em;
           visibility: hidden;
           ">
-        <table class="table table-bordered blitems" style="font-size: 10px; font-family: serif; border-color: black;">
+        <table class="table table-bordered blitems" style="font-size: 13px; font-family: serif; border-color: black;">
           <thead style="background: #c9c9c967; font-size: 10px;
         font-weight: 800;" class="text-center">
             <tr>
@@ -267,7 +279,9 @@
           page: {{forloop.counter}}/{{orderitems|length}}
         </small>
       </div>
-
+      <p>
+        عدم تجاوز أسبوع لإرجاع البضاعة و شكرا
+      </p>
     </div>
   </div>
     {% endif %}

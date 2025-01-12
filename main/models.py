@@ -1093,6 +1093,7 @@ class Bonsortie(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
     #statud if regl == r0
     statusreg=models.CharField(max_length=50, null=True, default='n1', blank=True)
+    car=models.CharField(max_length=500, null=True, default='n1', blank=True)
     #statud if factur == f1
     statusfc=models.CharField(max_length=50, null=True, default='b1', blank=True)
     def save(self, *args, **kwargs):

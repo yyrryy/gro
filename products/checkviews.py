@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient
 from django.http import JsonResponse, HttpResponse
 import qrcode
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
@@ -92,9 +92,11 @@ def bonsortie(request):
         receipt_no = f"BS{year}{latest_receipt_no + 1:09}"
     else:
         receipt_no = f"BS{year}000000001"
-    print('>>>>>>', receipt_no)
+    print('>>>>>>', Carlogos.objects.all())
+    
     return render(request, 'bonsortie.html', {
         'title':'Bon de Sortie',
+        'cars':Carlogos.objects.all()
         # 'clients':Client.objects.all(),
         # # 'products':Produit.objects.all(),
         # 'commercials':Represent.objects.all(),
@@ -104,6 +106,7 @@ def addbonsortie(request):
 
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
+    car=request.POST.get('car')
     #repid=request.POST.get('repid')
     products=request.POST.get('products')
     totalbon=request.POST.get('totalbon')
@@ -143,7 +146,8 @@ def addbonsortie(request):
         bon_no=receipt_no,
         note=note,
         user=request.user,
-        paidamount=payment
+        paidamount=payment,
+        car=car
     )
     print('>>>>>>', len(json.loads(products))>0)
     if len(json.loads(products))>0:
@@ -173,7 +177,27 @@ def addbonsortie(request):
                     product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
                 product.save()
 
-    if float(payment)>0:
+    # if float(payment)>0:
+    #     PaymentClientbl.objects.create(
+    #         client_id=clientid,
+    #         amount=payment,
+    #         date=date.today(),
+    #         mode='espece',
+    #         npiece=f'Paiement de bon de sortie {order.bon_no}',
+    #         issortie=True
+    #     )
+    if float(payment)<float(totalbon):
+        order.rest=round(float(totalbon)-float(payment), 2)
+        Avanceclient.objects.create(
+            client_id=clientid,
+            amount=payment,
+            #today
+            date=timezone.now().date(),
+            npiece=f'Avance de bon de sortie {order.bon_no}',
+            issortie=True
+        )
+    if float(payment)==float(totalbon):
+        order.ispaid=True
         PaymentClientbl.objects.create(
             client_id=clientid,
             amount=payment,
@@ -182,10 +206,6 @@ def addbonsortie(request):
             npiece=f'Paiement de bon de sortie {order.bon_no}',
             issortie=True
         )
-    if float(payment)<float(totalbon):
-        order.rest=round(float(totalbon)-float(payment), 2)
-    if float(payment)==float(totalbon):
-        order.ispaid=True
     order.save()
     client.soldtotal=round(float(client.soldtotal)-float(payment), 2)
     client.soldbl=round(float(client.soldbl)-float(payment), 2)

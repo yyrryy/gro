@@ -2630,8 +2630,8 @@ def listavances(request):
         'today':timezone.now().date(),
         'target':target,
     }
-    if avances:
-        ctx['total']=round(Avanceclient.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+    # if avances:
+    #     ctx['total']=round(Avanceclient.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
 
     return render(request, 'listavances.html', ctx)
 
