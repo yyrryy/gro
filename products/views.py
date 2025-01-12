@@ -9549,7 +9549,7 @@ def sortieprint2(request, id):
     order=Bonsortie.objects.get(pk=id)
     orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
     orderitems=list(orderitems)
-    orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
+    orderitems=[orderitems[i:i+15] for i in range(0, len(orderitems), 15)]
     ctx={
         'title':f'Bon de Sortie {order.bon_no}',
         'order':order,
