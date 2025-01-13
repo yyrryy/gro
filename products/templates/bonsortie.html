@@ -769,6 +769,7 @@
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           $.get('/products/getqtyprice',
             {
+              'term':term,
               'target':'s',
               'id':id
             },
@@ -829,7 +830,7 @@
                 return
             }
 
-          parentdiv.find('.submitbonsortie').addClass('disabled')
+          
           trs=parentdiv.find('.bonsortiebody tr')
           let products = []
           trs.each(function(){
@@ -876,6 +877,11 @@
           //     'csrfmiddlewaretoken': '{{csrf_token}}'
           // },
           // console.log(data)
+          if (parseFloat(payment)>totalbon){
+            alertify.error('Payment superieur au total')
+            return
+          }
+          parentdiv.find('.submitbonsortie').addClass('disabled')
           console.log(payment)
           $.ajax({
               url: "{% url 'products:addbonsortie' %}",

@@ -272,6 +272,7 @@ class Stockin(models.Model):
     remise4=models.FloatField(default=0.00, null=True, blank=
     True)
     total=models.FloatField(default=0.00)
+    net=models.FloatField(default=0.00)
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
     nbon=models.ForeignKey(Itemsbysupplier, on_delete=models.CASCADE, default=None, null=True, blank=True)
     isavoir=models.BooleanField(default=False)
@@ -662,6 +663,7 @@ class Outfacture(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
 class Livraisonitem(models.Model):
+    pricesofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True)
     total=models.FloatField(default=0.00)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
@@ -1076,8 +1078,10 @@ class DeviItemsupplier(models.Model):
 
 
 class Bonsortie(models.Model):
+    pricesofout=models.TextField(default=None, blank=True, null=True)
     remise=models.BooleanField(default=False)
     paidamount=models.FloatField(default=0.00)
+    remiseamount=models.FloatField(default=0.00)
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     bonlivraison=models.ForeignKey(Bonlivraison, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='blofbon')
     devi=models.ForeignKey(Devi, on_delete=models.SET_NULL, default=None, null=True, blank=True)
@@ -1104,6 +1108,7 @@ class Bonsortie(models.Model):
         return self.bon_no
 # lines in bon sorie
 class Sortieitem(models.Model):
+    pricesofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonsortie, on_delete=models.CASCADE, default=None)
     total=models.FloatField(default=0.00)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)

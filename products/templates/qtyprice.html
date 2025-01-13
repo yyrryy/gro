@@ -16,7 +16,7 @@
     <tbody>
         {% for i in history %}
         <tr>
-            <td>{{ i.date|date:'d/m/Y' }}</td>
+            <td>{{ i.date|date:'d/m/Y' }} -{{i.id}}</td>
             <td class="qtyofprice" id="{{i.id}}">{{ i.qtyofprice }} </td>
             <td>
                 ({% if i.isfarah %}FR {% else %}OR{%endif%})

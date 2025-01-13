@@ -148,14 +148,26 @@
           <small>
             page: {{forloop.counter}}/{{orderitems|length}}
           </small>
-          <div class="text-center d-flex justify-content-between" style="background: #aeaeae8c;
+          <div class="" style="background: #aeaeae8c;
           font-size: 13px; width:14em;">
+          <div class="text-center d-flex justify-content-between">
+
             <div>Total</div>
             <div style="font-size: 16px; margin-right: 13px;">
               <strong>
                 {{order.total|floatformat:2|intspace}}
               </strong>
             </div>
+          </div>
+          <div class="text-center d-flex justify-content-between">
+
+            <div>Remise</div>
+            <div style="font-size: 16px; margin-right: 13px;">
+              <strong>
+                {{order.remiseamount|floatformat:2|intspace}}
+              </strong>
+            </div>
+          </div>
           </div>
           
 

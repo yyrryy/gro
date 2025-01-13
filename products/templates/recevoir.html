@@ -103,6 +103,7 @@
                     <td style="width: 5%;">Dernier P.</td>
                     <td style="width: 5%;">Stock</td>
                     <td hidden style="width: 5%;">Devise</td>
+                    <td style=" width: 5%;">Qté barcode</td>
                     <td style=" width: 5%;">Quantité</td>
                     <td style=" width: 5%;">Prix</td>
                     <td style=" width: 5%;">Remise1</td>
@@ -208,7 +209,7 @@
   }
   function printbarcode(){
     supplierid=$('.supplierselect').val()
-    datebonachat=$('.datebonachat').val()
+    datebonachat=$('.datefacture').val()
     if (supplierid=='' || datebonachat==''){
       alertify.error('Fourniseur ou date invalid')
       return
@@ -217,7 +218,7 @@
     let products = []
     trs.each(function(){
         let tr = $(this)
-        let qty = tr.find('.qty').val()
+        let qty = tr.find('.qtybarcode').val() || tr.find('.qty').val()
         let name = tr.find('.name').text()
         let ref = tr.find('.ref').text()
         let price = tr.find('.price').val()
@@ -515,6 +516,7 @@
         <td style="paddingpx 0; font-size: 13px;">${dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
         <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
+        <td><input class="qtybarcode" style="width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${addqty.val()}" style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
@@ -781,6 +783,8 @@
         <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>
         <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${item.devise}" style="width:65px;"></td>
+        <td><input class="qtybarcode" style="width:65px;"></td>
+
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>

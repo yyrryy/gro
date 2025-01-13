@@ -102,6 +102,7 @@ def bonsortie(request):
         # 'commercials':Represent.objects.all(),
     })
 
+
 def addbonsortie(request):
 
     #current_time = datetime.now().strftime('%H:%M:%S')
@@ -153,33 +154,56 @@ def addbonsortie(request):
         car=car
     )
     print('>>>>>>', len(json.loads(products))>0)
-    if len(json.loads(products))>0:
-        with transaction.atomic():
+    #if len(json.loads(products))>0:
+    with transaction.atomic():
+        for i in json.loads(products):
+            farah=i['farah']=='1'
+            product=Produit.objects.get(pk=i['productid'])
+            #create sortie items
+            sortitem=Sortieitem.objects.create(
+                bon=order,
+                remise=i['remise'],
+                name=i['name'],
+                ref=i['ref'],
+                product=product,
+                qty=i['qty'],
+                price=i['price'],
+                total=i['total'],
+                client_id=clientid,
+                date=datebon,
+                isfarah=farah,
+            )
+        
+            # update stock accordinly
+            if farah:
+                product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
+            else:
+                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
+            product.save()
             
-            for i in json.loads(products):
-                farah=i['farah']=='1'
-                product=Produit.objects.get(pk=i['productid'])
-                Sortieitem.objects.create(
-                    bon=order,
-                    remise=i['remise'],
-                    name=i['name'],
-                    ref=i['ref'],
-                    product=product,
-                    qty=i['qty'],
-                    price=i['price'],
-                    total=i['total'],
-                    client_id=clientid,
-                    date=datebon,
-                    isfarah=farah
-                )
+            # update prices accordinly
             
-            
-                if farah:
-                    product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
+            pricesofout=[]
+            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=farah, product=product, isavoir=False).order_by('id')
+            thisqty=int(i['qty'])
+            for pr in prices:
+                print('>> qty', thisqty, pr.product.ref)
+                if not thisqty<=0:
+                    print('>> qty is not 0')
+                    if pr.qtyofprice<=thisqty:
+                        thisqty=thisqty-int(pr.qtyofprice)
+                        pr.qtyofprice=0
+                        pricesofout.insert(0, pr.id)
+                    else:
+                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        thisqty=0
+                        pricesofout.insert(0, pr.id)
+                    pr.save()
                 else:
-                    product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
-                product.save()
-
+                    print('>> qty', thisqty, pr.product.ref, 'breaking')
+                    break
+            sortitem.pricesofout=pricesofout
+            sortitem.save()
     # if float(payment)>0:
     #     PaymentClientbl.objects.create(
     #         client_id=clientid,
@@ -190,7 +214,10 @@ def addbonsortie(request):
     #         issortie=True
     #     )
     if float(payment)<float(totalbon):
-        if not remise:
+        if remise:
+            order.ispaid=True
+            order.remiseamount=round(float(totalbon)-float(payment), 2)
+        else:
             order.rest=round(float(totalbon)-float(payment), 2)
             Avanceclient.objects.create(
                 client_id=clientid,
@@ -210,6 +237,7 @@ def addbonsortie(request):
             npiece=f'Paiement de bon de sortie {order.bon_no}',
             issortie=True
         )
+    
     order.save()
     client.soldtotal=round(float(client.soldtotal)-float(payment), 2)
     client.soldbl=round(float(client.soldbl)-float(payment), 2)
@@ -412,7 +440,7 @@ def validatebonsortieproductprice(request):
     bonid = request.GET.get('bonid')
     
     bon = Bonsortie.objects.get(pk=bonid)
-    bonpaid=bon.ispaid
+    
     items = Sortieitem.objects.filter(bon=bon)
     totalfarah, totalorgh = 0, 0
     farahitems, orghitems = [], []
@@ -421,11 +449,21 @@ def validatebonsortieproductprice(request):
     for i in items:
         product = i.product
         item_total = float(i.total)
-        
+        price=Stockin.objects.filter(pk__in=json.loads(i.pricesofout)).first()
+        print('>> price hist', price, i.pricesofout)
+        p=i.price
+        print('>>> price before', p, i.price)
+        if price:
+            p=price.net/0.65
+            #p=round(p-(p*0.25), 2)
+        print('>>>> price', p)
+
         livraison_data = {
-            'total': item_total,
+            'pricesofout':i.pricesofout,
+            'total': p*i.qty,
+            'price':p,
+            'remise':25,
             'qty': i.qty,
-            
             'name': i.name,
             'product': product,
             'client': i.client,
@@ -436,13 +474,13 @@ def validatebonsortieproductprice(request):
             totalfarah += product.frsellprice*int(i.qty)
             livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
-            livraison_data['price'] = product.frsellprice
+            #livraison_data['price'] = product.frsellprice
             farahitems.append(Livraisonitem(**livraison_data))
         else:
             totalfarah += product.sellprice*int(i.qty)
             livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
-            livraison_data['price'] = product.sellprice
+            #livraison_data['price'] = product.sellprice
             orghitems.append(Livraisonitem(**livraison_data))
     
     # Helper function to generate Bonlivraison

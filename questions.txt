@@ -48,9 +48,13 @@ annuleer bnts
 
 btn tva bon achat
 
-avoir should add to qtyofprice
-
-
+//ticket achat details
+//BA25ID achat number
+//nulber of ticket in bon achat
+//center ref in ticket majuscul
+//avoir should add to qtyofprice
+remise show in bonsotie
+add bon sortie prices in items alse in bon livraison
 
 listbl
 ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')"
