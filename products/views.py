@@ -2416,21 +2416,22 @@ def updatebonlivraison(request):
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
 
     thisclient=livraison.client
-    if livraison.client==client:
-        print('same client', float(thisclient.soldtotal), float(livraison.total), float(totalbon))
-        thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total)+float(totalbon), 2)
-        thisclient.soldbl=round(float(thisclient.soldbl)-float(livraison.total)+float(totalbon), 2)
-        thisclient.save()
-    else:
-        print('not same')
-        thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total), 2)
-        thisclient.soldbl=round(float(thisclient.soldbl)-float(livraison.total), 2)
-        thisclient.save()
-        print('old', thisclient.soldtotal)
-        client.soldtotal+=float(totalbon)
-        client.soldbl+=float(totalbon)
-        client.save()
-        print('new', client.soldtotal)
+    # if livraison.client==client:
+    #     print('same client', float(thisclient.soldtotal), float(livraison.total), float(totalbon))
+    #     thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total)+float(totalbon), 2)
+    #     thisclient.soldbl=round(float(thisclient.soldbl)-float(livraison.total)+float(totalbon), 2)
+    #     thisclient.save()
+    # else:
+    #     print('not same')
+    #     thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total), 2)
+    #     thisclient.soldbl=round(float(thisclient.soldbl)-float(livraison.total), 2)
+    #     thisclient.save()
+    #     print('old', thisclient.soldtotal)
+    #     client.soldtotal+=float(totalbon)
+    #     client.soldbl+=float(totalbon)
+    #     client.save()
+    #     print('new', client.soldtotal)
+    
     livraison.modlvrsn=transport
     livraison.client=client
     livraison.note=note
@@ -2446,16 +2447,16 @@ def updatebonlivraison(request):
         if target=='f':
             print('>>> deleting old bon items')
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
-            st=Stockin.objects.filter(isfarah=True, product=product).last()
-            st.qtyofprice=st.qtyofprice+int(i.qty)
-            st.save()
+            
             
         else:
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
-            st=Stockin.objects.filter(isfarah=False, product=product).last()
-            st.qtyofprice=st.qtyofprice+int(i.qty)
-            st.save()
-            
+            # st=Stockin.objects.filter(isfarah=False, product=product).last()
+            # st.qtyofprice=st.qtyofprice+int(i.qty)
+            # st.save()
+        st=Stockin.objects.filter(pk__in=json.loads(i.pricesofout)).last()
+        st.qtyofprice=st.qtyofprice+int(i.qty)
+        st.save()
         product.save()
         i.delete()
 
@@ -2473,9 +2474,11 @@ def updatebonlivraison(request):
 
         qty=int(i['qty'])
         product=Produit.objects.get(pk=i['productid'])
+        pricesofout=[]
+        qtyofout=[]
         if target=='f':
             product.stocktotalfarah=int(product.stocktotalfarah)-qty
-            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product).order_by('id')
+            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
             thisqty=int(i['qty'])
             for pr in prices:
                 print('>> qty', thisqty, pr.product.ref)
@@ -2483,10 +2486,14 @@ def updatebonlivraison(request):
                     print('>> qty is not 0')
                     if pr.qtyofprice<=thisqty:
                         thisqty=thisqty-int(pr.qtyofprice)
+                        qtyofout.append(pr.qtyofprice)
                         pr.qtyofprice=0
+                        pricesofout.insert(0, pr.id)
                     else:
                         pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        qtyofout.append(thisqty)
                         thisqty=0
+                        pricesofout.insert(0, pr.id)
                     pr.save()
                 else:
                     print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -2502,10 +2509,14 @@ def updatebonlivraison(request):
                     print('>> qty is not 0')
                     if pr.qtyofprice<=thisqty:
                         thisqty=thisqty-int(pr.qtyofprice)
+                        qtyofout.append(pr.qtyofprice)
                         pr.qtyofprice=0
+                        pricesofout.insert(0, pr.id)
                     else:
                         pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        qtyofout.append(thisqty)
                         thisqty=0
+                        pricesofout.insert(0, pr.id)
                     pr.save()
                 else:
                     print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -2514,6 +2525,8 @@ def updatebonlivraison(request):
 
         # create new livraison items
         Livraisonitem.objects.create(
+            qtyofout=qtyofout,
+            pricesofout=pricesofout,
             bon=livraison,
             remise=i['remise'],
             name=i['name'],

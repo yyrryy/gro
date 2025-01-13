@@ -465,12 +465,13 @@ def validatebonsortieproductprice(request):
             for pr, qty in zip(prices, qtyofout):
                 allprices+=pr.net*qty
             p=allprices/sum(qtyofout)
-            p=p/0.65
+            p=round(p/0.65, 2)
             #p=round(p-(p*0.25), 2)
         print('>>>> price', p)
 
         livraison_data = {
             'pricesofout':i.pricesofout,
+            'qtyofout':i.qtyofout,
             'total': round(p-(p*0.25), 2)*i.qty,
             'price':p,
             'remise':25,
@@ -482,13 +483,13 @@ def validatebonsortieproductprice(request):
         }
 
         if i.isfarah:
-            totalfarah += product.frsellprice*int(i.qty)
+            totalfarah += round(p-(p*0.25), 2)*i.qty
             livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
             #livraison_data['price'] = product.frsellprice
             farahitems.append(Livraisonitem(**livraison_data))
         else:
-            totalfarah += product.sellprice*int(i.qty)
+            totalfarah += round(p-(p*0.25), 2)*i.qty
             livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
             #livraison_data['price'] = product.sellprice
@@ -512,6 +513,7 @@ def validatebonsortieproductprice(request):
             'bon_no': receipt_no,
             'note': bon.note,
             'bonsortie':bon,
+            'note':f'{bon.car}-{bon.note}'
             # make created bon paid if the original bon is paid
             #'ispaid':bonpaid
         }
