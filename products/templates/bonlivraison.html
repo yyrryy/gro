@@ -353,7 +353,7 @@
                     },
                     success: function(data){
                       
-                      $('.addclientprice').text((data.price).toFixed(2))
+                      $('.addclientprice').text(`${(data.price).toFixed(2)} (${data.remise})`)
                     }
                   })
                 })

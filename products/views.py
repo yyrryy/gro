@@ -794,7 +794,7 @@ def addsupply(request):
         buyprice=float(i['price'])
         print('>>> buyprice', buyprice, buyprice-(buyprice*(remise1/100)))
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
-        netwithremise1=round(buyprice-(buyprice*(remise1/100)))
+        netwithremise1=round(buyprice-(buyprice*(remise1/100)), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
         if target=='f':
             # calcul pondiré, stock needs to be more than 0
