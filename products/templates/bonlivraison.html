@@ -864,7 +864,7 @@
               },
               success: function(data){
                 
-                parentdiv.find('.addclientprice').text((data.price).toFixed(2))
+                $('.addclientprice').text(`${(data.price).toFixed(2)} (${data.remise})`)
               }
             })
 

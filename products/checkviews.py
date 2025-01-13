@@ -464,7 +464,7 @@ def validatebonsortieproductprice(request):
             allprices=0
             for pr, qty in zip(prices, qtyofout):
                 allprices+=pr.net*qty
-            p=allprices/sum(qtyofout)
+            p=round(allprices/sum(qtyofout), 2)
             p=round(p/0.65, 2)
             #p=round(p-(p*0.25), 2)
         print('>>>> price', p)
@@ -472,7 +472,7 @@ def validatebonsortieproductprice(request):
         livraison_data = {
             'pricesofout':i.pricesofout,
             'qtyofout':i.qtyofout,
-            'total': round(p-(p*0.25), 2)*i.qty,
+            'total': round(round(p-(p*0.25), 2)*i.qty, 2),
             'price':p,
             'remise':25,
             'qty': i.qty,
@@ -483,13 +483,13 @@ def validatebonsortieproductprice(request):
         }
 
         if i.isfarah:
-            totalfarah += round(p-(p*0.25), 2)*i.qty
+            totalfarah += round(round(p-(p*0.25), 2)*i.qty, 2)
             livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
             #livraison_data['price'] = product.frsellprice
             farahitems.append(Livraisonitem(**livraison_data))
         else:
-            totalfarah += round(p-(p*0.25), 2)*i.qty
+            totalorgh += round(round(p-(p*0.25), 2)*i.qty, 2)
             livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
             #livraison_data['price'] = product.sellprice
@@ -508,7 +508,7 @@ def validatebonsortieproductprice(request):
             receipt_no = f"{prefix}{year}000000001"
         
         bon_data = {
-            'total': total,
+            'total': round(total, 2),
             'date': timezone.now(),
             'bon_no': receipt_no,
             'note': bon.note,
@@ -2268,4 +2268,23 @@ def barcodepdct(request):
     product=Produit.objects.get(ref=ref)
     return JsonResponse({
         'data':f"{product.ref}§{product.name}§{product.buyprice}§{product.stocktotalfarah if target=='f' else product.stocktotalorgh}§{product.stockfacturefarah if target=='f' else product.stocktotalorgh}§{product.id}§{product.frsellprice if target=='f' else product.sellprice}§{product.frremisesell if target=='f' else product.remisesell}§{product.prixnet}§{product.representprice}",
+    })
+
+def getlastbuyprice(request):
+    id=request.GET.get('id')
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    product=Produit.objects.filter(pk=id).last()
+    dp=0
+    remise=0
+    if product:
+        if isfarah:
+            dp=product.frbuyprice
+            remise=product.frremise1
+        else:
+            dp=product.frbuyprice
+            remise=product.frremise1
+    return JsonResponse({
+        'remise':remise,
+        'dp':dp
     })

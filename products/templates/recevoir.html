@@ -574,7 +574,11 @@
         // addqty.val('')
         // addremise.val(remise)
         addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}§${qtyjeu}`)
-        parentdiv.find('.addlastbuyprice').text('Dernier pr.ach. '+dp)
+        $.get('/products/getlastbuyprice', {
+          'id':id
+        }, (data)=>{
+          parentdiv.find('.addlastbuyprice').text(`Dernier pr.ach. ${data.dp} (${data.remise})`)
+        })
         $('.addrowjeubtn').attr('qtyjeu', qtyjeu)
         // let selected = $(this).find(':selected')
         // selected.remove()
