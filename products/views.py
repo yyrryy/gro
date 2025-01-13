@@ -1020,14 +1020,14 @@ def addbonlivraison(request):
                         print('>> qty is not 0')
                         if pr.qtyofprice<=thisqty:
                             thisqty=thisqty-int(pr.qtyofprice)
+                            qtyofout.append(pr.qtyofprice)
                             pr.qtyofprice=0
                             pricesofout.insert(0, pr.id)
-                            qtyofout.append(pr.qtyofprice)
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                            qtyofout.append(thisqty)
                             thisqty=0
                             pricesofout.insert(0, pr.id)
-                            qtyofout.append(pr.thisqty)
                         pr.save()
                     else:
                         print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -1043,14 +1043,14 @@ def addbonlivraison(request):
                         print('>> qty is not 0')
                         if pr.qtyofprice<=thisqty:
                             thisqty=thisqty-int(pr.qtyofprice)
+                            qtyofout.append(pr.qtyofprice)
                             pr.qtyofprice=0
                             pricesofout.insert(0, pr.id)
-                            qtyofout.append(pr.qtyofprice)
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                            qtyofout.append(thisqty)
                             thisqty=0
                             pricesofout.insert(0, pr.id)
-                            qtyofout.append(pr.thisqty)
                         pr.save()
                     else:
                         print('>> breaking')

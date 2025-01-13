@@ -193,14 +193,14 @@ def addbonsortie(request):
                     print('>> qty is not 0')
                     if pr.qtyofprice<=thisqty:
                         thisqty=thisqty-int(pr.qtyofprice)
+                        qtyofout.append(pr.qtyofprice)
                         pr.qtyofprice=0
                         pricesofout.append(pr.id)
-                        qtyofout.append(pr.qtyofprice)
                     else:
                         pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                        qtyofout.append(thisqty)
                         thisqty=0
                         pricesofout.append(pr.id)
-                        qtyofout.append(thisqty)
                     pr.save()
                 else:
                     print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -471,8 +471,8 @@ def validatebonsortieproductprice(request):
 
         livraison_data = {
             'pricesofout':i.pricesofout,
-            'total': p*i.qty,
-            'price':pbrut,
+            'total': round(p-(p*0.25), 2)*i.qty,
+            'price':p,
             'remise':25,
             'qty': i.qty,
             'name': i.name,
