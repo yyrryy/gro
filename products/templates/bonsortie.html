@@ -764,7 +764,7 @@
           // $(this).parent().parent().find('.addstockfacture').text(stockfacture)
           addqty.val('')
           addqty.focus()
-          addprice.val(sellprice)
+          addprice.val(0)
           addremise.val(remise)
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           $.get('/products/getqtyprice',

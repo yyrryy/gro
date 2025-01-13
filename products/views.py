@@ -1008,6 +1008,7 @@ def addbonlivraison(request):
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             pricesofout=[]
+            qtyofout=[]
             if isfarah:
                 print('>>> we are in farah')
                 product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
@@ -1021,10 +1022,12 @@ def addbonlivraison(request):
                             thisqty=thisqty-int(pr.qtyofprice)
                             pr.qtyofprice=0
                             pricesofout.insert(0, pr.id)
+                            qtyofout.append(pr.qtyofprice)
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
                             thisqty=0
                             pricesofout.insert(0, pr.id)
+                            qtyofout.append(pr.thisqty)
                         pr.save()
                     else:
                         print('>> qty', thisqty, pr.product.ref, 'breaking')
@@ -1042,10 +1045,12 @@ def addbonlivraison(request):
                             thisqty=thisqty-int(pr.qtyofprice)
                             pr.qtyofprice=0
                             pricesofout.insert(0, pr.id)
+                            qtyofout.append(pr.qtyofprice)
                         else:
                             pr.qtyofprice=int(pr.qtyofprice)-thisqty
                             thisqty=0
                             pricesofout.insert(0, pr.id)
+                            qtyofout.append(pr.thisqty)
                         pr.save()
                     else:
                         print('>> breaking')
@@ -1053,6 +1058,7 @@ def addbonlivraison(request):
                     
             product.save()
             Livraisonitem.objects.create(
+                qtyofout=qtyofout,
                 pricesofout=pricesofout,
                 bon=order,
                 remise=i['remise'],

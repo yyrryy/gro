@@ -182,8 +182,9 @@ def addbonsortie(request):
             product.save()
             
             # update prices accordinly
-            
+            # pri lli7diffo' d mnchk addifo4n 4kola pri
             pricesofout=[]
+            qtyofout=[]
             prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=farah, product=product, isavoir=False).order_by('id')
             thisqty=int(i['qty'])
             for pr in prices:
@@ -193,16 +194,19 @@ def addbonsortie(request):
                     if pr.qtyofprice<=thisqty:
                         thisqty=thisqty-int(pr.qtyofprice)
                         pr.qtyofprice=0
-                        pricesofout.insert(0, pr.id)
+                        pricesofout.append(pr.id)
+                        qtyofout.append(pr.qtyofprice)
                     else:
                         pr.qtyofprice=int(pr.qtyofprice)-thisqty
                         thisqty=0
-                        pricesofout.insert(0, pr.id)
+                        pricesofout.append(pr.id)
+                        qtyofout.append(thisqty)
                     pr.save()
                 else:
                     print('>> qty', thisqty, pr.product.ref, 'breaking')
                     break
             sortitem.pricesofout=pricesofout
+            sortitem.qtyofout=qtyofout
             sortitem.save()
     # if float(payment)>0:
     #     PaymentClientbl.objects.create(
@@ -449,19 +453,26 @@ def validatebonsortieproductprice(request):
     for i in items:
         product = i.product
         item_total = float(i.total)
-        price=Stockin.objects.filter(pk__in=json.loads(i.pricesofout)).first()
-        print('>> price hist', price, i.pricesofout)
-        p=i.price
+        # cou moyen
+        prices=Stockin.objects.filter(pk__in=json.loads(i.pricesofout))
+        qtyofout=json.loads(i.qtyofout)
+        print('>> price hist', prices, i.pricesofout)
+        p=round(i.price/0.75, 2)
+        pbrut=i.price
         print('>>> price before', p, i.price)
-        if price:
-            p=price.net/0.65
+        if prices:
+            allprices=0
+            for pr, qty in zip(prices, qtyofout):
+                allprices+=pr.net*qty
+            p=allprices/sum(qtyofout)
+            p=p/0.65
             #p=round(p-(p*0.25), 2)
         print('>>>> price', p)
 
         livraison_data = {
             'pricesofout':i.pricesofout,
             'total': p*i.qty,
-            'price':p,
+            'price':pbrut,
             'remise':25,
             'qty': i.qty,
             'name': i.name,

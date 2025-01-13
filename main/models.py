@@ -221,6 +221,7 @@ class Supplier(models.Model):
     rest=models.FloatField(default=0.00)
     image=models.ImageField(upload_to='supplierimages/', null=True, blank=True, default=None)
     note=models.TextField(default=None, null=True)
+    
     def __str__(self) -> str:
         return self.name
 
@@ -664,6 +665,7 @@ class Outfacture(models.Model):
     isorgh=models.BooleanField(default=False)
 class Livraisonitem(models.Model):
     pricesofout=models.TextField(default=None, blank=True, null=True)
+    qtyofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True)
     total=models.FloatField(default=0.00)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)
@@ -1109,6 +1111,7 @@ class Bonsortie(models.Model):
 # lines in bon sorie
 class Sortieitem(models.Model):
     pricesofout=models.TextField(default=None, blank=True, null=True)
+    qtyofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonsortie, on_delete=models.CASCADE, default=None)
     total=models.FloatField(default=0.00)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None, null=True)

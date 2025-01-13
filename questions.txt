@@ -55,6 +55,7 @@ btn tva bon achat
 //avoir should add to qtyofprice
 remise show in bonsotie
 add bon sortie prices in items alse in bon livraison
+0 in price bon sortie
 
 listbl
 ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')"
