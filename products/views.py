@@ -1030,7 +1030,7 @@ def addbonlivraison(request):
     # mode=request.POST.get('mode')
     # npiece=request.POST.get('npiece')
     # echeance=request.POST.get('echeance')
-    print('>> echeance', echeance, echeance=="")
+    
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
