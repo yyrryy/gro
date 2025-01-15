@@ -49,7 +49,10 @@
             </div>
             <div class="col-4">
                 <small>Bank:</small> <br>
-                <input type="text" name="bank" class="w-100" {{reglement.bank}}>
+                <input type="text" name="bank" class="w-100" value="{{reglement.bank}}">
+            </div>
+            <div class="col-4">
+                <button class="w-100 btn btn-primary" onclick="updatereglclient('{{reglement.id}}')">Modifier</button>
             </div>
         </div>
     </div>

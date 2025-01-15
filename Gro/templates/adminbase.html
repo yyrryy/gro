@@ -1007,6 +1007,38 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function updatereglclient(id){
+        mantant=$('[name="mantant"]').val()
+        npiece=$('[name="npiece"]').val()
+        mode=$('[name="mode"]').val()
+        echeance=$('[name="echeance"]').val()
+        bank=$('[name="bank"]').val()
+        date=$('.regldate').val()
+        if (date==''){
+          alertify.error('Date')
+          error
+        }
+        $.get('/products/updatereglebons', {
+          'reglementid':id,
+          'mantant':mantant,
+          'mode':mode,
+          'npiece':npiece,
+          'date':date,
+          'echeance':echeance,
+          'bank':bank
+        })
+      }
+      function checkmax(event){
+        // v as value
+        v=$(event.target).val()
+        max=$(event.target).attr('max')
+        if (v<0 || v>max){
+          alertify.error('Invalid quantité')
+          //$('.valider').addClass('disabled')
+        }else{
+          //$('.valider').removeClass('disabled')
+        }
+      }
       function removelocalstorage(target){
         localStorage.removeItem('pdctsin'+target)
         localStorage.removeItem(target)
@@ -1666,6 +1698,18 @@ a .uil {
         if (note!=''){
           $.get('/products/updatenotebs', {
           'note':note,
+          'blid':blid
+          }, (data)=>{
+            console.log('here')
+            ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
+          })
+        }
+      }
+      function updatecarbs(event, blid){
+        let car= $(event.target).parent().find('input').val()
+        if (car!=''){
+          $.get('/products/updatecarbs', {
+          'car':car,
           'blid':blid
           }, (data)=>{
             console.log('here')

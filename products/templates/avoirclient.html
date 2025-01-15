@@ -24,7 +24,7 @@
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
   <div>
-    {{title}}
+    {{title}} {{target}}
   </div>
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
 </div>
@@ -305,7 +305,7 @@
         let addremise=parentdiv.find('[name="addremise"]')
         let priceclient=parentdiv.find('.addclientprice ').text()
         // >>> in avoir it's ok if empty
-        if (addqty.val()=='' || addprice.val()=='' || addremise.val()==''){
+        if (addqty.val()=='' || addprice.val()=='' || addremise.val()=='' || addqty.val()==0 || addprice.val()==0){
           alertify.error('Veuillez remplir tous les champs')
           return
         }
@@ -542,7 +542,7 @@
           let addremise=$(this).parent().parent().find('input[name="addremise"]')
           let addqty=$(this).parent().parent().find('input[name="addqty"]')
           console.log('qty of change',addqty)
-          $(this).parent().parent().find('.addstock').html(`<span>Stocktotal:${stock}</span><br><span>StockFac:${stockfacture}</span>`)
+          $(this).parent().parent().find('.addstock').html(`<span>Stocktotal:${stock}</span>`)
           addqty.val('')
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           // we are getting ere list of reps that have price

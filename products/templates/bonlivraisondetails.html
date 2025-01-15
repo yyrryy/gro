@@ -7,10 +7,18 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
       Imprimer
     </button>
-    <!-- {% if order.isfacture %}
-    <button class="btn mt-2 w-100 bg-orange" onclick="degenerer(event, '{{order.id}}', 'bonl{{order.id}}', '/products/bonlivraisondetails/{{order.id}}')">
-      Dégenerer Facture
+    {% for i in reglements %}
+    <div class="alert alert-danger">
+      Reglement de bon: REG#{{i.id}}
+    </div>
+    {% endfor %}
+    {% if not order.isvalid %}
+    <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}?target={{target}}')">
+      Modifier
     </button>
+    {% endif %}
+    <!-- {% if order.isfacture %}
+    
     <select name="client" id="" style="width:100%;" class="select2 clientselectchangeinbl form-select notemptylivraison mt-5">
 
     </select>
@@ -18,19 +26,22 @@
 
     {% endif %}
     {% else %} -->
-    {% if order.ispaid %}
+    <!-- {% if order.ispaid %}
     <p>
       Bon est reglé
     </p>
-    {% else %}
+    <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}?target={{target}}')">
+      Modifier
+    </button>
+    {% else %} -->
     <!-- <button class="btn w-100 btn-success" onclick="ajaxpage('generatefacturetab{{order.id}}', 'Generer Fact.', '/products/validatebonsortie?bonid={{order.id}}')">
       Generer Bon sortie
     </button> -->
     <!-- if it has order sortie, dont diplay modifier -->
-    {% if order.iscanceled %}
+    <!-- {% if order.iscanceled %}
     <button>Rastaurer</button>
     {%endif%}
-    {% if not order.ispaid or not order.isfacture %}
+    {% if not order.ispaid %}
       {% if not order.iscanceled %}
       <button class="btn btn-danger" onclick="cancelthis('{{order.id}}', 'bon', '/products/bonlivraisondetails/{{order.id}}')">Anullé</button>
       {% endif %}
@@ -48,8 +59,8 @@
     {% endif %}
     <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">
       Entette
-    </button>
-
+    </button> -->
+    
     <!-- <strong class="mt-2">Transport</strong>
     <div class="d-flex">
       <input value="{{order.modlvrsn}}">
@@ -105,7 +116,7 @@
   <div id="printbl{{order.id}}" class="bonbody col-9 position-relative">
 
 
-    {% if order.total == 0 and order.isfacture %}
+    {% if order.total == 0 %}
     <div class="alert alert-success">
       <b>Tous produit de ce bon ont eté generé</b>
     </div>

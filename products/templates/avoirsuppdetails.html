@@ -3,7 +3,7 @@
   <button class="btn btn-success" onclick="Printavsuppoir('printavsupp{{avoir.id}}')">
     Telecharger
   </button>
-  <button class="btn btn-success" onclick="ajaxpage('addmodifieravoirsupp{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoirsupp/{{avoir.id}}')">
+  <button class="btn btn-success" onclick="ajaxpage('addmodifieravoirsupp{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoirsupp?target={{target}}&id={{avoir.id}}')">
     Modifier
   </button>
   {% if reglement %}

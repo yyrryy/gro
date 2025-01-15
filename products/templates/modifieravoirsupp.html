@@ -24,7 +24,7 @@ margin: 0;
 <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
   <div>
-    {{title}}
+    {{title}} {{target}}
   </div>
   <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
 </div>
@@ -33,7 +33,7 @@ margin: 0;
        <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
           <div class="col-5">
 
-            <select name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectavsupp{{avoir.id}}">
+            <select hidden name="mode" id="" style="width:100%;" class="form-select notemptylivraison modeselectavsupp{{avoir.id}}">
               <option value="bl">BL</option>
               <option value="facture" {% if avoir.avoirfacture %} selected {% endif %}>Facture</option>
             </select>
@@ -458,6 +458,7 @@ margin: 0;
             url: "{% url 'products:updatebonavoirsupp' %}",
             type: 'POST',
             data: {
+              'target':'{{target}}',
               'bonid': '{{avoir.id}}',
               'totalbon': totalbon,
               'supplierid': supplierid,

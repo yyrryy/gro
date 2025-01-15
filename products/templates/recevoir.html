@@ -22,8 +22,6 @@
           <small class="mt-5">Date Facture</small>
           <input type="date" name="datefacture" class="form-control datefacture" placeholder="Date de Bon" value="">
           <select name="mode" class="form-select mt-2 mode">
-            <option value="">Mode</option>
-            <option value="facture">Facture</option>
             <option value="bon">Bon</option>
           </select>
           <small class="mt-5">Ref error</small>
@@ -370,7 +368,8 @@
     // let selected = $('.resultsholderbonachat').find(':selected')
     // selected.remove()
   }
-    $(function(){
+    
+  $(function(){
       $('.resultsholderbonachat').select2({
         minimumInputLength: 1,
         placeholder:'Chercher un produit',
@@ -575,9 +574,10 @@
         // addremise.val(remise)
         addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}§${qtyjeu}`)
         $.get('/products/getlastbuyprice', {
+          'target':'{{target}}',
           'id':id
         }, (data)=>{
-          parentdiv.find('.addlastbuyprice').text(`Dernier pr.ach. ${data.dp} (${data.remise})`)
+          parentdiv.find('.addlastbuyprice').text(`Dernier pr.ach. ${data.dp} (${data.remise}%)`)
         })
         $('.addrowjeubtn').attr('qtyjeu', qtyjeu)
         // let selected = $(this).find(':selected')

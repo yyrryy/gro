@@ -31,7 +31,7 @@ margin: 0;
 <div class="alert alert-success">
   <b>Ce bon est payé</b>
 </div>
-{%else%}
+{%endif%}
 <div class="">
        <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
           <div class="col-5">
@@ -159,6 +159,7 @@ margin: 0;
               <!-- items of the bon -->
               {% for i in items %}
               <tr class="itemrow">
+                <input type="hidden" value="{{i.id}}" class="bonitem">
                   <td class="ref" onclick="removelineupdatebl(event, '{{livraison.id}}', '{{i.product.id}}')">{{i.product.ref}}</td>
                   <td class="name">{{i.product.name}}</td>
                   <td>{{i.product.buyprice}}</td>
@@ -192,7 +193,7 @@ margin: 0;
     {{livraison.id}}
 </div>
 
-{%endif%}
+
 <script>
   //removelineupdatebl
   function removelineupdatebl(event, blid, id) {
@@ -570,10 +571,12 @@ margin: 0;
             let price = tr.find('.price').val()
             let remise = tr.find('.remise').val()
             let total = tr.find('.total').text()
+            let bonitemid = tr.find('.bonitemid').text()
             let clientprice = tr.find('.clientprice').text()
             let productid = tr.find('input[name="productid"]').val()
             let product = {
                 'qty': qty,
+                'bonitemid': bonitemid,
                 'name': name,
                 'ref': ref,
                 'price': price,

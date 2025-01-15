@@ -236,7 +236,7 @@
         </thead>
         <tbody class="listfcbody">
           {% for order in bons %}
-            <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}')" mode="waiting"
+            <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}?target={{target}}')" mode="waiting"
             >
               <td>{{ order.facture_no }}</td>
               <td>{{ order.date|date:'d/m/Y' }}</td>

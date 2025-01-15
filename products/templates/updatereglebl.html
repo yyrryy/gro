@@ -1,10 +1,11 @@
 <div class="col-3">
+    {{reglement.bank.upper}}
     <strong>
         PAYMENT N° REGL#{{reglement.id}} <button class="bi bi-download" onclick="printreglementclient('{{reglement.id}}')"></button>
     </strong>
     <div class="">
         <small>Date de reglement:</small> <br>
-        <input type="date" name="" class="w-100 notempty mb-2" value="{{reglement.date|date:'Y-m-d'}}">
+        <input type="date" class="w-100 notempty mb-2 regldate" value="{{reglement.date|date:'Y-m-d'}}">
     </div><br>
     
     <input name="reglementid" hidden>
@@ -49,7 +50,10 @@
             </div>
             <div class="col-4">
                 <small>Bank:</small> <br>
-                <input type="text" name="bank" class="w-100" {{reglement.bank}}>
+                <input type="text" name="bank" class="w-100" value="{{reglement.bank}}">
+            </div>
+            <div class="col-4">
+                <button class="w-100 btn btn-primary" onclick="updatereglclient('{{reglement.id}}')">Modifier</button>
             </div>
         </div>
     </div>
@@ -105,7 +109,8 @@
                                 Facture N° {{i.facture.facture_no}} {% if i.rest > 0 %}(Total:{{i.total}}){% endif %} <br>
 
                             </strong>
-                            --{{i.bon_no}}
+                            --{{i.bon_no}} 
+                            <!-- <button onclick="removebonfromregl('{{i.id}}')" class="btn btn-danger"></button> -->
                         </td>
                         <td>
                             {{i.total}}
@@ -125,15 +130,16 @@
                             </strong>
                             {% for b in i.bons.all %}
                             --{{b.bon_no}} 
+                            <!-- <button onclick="removebonfromregl('{{i.id}}')" class="btn btn-danger"></button> -->
                             <br>
                             {% endfor %}
 
                         </td>
                         <td>
                             {% if i.rest > 0 %}
-                            {{i.rest}}
-                            {% else %}
+                            
                             {{i.total}}
+                            {% else %}
                             {% endif %}
                         </td>
                         
@@ -248,3 +254,4 @@
         </table>
     </div>
 </div>
+

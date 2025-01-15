@@ -9,19 +9,20 @@
     <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
       Valider Bon sortie (prix bon sortie)
     </button>
-    <button class="btn w-100 btn-success mt-2" onclick="validatebonsortieproductprice(event, '{{order.id}}')">
+    <!-- <button class="btn w-100 btn-success mt-2" onclick="validatebonsortieproductprice(event, '{{order.id}}')">
       Valider Bon sortie (prix de produit)
-    </button>
+    </button> -->
     {% endif %}
     {% if not order.ispaid %}
     <button class="btn w-100 btn-info" onclick="paybonsortie(event, '{{order.id}}')">
       Payé
     </button>
     {% endif %}
-    <!-- <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierlivraison/{{order.id}}')">
+    {% if not order.generated and not order.ispaid %}
+    <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
       Modifier
-    </button> -->
-
+    </button>
+    {% endif %}
 
     <!-- <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">
       Entette

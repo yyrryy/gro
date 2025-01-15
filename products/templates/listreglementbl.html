@@ -1101,7 +1101,7 @@
 
     $('.submitaddreglemntclientbtn').on('click', function(event){
         event.preventDefault()
-        $(event.target).addClass('disabled')
+        //$(event.target).addClass('disabled')
         let parentdiv=$(this).parent().parent()
         var isAnyEmpty = parentdiv.find('.notempty').filter(function() { return $(this).val() == ''; }).length > 0;
         if (isAnyEmpty){
@@ -1117,7 +1117,7 @@
             $(this).attr('disabled', false)
             return
         }
-        $(event.target).addClass('disabled')
+        //$(event.target).addClass('disabled')
         // if ((selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
         //     return this.value;
         // }).get()).length == 0){

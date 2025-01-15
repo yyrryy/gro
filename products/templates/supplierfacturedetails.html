@@ -7,11 +7,12 @@
   </button>
   <button class="btn btn-sm btn-success" onclick="entete()">
     entette
-  </button>
-
-  <button class="btn btn-danger" onclick="ajaxpage('addmodifierfacture{{facture.id}}', 'Modifier facture {{facture.facture_no}}', '/products/modifierfacture/{{facture.id}}')">
-    Modifier
   </button> -->
+  {% if not facture.bons.all %}
+  <button class="btn btn-danger" onclick="ajaxpage('addmodifierfacture{{facture.id}}', 'Modifier facture {{facture.facture_no}}', '/products/modifierfactureachat?target={{target}}&id={{facture.id}}')">
+    Modifier
+  </button>
+  {% endif %}
   <!-- <button class="btn btn-success" onclick="comptable(event, '{{facture.id}}')">
   {% if facture.isaccount %}
     Normal
@@ -118,7 +119,7 @@
                     </td>
                     <td class="text-center">
                       {% for v in i %}
-                      {{v.qty}}
+                      {{v.quantity}}
                       <br>
                       {% endfor %}
                     </td>
@@ -270,7 +271,7 @@
             </td>
             <td class="text-center">
               {% for v in i %}
-              {{v.qty}}
+              {{v.quantity}}
               <br>
               {% endfor %}
             </td>

@@ -23,7 +23,7 @@ margin: 0;
 </style>
 
 <div class="text-white rounded d-flex justify-content-between" style="background: #1a6a9b;">
-  <button class="btn bi bi-arrow-left" onclick="ajaxpage('bonachat92', 'Bon achat FR-BA0092', '/products/bonachatdetails/{{bon.id}}?target={{target}}')"></button>
+  <button class="btn bi bi-arrow-left" onclick="ajaxpage('bonachat92', 'Bon achat FR-BA0092', '/products/supplierfacturedetails/{{bon.id}}?target={{target}}')"></button>
   <div>
     {{title}} {{target}}
   </div>
@@ -34,7 +34,7 @@ margin: 0;
 <div class="alert alert-success">
   <b>Ce bon est payé ou avance</b>
 </div>
-{% endif %}
+{%else%}
 <div class="">
        <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
           <div class="col-5">
@@ -54,8 +54,8 @@ margin: 0;
                   <input type="date" class="form-control datebonachat{{bon.id}}" name="datebonachat{{bon.id}}" value="{{bon.date|date:'Y-m-d'}}" placeholder="Date bon">
               </div>
               <div class="mb-2">
-                <small>N° Bon:</small>
-                  <input type="text" class="form-control bonachatno{{bon.id}}" name="bonachatno{{bon.id}}" value="{{bon.nbon}}">
+                <small>N° Facture:</small>
+                  <input type="text" class="form-control bonachatno{{bon.id}}" name="bonachatno{{bon.id}}" value="{{bon.facture_no}}">
               </div>
               <select hidden name="mode" class="form-select mt-2 modeupdatebonachat{{bon.id}}">
                 <option value="facture" {% if bon.isfacture %} selected {% endif %}>Facture</option>
@@ -159,7 +159,9 @@ margin: 0;
                     <!-- <td>
                       <input style="width:65px;" type="text" value="{{i.devise}}" class="devise">
                     </td> -->
-                    <td><input style="width:65px;" type="number" class="calculate qty" onkeyup="calculatebonachat(event)" name="qty" value="{{i.quantity}}"></td>
+                    <td><input 
+                      {% if i.stockin %}readonly{%endif%}
+                      style="width:65px;" type="number" class="calculate qty" onkeyup="calculatebonachat(event)" name="qty" value="{{i.qty}}"></td>
                     <td><input style="width:65px;" type="number" class="calculate price" onkeyup="calculatebonachat(event)" name="price" value="{{i.price}}"></td>
                     <td><input style="width:65px;" type="number" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise1}}"></td>
                     <td><input style="width:65px;" type="number" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" value="{{i.remise2}}"></td>
@@ -190,7 +192,7 @@ margin: 0;
     </div>
     {{bon.id}}
 </div>
-
+{% endif %}
 <script>
   readingqrcode=false
   function addrowbonachat(event){
@@ -214,7 +216,7 @@ margin: 0;
         return
       }
       var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
-      pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{bon.id}}{{target}}')) || []
+      pdcts=JSON.parse(localStorage.getItem('pdctsinfactureachat{{bon.id}}{{target}}')) || []
       
       console.log(id, pdcts, pdcts.includes(id))
       if (pdcts.includes(id)){
@@ -253,7 +255,7 @@ margin: 0;
         'total':addtotal
       }
       pdcts.push(id)
-      localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
+      localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
       let tr = `
       <tr class="itemrow">
         <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
@@ -292,7 +294,7 @@ margin: 0;
           totalSum += parseFloat($(this).text());
         });
       console.log('saving')
-      savetolocalstorage(item, totalSum, 'bonachat{{bon.id}}{{target}}')
+      savetolocalstorage(item, totalSum, 'factureachat{{bon.id}}{{target}}')
       totalbon.text(totalSum.toFixed(2))
       // parentdiv.find('.resultsholderbonachat').val('').trigger('change')
       parentdiv.find('.resultsholderbonachat').select2('open')
@@ -323,7 +325,7 @@ margin: 0;
       return
     }
     var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = addname.attr('data').split('§');
-    pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{bon.id}}{{target}}')) || []
+    pdcts=JSON.parse(localStorage.getItem('pdctsinfactureachat{{bon.id}}{{target}}')) || []
     
     console.log(id, pdcts, pdcts.includes(id))
     if (pdcts.includes(id)){
@@ -366,7 +368,7 @@ margin: 0;
     }
     
     pdcts.push(id)
-    localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
+    localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
     let tr = `
     <tr class="itemrow">
       <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
@@ -425,9 +427,9 @@ margin: 0;
             // remove element
             // remove id from localstorage
             $(event.target).parent().remove()
-            pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{bon.id}}{{target}}'))
+            pdcts=JSON.parse(localStorage.getItem('pdctsinfactureachat{{bon.id}}{{target}}'))
             pdcts.splice(pdcts.indexOf(id), 1)
-            localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
+            localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
             // update total
             let totalbon = parseFloat(parentdiv.find('.totalbon').text())
             let totalrow = parseFloat($(event.target).parent().find('.total').text())
@@ -462,7 +464,7 @@ margin: 0;
       //   return
       // }
       var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
-      pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{bon.id}}{{target}}')) || []
+      pdcts=JSON.parse(localStorage.getItem('pdctsinfactureachat{{bon.id}}{{target}}')) || []
 
       console.log(id, pdcts, pdcts.includes(id))
       if (pdcts.includes(id)){
@@ -477,7 +479,7 @@ margin: 0;
 
 
       pdcts.push(id)
-      localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
+      localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
       let addtotal=(parseFloat(addqty.val()==''?0:addqty.val())*parseFloat(addprice.val()==''?0:addprice.val())).toFixed(2) || 0
       let tr = `
       <tr class="itemrow ${stock<=0? "text-danger":"" }">: 2
@@ -543,12 +545,12 @@ margin: 0;
       });
 
     })
-  localStorage.removeItem('pdctsinbonachat{{bon.id}}{{target}}')
+  localStorage.removeItem('pdctsinfactureachat{{bon.id}}{{target}}')
   var productIds = [];
   {% for i in items %}
   productIds.push('{{ i.product.id }}');
   {% endfor %}
-  localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(productIds));
+  localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', JSON.stringify(productIds));
   $(document).ready(function(){
     $('.supplierbonachat{{bon.id}}').select2('open')
   })
@@ -650,7 +652,7 @@ margin: 0;
         let orderno = $('.bonachatno{{bon.id}}').val()
         let totalbon=parseFloat($('.totalbonachat{{bon.id}}').text())
         console.log('sending')
-        localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', '[]')
+        localStorage.setItem('pdctsinfactureachat{{bon.id}}{{target}}', '[]')
         console.log(products)
         console.log({
               'bonid': '{{bon.id}}',
@@ -663,7 +665,7 @@ margin: 0;
               'csrfmiddlewaretoken': '{{csrf_token}}'
             },)
         $.ajax({
-            url: "{% url 'products:updatebonachat' %}",
+            url: "{% url 'products:updatefactureachat' %}",
             type: 'POST',
             data: {
               'target':'{{target}}',
@@ -680,7 +682,7 @@ margin: 0;
               if (data.success){
                 alertify.success('Bon Achat modifié')
                 deletetab('addmodifierbonachat{{bon.id}}')
-                ajaxpage('bonachat{{bon.id}}', 'Bon achat {{bon.nbon}}', '/products/bonachatdetails/{{bon.id}}?target={{target}}')
+                ajaxpage('bonachat{{bon.id}}', 'Bon achat {{bon.nbon}}', '/products/supplierfacturedetails/{{bon.id}}?target={{target}}')
                 // delerte this tab
                 // deletetab('modifierlivraison{{bon.id}}')
               }

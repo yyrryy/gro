@@ -56,6 +56,24 @@ class Incaisse(models.Model):
     note=models.TextField(default=None, null=True, blank=True)
 
 class Produit(models.Model):
+    # negative stock
+    isnegativeinfr=models.BooleanField(default=False)
+    isnegative=models.BooleanField(default=False)
+    frnegative=models.TextField(default='[]')
+    # sortie items where there is negative
+    frsorties=models.TextField(default='[]')
+    # negative stock
+    negative=models.TextField(default='[]')
+    # sortie items where there is negative
+    sorties=models.TextField(default='[]')
+    #samethis in livraion
+    frnegativeliv=models.TextField(default='[]')
+    # sortie items where there is negative
+    frliv=models.TextField(default='[]')
+    # negative stock
+    negativeliv=models.TextField(default='[]')
+    # sortie items where there is negative
+    liv=models.TextField(default='[]')
     # quantity of product in jeu (2, 4)
     qtyjeu=models.IntegerField(default=0, null=True, blank=True)
     name=models.CharField(max_length=500, null=True)
@@ -83,9 +101,9 @@ class Produit(models.Model):
     coutmoyen=models.FloatField(default=None, null=True, blank=True)
     frcoutmoyen=models.FloatField(default=None, null=True, blank=True)
     sellprice=models.FloatField(default=None, null=True, blank=True)
-    remisesell=models.IntegerField(default=35, null=True, blank=True)
+    remisesell=models.FloatField(default=0.0, null=True, blank=True)
     frsellprice=models.FloatField(default=None, null=True, blank=True)
-    frremisesell=models.IntegerField(default=35, null=True, blank=True)
+    frremisesell=models.FloatField(default=0.0, null=True, blank=True)
     stockinitial=models.IntegerField(default=0, null=True, blank=True)
     #checkprice= models.FloatField(default=None, null=True, blank=True)
     prixnet=models.FloatField(default=None, null=True, blank=True)
@@ -663,6 +681,7 @@ class Outfacture(models.Model):
     date=models.DateField(default=None, blank=True, null=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
+    livraison=models.ForeignKey('Livraisonitem', on_delete=models.SET_NULL, default=None, null=True)
 class Livraisonitem(models.Model):
     pricesofout=models.TextField(default=None, blank=True, null=True)
     qtyofout=models.TextField(default=None, blank=True, null=True)
@@ -1164,7 +1183,7 @@ class Outfactureachat(models.Model):
     date=models.DateField(default=None, blank=True, null=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
-
+    stockin=models.ForeignKey(Stockin, on_delete=models.SET_NULL, default=None, null=True)
 
 class Config(models.Model):
     caissesortie=models.FloatField(default=0.00)

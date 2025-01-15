@@ -796,7 +796,95 @@ def addsupply(request):
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netwithremise1=round(buyprice-(buyprice*(remise1/100)), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
+        
+        #product.isnew=True
+        print('creating', product.ref)
+        
+        if isfacture:
+             Outfactureachat.objects.create(
+                facture=facture,
+                remise1=remise1,
+                remise2=remise2,
+                remise3=remise3,
+                remise4=remise4,
+                price=i['price'],
+                ref=i['ref'],
+                name=i['name'],
+                product=product,
+                qty=i['qty'],
+                total=i['total'],
+                supplier_id=supplierid,
+                date=datebon,
+                isfarah=target=='f',
+                isorgh=target=='o',
+            )
+        else:
+            Stockin.objects.create(
+                date=datebon,
+                product=product,
+                quantity=i['qty'],
+                price=i['price'],
+                ref=i['ref'],
+                name=i['name'],
+                remise1=remise1,
+                remise2=remise2,
+                remise3=remise3,
+                remise4=remise4,
+                net=netwithremise1,
+                # remise=remise,
+                qtyofprice=i['qty'],
+                total=i['total'],
+                supplier_id=supplierid,
+                isfacture=isfacture,
+                isfarah=target=='f',
+                isorgh=target=='o',
+                nbon=bon
+            )
         if target=='f':
+            # if product.isnegativeinfr:
+            #     print('>> product is negative')
+            #     qtynegative=json.loads(product.frnegative)
+            #     sortitems=json.loads(product.frsorties)
+            #     print('>> ', qtynegative, sortitems)
+            #     thisqty=int(i['qty'])
+            #     #for , ss in zip(qtynegative, sortitems):
+            #     for index, (qq, ss) in enumerate(zip(qtynegative, sortitems)):
+            #         print('>> thisqty, qq', thisqty, qq)
+            #         if not int(qq)==0:
+            #             if not thisqty<=0:
+            #                 # find sortie and add qty and price
+            #                 sorti=Sortieitem.objects.get(pk=ss)
+            #                 prices=json.loads(sorti.pricesofout)
+            #                 qtyofout=json.loads(sorti.qtyofout)
+            #                 if thisqty>=qq:
+            #                     print(">>thisqty>=qq", thisqty>=qq, qq)
+            #                     qtyofout.append(qq)
+            #                     prices.append(st.id)
+            #                     diff=int(thisqty)-int(qq)
+            #                     thisqty=diff
+            #                     st.qtyofprice=diff
+            #                     st.save()
+            #                     qtyofout[index]=0
+            #                     product.save()
+            #                     # qtynegative.remove(qq)
+            #                     # sortitems.remove(ss)
+            #                 else:
+            #                     diff=int(qq)-int(thisqty)
+            #                     qtyofout.append(diff)
+            #                     prices.append(st.id)
+            #                     st.qtyofprice=0
+            #                     st.save()
+            #                     qtyofout[index]=diff
+            #                 sorti.pricesofout=prices
+            #                 sorti.qtyofout=qtyofout
+            #                 sorti.save()
+            #                     # finish
+            #         if sum(qtynegative)==0:
+            #             print('>> sum', sum(qtynegative), qtynegative)
+            #             product.isnegativeinfr=False
+            #         product.save()            
+
+                    
             # calcul pondiré, stock needs to be more than 0
             if product.stocktotalfarah>0:
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
@@ -824,6 +912,45 @@ def addsupply(request):
             if isfacture:
                 product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
         else:
+            # if product.isnegative:
+            #     qtynegative=json.loads(product.negative)
+            #     sortitems=json.loads(product.sorties)
+            #     thisqty=int(i['qty'])
+                
+            #     #for , ss in zip(qtynegative, sortitems):
+            #     for index, (qq, ss) in enumerate(zip(qtynegative, sortitems)):
+            #         if not int(qq)==0:
+            #             if not thisqty<=0:
+            #                 # find sortie and add qty and price
+            #                 sorti=Sortieitem.objects.get(pk=ss)
+            #                 prices=json.loads(sorti.pricesofout)
+            #                 qtyofout=json.loads(sorti.qtyofout)
+            #                 if thisqty>=qq:
+            #                     qtyofout.append(qq)
+            #                     prices.append(st.id)
+            #                     diff=int(thisqty)-int(qq)
+            #                     thisqty=diff
+            #                     st.qtyofprice=diff
+            #                     st.save()
+            #                     qtyofout[index]=0
+            #                     product.save()
+            #                     # qtynegative.remove(qq)
+            #                     # sortitems.remove(ss)
+            #                 else:
+            #                     diff=int(qq)-int(thisqty)
+            #                     qtyofout.append(diff)
+            #                     prices.append(st.id)
+            #                     st.qtyofprice=0
+            #                     st.save()
+            #                     qtyofout[index]=diff
+            #                 sorti.pricesofout=prices
+            #                 sorti.qtyofout=qtyofout
+            #                 sorti.save()
+            #                     # finish
+            #         if sum(qtynegative)==0:
+            #             product.isnegative=False
+            #         product.save()
+            
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
                 actualtotal=0
@@ -849,33 +976,6 @@ def addsupply(request):
                 product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
         # recodrd remise 1, 2, 3, 4
         product.save()
-        #product.isnew=True
-        print('creating', product.ref)
-        st=Stockin.objects.create(
-            date=datebon,
-            product=product,
-            quantity=i['qty'],
-            price=i['price'],
-            ref=i['ref'],
-            name=i['name'],
-            remise1=remise1,
-            remise2=remise2,
-            remise3=remise3,
-            remise4=remise4,
-            net=netwithremise1,
-            # remise=remise,
-            qtyofprice=i['qty'],
-            total=i['total'],
-            supplier_id=supplierid,
-            isfacture=isfacture,
-            isfarah=target=='f',
-            isorgh=target=='o'
-        )
-        if isfacture:
-            st.facture=facture
-        else:
-            st.nbon=bon
-        st.save()
     # # update cout moyen, it will be calculated by deviding total prices by total qty
 
         # totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
@@ -1012,49 +1112,49 @@ def addbonlivraison(request):
             if isfarah:
                 print('>>> we are in farah')
                 product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
-                thisqty=int(i['qty'])
-                for pr in prices:
-                    print('>> qty', thisqty, pr.product.ref)
-                    if not thisqty<=0:
-                        print('>> qty is not 0')
-                        if pr.qtyofprice<=thisqty:
-                            thisqty=thisqty-int(pr.qtyofprice)
-                            qtyofout.append(pr.qtyofprice)
-                            pr.qtyofprice=0
-                            pricesofout.insert(0, pr.id)
-                        else:
-                            pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                            qtyofout.append(thisqty)
-                            thisqty=0
-                            pricesofout.insert(0, pr.id)
-                        pr.save()
-                    else:
-                        print('>> qty', thisqty, pr.product.ref, 'breaking')
-                        break
+                # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
+                # thisqty=int(i['qty'])
+                # for pr in prices:
+                #     print('>> qty', thisqty, pr.product.ref)
+                #     if not thisqty<=0:
+                #         print('>> qty is not 0')
+                #         if pr.qtyofprice<=thisqty:
+                #             thisqty=thisqty-int(pr.qtyofprice)
+                #             qtyofout.insert(0, pr.qtyofprice)
+                #             pr.qtyofprice=0
+                #             pricesofout.insert(0, pr.id)
+                #         else:
+                #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                #             qtyofout.insert(0, thisqty)
+                #             thisqty=0
+                #             pricesofout.insert(0, pr.id)
+                #         pr.save()
+                #     else:
+                #         print('>> qty', thisqty, pr.product.ref, 'breaking')
+                #         break
 
 
             else:
                 thisqty=int(i['qty'])
                 product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
-                prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product, isavoir=False)
-                for pr in prices:
-                    if not thisqty<=0:
-                        print('>> qty is not 0')
-                        if pr.qtyofprice<=thisqty:
-                            thisqty=thisqty-int(pr.qtyofprice)
-                            qtyofout.append(pr.qtyofprice)
-                            pr.qtyofprice=0
-                            pricesofout.insert(0, pr.id)
-                        else:
-                            pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                            qtyofout.append(thisqty)
-                            thisqty=0
-                            pricesofout.insert(0, pr.id)
-                        pr.save()
-                    else:
-                        print('>> breaking')
-                        break
+                # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product, isavoir=False)
+                # for pr in prices:
+                #     if not thisqty<=0:
+                #         print('>> qty is not 0')
+                #         if pr.qtyofprice<=thisqty:
+                #             thisqty=thisqty-int(pr.qtyofprice)
+                #             qtyofout.insert(0, pr.qtyofprice)
+                #             pr.qtyofprice=0
+                #             pricesofout.insert(0, pr.id)
+                #         else:
+                #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+                #             qtyofout.insert(0, thisqty)
+                #             thisqty=0
+                #             pricesofout.insert(0, pr.id)
+                #         pr.save()
+                #     else:
+                #         print('>> breaking')
+                #         break
                     
             product.save()
             Livraisonitem.objects.create(
@@ -1651,9 +1751,10 @@ def bonlivraisondetails(request, id):
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     print('orderitems', orderitems)
-    reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    reglements=PaymentClientbl.objects.filter(Q(bons__in=[order])| Q(factures__in=[order.facture]))
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
+    print('>> reglement', reglements)
     ctx={
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
@@ -1666,8 +1767,16 @@ def bonlivraisondetails(request, id):
 
 
 def facturedetails(request, id):
+    target=request.GET.get('target')
     order=Facture.objects.get(pk=id)
-    orderitems=Outfacture.objects.filter(facture=order).order_by('product__name')
+    
+    
+    bons=order.bons.all()
+    total=bons.aggregate(Sum('total')).get('total__sum')
+    print('>> total', total)
+    order.total=total
+    order.save()
+    orderitems=Livraisonitem.objects.filter(bon__in=bons)
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
@@ -1678,6 +1787,7 @@ def facturedetails(request, id):
         'orderitems':orderitems,
         'tva':order.tva,
         'ttc':order.total,
+        'target':target,
         'ht':round(order.total-order.tva, 2),
         'reps':Represent.objects.all()
     }
@@ -1686,7 +1796,14 @@ def facturedetails(request, id):
 def supplierfacturedetails(request, id):
     target=request.GET.get('target')
     order=Factureachat.objects.get(pk=id)
-    orderitems=Outfactureachat.objects.filter(facture=order).order_by('product__name')
+    bons=order.bons.all()
+    print('>> bons', bons)
+    total=bons.aggregate(Sum('total')).get('total__sum')
+    print('>> total', total)
+    order.total=total
+    #order.save()
+    # orderitems=Outfactureachat.objects.filter(facture=order).order_by('product__name')
+    orderitems=Stockin.objects.filter(nbon__in=bons)
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
@@ -1836,10 +1953,10 @@ def listbonlivraison(request):
     # get only the last 100 orders of the current year
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
-        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(isvalid=True).exclude(iscanceled=True).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(isvalid=True).exclude(iscanceled=True).order_by('-bon_no')
         total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')[:50]
+        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')
         total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
@@ -2372,12 +2489,28 @@ def modifieravoir(request, id):
     avoir=Avoirclient.objects.get(pk=id)
     items=Stockin.objects.filter(avoir=avoir)
     ctx={
+        'title':'Mofier avoir '+ avoir.no,
         'target':target,
         'avoir':avoir,
         'items':items,
         'commercials':Represent.objects.all(),
     }
     return render(request, 'modifieravoir.html', ctx)
+
+
+def modifieravoirsupp(request):
+    target=request.GET.get('target')
+    id=request.GET.get('id')
+    avoir=Avoirsupplier.objects.get(pk=id)
+    items=Returnedsupplier.objects.filter(avoir=avoir)
+    ctx={
+        'title':'Mofier avoir Fournisseur'+ avoir.no,
+        'target':target,
+        'avoir':avoir,
+        'items':items,
+        'commercials':Represent.objects.all(),
+    }
+    return render(request, 'modifieravoirsupp.html', ctx)
 
 
 def modifierfacture(request, id):
@@ -2414,8 +2547,8 @@ def updatebonlivraison(request):
     note=request.POST.get('note')
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
-
     thisclient=livraison.client
+
     # if livraison.client==client:
     #     print('same client', float(thisclient.soldtotal), float(livraison.total), float(totalbon))
     #     thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total)+float(totalbon), 2)
@@ -2454,9 +2587,9 @@ def updatebonlivraison(request):
             # st=Stockin.objects.filter(isfarah=False, product=product).last()
             # st.qtyofprice=st.qtyofprice+int(i.qty)
             # st.save()
-        st=Stockin.objects.filter(pk__in=json.loads(i.pricesofout)).last()
-        st.qtyofprice=st.qtyofprice+int(i.qty)
-        st.save()
+        #st=Stockin.objects.filter(pk__in=json.loads(i.pricesofout)).last()
+        #st.qtyofprice=st.qtyofprice+int(i.qty)
+        #st.save()
         product.save()
         i.delete()
 
@@ -2478,55 +2611,70 @@ def updatebonlivraison(request):
         qtyofout=[]
         if target=='f':
             product.stocktotalfarah=int(product.stocktotalfarah)-qty
-            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
-            thisqty=int(i['qty'])
-            for pr in prices:
-                print('>> qty', thisqty, pr.product.ref)
-                if not thisqty<=0:
-                    print('>> qty is not 0')
-                    if pr.qtyofprice<=thisqty:
-                        thisqty=thisqty-int(pr.qtyofprice)
-                        qtyofout.append(pr.qtyofprice)
-                        pr.qtyofprice=0
-                        pricesofout.insert(0, pr.id)
-                    else:
-                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                        qtyofout.append(thisqty)
-                        thisqty=0
-                        pricesofout.insert(0, pr.id)
-                    pr.save()
-                else:
-                    print('>> qty', thisqty, pr.product.ref, 'breaking')
-                    break
+            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
+            # thisqty=int(i['qty'])
+            # for pr in prices:
+            #     print('>> qty', thisqty, pr.product.ref)
+            #     if not thisqty<=0:
+            #         print('>> qty is not 0')
+            #         if pr.qtyofprice<=thisqty:
+            #             thisqty=thisqty-int(pr.qtyofprice)
+            #             qtyofout.append(pr.qtyofprice)
+            #             pr.qtyofprice=0
+            #             pricesofout.insert(0, pr.id)
+            #         else:
+            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+            #             qtyofout.append(thisqty)
+            #             thisqty=0
+            #             pricesofout.insert(0, pr.id)
+            #         pr.save()
+            #     else:
+            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
+            #         break
+        
         else:
             product.stocktotalorgh=int(product.stocktotalorgh)-qty
-            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product).order_by('id')
+            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product).order_by('id')
 
-            thisqty=int(i['qty'])
-            for pr in prices:
-                print('>> qty', thisqty, pr.product.ref)
-                if not thisqty<=0:
-                    print('>> qty is not 0')
-                    if pr.qtyofprice<=thisqty:
-                        thisqty=thisqty-int(pr.qtyofprice)
-                        qtyofout.append(pr.qtyofprice)
-                        pr.qtyofprice=0
-                        pricesofout.insert(0, pr.id)
-                    else:
-                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                        qtyofout.append(thisqty)
-                        thisqty=0
-                        pricesofout.insert(0, pr.id)
-                    pr.save()
-                else:
-                    print('>> qty', thisqty, pr.product.ref, 'breaking')
-                    break
+            # thisqty=int(i['qty'])
+            # for pr in prices:
+            #     print('>> qty', thisqty, pr.product.ref)
+            #     if not thisqty<=0:
+            #         print('>> qty is not 0')
+            #         if pr.qtyofprice<=thisqty:
+            #             thisqty=thisqty-int(pr.qtyofprice)
+            #             qtyofout.append(pr.qtyofprice)
+            #             pr.qtyofprice=0
+            #             pricesofout.insert(0, pr.id)
+            #         else:
+            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+            #             qtyofout.append(thisqty)
+            #             thisqty=0
+            #             pricesofout.insert(0, pr.id)
+            #         pr.save()
+            #     else:
+            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
+            #         break
+        
         product.save()
-
+        # if i.get('bonitemid', None):
+        #     st=Livraisonitem.objects.filter(pk=i['bonitemid']).first()
+        # # if not itemid means it's a new line
+        #     print('>>> already, updating old date')
+        #     st.remise=i['remise'],
+        #     st.name=i['name'],
+        #     st.ref=i['ref'],
+        #     st.qty=qty,
+        #     st.price=i['price'],
+        #     st.total=i['total'],
+        #     st.date=datebon,
+        #     st.save()
+        # else:
+        #     print('>> new line')
         # create new livraison items
         Livraisonitem.objects.create(
-            qtyofout=qtyofout,
-            pricesofout=pricesofout,
+            # qtyofout=qtyofout,
+            # pricesofout=pricesofout,
             bon=livraison,
             remise=i['remise'],
             name=i['name'],
@@ -2758,8 +2906,8 @@ def listreglementsupp(request):
         'suppliers':Supplier.objects.all(),
         'today':timezone.now().date()
     }
-    if reglements:
-        ctx['total']=round(PaymentSupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+    # if reglements:
+    #     ctx['total']=round(PaymentSupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
     return render(request, 'listreglementsupp.html', ctx)
 
 
@@ -3438,24 +3586,23 @@ def addavoirclient(request):
                 bonid=i['bonid']
                 #if bonid:
                 bon=Bonlivraison.objects.get(pk=bonid)
-                prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
-                print('>>> prices', prices)
+                #prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
                 ## finish this prices
                 thisqty=int(i['qty'])
                 
-                for price in prices:
-                    print('>> id of qty', price.id)
-                    if not thisqty==0:
-                        needs=price.quantity-price.qtyofprice
-                        price.qtyofprice+=needs
-                        if needs>thisqty:
-                            price.qtyofprice=thisqty
-                            thisqty=0
-                        else:
-                            thisqty-=needs
-                        price.save()
+                # for price in prices:
+                #     print('>> id of qty', price.id)
+                #     if not thisqty==0:
+                #         needs=price.quantity-price.qtyofprice
+                #         price.qtyofprice+=needs
+                #         if needs>thisqty:
+                #             price.qtyofprice=thisqty
+                #             thisqty=0
+                #         else:
+                #             thisqty-=needs
+                #         price.save()
 
-                # if prices.exists():
+                # # if prices.exists():
                 #     thisqty=int(i['qty'])
                 #     for p in prices:
                 #         if thisqty==0:
@@ -3464,6 +3611,25 @@ def addavoirclient(request):
                 #             p.quantity+=thisqty
             if isorgh:
                 product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+                bonid=i['bonid']
+                #if bonid:
+                bon=Bonlivraison.objects.get(pk=bonid)
+                # prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
+                # print('>>> prices', prices)
+                # ## finish this prices
+                # thisqty=int(i['qty'])
+                
+                # for price in prices:
+                #     print('>> id of qty', price.id)
+                #     if not thisqty==0:
+                #         needs=price.quantity-price.qtyofprice
+                #         price.qtyofprice+=needs
+                #         if needs>thisqty:
+                #             price.qtyofprice=thisqty
+                #             thisqty=0
+                #         else:
+                #             thisqty-=needs
+                #         price.save()
             product.save()
             Stockin.objects.create(
                 isavoir=True,
@@ -3876,9 +4042,9 @@ def listbonachat(request):
     target=request.GET.get('target')
     thisyear=timezone.now().year
     if target=='f':
-        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True, isvalid=False).order_by('-date')[:50]
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True, isvalid=False).order_by('-id')[:50]
     elif target=='o':
-        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isorgh=True, isvalid=False).order_by('-date')[:50]
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=False, isvalid=False).order_by('-id')[:50]
     ctx={
         'title':'List des bon achat',
         'bons':bons,
@@ -3936,6 +4102,24 @@ def modifierbonachat(request, id):
     return render(request, 'modifierbonachat.html', ctx)
 
 
+def modifierfactureachat(request):
+    target=request.GET.get('target')
+    id=request.GET.get('id')
+    print('>>', target)
+    bon=Factureachat.objects.get(pk=id)
+    items=Outfactureachat.objects.filter(facture=bon)
+    print(items)
+    ctx={
+        'title':'Modifier Facture achat '+bon.facture_no,
+        'bon':bon,
+        'items':items,
+        'suppliers':Supplier.objects.all(),
+        'target':target
+    }
+    return render(request, 'modifierfactureachat.html', ctx)
+
+
+
 def updatebonachat(request):
     id=request.POST.get('bonid')
     target=request.POST.get('target')
@@ -3985,8 +4169,15 @@ def updatebonachat(request):
 
     with transaction.atomic():
         for i in json.loads(request.POST.get('products')):
-
-
+            remise1=0 if i['remise1']=="" else i['remise1']
+            remise2=0 if i['remise2']=="" else i['remise2']
+            remise3=0 if i['remise3']=="" else i['remise3']
+            remise4=0 if i['remise4']=="" else i['remise4']
+            buyprice=float(i['price'])
+            print('>>> buyprice', buyprice, buyprice-(buyprice*(float(remise1)/100)))
+            # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
+            netwithremise1=round(buyprice-(buyprice*(float(remise1)/100)), 2)
+            netprice=round(float(i['total'])/float(i['qty']), 2)
             qty=0 if i['qty']=="" else int(i['qty'])
             product=Produit.objects.get(pk=i['productid'])
             print('>>>>>>>adding total')
@@ -3999,6 +4190,20 @@ def updatebonachat(request):
             #     product.stockfacture=int(product.stockfacture)+qty
             #product.save()
             # create new livraison items
+            # if i.get('achatitemid', None):
+            #     st=Stockin.objects.filter(pk=i['achatitemid']).first()
+            # # if not itemid means it's a new line
+            #     print('>>> already')
+            #     st.quantity=i['qty']
+            #     st.price=i['price']
+            #     st.remise1=0 if i['remise1']=="" else i['remise1']
+            #     st.remise2=0 if i['remise2']=="" else i['remise2']
+            #     st.remise3=0 if i['remise3']=="" else i['remise3']
+            #     st.remise4=0 if i['remise4']=="" else i['remise4']
+            #     st.net=netwithremise1
+            #     st.save()
+            # else:
+            #     print('>>> new line')
             Stockin.objects.create(
                 nbon=bon,
                 supplier=supplier,
@@ -4012,8 +4217,10 @@ def updatebonachat(request):
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
                 qtyofprice=qty,
-                isfarah=isfarah
+                isfarah=isfarah,
+                net=netwithremise1
             )
+            
             totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
             totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
             print(totalprices, totalqty)
@@ -4024,17 +4231,151 @@ def updatebonachat(request):
                 product.frremise2=0 if i['remise2']=="" else i['remise2']
                 product.frremise3=0 if i['remise3']=="" else i['remise3']
                 product.frremise4=0 if i['remise4']=="" else i['remise4']
+                product.frsellprice=0 if i['price']=="" else i['price']
+                product.frremisesell=0 if i['remise1']=="" else i['remise1']
+                product.frnetbuyprice=netprice
             else:
                 product.buyprice=0 if i['price']=="" else i['price']
                 product.remise1=0 if i['remise1']=="" else i['remise1']
                 product.remise2=0 if i['remise2']=="" else i['remise2']
                 product.remise3=0 if i['remise3']=="" else i['remise3']
                 product.remise4=0 if i['remise4']=="" else i['remise4']
+                product.sellprice=0 if i['price']=="" else i['price']
+                product.remisesell=0 if i['remise1']=="" else i['remise1']
+                product.netbuyprice=netprice
             product.save()
 
     return JsonResponse({
         'success':True
     })
+
+def updatefactureachat(request):
+    id=request.POST.get('bonid')
+    target=request.POST.get('target')
+    print('>>> target', target)
+    isfarah=target=='f'
+    bon=Factureachat.objects.get(pk=id)
+    bon.date=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d')
+    bon.factue_no=request.POST.get('orderno')
+    isfacture= True if request.POST.get('mode')=='facture' else False
+    totalbon=request.POST.get('totalbon')
+    supplier=Supplier.objects.get(pk=request.POST.get('supplierid'))
+    thissupplier=bon.supplier
+    if bon.supplier==supplier:
+        print('same supplier', float(thissupplier.rest), float(bon.total), float(totalbon))
+        thissupplier.rest=round(float(thissupplier.rest)-float(bon.total)+float(totalbon), 2)
+        thissupplier.save()
+    else:
+        print('not same')
+        thissupplier.rest=round(float(thissupplier.rest)-float(bon.total), 2)
+        thissupplier.save()
+        print('old', thissupplier.rest)
+        supplier.rest=round(float(supplier.rest)+float(totalbon), 2)
+        supplier.save()
+        print('new', supplier.rest)
+    # bon.supplier.rest=float(bon.supplier.rest)-float(bon.total)
+    # bon.supplier.save()
+    items=Outfactureachat.objects.filter(facture=bon)
+    # update this items
+    for i in items:
+        product=i.product
+        print('removing from total')
+        if isfarah:
+            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+        else:
+            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+        # if bon.isfacture:
+        #     print('removing from facture')
+        #     product.stockfacture=int(product.stockfacture)-int(i.quantity)
+        product.save()
+        #i.delete()
+
+    bon.supplier=supplier
+    bon.total=totalbon
+    bon.facture_no=request.POST.get('orderno')
+    #bon.isfacture=isfacture
+    bon.save()
+
+    with transaction.atomic():
+        for i in json.loads(request.POST.get('products')):
+            remise1=0 if i['remise1']=="" else i['remise1']
+            remise2=0 if i['remise2']=="" else i['remise2']
+            remise3=0 if i['remise3']=="" else i['remise3']
+            remise4=0 if i['remise4']=="" else i['remise4']
+            buyprice=float(i['price'])
+            print('>>> buyprice', buyprice, buyprice-(buyprice*(float(remise1)/100)))
+            # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
+            netwithremise1=round(buyprice-(buyprice*(float(remise1)/100)), 2)
+            netprice=round(float(i['total'])/float(i['qty']), 2)
+            qty=0 if i['qty']=="" else int(i['qty'])
+            product=Produit.objects.get(pk=i['productid'])
+            print('>>>>>>>adding total')
+            if isfarah:
+                product.stocktotalfarah=int(product.stocktotalfarah)+qty
+            else:
+                product.stocktotalorgh=int(product.stocktotalorgh)+qty
+            # if isfacture:
+            #     print('>>>>>>>adding fc')
+            #     product.stockfacture=int(product.stockfacture)+qty
+            #product.save()
+            # create new livraison items
+            if i.get('achatitemid', None):
+                st=Outfactureachat.objects.filter(pk=i['achatitemid']).first()
+            # if not itemid means it's a new line
+                print('>>> already')
+                st.qty=i['qty']
+                st.price=i['price']
+                st.remise1=0 if i['remise1']=="" else i['remise1']
+                st.remise2=0 if i['remise2']=="" else i['remise2']
+                st.remise3=0 if i['remise3']=="" else i['remise3']
+                st.remise4=0 if i['remise4']=="" else i['remise4']
+                st.save()
+            else:
+                print('>>> new line')
+                Outfactureachat.objects.create(
+                    facture=bon,
+                    supplier=supplier,
+                    remise1=0 if i['remise1']=="" else i['remise1'],
+                    remise2=0 if i['remise2']=="" else i['remise2'],
+                    remise3=0 if i['remise3']=="" else i['remise3'],
+                    remise4=0 if i['remise4']=="" else i['remise4'],
+                    product=product,
+                    date=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d'),
+                    qty=qty,
+                    price=0 if i['price']=="" else i['price'],
+                    total=0 if i['total']=="" else i['total'],
+                    isfarah=isfarah,
+                )
+                
+            totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
+            totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
+            print(totalprices, totalqty)
+            #product.coutmoyen=round(totalprices/totalqty, 2)
+            if isfarah:
+                product.frbuyprice=0 if i['price']=="" else i['price']
+                product.frremise1=0 if i['remise1']=="" else i['remise1']
+                product.frremise2=0 if i['remise2']=="" else i['remise2']
+                product.frremise3=0 if i['remise3']=="" else i['remise3']
+                product.frremise4=0 if i['remise4']=="" else i['remise4']
+                product.frsellprice=0 if i['price']=="" else i['price']
+                product.frremisesell=0 if i['remise1']=="" else i['remise1']
+                product.frnetbuyprice=netprice
+            else:
+                product.buyprice=0 if i['price']=="" else i['price']
+                product.remise1=0 if i['remise1']=="" else i['remise1']
+                product.remise2=0 if i['remise2']=="" else i['remise2']
+                product.remise3=0 if i['remise3']=="" else i['remise3']
+                product.remise4=0 if i['remise4']=="" else i['remise4']
+                product.sellprice=0 if i['price']=="" else i['price']
+                product.remisesell=0 if i['remise1']=="" else i['remise1']
+                product.netbuyprice=netprice
+            product.save()
+
+    return JsonResponse({
+        'success':True
+    })
+
+
 
 def getsuppbons(request):
     supplierid=request.POST.get('supplierid')
@@ -4626,9 +4967,10 @@ def searchproductbonsortie(request):
 
     results=[]
     for i in products:
+        ref=i.farahref if term.startswith('fr-') else i.ref
         results.append({
             'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}',
-            'text':f'{i.ref.upper()} - {i.name.upper()}',
+            'text':f'{ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah+i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah,
             'image':i.image.url if i.image else "",
@@ -4881,45 +5223,47 @@ def getclientfactureprice(request):
 
 
 def updatereglebons(request):
-    reglementid=request.POST.get('reglementid')
-    mantant=request.POST.get('mantant')
-    mode=request.POST.get('mode')
-    npiece=request.POST.get('npiece')
-    date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
-    echeance=request.POST.get('echeance')
+    reglementid=request.GET.get('reglementid')
+    mantant=request.GET.get('mantant')
+    mode=request.GET.get('mode')
+    bank=request.GET.get('bank')
+    npiece=request.GET.get('npiece')
+    date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+    echeance=request.GET.get('echeance')
     echeance=datetime.strptime(echeance, '%Y-%m-%d') if echeance!='' else None
-    newbons=json.loads(request.POST.get('bons'))
+    # newbons=json.loads(request.POST.get('bons'))
     reglement=PaymentClientbl.objects.get(pk=reglementid)
+    # thisclient=reglement.client
+    # #print('soldbl', float(thisclient.soldbl),float(reglement.amount),float(mantant))
+    # thisclient.soldbl=round(float(thisclient.soldbl)+float(reglement.amount)-float(mantant), 2)
+    # thisclient.soldtotal=round(float(thisclient.soldtotal)+float(reglement.amount)-float(mantant), 2)
+    # thisclient.save()
+    # oldbons=reglement.bons.all()
+    # livraisons=Bonlivraison.objects.filter(pk__in=newbons)
+    # for i in oldbons:
+    #     otherregl=PaymentClientbl.objects.filter(bons=i.id).exclude(pk=reglementid)
+    #     if not otherregl.exists():
+    #         i.ispaid=False
+    #         i.statusreg='n1'
+    #         i.save()
+    # #oldbons.update(ispaid=False)
+    # #oldbons.update(statusreg='n1')
+    # #print(oldbons)
+    # #print(livraisons)
+    # livraisons.update(ispaid=True)
+    # livraisons.update(statusreg='r0')
+    # reglement.bons.clear()
 
-    thisclient=reglement.client
-    #print('soldbl', float(thisclient.soldbl),float(reglement.amount),float(mantant))
-    thisclient.soldbl=round(float(thisclient.soldbl)+float(reglement.amount)-float(mantant), 2)
-    thisclient.soldtotal=round(float(thisclient.soldtotal)+float(reglement.amount)-float(mantant), 2)
-    thisclient.save()
-    oldbons=reglement.bons.all()
-    livraisons=Bonlivraison.objects.filter(pk__in=newbons)
-    for i in oldbons:
-        otherregl=PaymentClientbl.objects.filter(bons=i.id).exclude(pk=reglementid)
-        if not otherregl.exists():
-            i.ispaid=False
-            i.statusreg='n1'
-            i.save()
-    #oldbons.update(ispaid=False)
-    #oldbons.update(statusreg='n1')
-    #print(oldbons)
-    #print(livraisons)
-    livraisons.update(ispaid=True)
-    livraisons.update(statusreg='r0')
-    reglement.bons.clear()
-
-    # # update regleemnt amount
+    # # # update regleemnt amount
     reglement.date=date
     reglement.amount=mantant
     reglement.mode=mode
+    reglement.bank=bank
     reglement.npiece=npiece
     reglement.echance=echeance
 
-    reglement.bons.set(livraisons)
+    print('>>> bank', bank)
+    #reglement.bons.set(livraisons)
     reglement.save()
     return JsonResponse({
         'success':True
@@ -5098,7 +5442,7 @@ def getlastsuppprice(request):
     price=0
     remise=0
     print('isfarah', isfarah)
-    prices=Stockin.objects.filter(product_id=id, supplier_id=supplierid, isfarah=isfarah)
+    prices=Stockin.objects.filter(product_id=id, supplier_id=supplierid, isfarah=isfarah, isavoir=False)
     lastprice=prices.last()
     if lastprice:
         price=lastprice.price
@@ -5110,7 +5454,7 @@ def getlastsuppprice(request):
         'price':price,
         'remise':remise,
         # 'facture':lastprice.facture,
-        'table':render(request, 'prodctprices.html', {'producthistory':prices.order_by('-date')}).content.decode('utf-8')
+        'table':render(request, 'prodctprices.html', {'producthistory':prices.order_by('-date')[:10]}).content.decode('utf-8')
     })
 
 
@@ -6053,7 +6397,8 @@ def updatebonavoir(request):
                 price=i['price'],
                 total=i['total'],
                 isavoir=True,
-                isfarah=isfarah,
+                isfarah=target=='f',
+                isorgh=target=='o',
                 qtyofprice=i['qty'],
                 date=datebon,
             )
@@ -6270,7 +6615,8 @@ def searchproductsforstock(request):
     return JsonResponse({
         'trs':render(request, 'stocktrs.html', {
             'products':products,
-            'target':target
+            'target':target,
+            'isfarah':target=='f'
         }).content.decode('utf-8'),
         #'stocktotal':Produit.objects.filter(q_objects).aggregate(Sum('stocktotal'))['stocktotal__sum']or 0,
         #'stockfacture':Produit.objects.filter(q_objects).aggregate(Sum('stockfacture'))['stockfacture__sum']or 0,
@@ -9234,6 +9580,17 @@ def updatenotebs(request):
     return JsonResponse({
         'success':True
        } )
+
+def updatecarbs(request):
+    car=request.GET.get('car')
+    blid=request.GET.get('blid')
+    bon=Bonsortie.objects.get(pk=blid)
+    bon.car=car
+    bon.save()
+    return JsonResponse({
+        'success':True
+       } )
+
 def updaterepbl(request):
     rep=request.GET.get('rep')
     blid=request.GET.get('blid')
@@ -10410,9 +10767,9 @@ def getqtyprice(request):
     if target=='s':
         term=request.GET.get('term')
         if (term.startswith('fr-')):
-            histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0, isfarah=True, isavoir=False).order_by('id')
+            histyory=Stockin.objects.filter(product_id=id, isfarah=True, isavoir=False).order_by('id')[:5]
         else:
-            histyory=Stockin.objects.filter(product_id=id, qtyofprice__gt=0, isfarah=False, isavoir=False).order_by('id')
+            histyory=Stockin.objects.filter(product_id=id, isfarah=False, isavoir=False).order_by('id')[:5]
     else:
-        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, qtyofprice__gt=0, isavoir=False).order_by('id')
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False).order_by('id')[:5]
     return render(request, 'qtyprice.html', {'history':histyory})
