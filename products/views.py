@@ -1026,10 +1026,10 @@ def addsupply(request):
 
 
 def addbonlivraison(request):
-    mantant=request.POST.get('mantant')
-    mode=request.POST.get('mode')
-    npiece=request.POST.get('npiece')
-    echeance=request.POST.get('echeance')
+    # mantant=request.POST.get('mantant')
+    # mode=request.POST.get('mode')
+    # npiece=request.POST.get('npiece')
+    # echeance=request.POST.get('echeance')
     print('>> echeance', echeance, echeance=="")
     #current_time = datetime.now().strftime('%H:%M:%S')
     clientid=request.POST.get('clientid')
@@ -1177,71 +1177,71 @@ def addbonlivraison(request):
     client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
     client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
     client.save()
-    if mantant=="":
-        return JsonResponse({
-            "success":True
-        })
-    if float(mantant)==0:
-        return JsonResponse({
-            "success":True
-        })
-    if echeance=="":
-        echeance=None
-    else:
-        echeance=datetime.strptime(echeance, '%Y-%m-%d')
-    if float(mantant)>float(totalbon):
-        diff=float(mantant)-float(totalbon)
-        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
-        regl=PaymentClientbl.objects.create(
-            client_id=clientid,
-            amount=mantant,
-            date=datebon,
-            echance=echeance,
-            mode=mode,
-            npiece=npiece,
-            isfarah=isfarah,
-            isorgh=isorgh
-        )
-        regl.bon=order
-        order.ispaid=True
-        Avanceclient.objects.create(
-            client_id=clientid,
-            amount=diff,
-            date=datebon,
-            isfarah=isfarah,
-            isorgh=isorgh,
-            bon=order
-        )
-    elif float(mantant)==float(totalbon):
-        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
-        regl=PaymentClientbl.objects.create(
-            client_id=clientid,
-            amount=mantant,
-            date=datebon,
-            echance=echeance,
-            mode=mode,
-            npiece=npiece,
-            isfarah=isfarah,
-            isorgh=isorgh
-        )
-        regl.bon=order
-        order.ispaid=True
-    else:
-        diff=float(totalbon)-float(mantant)
-        # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
-        regl=PaymentClientbl.objects.create(
-            client_id=clientid,
-            amount=mantant,
-            date=datebon,
-            echance=echeance,
-            mode=mode,
-            npiece=npiece,
-            isfarah=isfarah,
-            isorgh=isorgh
-        )
-        regl.bon=order
-        order.rest=diff
-    #diff=float(mantant)-float(totalbon)
+    # if mantant=="":
+    #     return JsonResponse({
+    #         "success":True
+    #     })
+    # if float(mantant)==0:
+    #     return JsonResponse({
+    #         "success":True
+    #     })
+    # if echeance=="":
+    #     echeance=None
+    # else:
+    #     echeance=datetime.strptime(echeance, '%Y-%m-%d')
+    # if float(mantant)>float(totalbon):
+    #     diff=float(mantant)-float(totalbon)
+    #     # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+    #     regl=PaymentClientbl.objects.create(
+    #         client_id=clientid,
+    #         amount=mantant,
+    #         date=datebon,
+    #         echance=echeance,
+    #         mode=mode,
+    #         npiece=npiece,
+    #         isfarah=isfarah,
+    #         isorgh=isorgh
+    #     )
+    #     regl.bon=order
+    #     order.ispaid=True
+    #     Avanceclient.objects.create(
+    #         client_id=clientid,
+    #         amount=diff,
+    #         date=datebon,
+    #         isfarah=isfarah,
+    #         isorgh=isorgh,
+    #         bon=order
+    #     )
+    # elif float(mantant)==float(totalbon):
+    #     # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+    #     regl=PaymentClientbl.objects.create(
+    #         client_id=clientid,
+    #         amount=mantant,
+    #         date=datebon,
+    #         echance=echeance,
+    #         mode=mode,
+    #         npiece=npiece,
+    #         isfarah=isfarah,
+    #         isorgh=isorgh
+    #     )
+    #     regl.bon=order
+    #     order.ispaid=True
+    # else:
+    #     diff=float(totalbon)-float(mantant)
+    #     # for m, mod, np, ech in zip(mantant, mode, npiece, echeance):
+    #     regl=PaymentClientbl.objects.create(
+    #         client_id=clientid,
+    #         amount=mantant,
+    #         date=datebon,
+    #         echance=echeance,
+    #         mode=mode,
+    #         npiece=npiece,
+    #         isfarah=isfarah,
+    #         isorgh=isorgh
+    #     )
+    #     regl.bon=order
+    #     order.rest=diff
+    # #diff=float(mantant)-float(totalbon)
     # increment it
     order.save()
     return JsonResponse({
@@ -5309,6 +5309,18 @@ def updatereglesupp(request):
 
 def getreglementbl(request, id):
     reglement=PaymentClientbl.objects.get(pk=id)
+    # get bons
+    bons=reglement.bons.all()
+    if bons:
+        otherregl=PaymentClientbl.objects.filter(bons__in=bons).exclude(pk=reglement.id)
+        print('>> has bons', bons)
+    # get factures
+    factures=reglement.factures.all()
+    if factures:
+        # get other regl with the same factures
+        otherregl=PaymentClientbl.objects.filter(factures__in=factures).exclude(pk=reglement.id)
+        print('>> has factures', factures)
+    print('>> other regl', otherregl)
     print('>>>>', reglement.issortie)
     if reglement.issortie:
         bons=reglement.bonsortie.all().order_by('date')
@@ -5325,6 +5337,7 @@ def getreglementbl(request, id):
     #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
     print('>> d', bons)
     ctx={
+        'otherregl':otherregl,
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
         'avances':reglement.avances.all().order_by('date'),

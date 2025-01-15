@@ -1767,6 +1767,8 @@ def facturemultiple(request):
     bons=json.loads(request.GET.get('bons'))
     year=timezone.now().strftime("%y")
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    reglements=PaymentClientbl.objects.filter(bons__in=[livraisons])
+    reglements.update(client_id=clientid)
     livraisons.update(client_id=clientid)
     # check if all bons are paid
     allpaid = all(livraison.ispaid for livraison in livraisons)
