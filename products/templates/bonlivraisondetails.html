@@ -9,7 +9,12 @@
     </button>
     {% for i in reglements %}
     <div class="alert alert-danger">
-      Reglement de bon: REG#{{i.id}}
+      Reglement de bon: REG#{{i.id}} <br>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
     </div>
     {% endfor %}
     {% if not order.isvalid %}

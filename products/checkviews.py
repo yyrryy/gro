@@ -1746,7 +1746,7 @@ def getsupplierbonsforfacture(request):
     for i in bons:
         # old code, if reglement is paid it's checked from here
         # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-        trs+=f'<tr class="blreglrow" supplierid="{supplierid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
+        trs+=f'<tr class="blreglrow" supplierid="{supplierid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}{"(reglé)" if i.ispaid else ""}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
 
 
     return JsonResponse({
@@ -1767,7 +1767,9 @@ def facturemultiple(request):
     bons=json.loads(request.GET.get('bons'))
     year=timezone.now().strftime("%y")
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
-    reglements=PaymentClientbl.objects.filter(bons__in=[livraisons])
+    livraison_ids = livraisons.values_list('id', flat=True)
+    print('>>> bons, livraions',bons, livraisons)
+    reglements=PaymentClientbl.objects.filter(bons__in=livraison_ids)
     reglements.update(client_id=clientid)
     livraisons.update(client_id=clientid)
     # check if all bons are paid
@@ -1801,13 +1803,29 @@ def facturemultiple(request):
             receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
         else:
             receipt_no = f"FC{year}000000001"
-    total=0
+    
+    # fc_no=request.GET.get('factureno')
+    # # check iffacture with numlber already exist
+    # if not fc_no=='':
+    #     receipt_no=fc_no
+    # facture=Facture.objects.filter(facture_no=fc_no).first()
+    # if facture and facture.bons.exists():
+    #     return JsonResponse({
+    #         'success':False,
+    #         'error':'Numero deja exist'
+    #     })
+    # if facture:
+    #     facture=facture
+    # else:
     facture=Facture.objects.create(
         facture_no=receipt_no,
         client_id=clientid,
         isfarah=isfarah,
         date=date
     )
+
+    total=0
+    
     if allpaid:
         print('>> all bons are paid')
         facture.ispaid=True
@@ -1857,21 +1875,21 @@ def facturemultiple(request):
         bon.save()
         # loop items of bon
         items=Livraisonitem.objects.filter(bon=bon)
-        for i in items:
-            Outfacture.objects.create(
-                facture=facture,
-                remise=i.remise,
-                name=i.name,
-                ref=i.ref,
-                product=i.product,
-                qty=i.qty,
-                price=i.price,
-                total=i.total,
-                client_id=clientid,
-                date=date,
-                isfarah=isfarah,
-                livraison=i
-            )    
+        # for i in items:
+        #     Outfacture.objects.create(
+        #         facture=facture,
+        #         remise=i.remise,
+        #         name=i.name,
+        #         ref=i.ref,
+        #         product=i.product,
+        #         qty=i.qty,
+        #         price=i.price,
+        #         total=i.total,
+        #         client_id=clientid,
+        #         date=date,
+        #         isfarah=isfarah,
+        #         livraison=i
+        #     )    
     facture.total=total
     facture.bons.set(livraisons)
     client.soldfacture+=total
@@ -1921,16 +1939,28 @@ def factureachatmultiple(request):
             receipt_no = f"AFC{year}{latest_receipt_no + 1:09}"
         else:
             receipt_no = f"AFC{year}000000001"
-    fc_no=request.GET.get('factureno')
+    fc_no=request.GET.get('factureno').upper()
+    # check iffacture with numlber already exist
     if not fc_no=='':
         receipt_no=fc_no
-    total=0
-    facture=Factureachat.objects.create(
+    facture=Factureachat.objects.filter(facture_no=fc_no).first()
+    print('>> facture ans items if exist',fc_no, facture, facture.bons)
+    # there is a facture with the same number and has no bons
+    if facture and facture.bons.exists():
+        return JsonResponse({
+            'success':False,
+            'error':'Numero deja exist'
+        })
+    if facture:
+        facture=facture
+    else:
+        facture=Factureachat.objects.create(
         facture_no=receipt_no,
         supplier_id=supplierid,
         isfarah=isfarah,
         date=date
     )
+    total=0
     if allpaid:
         print('>> all bons are paid')
         facture.ispaid=True
@@ -1951,24 +1981,26 @@ def factureachatmultiple(request):
         # loop items of bon
         items=Stockin.objects.filter(nbon=bon)
         print('items in multiple', items)
-        for i in items:
-            Outfactureachat.objects.create(
-                facture=facture,
-                remise1=i.remise1,
-                remise2=i.remise2,
-                remise3=i.remise3,
-                remise4=i.remise4,
-                name=i.name,
-                ref=i.ref,
-                product=i.product,
-                qty=i.quantity,
-                price=i.price,
-                total=i.total,
-                supplier_id=supplierid,
-                date=date,
-                isfarah=isfarah,
-                stockin=i
-            )    
+        # depricated
+        # for i in items:
+        #     Outfactureachat.objects.create(
+        #         facture=facture,
+        #         remise1=i.remise1,
+        #         remise2=i.remise2,
+        #         remise3=i.remise3,
+        #         remise4=i.remise4,
+        #         name=i.name,
+        #         ref=i.ref,
+        #         product=i.product,
+        #         qty=i.quantity,
+        #         price=i.price,
+        #         total=i.total,
+        #         supplier_id=supplierid,
+        #         date=date,
+        #         isfarah=isfarah,
+        #         stockin=i
+        #     )    
+    
     facture.total=total
     facture.bons.set(livraisons)
     facture.save()
@@ -1980,6 +2012,9 @@ def factureachatmultiple(request):
 
 def updatebonavoirsupp(request):
     id=request.POST.get('bonid')
+    orderno=request.POST.get('orderno')
+    note=request.POST.get('note')
+    print('>>> order, note', orderno, note)
     target=request.POST.get('target')
     isfarah=target=='f'
     avoir=Avoirsupplier.objects.get(pk=id)
@@ -2008,7 +2043,8 @@ def updatebonavoirsupp(request):
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
     avoir.date=datebon
     #avoir.no=request.POST.get('orderno')
-    
+    avoir.no=orderno
+    avoir.note=note
     avoir.save()
     # update this items
 
@@ -2537,3 +2573,126 @@ def updatebonsortie(request):
         'success':True
     })
 
+def removebonfromfacture(request):
+    factureid=request.GET.get('factureid')
+    bonid=request.GET.get('bonid')
+    facture=Facture.objects.get(pk=factureid)
+    bon=Bonlivraison.objects.get(pk=bonid)
+    bon.isfacture=False
+    bon.save()
+    facture.bons.remove(bon)
+    facture.total-=bon.total
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def removebonfromfactureachat(request):
+    factureid=request.GET.get('factureid')
+    bonid=request.GET.get('bonid')
+    facture=Factureachat.objects.get(pk=factureid)
+    bon=Itemsbysupplier.objects.get(pk=bonid)
+    bon.isfacture=False
+    bon.save()
+    facture.bons.remove(bon)
+    facture.total-=bon.total
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def removebonfromregl(request):
+    reglid=request.GET.get('reglid')
+    bonid=request.GET.get('bonid')
+    bon=Bonlivraison.objects.get(pk=bonid)
+    regl=PaymentClientbl.objects.get(pk=reglid)
+    print('>>> bon', bon)
+    bon.ispaid=False
+    bon.save()
+    regl.bons.remove(bon)
+    regl.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def removeavoirfromregl(request):
+    reglid=request.GET.get('reglid')
+    avoirid=request.GET.get('avoirid')
+    avoir=Avoirclient.objects.get(pk=avoirid)
+    regl=PaymentClientbl.objects.get(pk=reglid)
+    regl.avoirs.remove(avoir)
+    regl.save()
+    avoir.inreglement=False
+    avoir.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def removeavancefromregl(request):
+    reglid=request.GET.get('reglid')
+    avanceid=request.GET.get('avanceid')
+    avance=Avanceclient.objects.get(pk=avanceid)
+    regl=PaymentClientbl.objects.get(pk=reglid)
+    regl.avances.remove(avance)
+    regl.save()
+    avance.inreglement=False
+    avance.save()
+    print('>> avance', avance)
+    return JsonResponse({
+        'success':True
+    })
+
+def deletereglementclient(request):
+    reglid=request.GET.get('reglid')
+    reglement=PaymentClientbl.objects.get(pk=reglid)
+    avoirs=reglement.avoirs.all()
+    bons=reglement.bons.all()
+    avances=reglement.avances.all()
+    factures=reglement.factures.all()
+    if factures:
+        for i in factures:
+            bons=i.bons.all()
+            # for i in bons:
+            #     i.ispaid=False
+            #     i.isvalid=False
+            #     i.save()
+            bons.update(ispaid=False)
+            bons.update(isvalid=False)
+    avoirs.update(inreglement=False)
+    avances.update(inreglement=False)
+    bons.update(ispaid=False)
+    bons.update(isvalid=False)
+    factures.update(ispaid=False)
+    factures.update(rest=0)
+    reglement.delete()
+    return JsonResponse({
+        'success':True
+    })
+
+
+def deletereglementsupplier(request):
+    reglid=request.GET.get('reglid')
+    reglement=PaymentSupplier.objects.get(pk=reglid)
+    avoirs=reglement.avoirs.all()
+    bons=reglement.bons.all()
+    avances=reglement.avances.all()
+    factures=reglement.factures.all()
+    if factures:
+        for i in factures:
+            bons=i.bons.all()
+            # for i in bons:
+            #     i.ispaid=False
+            #     i.isvalid=False
+            #     i.save()
+            bons.update(ispaid=False)
+            bons.update(isvalid=False)
+    avoirs.update(inreglement=False)
+    avances.update(inreglement=False)
+    bons.update(ispaid=False)
+    bons.update(isvalid=False)
+    factures.update(ispaid=False)
+    factures.update(rest=0)
+    reglement.delete()
+    return JsonResponse({
+        'success':True
+    })

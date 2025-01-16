@@ -347,7 +347,7 @@
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
     loadinglistbl = true;
-    $.get(`/products/loadlistbl/?page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    $.get(`/products/loadlistbl/?target={{target}}&valid=1&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
 
       const tbody = $('.listbltable tbody');
       tbody.append(data.trs);

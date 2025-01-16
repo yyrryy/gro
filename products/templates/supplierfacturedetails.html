@@ -31,7 +31,7 @@
 
   <!-- {% if not facture.printed %}
   <button class="ms-2 btn btn-success" onclick="printed(event, '{{facture.id}}')">
-    Reçu par client
+    Reçu par supplier
   </button>
   {% endif %} -->
 </div>
@@ -63,20 +63,9 @@
             ">Date: <strong>{{facture.date|date:"d/m/Y"}}</strong></h5>
             </div>
             <div style="width: 20em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-              Client <strong>{{facture.client.name.upper}}</strong>
-              <p>
-                {{facture.client.code}}
-              </p>
-              {% if facture.client.ice %}
-              <p>
-
-                ICE: {{facture.client.ice}}
-              </p>
-              {% endif %}
-              <p>
-
-              Ville: {{facture.client.city}}
-              </p>
+              Fournisseur <strong>{{facture.supplier.name.upper}}</strong>
+              
+              
             </div>
           </div>
 
@@ -107,13 +96,13 @@
                   <tr>
                       <td style="height: 156mm;">
                         {% for v in i %}
-                        {{v.ref.upper}}
+                        {{v.product.ref.upper}}
                         <br>
                         {% endfor %}
                       </td>
                     <td style="white-space: nowrap;">
                         {% for v in i %}
-                          {{v.name.upper|slice:"50"}}
+                          {{v.product.name.upper|slice:"50"}}
                           <br>
                         {% endfor %}
                     </td>
@@ -156,33 +145,33 @@
           <tr style="background: #c9c9c9; font-size: 10px;
           font-weight: 800;border: 1px solid">
             <td colspan="5">
-              <strong style="font-size: 13px" >
+              <!-- <strong style="font-size: 13px" >
                 Total H.T
-              </strong>
+              </strong> -->
             </td>
             <td>
-              <strong class="htfc{{facture.id}}" style="font-size: 13px">
+              <!-- <strong class="htfc{{facture.id}}" style="font-size: 13px">
                 {{ht|floatformat:2|intspace}}
-              </strong>
+              </strong> -->
             </td>
             <td colspan="5">
-              <strong style="font-size: 13px">
+              <!-- <strong style="font-size: 13px">
                 TVA
-              </strong>
+              </strong> -->
             </td>
             <td>
-              <strong class="tvafc{{facture.id}}" style="font-size: 13px">
+              <!-- <strong class="tvafc{{facture.id}}" style="font-size: 13px">
                 {{tva|floatformat:2|intspace}}
-              </strong>
+              </strong> -->
             </td>
             <td colspan="5">
               <strong style="font-size: 13px">
-                Total TTC
+                Total
               </strong>
             </td>
             <td>
               <strong class="ttcgc{{facture.id}}" style="font-size: 15px">
-                {{ttc|floatformat:2|intspace}}
+                {{facture.total|floatformat:2|intspace}}
               </strong>
             </td>
           </tr>
@@ -222,13 +211,9 @@
             ">Date: <strong>{{facture.date|date:"d/m/Y"}}</strong></h5>
             </div>
             <div style="width: 20em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-              Client <strong>{{facture.client.name.upper}}</strong>
-              <p>
-                {{facture.client.code}}
-              </p>
-              <p>
-                ICE: {{facture.client.ice}} <br>Ville: {{facture.client.city}}
-              </p>
+              Fournisseur <strong>{{facture.supplier.name.upper}}</strong>
+              
+              
             </div>
           </div>
 
@@ -259,13 +244,13 @@
             <tr>
               <td style="height: 180mm;">
                 {% for v in i %}
-                {{v.ref.upper}}
+                {{v.product.ref.upper}}
                 <br>
                 {% endfor %}
               </td>
               <td style="white-space: nowrap;">
                 {% for v in i %}
-                  {{v.name.upper|slice:"50"}}
+                  {{v.product.name.upper|slice:"50"}}
                   <br>
                 {% endfor %}
             </td>
@@ -314,12 +299,29 @@
 
   </div>
 
-  <div class="">
+  <div class="col-5">
     Reglement
+    
     {% for i in reglements %}
-    <div class="">
-      {{i.mode}}{{i.npiece}} {{i.amount|floatformat:2}}Dh
+    <div class="alert alert-danger">
+      Reglement de bon: REG#{{i.id}} <br>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
     </div>
+    {% endfor %}
+    <br>
+    <strong>
+      bons:
+    </strong> <br>
+    {% for i in facture.bons.all %}
+    <div class="alert alert-success">
+      <strong>N°: {{i.nbon}}</strong> <br>
+      <button class="w-100" onclick="removebonfromfactureachat(event, '{{facture.id}}', '{{i.id}}')">Decrocher</button>
+    </div>
+    
     {% endfor %}
   </div>
 </div>

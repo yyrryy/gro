@@ -543,7 +543,68 @@
 
 <script>
   populateyears()
-
+    function deletereglementclient(reglid){
+        alertify.confirm(
+            'Confirmation',
+            'Confirmer?',
+            ()=>{
+            $.get('/products/deletereglementclient', {
+                'reglid':reglid,
+            }, (data)=>{
+                ajaxpage('ee','ee', '/products/listreglementbl?target={{target}}')
+                // if (data.success){
+                //     $(event.target).parent().remove()
+                // }
+            })
+            }, ()=>console.log('>>'))
+    
+    }
+    function removebonfromregl(event, reglid, bonid){
+        alertify.confirm(
+            'Confirmation',
+            'Confirmer?',
+            ()=>{
+            $.get('/products/removebonfromregl', {
+                'reglid':reglid,
+                'bonid':bonid,
+            }, (data)=>{
+                if (data.success){
+                    $(event.target).parent().remove()
+                }
+            })
+            }, ()=>console.log('>>'))
+    
+    }
+    function removeavoirfromregl(event, reglid, avoirid){
+        alertify.confirm(
+            'Confirmation',
+            'Confirmer?',
+            ()=>{
+            $.get('/products/removeavoirfromregl', {
+                'reglid':reglid,
+                'avoirid':avoirid,
+            }, (data)=>{
+                if (data.success){
+                    $(event.target).parent().parent().remove()
+                }
+            })
+            }, ()=>console.log('>>'))
+    }
+    function removeavancefromregl(event, reglid, avanceid){
+        alertify.confirm(
+            'Confirmation',
+            'Confirmer?',
+            ()=>{
+            $.get('/products/removeavancefromregl', {
+                'reglid':reglid,
+                'avanceid':avanceid,
+            }, (data)=>{
+                if (data.success){
+                    $(event.target).parent().parent().remove()
+                }
+            })
+            }, ()=>console.log('>>'))
+    }
   // load more bl in regle not woking
   function checkyearreglbl(event){
     inpval=$(event.target).val()
@@ -685,7 +746,7 @@
     loadingreglbl = true;
     term=$('.searchinputlistreglbl').val()
     year=$('[name="yearsreglbl"]').val()
-    $.get(`/products/loadreglbl/?page=${currentPagereglbl}&term=${term}&year=${year}`, (data)=>{
+    $.get(`/products/loadreglbl/?target={{target}}&page=${currentPagereglbl}&term=${term}&year=${year}`, (data)=>{
 
       const tbody = $('.reglbltable tbody');
       tbody.append(data.trs);

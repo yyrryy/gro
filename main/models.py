@@ -798,6 +798,7 @@ class Avoirsupplier(models.Model):
         related_name='returned_supplier',
         max_length=100, blank=True, default=None
     )
+    note=models.TextField(default=None, null=True, blank=True)
     total = models.FloatField(default=0, blank=True, null=True)
     avoirbl=models.BooleanField(default=False)
     avoirfacture=models.BooleanField(default=False)

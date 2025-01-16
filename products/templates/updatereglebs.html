@@ -1,10 +1,8 @@
-
 <div class="col-3">
-    
+    {{reglement.bank.upper}}
     <strong>
         PAYMENT N° REGL#{{reglement.id}} <button class="bi bi-download" onclick="printreglementclient('{{reglement.id}}')"></button>
     </strong>
-    <button class="btn btn-danger bi bi-trash" onclick="deletereglementclient('{{reglement.id}}')"></button>
     <div class="">
         <small>Date de reglement:</small> <br>
         <input type="date" class="w-100 notempty mb-2 regldate" value="{{reglement.date|date:'Y-m-d'}}">
@@ -144,16 +142,12 @@
                             {{i.date|date:'d/m/Y'}}
                         </td>
                         <td>
-                            <strong class="text-primary">
-                                Facture N° {{i.facture.facture_no}} {% if i.rest > 0 %}(Total:{{i.total}}){% endif %} <br>
-
-                            </strong>
                             <div class="mb-3">
                                 --{{i.bon_no}} 
-                                <button onclick="removebonfromregl(event, '{{reglement.id}}', '{{i.id}}')" class="btn btn-danger "></button>
+                                <button onclick="removesortiefromregl(event, '{{reglement.id}}', '{{i.id}}')" class="btn btn-danger "></button>
 
                             </div>
-                            <!-- --{{i.bon_no}} 
+                            <!-- --{{i.bon_no}}
                             <button onclick="removebonfromregl(event, '{{reglement.id}}', '{{i.id}}')" class="btn btn-danger mb-3"></button> -->
                         </td>
                         <td>
@@ -162,35 +156,7 @@
                         
                     </tr>
                     {% endfor %}
-                    {% for i in factures %}
-                    <tr>
-                        <td>
-                            {{i.date|date:'d/m/Y'}}
-                        </td>
-                        <td>
-                            <strong class="text-primary">
-                                Facture N° {{i.facture_no}} {% if i.rest > 0 %}(Total:{{i.total}}){% endif %} <br>
-
-                            </strong>
-                            {% for b in i.bons.all %}
-                            <div class="mb-3">
-                                --{{b.bon_no}} 
-                                <!-- <button onclick="removebonfromregl(event, '{{reglement.id}}', '{{b.id}}')" class="btn btn-danger "></button> -->
-
-                            </div>
-                            {% endfor %}
-
-                        </td>
-                        <td>
-                            {% if i.rest > 0 %}
-                            
-                            {{i.total}}
-                            {% else %}
-                            {% endif %}
-                        </td>
-                        
-                    </tr>
-                    {% endfor %}
+                    
                 </tbody>
                 
             </table>

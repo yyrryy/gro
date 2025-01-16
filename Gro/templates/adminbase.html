@@ -1007,6 +1007,42 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function removebonfromfacture(event, factureid, bonid){
+        alertify.confirm('Confirmer', ()=>{
+
+          $.get('/products/removebonfromfacture', {
+            'factureid':factureid,
+            'bonid':bonid
+          }, (data)=>{
+            if (data.success){
+              $(event.target).parent().remove()
+            }
+          }
+          )
+        
+        }, ()=>{
+          console.log('>> not decrocher bon')
+        })
+      }
+      // remove bon from facture achat
+      function removebonfromfactureachat(event, factureid, bonid){
+        alertify.confirm('Confirmer', ()=>{
+
+          $.get('/products/removebonfromfactureachat', {
+            'factureid':factureid,
+            'bonid':bonid
+          }, (data)=>{
+            if (data.success){
+              $(event.target).parent().remove()
+            }
+          }
+          )
+        
+        }, ()=>{
+          console.log('>> not decrocher bon')
+        })
+      }
+
       function updatereglclient(id){
         mantant=$('[name="mantant"]').val()
         npiece=$('[name="npiece"]').val()
@@ -1028,6 +1064,30 @@ a .uil {
           'bank':bank
         })
       }
+      
+      function updatereglsupp(id){
+        mantant=$('[name="mantant"]').val()
+        npiece=$('[name="npiece"]').val()
+        mode=$('[name="mode"]').val()
+        echeance=$('[name="echeance"]').val()
+        bank=$('[name="bank"]').val()
+        date=$('.regldate').val()
+        if (date==''){
+          alertify.error('Date')
+          error
+        }
+        $.get('/products/updatereglesupp', {
+          'reglementid':id,
+          'mantant':mantant,
+          'mode':mode,
+          'npiece':npiece,
+          'date':date,
+          'echeance':echeance,
+          'bank':bank
+        })
+      }
+      
+
       function checkmax(event){
         // v as value
         v=$(event.target).val()

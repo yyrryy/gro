@@ -50,7 +50,8 @@ def getproductsbycategory(request):
         'home':False,
         'target':target,
         'marks':marks,
-
+        'isfarah':target=='f',
+        'target':target
     }
     return JsonResponse({
         'data':render(request, 'stocktrs.html', ctx).content.decode('utf-8'),
@@ -745,27 +746,29 @@ def addsupply(request):
     supplier.rest=float(supplier.rest)+float(totalbon)
     supplier.save()
     tva=0
-    if isfacture:
-        print('>> creating facture')
-        facture=Factureachat.objects.create(
-            user=user,
-            facture_no=nbon,
-            supplier_id=supplierid,
-            isfarah=isfarah,
-            date=datefacture,
-            total=totalbon
-        )
-        tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
-    else:
-        bon=Itemsbysupplier.objects.create(
-            user=user,
-            isfarah=True if target=='f' else False,
-            isorgh=True if target=='o' else False,
-            supplier_id=supplierid,
-            total=totalbon,
-            date=datefacture,
-            nbon=nbon,
-        )
+    # if isfacture:
+    #     print('>> creating facture')
+    #     facture=Factureachat.objects.create(
+    #         user=user,
+    #         facture_no=nbon,
+    #         supplier_id=supplierid,
+    #         isfarah=isfarah,
+    #         date=datefacture,
+    #         total=totalbon
+    #     )
+    #     tva=round(float(totalbon)-(float(totalbon)/1.2), 2)
+    # else:
+    #     
+    # 
+    bon=Itemsbysupplier.objects.create(
+        user=user,
+        isfarah=True if target=='f' else False,
+        isorgh=True if target=='o' else False,
+        supplier_id=supplierid,
+        total=totalbon,
+        date=datefacture,
+        nbon=nbon,
+    )
     if not devid == "":
         devi=Devisupplier.objects.get(pk=devid)
         devi.generatedbl=True
@@ -798,48 +801,47 @@ def addsupply(request):
         netprice=round(float(i['total'])/float(i['qty']), 2)
         
         #product.isnew=True
-        print('creating', product.ref)
         
-        if isfacture:
-             Outfactureachat.objects.create(
-                facture=facture,
-                remise1=remise1,
-                remise2=remise2,
-                remise3=remise3,
-                remise4=remise4,
-                price=i['price'],
-                ref=i['ref'],
-                name=i['name'],
-                product=product,
-                qty=i['qty'],
-                total=i['total'],
-                supplier_id=supplierid,
-                date=datebon,
-                isfarah=target=='f',
-                isorgh=target=='o',
-            )
-        else:
-            Stockin.objects.create(
-                date=datebon,
-                product=product,
-                quantity=i['qty'],
-                price=i['price'],
-                ref=i['ref'],
-                name=i['name'],
-                remise1=remise1,
-                remise2=remise2,
-                remise3=remise3,
-                remise4=remise4,
-                net=netwithremise1,
-                # remise=remise,
-                qtyofprice=i['qty'],
-                total=i['total'],
-                supplier_id=supplierid,
-                isfacture=isfacture,
-                isfarah=target=='f',
-                isorgh=target=='o',
-                nbon=bon
-            )
+        # if isfacture:
+        #      Outfactureachat.objects.create(
+        #         facture=facture,
+        #         remise1=remise1,
+        #         remise2=remise2,
+        #         remise3=remise3,
+        #         remise4=remise4,
+        #         price=i['price'],
+        #         ref=i['ref'],
+        #         name=i['name'],
+        #         product=product,
+        #         qty=i['qty'],
+        #         total=i['total'],
+        #         supplier_id=supplierid,
+        #         date=datebon,
+        #         isfarah=target=='f',
+        #         isorgh=target=='o',
+        #     )
+        # else:
+        Stockin.objects.create(
+            date=datebon,
+            product=product,
+            quantity=i['qty'],
+            price=i['price'],
+            ref=i['ref'],
+            name=i['name'],
+            remise1=remise1,
+            remise2=remise2,
+            remise3=remise3,
+            remise4=remise4,
+            net=netwithremise1,
+            # remise=remise,
+            qtyofprice=i['qty'],
+            total=i['total'],
+            supplier_id=supplierid,
+            isfacture=isfacture,
+            isfarah=target=='f',
+            isorgh=target=='o',
+            nbon=bon
+        )
         if target=='f':
             # if product.isnegativeinfr:
             #     print('>> product is negative')
@@ -887,18 +889,20 @@ def addsupply(request):
                     
             # calcul pondiré, stock needs to be more than 0
             if product.stocktotalfarah>0:
+                print('>> has stock')
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
-                actualtotal=0
-                remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
-                for b in remainingstock:
-                    actualtotal+=float(b.price)*float(b.qtyofprice)
+                actualtotal=product.stocktotalfarah*product.frbuyprice
+                # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
+                # for b in remainingstock:
+                #     actualtotal+=float(b.price)*float(b.qtyofprice)
                 thistotal=int(i['qty'])*buyprice
                 print('>>>>>> thistotal', thistotal)
                 totalprices=round(thistotal+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.frcoutmoyen=pondire
                 product.save()
-            product.frcoutmoyen=buyprice
+            else:
+                product.frcoutmoyen=buyprice
             product.frremise1=remise1
             product.frremise2=remise2
             product.frremise3=remise3
@@ -909,8 +913,8 @@ def addsupply(request):
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
             product.frsellprice=buyprice
             product.frremisesell=remise1
-            if isfacture:
-                product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
+            # if isfacture:
+            #     product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
         else:
             # if product.isnegative:
             #     qtynegative=json.loads(product.negative)
@@ -953,15 +957,17 @@ def addsupply(request):
             
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
-                actualtotal=0
-                remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
-                for i in remainingstock:
-                    actualtotal+=float(i.price)*float(i.qtyofprice)
-                totalprices=round((float(i['qty'])*netprice)+actualtotal, 2)
+                actualtotal=product.stocktotalorgh*product.buyprice
+                # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
+                # for i in remainingstock:
+                #     actualtotal+=float(i.price)*float(i.qtyofprice)
+                thistotal=int(i['qty'])*buyprice
+                totalprices=round(thistotal+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
-            product.coutmoyen=buyprice
+            else:
+                product.coutmoyen=buyprice
             product.remise1=remise1
             product.remise2=remise2
             product.remise3=remise3
@@ -1780,8 +1786,9 @@ def facturedetails(request, id):
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
-
+    reglements=PaymentClientbl.objects.filter(factures__in=[order])
     ctx={
+        'reglements':reglements,
         'title':f'Facture {order.facture_no}',
         'facture':order,
         'orderitems':orderitems,
@@ -1798,24 +1805,27 @@ def supplierfacturedetails(request, id):
     order=Factureachat.objects.get(pk=id)
     bons=order.bons.all()
     print('>> bons', bons)
-    total=bons.aggregate(Sum('total')).get('total__sum')
-    print('>> total', total)
-    order.total=total
-    #order.save()
+    if bons:
+        total=bons.aggregate(Sum('total')).get('total__sum')
+        print('>> total', total)
+        order.total=total
+        order.save()
     # orderitems=Outfactureachat.objects.filter(facture=order).order_by('product__name')
     orderitems=Stockin.objects.filter(nbon__in=bons)
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
-
+    reglements=PaymentSupplier.objects.filter(factures__in=[order])
+    print('>>bons', bons)
     ctx={
+        'reglements':reglements,
         'title':f'Facture achat {order.facture_no}',
         'facture':order,
         'orderitems':orderitems,
-        'tva':order.tva,
-        'ttc':order.total,
+        # 'tva':order.tva,
+        # 'ttc':order.total,
+        # 'ht':round(order.total-order.tva, 2),
         'target':target,
-        'ht':round(order.total-order.tva, 2),
     }
     return render(request, 'supplierfacturedetails.html', ctx)
 
@@ -2540,6 +2550,7 @@ def modifierfacture(request, id):
 def updatebonlivraison(request):
     id=request.POST.get('bonid')
     livraison=Bonlivraison.objects.get(pk=id)
+
     client=Client.objects.get(pk=request.POST.get('clientid'))
     totalbon=request.POST.get('totalbon')
     target=request.POST.get('target')
@@ -2548,7 +2559,13 @@ def updatebonlivraison(request):
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
     thisclient=livraison.client
-
+    #facture of bon
+    facture=Facture.objects.filter(bons__in=[livraison]).first()
+    if facture:
+        print('>>> has facture', facture.total, 'updating total', round(float(facture.total)-float(livraison.total)+float(totalbon), 2))
+        newtotal=round(float(facture.total)-float(livraison.total)+float(totalbon), 2)
+        facture.total=newtotal
+        facture.save()
     # if livraison.client==client:
     #     print('same client', float(thisclient.soldtotal), float(livraison.total), float(totalbon))
     #     thisclient.soldtotal=round(float(thisclient.soldtotal)-float(livraison.total)+float(totalbon), 2)
@@ -2773,11 +2790,11 @@ def updatebonfacture(request):
 def listreglementbl(request):
     target=request.GET.get('target')
     if target=="f":
-        reglements=PaymentClientbl.objects.filter(client__clientfarah=True).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(isfarah=True, isavoir=False).order_by('-id')[:50]
     elif target=="o":
-        reglements=PaymentClientbl.objects.filter(client__clientorgh=True).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(isorgh=True, isavoir=False).order_by('-id')[:50]
     else:
-        reglements=PaymentClientbl.objects.filter(client__clientsortie=True).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(issortie=True, isavoir=False).order_by('-id')[:50]
     print('lenreg', len(reglements))
     ctx={
         'title':'List des reglements CL BL' +target,
@@ -3870,29 +3887,39 @@ def sendrelevclient(request):
         }).content.decode('utf-8'),
         'soldfc':client.soldfacture,
     })
-
 def relevclient(request):
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
-    isfarah=target=='f'
     client=Client.objects.get(pk=clientid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate])
-    avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate])
-    reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
-    if target=="s":
+    print('>> target', target)
+    if target=="f":
+        print('>>> here in farah', clientid, )
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+    elif target=="s":
         bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
     # sold=round(totaldebit-totalcredit, 2)
 
     # chain all the data based on dates
     # first get all dates
+    # print('>> avances', avances[0].amount)
     releve = chain(*[
     ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
@@ -3913,7 +3940,7 @@ def relevclient(request):
             'enddate':enddate,
 
         }).content.decode('utf-8'),
-        'soldfc':client.soldfacture,
+        #'soldfc':client.soldfacture,
     })
 
 
@@ -3962,16 +3989,22 @@ def relevsupplier(request):
 
 def sendrelevclientfc(request):
     clientcode=request.GET.get('clientcode')
+    target=request.GET.get('target')
     client=Client.objects.get(code=clientcode)
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirclient.objects.filter(client=client, avoirfacture=True, date__range=[startdate, enddate])
-    reglementsfc=PaymentClientfc.objects.filter(client=client, date__range=[startdate, enddate])
+    if target=='f':
+        avoirs=Avoirclient.objects.filter(client=client, date__range=[startdate, enddate])
+        reglementsfc=PaymentClientfc.objects.filter(client=client, date__range=[startdate, enddate])
 
-    bons=Facture.objects.filter(client=client, date__range=[startdate, enddate])
+        bons=Facture.objects.filter(client=client, date__range=[startdate, enddate], isfarah=True)
+    else:
+        avoirs=Avoirclient.objects.filter(client=client, date__range=[startdate, enddate], isorgh=True)
+        reglementsfc=PaymentClientbl.objects.filter(client=client, date__range=[startdate, enddate], isorgh=True)
 
+        bons=Facture.objects.filter(client=client, date__range=[startdate, enddate], isorgh=True)
     # chain all the data based on dates
     # first get all dates
     releve = chain(*[
@@ -3996,38 +4029,57 @@ def sendrelevclientfc(request):
     })
 def relevclientfc(request):
     clientid=request.POST.get('clientid')
-    clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
     client=Client.objects.get(pk=clientid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=True, date__range=[startdate, enddate])
-    reglementsfc=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
-
-    bons=Facture.objects.filter(client_id=clientid, date__range=[startdate, enddate])
+    if target=="f":
+        print('>>> here in farah', clientid, )
+        bons=Facture.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+    elif target=="s":
+        bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+    else:
+        bons=Facture.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
+    # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
+    # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
+    # sold=round(totaldebit-totalcredit, 2)
 
     # chain all the data based on dates
     # first get all dates
+    print('>> bons, target', bons, target)
     releve = chain(*[
-    ((bon, 'Facture') for bon in bons),
+    ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
-    ((reglementfc, 'PaymentClientfc') for reglementfc in reglementsfc),
+    ((avance, 'avanceclient') for avance in avances),
+    ((reglementbl, 'PaymentClientbl') for reglementbl in reglementsbl),
     ])
 
     # Sort the items by date
     sorted_releve = sorted(releve, key=lambda item: item[0].date)
-    for i in sorted_releve:
-        print(i)
+
 
     return JsonResponse({
-        'html':render(request, 'releveclfc.html', {
-            'releve':[sorted_releve[i:i+26] for i in range(0, len(sorted_releve), 26)],
+        'html':render(request, 'relevecl.html', {
+            'releve':[sorted_releve[i:i+32] for i in range(0, len(sorted_releve), 32)],
             'client':client,
+
             'startdate':startdate,
             'enddate':enddate,
 
-        }).content.decode('utf-8')
+        }).content.decode('utf-8'),
+        #'soldfc':client.soldfacture,
     })
 
 def getclientrep(request, id):
@@ -4132,18 +4184,24 @@ def updatebonachat(request):
     totalbon=request.POST.get('totalbon')
     supplier=Supplier.objects.get(pk=request.POST.get('supplierid'))
     thissupplier=bon.supplier
-    if bon.supplier==supplier:
-        print('same supplier', float(thissupplier.rest), float(bon.total), float(totalbon))
-        thissupplier.rest=round(float(thissupplier.rest)-float(bon.total)+float(totalbon), 2)
-        thissupplier.save()
-    else:
-        print('not same')
-        thissupplier.rest=round(float(thissupplier.rest)-float(bon.total), 2)
-        thissupplier.save()
-        print('old', thissupplier.rest)
-        supplier.rest=round(float(supplier.rest)+float(totalbon), 2)
-        supplier.save()
-        print('new', supplier.rest)
+    facture=Factureachat.objects.filter(bons__in=[bon]).first()
+    if facture:
+        print('>>> has facture', facture.total, 'updating total', round(float(facture.total)-float(bon.total)+float(totalbon), 2))
+        newtotal=round(float(facture.total)-float(bon.total)+float(totalbon), 2)
+        facture.total=newtotal
+        facture.save()
+    # if bon.supplier==supplier:
+    #     print('same supplier', float(thissupplier.rest), float(bon.total), float(totalbon))
+    #     thissupplier.rest=round(float(thissupplier.rest)-float(bon.total)+float(totalbon), 2)
+    #     thissupplier.save()
+    # else:
+    #     print('not same')
+    #     thissupplier.rest=round(float(thissupplier.rest)-float(bon.total), 2)
+    #     thissupplier.save()
+    #     print('old', thissupplier.rest)
+    #     supplier.rest=round(float(supplier.rest)+float(totalbon), 2)
+    #     supplier.save()
+    #     print('new', supplier.rest)
     # bon.supplier.rest=float(bon.supplier.rest)-float(bon.total)
     # bon.supplier.save()
     items=Stockin.objects.filter(nbon=bon)
@@ -4164,7 +4222,7 @@ def updatebonachat(request):
     bon.supplier=supplier
     bon.total=totalbon
     bon.nbon=request.POST.get('orderno')
-    bon.isfacture=isfacture
+    # bon.isfacture=isfacture
     bon.save()
 
     with transaction.atomic():
@@ -4181,10 +4239,7 @@ def updatebonachat(request):
             qty=0 if i['qty']=="" else int(i['qty'])
             product=Produit.objects.get(pk=i['productid'])
             print('>>>>>>>adding total')
-            if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)+qty
-            else:
-                product.stocktotalorgh=int(product.stocktotalorgh)+qty
+            
             # if isfacture:
             #     print('>>>>>>>adding fc')
             #     product.stockfacture=int(product.stockfacture)+qty
@@ -4221,11 +4276,27 @@ def updatebonachat(request):
                 net=netwithremise1
             )
             
-            totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
-            totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
-            print(totalprices, totalqty)
+            # totalprices=Stockin.objects.filter(product=product).aggregate(Sum('total'))['total__sum'] or 0
+            # totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
+            # print(totalprices, totalqty)
             #product.coutmoyen=round(totalprices/totalqty, 2)
             if isfarah:
+                if product.stocktotalfarah>0:
+                    print('>> has stock')
+                    totalqtys=int(product.stocktotalfarah)+int(i['qty'])
+                    lastbuyprice=Stockin.objects.filter(product=product, isfarah=True).last()
+                    if lastbuyprice:
+                        actualtotal=product.stocktotalfarah*lastbuyprice.price
+                        thistotal=int(i['qty'])*buyprice
+                        totalprices=round(thistotal+actualtotal, 2)
+                        pondire=round(totalprices/totalqtys, 2)
+                        product.frcoutmoyen=pondire
+                        #product.save()
+                    else:
+                        product.frcoutmoyen=buyprice
+                else:
+                    product.frcoutmoyen=buyprice
+                product.stocktotalfarah=int(product.stocktotalfarah)+qty
                 product.frbuyprice=0 if i['price']=="" else i['price']
                 product.frremise1=0 if i['remise1']=="" else i['remise1']
                 product.frremise2=0 if i['remise2']=="" else i['remise2']
@@ -4235,6 +4306,22 @@ def updatebonachat(request):
                 product.frremisesell=0 if i['remise1']=="" else i['remise1']
                 product.frnetbuyprice=netprice
             else:
+                if product.stocktotalorgh>0:
+                    print('>> has stock')
+                    totalqtys=int(product.stocktotalorgh)+int(i['qty'])
+                    lastbuyprice=Stockin.objects.filter(product=product, isfarah=False).last()
+                    if lastbuyprice:
+                        actualtotal=product.stocktotalorgh*lastbuyprice.price
+                        thistotal=int(i['qty'])*buyprice
+                        totalprices=round(thistotal+actualtotal, 2)
+                        pondire=round(totalprices/totalqtys, 2)
+                        product.coutmoyen=pondire
+                        #product.save()
+                    else:
+                        product.coutmoyen=buyprice
+                else:
+                    product.coutmoyen=buyprice
+                product.stocktotalorgh=int(product.stocktotalorgh)+qty
                 product.buyprice=0 if i['price']=="" else i['price']
                 product.remise1=0 if i['remise1']=="" else i['remise1']
                 product.remise2=0 if i['remise2']=="" else i['remise2']
@@ -5273,33 +5360,34 @@ def updatereglebons(request):
 
 
 def updatereglesupp(request):
-    reglementid=request.POST.get('reglementid')
-    mantant=request.POST.get('mantant')
-    mode=request.POST.get('mode')
-    npiece=request.POST.get('npiece')
-    date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
-    echeance=request.POST.get('echeance')
+    reglementid=request.GET.get('reglementid')
+    mantant=request.GET.get('mantant')
+    mode=request.GET.get('mode')
+    npiece=request.GET.get('npiece')
+    date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+    echeance=request.GET.get('echeance')
+    bank=request.GET.get('bank')
     echeance=datetime.strptime(echeance, '%Y-%m-%d') if echeance!='' else None
-    newbons=json.loads(request.POST.get('bons'))
     reglement=PaymentSupplier.objects.get(pk=reglementid)
 
-    thissupplier=reglement.supplier
-    thissupplier.rest=round(float(thissupplier.rest)+float(reglement.amount)-float(mantant), 2)
-    thissupplier.save()
-    oldbons=reglement.bons.all()
-    livraisons=Itemsbysupplier.objects.filter(pk__in=newbons)
-    oldbons.update(ispaid=False)
-    livraisons.update(ispaid=True)
-    reglement.bons.clear()
+    # thissupplier=reglement.supplier
+    # thissupplier.rest=round(float(thissupplier.rest)+float(reglement.amount)-float(mantant), 2)
+    # thissupplier.save()
+    # oldbons=reglement.bons.all()
+    # livraisons=Itemsbysupplier.objects.filter(pk__in=newbons)
+    # oldbons.update(ispaid=False)
+    # livraisons.update(ispaid=True)
+    # reglement.bons.clear()
 
-    # # update regleemnt amount
+    # # # update regleemnt amount
     reglement.date=date
+    reglement.bank=bank
     reglement.amount=mantant
     reglement.mode=mode
     reglement.npiece=npiece
-    reglement.echance=echeance
+    reglement.echeance=echeance
 
-    reglement.bons.set(livraisons)
+    #reglement.bons.set(livraisons)
     reglement.save()
     return JsonResponse({
         'success':True
@@ -5320,12 +5408,14 @@ def getreglementbl(request, id):
         # get other regl with the same factures
         otherregl=PaymentClientbl.objects.filter(factures__in=factures).exclude(pk=reglement.id)
         print('>> has factures', factures)
-    print('>> other regl', otherregl)
+    #print('>> other regl', otherregl)
     print('>>>>', reglement.issortie)
     if reglement.issortie:
+        template='updatereglebs.html'
         bons=reglement.bonsortie.all().order_by('date')
         livraisons=Bonsortie.objects.filter(client=reglement.client).exclude(pk__in=[bon.pk for bon in bons]).order_by('date')[:50]
     else:
+        template='updatereglebl.html'
         bons=reglement.bons.all().order_by('date')
         livraisons=Bonlivraison.objects.filter(client=reglement.client).exclude(pk__in=[bon.pk for bon in bons]).order_by('date')[:50]
     # bons without bons in reglement
@@ -5337,16 +5427,16 @@ def getreglementbl(request, id):
     #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="loadblinupdateregl" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" onchange="checkreglementbox(event)"></td></tr>'
     print('>> d', bons)
     ctx={
-        'otherregl':otherregl,
+        #'otherregl':otherregl,
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
         'avances':reglement.avances.all().order_by('date'),
         'bons':bons,
         'factures':reglement.factures.all().order_by('date'),
     }
-    print('>>>', reglement)
+    
     return JsonResponse({
-        'html':render(request, 'updatereglebl.html', ctx).content.decode('utf-8')
+        'html':render(request, template, ctx).content.decode('utf-8')
     })
     return JsonResponse({
 
@@ -6886,6 +6976,8 @@ def loadlistbl(request):
     page = int(request.GET.get('page', 1))
     target =request.GET.get('target')
     isfarah=target=='f'
+    all=request.GET.get('all')=='1'
+    valid=request.GET.get('valid')=='1'
     year =request.GET.get('year')
     startdate =request.GET.get('startdate')
     enddate =request.GET.get('enddate')
@@ -6943,60 +7035,67 @@ def loadlistbl(request):
                 )
         print(startdate, enddate)
         if startdate=='0' and enddate=='0':
-            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no')[start:end]
-            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            if all:
+                bons=Bonlivraison.objects.exclude(isvalid=True).filter(date__year=thisyear, isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
+            if valid:
+                bons=Bonlivraison.objects.filter(isvalid=True, date__year=thisyear, isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
+            #total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         else:
-            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
-            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        for i in bons:
-            trs+=f'''
-            <tr
-            style="background: {"lightgreen;" if i.isdelivered else ""} color:{"blue" if i.isfacture else ""} "
-            class="ord {"text-danger" if i.ispaid else ''} bl-row"
-            year={year}
-            orderid="{i.id}"
-            ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')"
-            term="{term}">
-                <td>{ i.bon_no }</td>
-                    <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                    <td>{ i.client.name }</td>
-                    <td>{ i.client.code }</td>
-                    <td style="color: blue;">{ i.total}</td>
-                    <td>{ i.client.region}</td>
-                    <td>{ i.client.city}</td>
-                    <td>{ "%.2f" % i.client.soldbl} </td>
-                    <td>{ i.salseman }</td>
-                    <td class="d-flex justify-content-between">
-                    <div>
-                    {'R0' if i.ispaid else 'N1' }
+            if all:
+                bons=Bonlivraison.objects.exclude(isvalid=True).filter(date__range=[startdate, enddate], isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
+            if valid:
+                bons=Bonlivraison.objects.filter(isvalid=True, date__range=[startdate, enddate], isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
+            # bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
+            # total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        # for i in bons:
+            # trs+=f'''
+            # <tr
+            # style="background: {"lightgreen;" if i.isdelivered else ""} color:{"blue" if i.isfacture else ""} "
+            # class="ord {"text-danger" if i.ispaid else ''} bl-row"
+            # year={year}
+            # orderid="{i.id}"
+            # ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')"
+            # term="{term}">
+            #     <td>{ i.bon_no }</td>
+            #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+            #         <td>{ i.client.name }</td>
+            #         <td>{ i.client.code }</td>
+            #         <td style="color: blue;">{ i.total}</td>
+            #         <td>{ i.client.region}</td>
+            #         <td>{ i.client.city}</td>
+            #         <td>{ "%.2f" % i.client.soldbl} </td>
+            #         <td>{ i.salseman }</td>
+            #         <td class="d-flex justify-content-between">
+            #         <div>
+            #         {'R0' if i.ispaid else 'N1' }
 
-                    </div>
-                    <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+            #         </div>
+            #         <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-                    </td>
-                    <td>
-                    {'OUI' if i.isfacture else 'NON'}
-                    </td>
+            #         </td>
+            #         <td>
+            #         {'OUI' if i.isfacture else 'NON'}
+            #         </td>
 
-                    <td>
-                        {i.commande.order_no if i.commande else "---"}
-                    </td>
-                    <td>
-                    {i.modlvrsn}
-                    </td>
-                    <td>
-                    {i.note}
-                    </td>
-                    <td class="d-flex">
-                  <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-                <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-                    </td>
+            #         <td>
+            #             {i.commande.order_no if i.commande else "---"}
+            #         </td>
+            #         <td>
+            #         {i.modlvrsn}
+            #         </td>
+            #         <td>
+            #         {i.note}
+            #         </td>
+            #         <td class="d-flex">
+            #       <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
+            #     <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
+            #         </td>
 
-              </tr>
-            '''
+            #   </tr>
+            # '''
         print('>>>load bl term')
         return JsonResponse({
-            'trs':trs,
+            'trs':render(request, 'bllist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
     if startdate != '0' and enddate != '0':
@@ -7235,6 +7334,7 @@ def searchforlistachat(request):
 
 def searchforlistbl(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     # we dont need this
@@ -7852,44 +7952,46 @@ def createnewrepaccount(request):
 
 def yeardatabl(request):
     year=request.GET.get('year')
+    target=request.GET.get('target')
     # get all bls of that year
     bls=Bonlivraison.objects.filter(date__year=year).order_by('-id')[:50]
-    trs=''
-    for i in bls:
-        trs+=f'''
-        <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
-            <td>{ i.bon_no }</td>
-            <td>{ i.date.strftime("%d/%m/%Y")}</td>
-            <td>{ i.client.name }</td>
-            <td>{ i.client.code }</td>
-            <td>{ i.total}</td>
-            <td>{ i.client.region}</td>
-            <td>{ i.client.city}</td>
-            <td>{ i.client.soldbl}</td>
-            <td>{ i.salseman }</td>
-            <td class="d-flex justify-content-between">
-              <div>
-              {'R0' if i.ispaid else 'N1' }
+    # trs=''
+    # for i in bls:
+    #     trs+=f'''
+    #     <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
+    #         <td>{ i.bon_no }</td>
+    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #         <td>{ i.client.name }</td>
+    #         <td>{ i.client.code }</td>
+    #         <td>{ i.total}</td>
+    #         <td>{ i.client.region}</td>
+    #         <td>{ i.client.city}</td>
+    #         <td>{ i.client.soldbl}</td>
+    #         <td>{ i.salseman }</td>
+    #         <td class="d-flex justify-content-between">
+    #           <div>
+    #           {'R0' if i.ispaid else 'N1' }
 
-              </div>
-              <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #           </div>
+    #           <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-            </td>
-            <td class="text-danger">
-            {'OUI' if i.isfacture else 'NON'}
+    #         </td>
+    #         <td class="text-danger">
+    #         {'OUI' if i.isfacture else 'NON'}
 
-            </td>
+    #         </td>
 
-            <td>
-              {i.commande.order_no if i.commande else '--'}
-            </td>
-            <td>
-              {i.modlvrsn}
-            </td>
-          </tr>
-        '''
+    #         <td>
+    #           {i.commande.order_no if i.commande else '--'}
+    #         </td>
+    #         <td>
+    #           {i.modlvrsn}
+    #         </td>
+    #       </tr>
+    #     '''
+    
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'bllist.html', {'bons':bls}).content.decode('utf-8'),
         'total':round(Bonlivraison.objects.filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
     })
 
@@ -8011,7 +8113,14 @@ def loadreglbl(request):
     start = (page - 1) * per_page
     end = page * per_page
     print('start', start, end)
-    reblbls = PaymentClientbl.objects.all().order_by('-id')[start:end]
+    target=request.GET.get('target')
+    if target=='f':
+        reblbls = PaymentClientbl.objects.filter(isfarah=True, isavoir=False).order_by('-id')[start:end]
+    elif target=='o':
+        reblbls = PaymentClientbl.objects.filter(isorgh=True, isavoir=False).order_by('-id')[start:end]
+    else:
+        reblbls = PaymentClientbl.objects.filter(issortie=True, isavoir=False).order_by('-id')[start:end]
+    
     return JsonResponse({
         'trs':render(request, 'reglbllist.html', {'bons':reblbls}).content.decode('utf-8'),
         'has_more': len(reblbls) == per_page
@@ -9992,9 +10101,9 @@ def factureprint(request, id):
         'title':f'Facture {order.facture_no}',
         'facture':order,
         'orderitems':orderitems,
-        'tva':order.tva,
-        'ttc':order.total,
-        'ht':round(order.total-order.tva, 2),
+        # 'tva':order.tva,
+        # 'ttc':order.total,
+        # 'ht':round(order.total-order.tva, 2),
     }
     return render(request, 'factureprint.html', ctx)
 

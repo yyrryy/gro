@@ -2,9 +2,11 @@
     <strong>
         PAYMENT N° REGLFOURN#{{reglement.id}} <button class="bi bi-download" onclick="printreglementsupplier('{{reglement.id}}')"></button>
     </strong>
+    <button class="btn btn-danger bi bi-trash" onclick="deletereglementsupplier('{{reglement.id}}')"></button>
+
     <div class="">
         <small>Date de reglement:</small> <br>
-        <input type="date" name="" class="w-100 notempty mb-2" value="{{reglement.date|date:'Y-m-d'}}">
+        <input type="date" name="" class="w-100 notempty mb-2 regldate" value="{{reglement.date|date:'Y-m-d'}}">
     </div><br>
     
     <input name="reglementid" hidden>

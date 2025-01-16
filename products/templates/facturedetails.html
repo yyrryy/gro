@@ -316,9 +316,25 @@
   <div class="">
     Reglement
     {% for i in reglements %}
-    <div class="">
-      {{i.mode}}{{i.npiece}} {{i.amount|floatformat:2}}Dh
+    <div class="alert alert-danger">
+      Reglement de bon: REG#{{i.id}} <br>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
     </div>
+    {% endfor %}
+    <br>
+    <strong>
+      bons:
+    </strong> <br>
+    {% for i in facture.bons.all %}
+    <div class="alert alert-success">
+      <strong>N°: {{i.bon_no}}</strong> <br>
+      <button class="w-100" onclick="removebonfromfacture(event, '{{facture.id}}', '{{i.id}}')">Decrocher</button>
+    </div>
+    
     {% endfor %}
   </div>
 </div>

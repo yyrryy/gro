@@ -621,8 +621,15 @@
           'clientid':clientid,
           'bons':JSON.stringify(selectedValues),
           'date':date
+        }, (data)=>{
+          if (data.success){
+            ajaxpage('add', '+ Article', '/products/listfactures?target={{target}}')
+          }else{
+            alertify.error(data.error)
+            $(this).removeClass('disabled')
+            
+          }
         })
-        ajaxpage('add', '+ Article', '/products/listfactures?target={{target}}')
     })
 
 $('.filterfcdate').on('click', function(){

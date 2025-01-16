@@ -603,8 +603,15 @@
           'bons':JSON.stringify(selectedValues),
           'date':date,
           'factureno':$('.facture_no').val()
+        }, (data)=>{
+          if (data.success){
+            ajaxpage('add', '+ Article', '/products/achatfacture?target={{target}}')
+          }else{
+            alertify.error(data.error)
+            $(this).removeClass('disabled')
+            
+          }
         })
-        ajaxpage('add', '+ Article', '/products/achatfacture?target={{target}}')
     })
 
 $('.filterfcdate').on('click', function(){
