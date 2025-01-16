@@ -233,14 +233,15 @@
               <!-- <td>{{ order.client.region }}</td> -->
               <!-- <td>{{ order.salseman }}</td> -->
               {% if order.ispaid %}
-              <td class="d-flex justify-content-between">
-                <div>
-                R0
-                <div style="width:15px; height:15px; border-radius:50%; background:green;" ></div>
-                </div>
-                <button class="btn"></button>
-              </td>
+              <div  style="text-align: center; background: lightgreen;">
+                Payé
+              </div>
+
               {% else %}
+              <div class="" style="text-align: center; background: rgb(255, 77, 0);">
+                Non payé
+              </div>
+              {% endif %}
 
               <td class="d-flex justify-content-between">
                 <div style="width:15px; height:15px; border-radius:50%; background:orange;" ></div>
