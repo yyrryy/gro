@@ -248,23 +248,19 @@
               <td>{{ order.client.city }}</td>
               <td>{{ order.client.soldfacture|floatformat:2|intspace }}</td>
               <!-- <td>{{ order.salseman }}</td> -->
+              <td>
               {% if order.ispaid %}
-            <div  style="text-align: center; background: lightgreen;">
-              Payé
-            </div>
+              <div  style="text-align: center; background: lightgreen;">
+                Payé
+              </div>
 
-            {% else %}
-            <div class="" style="text-align: center; background: rgb(255, 77, 0);">
-              Non payé
-            </div>
-            {% endif %}
-
-              <td class="d-flex justify-content-between">
-                <div style="width:15px; height:15px; border-radius:50%; background:orange;" ></div>
-                <!-- <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{{order.id}}')"></button> -->
-              </td>
-
+              {% else %}
+              <div class="" style="text-align: center; background: rgb(255, 77, 0);">
+                Non payé
+              </div>
               {% endif %}
+            </td>
+
               <td>
                 {{order.note}}
               </td>
