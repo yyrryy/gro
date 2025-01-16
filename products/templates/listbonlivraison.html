@@ -122,7 +122,6 @@
           <td style="width: 5%;">Code client</td>
           <td style="width: 5%;" onclick="intsorttable(event)">Total</td>
           <td style="width: 5%;" onclick="sorttable(event)">Ville</td>
-          <td style="width: 5%;">Solde bl cl.</td>
           <td style="width: 5%;">N° Facture</td>
           <td style="width: 5%;" onclick="sorttable(event)">N° bon sortie</td>
           <td style="width: 5%;" onclick="sorttable(event)">N° devis</td>
@@ -143,7 +142,6 @@
             <td >{{ order.client.code }}</td>
             <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}</td>
             <td >{{ order.client.city }}</td>
-            <td >{{ order.client.soldbl|floatformat:2|intspace }}</td>
             <td class="d-flex justify-content-between">
               {% if order.isfacture %}
               <div>

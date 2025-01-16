@@ -3,6 +3,8 @@
     <strong>
         PAYMENT N° REGL#{{reglement.id}} <button class="bi bi-download" onclick="printreglementclient('{{reglement.id}}')"></button>
     </strong>
+    <button class="btn btn-danger bi bi-trash" onclick="deletereglementclient('{{reglement.id}}')"></button>
+
     <div class="">
         <small>Date de reglement:</small> <br>
         <input type="date" class="w-100 notempty mb-2 regldate" value="{{reglement.date|date:'Y-m-d'}}">

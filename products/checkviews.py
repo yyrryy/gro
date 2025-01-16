@@ -424,7 +424,7 @@ def validatebonsortie(request):
         
         bon_data = {
             'total': total,
-            'date': timezone.now(),
+            'date': date.today(),
             'bon_no': receipt_no,
             'note': bon.note,
             'bonsortie':bon,
