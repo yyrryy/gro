@@ -813,6 +813,15 @@
           //     'csrfmiddlewaretoken': '{{csrf_token}}'
           // },
           // console.log(data)
+          isremise=$('.remisecheck').is(':checked')
+          if (parseFloat(payment)>0){
+            if (parseFloat(payment)<totalbon){
+              if (!isremise){
+                alertify.error('error payment avance/remise')
+                return
+              }
+            }
+          }
           if (parseFloat(payment)>totalbon){
             alertify.error('Payment superieur au total')
             return
