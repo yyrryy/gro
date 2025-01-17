@@ -2773,6 +2773,7 @@ def updatebonsoffacture(request):
     bons=json.loads(request.GET.get('bons'))
     print('>> facture, bons', facture, bons)
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    livraisons.update(isfacture=True)
     # livraison_ids = livraisons.values_list('id', flat=True)
     facture.bons.add(*livraisons)
     return JsonResponse({
