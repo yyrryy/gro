@@ -224,7 +224,7 @@
                 Bank
             </th>
               <th>
-                  N° Bons
+                  Satatus
               </th>
           </thead>
           <tbody>
@@ -260,7 +260,15 @@
                      {{i.bank.upper}}
                 </td>
                   <td class="d-flex justify-content-between">
-                     <div class="accordion" id="accordionbons{{i.id}}">
+                    {% if i.inreglement %}
+                    <div class="" style="text-align: center; background: rgb(179, 255, 0);">
+                        Reglement
+                    </div>
+                    {% else %}
+                    <button class="btn bi bi-trash" onclick="deleteavancesupp(event, '{{i.id}}')"></button>
+                    {% endif %}
+
+                     <!-- <div class="accordion" id="accordionbons{{i.id}}">
 
                          <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsbon{{i.id}}" aria-expanded="true" aria-controls="collapsbon{{i.id}}">
 
@@ -278,7 +286,7 @@
 
 
                          </div>
-                     </div>
+                     </div> -->
                      <!-- <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" data-tooltip="Bon Nos: {% for bon in i.bons.all %}{{ bon.bon_no }}{% if not forloop.last %}, {% endif %}{% endfor %}" onclick="ajaxpage('regl{{i.id}}tab', 'regl{{i.id}}tab', 'products/viewreglement/{{i.id}}')">
                      </button> -->
 
@@ -297,7 +305,27 @@
 
 
 <script>
-  function removereglrowsupp(event){
+    function deleteavancesupp(event, avanceid){
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value'
+               , function(evt, value) { if (value=='ORGHAD'){
+                    $.get('/products/deleteavancesupp', {
+                        'avanceid':avanceid
+                    }, (data)=>{
+                        if (data.success){
+                            $(event.target).closest('tr').remove()
+                        }else{
+                            alertify.error('Error avance supprimer #334EER3')
+                        }
+                    })
+                
+               }else{
+                console.log('>> mot de pass')
+               } }
+               , function() { alertify.error('Cancel') });
+        
+    }
+    
+    function removereglrowsupp(event){
         let parentdiv=$(event.target).parent().parent()
         let amountinp=parentdiv.find('[name="mantantreglementsupp"]').val()
         if (amountinp.length==0){

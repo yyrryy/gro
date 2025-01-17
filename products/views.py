@@ -268,7 +268,7 @@ def addsupplier(request):
     ice=request.POST.get('suppice')
     suppif=request.POST.get('supplierif')
     rc=request.POST.get('supplierrc')
-    plafon=request.POST.get('supplierplafon')
+    plafon=request.POST.get('supplierplafon') or 0
     modereglement=request.POST.get('modereglement')
     print('>> name', name, 'phone', phone, 'address', address, 'image', image, 'personalname', personalname, 'phone2', phone2, 'rest', sold, 'note', note, 'city', city, 'email', email, 'ice', ice, 'suppif', suppif, 'rc', rc, 'modereglement', modereglement, 'plafon', plafon)
     Supplier.objects.create(
@@ -294,7 +294,8 @@ def addsupplier(request):
         'title':'List des fournisseurs'
     }
     return JsonResponse({
-        'html':render(request, 'suppliers.html', ctx).content.decode('utf-8')
+        'success':True,
+        #'html':render(request, 'suppliers.html', ctx).content.decode('utf-8')
     })
 
 def getsupplierdata(request):
@@ -2826,11 +2827,11 @@ def updatebonfacture(request):
 def listreglementbl(request):
     target=request.GET.get('target')
     if target=="f":
-        reglements=PaymentClientbl.objects.filter(isfarah=True, isavoir=False).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(isfarah=True).order_by('-id')[:50]
     elif target=="o":
-        reglements=PaymentClientbl.objects.filter(isorgh=True, isavoir=False).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(isorgh=True).order_by('-id')[:50]
     else:
-        reglements=PaymentClientbl.objects.filter(issortie=True, isavoir=False).order_by('-id')[:50]
+        reglements=PaymentClientbl.objects.filter(issortie=True).order_by('-id')[:50]
     print('lenreg', len(reglements))
     ctx={
         'title':'List des reglements CL BL' +target,
@@ -2943,8 +2944,8 @@ def supplierlistavances(request):
         'today':timezone.now().date(),
         'target':target,
     }
-    if avances:
-        ctx['total']=round(Avancesupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
+    # if avances:
+    #     ctx['total']=round(Avancesupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
 
     return render(request, 'supplierlistavances.html', ctx)
 
@@ -3698,9 +3699,9 @@ def addavoirclient(request):
                 date=datebon,
                 qtyofprice=i['qty']
             )
-        client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
-        client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
-        client.save()
+        # client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
+        # client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
+        # client.save()
         totalamount=sum([i for i in mantant if i is not None])
         if totalamount>0:
             print('totalamount', totalamount)
@@ -4163,14 +4164,14 @@ def bonachatdetails(request, id):
     bon=Itemsbysupplier.objects.get(pk=id)
     items=Stockin.objects.filter(nbon=bon)
     payments=PaymentSupplier.objects.filter(bons__in=[bon])
-    orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
+    #orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
 
     ctx={
         'title':f'Bon achat {bon.nbon}',
         'bon':bon,
         'items':items,
         'payments':payments,
-        'orderitems':orderitems,
+        'orderitems':items,
         'target':target
     }
     return render(request, 'bonachatdetails.html', ctx)
@@ -7459,6 +7460,98 @@ def searchforlistbl(request):
         'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
     })
+
+def searchforlistbs(request):
+    term=request.GET.get('term')
+    target=request.GET.get('target')
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+    # we dont need this
+    # if(term==''):
+
+    #     bons=Bonsortie.objects.filter(date__year=thisyear)[:50]
+    #     total=round(Bonsortie.objects.filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    #     trs=''
+    #     for i in bons:
+    #         trs+=f'''
+    #         <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/Bonsortiedetails/{i.id}')">
+    #             <td>{ i.bon_no }</td>
+    #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #             <td>{ i.client.name }</td>
+    #             <td>{ i.client.code }</td>
+    #             <td>{ i.total}</td>
+    #             <td>{ i.client.region}</td>
+    #             <td>{ i.client.city}</td>
+    #             <td>{ i.client.soldbl}</td>
+    #             <td>{ i.salseman }</td>
+    #             <td class="d-flex justify-content-between">
+    #             <div>
+    #             {'R0' if i.ispaid else 'N1' }
+
+    #             </div>
+    #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+
+    #             </td>
+    #             <td class="text-danger">
+
+    #             </td>
+    #             <td class="text-danger">
+    #             {'OUI' if i.isfacture else 'NON'}
+
+    #             </td>
+
+    #             <td>
+
+
+    #             </td>
+    #             <td>
+    #             {i.note}
+    #             </td>
+    #             <td>
+    #             {i.modlvrsn}
+    #             </td>
+    #             <td class="d-flex">
+    #               <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
+    #             <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
+    #             </td>
+    #         </tr>
+    #         '''
+    #     return JsonResponse({
+    #         'trs':trs
+    #     })
+
+    # Split the term into individual words separated by '*'
+    search_terms = term.split('+')
+    print(search_terms)
+
+    # Create a list of Q objects for each search term and combine them with &
+    q_objects = Q()
+    for i in search_terms:
+        q_objects &= (Q(client__name__iregex=i) |
+                Q(bon_no__iregex=i) |
+                Q(client__region__iregex=i)|
+                Q(client__city__iregex=i)|
+                Q(client__code__iregex=i)|
+                Q(total__iregex=i)|
+                Q(note__iregex=i)|
+                Q(car__iregex=i)
+                
+            )
+    print(">> here 1",startdate, enddate)
+    if startdate=='0' and enddate=='0':
+        bons=Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[:50]
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    else:
+        print(">> here 1²",startdate, enddate)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+
+    return JsonResponse({
+        'trs':render(request, 'bslist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
+        'total':total
+    })
+
+
 
 def searchforlistbc(request):
     term=request.GET.get('term')

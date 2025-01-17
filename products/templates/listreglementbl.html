@@ -438,7 +438,7 @@
                {% for i in reglements %}
                <tr class="reglbl-row" style={% if i.mode != 'espece' and i.echance == today %}"background: yellow;"{% elif i.mode != 'espece' and i.echance < today %}"color:red" {% endif %} >
                     <td>
-                        REGL#{{i.id}}
+                        REGL#{{i.id}} {% if i.isavoir %} (Avoir) {% endif %}
                     </td>
                      <td>
                           {{i.mode}} <br>

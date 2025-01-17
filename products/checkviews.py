@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier
 from django.http import JsonResponse, HttpResponse
 import qrcode
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
@@ -2358,9 +2358,9 @@ def printbarcode(request):
     barcodes = []
     for i in products:
         if isfarah:
-            ref='fr-'+i['ref']
+            ref='fr-'+i['ref'].strip()
         else:
-            ref=i['ref']
+            ref=i['ref'].strip()
         print('>>> ref', ref)
         name=i['name']
         remise1=0 if i['remise1']=='' else int(i['remise1'])
@@ -2766,6 +2766,22 @@ def deletereglementsupplier(request):
         'success':True
     })
 
+def deleteavancesupp(request):
+    avanceid=request.GET.get('avanceid')
+    avance=Avancesupplier.objects.get(pk=avanceid)
+    avance.delete()
+    return JsonResponse({
+        'success':True
+    })
+
+def deleteavanceclient(request):
+    avanceid=request.GET.get('avanceid')
+    avance=Avanceclient.objects.get(pk=avanceid)
+    avance.delete()
+    return JsonResponse({
+        'success':True
+    })
+
 def updatebonsoffacture(request):
     factureid=request.GET.get('factureid')
     facture=Facture.objects.get(pk=factureid)
@@ -2780,3 +2796,18 @@ def updatebonsoffacture(request):
     return JsonResponse({
         'success':True
     })
+
+
+def printbulk(request):
+    ids=json.loads(request.GET.get('ids'))
+    print('>>ids', ids)
+    bons = Bonsortie.objects.filter(pk__in=ids)
+    print('>>bons', bons)
+    items=Sortieitem.objects.filter(bon__in=bons)
+    orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
+    return render(request, 'printbulk.html', {'bons':bons, 'orderitems':orderitems, 'total':bons.aggregate(Sum('total'))['total__sum'] or 0, 'today':timezone.now().date()})
+
+def caisse(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    pass

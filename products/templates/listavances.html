@@ -306,9 +306,7 @@
             <th onclick="sorttable(event)">
                 Status
             </th>
-              <th onclick="sorttable(event)">
-                  N° Bons
-              </th>
+              
           </thead>
           <tbody>
                {% for i in avances %}
@@ -349,33 +347,11 @@
                     <div class="" style="text-align: center; background: rgb(179, 255, 0);">
                         Reglement
                     </div>
+                    {% else %}
+                    <button class="btn bi bi-trash" onclick="deleteavanceclient(event, '{{i.id}}')"></button>
                     {% endif %}
                    </td>
-                     <td class="d-flex justify-content-between">
-                        <div class="accordion" id="accordionbons{{i.id}}">
-
-                            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsbon{{i.id}}" aria-expanded="true" aria-controls="collapsbon{{i.id}}">
-
-
-                            </button>
-
-                            <div id="collapsbon{{i.id}}" class="text-start collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{i.id}}">
-                                {% for bon in i.bons.all %}
-                                (Bon){{ bon.bon_no }} <br>
-                                {% endfor %}
-                                {% for fact in i.factures.all %}
-                                (Facture){{ fact.fact_no }} <br>
-                                {% endfor %}
-                                
-
-
-                            </div>
-                        </div>
-                        <!-- <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" data-tooltip="Bon Nos: {% for bon in i.bons.all %}{{ bon.bon_no }}{% if not forloop.last %}, {% endif %}{% endfor %}" onclick="ajaxpage('regl{{i.id}}tab', 'regl{{i.id}}tab', 'products/viewreglement/{{i.id}}')">
-                        </button> -->
-
-                        
-                     </td>
+                     
                </tr>
                {% endfor %}
           </tbody>
@@ -420,7 +396,26 @@
 
 <script>
   populateyears()
-
+  function deleteavanceclient(event, avanceid){
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value'
+               , function(evt, value) { if (value=='ORGHAD'){
+                    $.get('/products/deleteavanceclient', {
+                        'avanceid':avanceid
+                    }, (data)=>{
+                        if (data.success){
+                            $(event.target).closest('tr').remove()
+                        }else{
+                            alertify.error('Error avance supprimer #334EdER3')
+                        }
+                    })
+                
+               }else{
+                console.log('>> mot de pass')
+               } }
+               , function() { alertify.error('Cancel') });
+        
+    }
+    
   // load more bl in regle not woking
   function checkyearreglbl(event){
     inpval=$(event.target).val()

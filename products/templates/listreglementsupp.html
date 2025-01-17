@@ -330,7 +330,7 @@
                {% for i in reglements %}
                <tr>
                     <td>
-                        REGLFOURN#{{reglement.id}}
+                        REGLFOURN#{{i.id}}
                     </td>
                      <td>
                           {{i.mode}}
@@ -370,6 +370,24 @@
 
 
 <script>
+    populateyears()
+    function deletereglementsupplier(reglid){
+        alertify.confirm(
+            'Confirmation',
+            'Confirmer?',
+            ()=>{
+            $.get('/products/deletereglementsupplier', {
+                'reglid':reglid,
+            }, (data)=>{
+                ajaxpage('ee','ee', '/products/listreglementsupp?target={{target}}')
+                // if (data.success){
+                //     $(event.target).parent().remove()
+                // }
+            })
+            }, ()=>console.log('>>'))
+    
+    }
+    
   function removereglrowsupp(event){
         let parentdiv=$(event.target).parent().parent()
         let amountinp=parentdiv.find('[name="mantantreglementsupp"]').val()

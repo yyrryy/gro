@@ -542,7 +542,7 @@
           let addremise=$(this).parent().parent().find('input[name="addremise"]')
           let addqty=$(this).parent().parent().find('input[name="addqty"]')
           console.log('qty of change',addqty)
-          $(this).parent().parent().find('.addstock').html(`<span>Stocktotal:${stock}</span>`)
+          //$(this).parent().parent().find('.addstock').html(`<span>Stocktotal:${stock}</span>`)
           addqty.val('')
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           // we are getting ere list of reps that have price

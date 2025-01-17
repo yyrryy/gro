@@ -1,0 +1,60 @@
+{% load global_tags %}
+{% for order in bons %}
+<tr class="ord bl-row " orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonsortiedetails/{{order.id}}')" style="background:" >
+  <td >
+    <input type="checkbox" onchange="addtoprint('{{order.bon_no}}')">
+    {{ order.bon_no }}
+  </td>
+  <td >{{ order.date|date:'d/m/Y' }}</td>
+  <td >{{ order.client.name }}</td>
+  <td >{{ order.client.code }}</td>
+  <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}
+  </td>
+  
+  <td class="">
+    {% if order.ispaid %}
+    <div  style="text-align: center; background: lightgreen;">
+      Encaissé
+    </div>
+    
+
+    {% else %}
+
+      <div class="" style="text-align: center; background: yellow;">
+        En attend
+      </div>
+      
+
+    {% endif %}
+  </td>
+
+  <td class="">
+    {% if order.generated %}
+    <div  style="text-align: center; background: lightgreen;">
+      Valider
+    </div>
+    
+
+    {% else %}
+
+      <div class="" style="text-align: center; background: yellow;">
+        No valider
+      </div>
+      
+
+    {% endif %}
+  </td>
+  
+  <td>
+    {% if order.note %} {{order.note}} {% endif %}
+  </td>
+  <td>
+    {% if order.user %} {{order.user.username}} {% endif %}
+  </td>
+  <td class="d-flex">
+    <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
+    <button class="btn btn-sm bi bi-download" onclick="printsortie2('{{order.id}}')"></button>
+  </td>
+
+</tr>
+{% endfor %}

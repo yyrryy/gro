@@ -348,6 +348,13 @@ class Client(models.Model):
     phone2=models.CharField(max_length=200, default=None, null=True)
     diver=models.BooleanField(default=False)
     accesscatalog=models.BooleanField(default=False)
+    def sold(self):
+        bons=Bonlivraison.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0
+        avoirs=Avoirclient.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0
+        avancess=Avanceclient.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
+        reglements=PaymentClientbl.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
+        return round(bons-avancess-avoirs-reglements, 2)
+        
     def __str__(self) -> str:
         return self.name+'-'+str(self.city)
 

@@ -778,8 +778,8 @@
     $(document).ready(function(){
       $('.clientselectbl').select2('open')
       // get products from localstorage
-      pdcts=JSON.parse(localStorage.getItem('bonlivraison')) || []
-      total=localStorage.getItem('totalbonlivraison') || 0
+      pdcts=JSON.parse(localStorage.getItem('bonlivraison{{target}}')) || []
+      total=localStorage.getItem('totalbonlivraison{{target}}') || 0
       parentdiv=$('.bonlivraisonbody')
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]

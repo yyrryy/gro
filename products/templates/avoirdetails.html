@@ -8,11 +8,13 @@
     <button class="btn btn-info" onclick="updateavoirnote(event, '{{avoir.id}}')">+
     </button>
   </div>
-  {% if not ovoir.ispaid or not avoir.inreglement %}
-  <button class="btn btn-danger" onclick="ajaxpage('addmodifieravoir{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoir/{{avoir.id}}?target={{target}}')">
+  
+  <button 
+  {% if avoir.ispaid or avoir.inreglement%}disabled{% endif %}
+  class="btn btn-danger" onclick="ajaxpage('addmodifieravoir{{avoir.id}}', 'Modifier avoir {{avoir.no}}', '/products/modifieravoir/{{avoir.id}}?target={{target}}')">
     Modifier
   </button>
-  {% endif %}
+  
   {% if reglement %}
   <div class="accordion col-6" id="accordionreglbl">
     <div class="">
