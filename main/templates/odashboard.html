@@ -21,6 +21,8 @@
     </div>
 
     <div class="d-flex">
+      <button class="bi bi-house" onclick="ajaxpage('ee', 'e', '/products/listbonlivraison?target=o')"></button>
+
       <!-- STOCK -->
       <div class="dropdown">
         <a class="btn dropdown-toggle bi bi-box-seam-fill d-flex flex-column btn p-2 text-white sectionbtn position-relative" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -28,24 +30,24 @@
         </a>
         
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addpducts', 'List produits', '/products/stock?target={{target}}')">Stock</div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/addproductspage?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addpducts', 'List produits', '/products/stock?target=o')">Stock</div>
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/addproductspage?target=o')">
             + Article
           </div>
           
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/categoriespage?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/categoriespage?target=o')">
             Families
           </div>
           
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/marquespage?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/marquespage?target=o')">
             Marques
           </div>
           
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target=o')">
             Alert Stock
           </div>
     
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/produits?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/produits?target=o')">
             Produits
           </div>
         </div>
@@ -58,43 +60,43 @@
         </a>
       
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <div class="sectionitem dropdown-item bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/clientspage?target={{target}}')">
+          <div class="sectionitem dropdown-item bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/clientspage?target=o')">
         List client
       </div>
 
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listdevi?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listdevi?target=o')">
         Devis
       </div>
 
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listcommand?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listcommand?target=o')">
         Commandes
       </div>
 
       
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target=o')">
         List Bons
       </div>
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target=o')">
         + Bon
       </div>
       
       
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listfactures?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listfactures?target=o')">
         Facture
       </div>    
 
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target=o')">
         Avoirs
       </div>
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementbl?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementbl?target=o')">
         Reglement
       </div>
 
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listavances?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listavances?target=o')">
         Avances
       </div>
       
-      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationcl?target={{target}}')">
+      <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationcl?target=o')">
         Situation
       </div>
       
@@ -108,56 +110,56 @@
         </a>
       
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <div class="sectionitem dropdown-item bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/supplierspage?target={{target}}')">
+          <div class="sectionitem dropdown-item bg-white text-success border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addclientstab', 'list clients', '/products/supplierspage?target=o')">
             List fournisserus
           </div>
     
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistdevi?target={{target}}&&suppliersection=1')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistdevi?target=o&&suppliersection=1')">
             Devis
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistcommand?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/supplierlistcommand?target=o')">
             Commandes
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target=o')">
             List Bons achat
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/recevoir?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/recevoir?target=o')">
             + Bon achat
           </div>
           
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/achatfacture?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/achatfacture?target=o')">
             Factures achat
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/listavoirsupplier?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addrecevoir', '+Achat', '/products/listavoirsupplier?target=o')">
             Avoir achat
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementsupp?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/listreglementsupp?target=o')">
             Reglement
           </div>
           
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/supplierlistavances?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/supplierlistavances?target=o')">
             Avances
           </div>
 
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationsupplier?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/situationsupplier?target=o')">
             Situation
           </div>
         </div>
       </div>
 
       
-      <!-- <div class="bi bi-box-seam-fill d-flex flex-column btn p-2 text-white sectionbtn position-relative" title="Stock" onclick="getsection(event, 'Farah', '/products/stocksection?target={{target}}')">
+      <!-- <div class="bi bi-box-seam-fill d-flex flex-column btn p-2 text-white sectionbtn position-relative" title="Stock" onclick="getsection(event, 'Farah', '/products/stocksection?target=o')">
         <small>Stock</small>
       </div> -->
-      <!-- <div class="d-flex flex-column btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="Client" onclick="getsection(event, 'Farah', '/products/clientsection?target={{target}}')">
+      <!-- <div class="d-flex flex-column btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="Client" onclick="getsection(event, 'Farah', '/products/clientsection?target=o')">
       <small>Clients</small>
       </div> -->
 
-      <!-- <div class="d-flex flex-column btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="Client" onclick="getsection(event, 'Farah', '/products/suppliersection?target={{target}}')">
+      <!-- <div class="d-flex flex-column btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="Client" onclick="getsection(event, 'Farah', '/products/suppliersection?target=o')">
         <small>Fournisseurs</small>
       </div> -->
 
-      <!-- <div class="btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="vente" onclick="getsection(event, 'Farah', '/products/ventesection?target={{target}}')"></div> -->
+      <!-- <div class="btn p-2 bi bi-people-fill text-white sectionbtn position-relative" title="vente" onclick="getsection(event, 'Farah', '/products/ventesection?target=o')"></div> -->
 
 
       <div class="d-flex flex-column btn p-2 bi bi-cart-plus-fill text-white sectionbtn position-relative">
@@ -173,8 +175,8 @@
       </a>
 
       <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-        <a class="dropdown-item" href="#" onclick="addscreen('/products/addproductspage?target={{target}}')">Produit</a>
-        <a class="dropdown-item" href="#" onclick="addscreen('/products/bondevi?target={{target}}')">Bon Livraison</a>
+        <a class="dropdown-item" href="#" onclick="addscreen('/products/addproductspage?target=o')">Produit</a>
+        <a class="dropdown-item" href="#" onclick="addscreen('/products/bondevi?target=o')">Bon Livraison</a>
         <a class="dropdown-item" href="#">Devi</a>
       </div>
     </div>

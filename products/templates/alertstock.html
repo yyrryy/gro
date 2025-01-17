@@ -130,15 +130,21 @@
     }
 
     function getlowbycategory(categoryid, categoryname, classname){
+      if ($('[name="supplier"]').val()==0){
+          alertify.error('Veuillez choisir un fournisseur')
+          return
+      }
       $(`.${classname}`).addClass('listactive').siblings().removeClass('listactive')
       $('.loadingscreen').addClass('d-block').removeClass('d-none')
       $('.categorynameholder').text(categoryname)
       $('.product_search_result').html('')
       $.ajax({
         url: "{% url 'products:getlowbycategory' %}",
-        type: "POST",
+        type: "GET",
         data: {
+          'target':"{{target}}",
             'category': categoryid,
+            'supplierid': $('[name="supplier"]').val(),
             'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function (data) {

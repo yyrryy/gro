@@ -251,7 +251,7 @@
                                         <td colspan="2">
 
                                         </td>
-                                        <td class="soldblregl text-danger" style="background: yellowgreen;"></td>
+                                        <td class="text-danger" style="background: yellowgreen;"></td>
                                         <td class="totalbonsbl text-danger" style="background: yellowgreen;">
                                         </td>
                                     </tr>
@@ -478,6 +478,9 @@
 
                             <div id="collapsbon{{i.id}}" class="text-start collapse" aria-labelledby="headingOne" data-parent="#accordionbons{{i.id}}">
                                 {% for bon in i.bons.all %}
+                                (Bon){{ bon.bon_no }} <br>
+                                {% endfor %}
+                                {% for bon in i.bonsortie.all %}
                                 (Bon){{ bon.bon_no }} <br>
                                 {% endfor %}
                                 {% for fact in i.factures.all %}

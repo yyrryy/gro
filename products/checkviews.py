@@ -117,7 +117,7 @@ def addbonsortie(request):
     # orderno
     #transport=request.POST.get('transport')
     note=request.POST.get('note')
-    payment=request.POST.get('payment')
+    payment=request.POST.get('payment') or 0
     print('>>>>>>', products, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
@@ -177,55 +177,56 @@ def addbonsortie(request):
             # update stock accordinly
             if farah:
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
-                negative=json.loads(product.frnegative)
-                sorties=json.loads(product.frsorties)
-                if float(product.stocktotalfarah)-float(i['qty'])<0:
-                    product.isnegativeinfr=True
-                    negative.append(float(i['qty'])-float(product.stocktotalfarah))
-                    sorties.append(sortitem.id)
-                    product.frnegative=negative
-                    product.frsorties=sorties
+                # negative=json.loads(product.frnegative)
+                # sorties=json.loads(product.frsorties)
+                # if float(product.stocktotalfarah)-float(i['qty'])<0:
+                #     product.isnegativeinfr=True
+                #     negative.append(float(i['qty'])-float(product.stocktotalfarah))
+                #     sorties.append(sortitem.id)
+                #     product.frnegative=negative
+                #     product.frsorties=sorties
+            
             else:
                 negative=json.loads(product.negative)
                 sorties=json.loads(product.sorties)
                 product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
-                negative=json.loads(product.negative)
-                sorties=json.loads(product.sorties)
-                if float(product.stocktotalorgh)-float(i['qty'])<0:
-                    product.isnegative=True
-                    negative.append(float(i['qty'])-float(product.stocktotalfarah))
-                    sorties.append(sortitem.id)
-                product.negative=negative
-                product.sorties=sorties
+                # negative=json.loads(product.negative)
+                # sorties=json.loads(product.sorties)
+                # if float(product.stocktotalorgh)-float(i['qty'])<0:
+                #     product.isnegative=True
+                #     negative.append(float(i['qty'])-float(product.stocktotalfarah))
+                #     sorties.append(sortitem.id)
+                # product.negative=negative
+                # product.sorties=sorties
             product.save()
             
             # update prices accordinly
             # pri lli7diffo' d mnchk addifo4n 4kola pri
-            pricesofout=[]
-            qtyofout=[]
-            prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=farah, product=product, isavoir=False).order_by('id')
-            thisqty=int(i['qty'])
-            for pr in prices:
-                print('>> qty', thisqty, pr.product.ref)
-                if not thisqty<=0:
-                    print('>> qty is not 0')
-                    if pr.qtyofprice<=thisqty:
-                        thisqty=thisqty-int(pr.qtyofprice)
-                        qtyofout.append(pr.qtyofprice)
-                        pr.qtyofprice=0
-                        pricesofout.append(pr.id)
-                    else:
-                        pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                        qtyofout.append(thisqty)
-                        thisqty=0
-                        pricesofout.append(pr.id)
-                    pr.save()
-                else:
-                    print('>> qty', thisqty, pr.product.ref, 'breaking')
-                    break
-            sortitem.pricesofout=pricesofout
-            sortitem.qtyofout=qtyofout
-            sortitem.save()
+            # pricesofout=[]
+            # qtyofout=[]
+            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=farah, product=product, isavoir=False).order_by('id')
+            # thisqty=int(i['qty'])
+            # for pr in prices:
+            #     print('>> qty', thisqty, pr.product.ref)
+            #     if not thisqty<=0:
+            #         print('>> qty is not 0')
+            #         if pr.qtyofprice<=thisqty:
+            #             thisqty=thisqty-int(pr.qtyofprice)
+            #             qtyofout.append(pr.qtyofprice)
+            #             pr.qtyofprice=0
+            #             pricesofout.append(pr.id)
+            #         else:
+            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
+            #             qtyofout.append(thisqty)
+            #             thisqty=0
+            #             pricesofout.append(pr.id)
+            #         pr.save()
+            #     else:
+            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
+            #         break
+            # sortitem.pricesofout=pricesofout
+            # sortitem.qtyofout=qtyofout
+            # sortitem.save()
     # if float(payment)>0:
     #     PaymentClientbl.objects.create(
     #         client_id=clientid,
@@ -235,30 +236,60 @@ def addbonsortie(request):
     #         npiece=f'Paiement de bon de sortie {order.bon_no}',
     #         issortie=True
     #     )
-    if float(payment)<float(totalbon):
+    if float(payment)>0:
         if remise:
+            print('>> Remise')
             order.ispaid=True
+            order.remise=True
             order.remiseamount=round(float(totalbon)-float(payment), 2)
-        else:
-            order.rest=round(float(totalbon)-float(payment), 2)
-            Avanceclient.objects.create(
-                client_id=clientid,
-                amount=payment,
-                #today
-                date=timezone.now().date(),
-                npiece=f'Avance de bon de sortie {order.bon_no}',
-                issortie=True
-            )
-    if float(payment)==float(totalbon):
-        order.ispaid=True
-        PaymentClientbl.objects.create(
+        regl=PaymentClientbl.objects.create(
             client_id=clientid,
             amount=payment,
             date=date.today(),
             mode='espece',
-            npiece=f'Paiement de bon de sortie {order.bon_no}',
+            #npiece=f'Paiement de bon de sortie {order.bon_no}',
+            npiece=f'espece',
             issortie=True
         )
+        regl.bonsortie.set([order])
+    # if float(payment)>0:
+    #     if float(payment)==float(totalbon):
+    #         print('>> crt regl')
+    #         order.ispaid=True
+    #         PaymentClientbl.objects.create(
+    #             client_id=clientid,
+    #             amount=payment,
+    #             date=date.today(),
+    #             mode='espece',
+    #             #npiece=f'Paiement de bon de sortie {order.bon_no}',
+    #             npiece=f'espece',
+    #             issortie=True
+    #         )
+    #     else:
+    #         if remise:
+    #             print('>> Remise')
+    #             order.ispaid=True
+    #             order.remiseamount=round(float(totalbon)-float(payment), 2)
+    #             PaymentClientbl.objects.create(
+    #                 client_id=clientid,
+    #                 amount=payment,
+    #                 date=date.today(),
+    #                 mode='espece',
+    #                 #npiece=f'Paiement de bon de sortie {order.bon_no}',
+    #                 npiece=f'espece',
+    #                 issortie=True
+    #             )
+    #         else:
+    #             print('>> crt avance')
+    #             order.rest=round(float(totalbon)-float(payment), 2)
+    #             Avanceclient.objects.create(
+    #                 client_id=clientid,
+    #                 amount=payment,
+    #                 #today
+    #                 date=timezone.now().date(),
+    #                 npiece=f'Avance de bon de sortie {order.bon_no}',
+    #                 issortie=True
+    #             )
     
     order.save()
     client.soldtotal=round(float(client.soldtotal)-float(payment), 2)
@@ -1710,7 +1741,7 @@ def getclientbonsforfacture(request):
     target=request.POST.get('target')
     print('>> target', target)
     if target=='s':
-        bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('date')[:50]
+        bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('date')
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     elif target=='f':
         bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=True).order_by('date')[:50]
@@ -2647,6 +2678,7 @@ def deletereglementclient(request):
     reglement=PaymentClientbl.objects.get(pk=reglid)
     avoirs=reglement.avoirs.all()
     bons=reglement.bons.all()
+    bonsortie=reglement.bonsortie.all()
     avances=reglement.avances.all()
     factures=reglement.factures.all()
     if factures:
@@ -2659,6 +2691,10 @@ def deletereglementclient(request):
             bons.update(ispaid=False)
             bons.update(isvalid=False)
     avoirs.update(inreglement=False)
+    bonsortie.update(ispaid=False)
+    bonsortie.update(remise=False)
+    bonsortie.update(paidamount=0.0)
+    bonsortie.update(remiseamount=0.0)
     avances.update(inreglement=False)
     bons.update(ispaid=False)
     bons.update(isvalid=False)

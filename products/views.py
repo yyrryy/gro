@@ -6,7 +6,7 @@ import openpyxl
 import qrcode
 # import Count
 from django.contrib.auth.models import User
-from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
+from django.db.models import Count, F, Sum, Q, BooleanField, Case, When, Value
 from django.db.models.functions import Cast
 from django.contrib.sessions.models import Session
 from functools import wraps
@@ -607,17 +607,49 @@ def updateproduct(request):
     })
 
 def alertstock(request):
-    targets = Category.objects.filter(produit__stocktotal__lte=F('produit__minstock')).annotate(
+    target=request.GET.get('target')
+    if target=='f':
+        targets = Category.objects.filter(produit__stocktotalfarah__lte=F('produit__minstock')).annotate(
+    total_products=Count('produit')
+    )
+    else:
+        targets = Category.objects.filter(produit__stocktotalorgh__lte=F('produit__minstock')).annotate(
     total_products=Count('produit')
     )
     return render(request, 'alertstock.html', {'title':'Alert Stock', 'categories':targets,
-    'suppliers':Supplier.objects.all()})
+    'suppliers':Supplier.objects.all(),
+    'target':target})
 
 def getlowbycategory(request):
-    category=request.POST.get('category')
-    products=Produit.objects.filter(category__id=category, stocktotal__lte=F('minstock'))
+    category=request.GET.get('category')
+    supplierid=request.GET.get('supplierid')
+    target=request.GET.get('target')
+    print('supplierid >>>>>>>>>><', supplierid)
+    #products = Product.objects.filter(category_id=category_id, stock__lte=F('minstock'), originsupp_id=supplierid)
+    isfarah=target=='f'
+    if isfarah:
+        products = Produit.objects.filter(category_id=category, stocktotalfarah__lte=F('minstock')).annotate(
+        is_preferred_supplier=Case(
+            When(originsupp_id=supplierid, then=Value(True)),
+            default=Value(False),
+            output_field=BooleanField(),
+        )).order_by('-is_preferred_supplier')
+    else:
+        products = Produit.objects.filter(category_id=category, stocktotalorgh__lte=F('minstock')).annotate(
+        is_preferred_supplier=Case(
+            When(originsupp_id=supplierid, then=Value(True)),
+            default=Value(False),
+            output_field=BooleanField(),
+        )).order_by('-is_preferred_supplier')
+    #suppliers=Supplier.objects.all()
+    marks=set([i.mark for i in products])
+    marks=[{"name":i.name if i else '', 'id':i.id if i else ''} for i in marks]
+    ctx={
+        'products':products,
+        'marks':marks
+    }
     return JsonResponse({
-        'data':render(request, 'lowstockproducts.html', {'products':products}).content.decode('utf-8')
+        'data':render(request, 'alertstocktrs.html', ctx).content.decode('utf-8')
     })
 
 def commandsupplier(request):
@@ -789,6 +821,7 @@ def addsupply(request):
             cmnd.save()
     for i in json.loads(products):
         product=Produit.objects.get(pk=i['productid'])
+        product.originsupp=supplier
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         remise2=0 if i['remise2']=='' else int(i['remise2'])
         remise3=0 if i['remise3']=='' else int(i['remise3'])
@@ -2957,7 +2990,7 @@ def getclientbons(request):
     if target=='s':
         avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False, ispaid=False).order_by('date')
         avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
-        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, generated=False).order_by('date')[:50]
+        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
         for i in bons:
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
@@ -4238,6 +4271,7 @@ def updatebonachat(request):
             netprice=round(float(i['total'])/float(i['qty']), 2)
             qty=0 if i['qty']=="" else int(i['qty'])
             product=Produit.objects.get(pk=i['productid'])
+            #product.originsupp=
             print('>>>>>>>adding total')
             
             # if isfacture:
@@ -7404,7 +7438,8 @@ def searchforlistbl(request):
                 Q(client__city__iregex=i)|
                 Q(client__code__iregex=i)|
                 Q(total__iregex=i)|
-                Q(command__bon_no__iregex=i)|
+                Q(bonsortie__bon_no__iregex=i)|
+                Q(facture__facture_no__iregex=i)|
                 Q(statusreg__iregex=i)|
                 Q(note__iregex=i)
             )
@@ -7516,7 +7551,9 @@ def searchforlistbc(request):
 
 def loadlistfc(request):
     page = int(request.GET.get('page', 1))
-    year =request.GET.get('year') or '2024'
+    year =request.GET.get('year')
+    target =request.GET.get('target')
+    isfarah=target=='f'
     startdate =request.GET.get('startdate')
     enddate =request.GET.get('enddate')
     term =request.GET.get('term')
@@ -7527,46 +7564,44 @@ def loadlistfc(request):
     end = page * per_page
     print('>>>>>', start, end, page)
     if comptable=='1':
-        if year=='0':
-            bons=Facture.objects.filter(date__year=thisyear, isaccount=True).order_by('-facture_no')[start:end]
-        else:
-            bons=Facture.objects.filter(date__year=year, isaccount=True).order_by('-facture_no')[start:end]
+        bons=Facture.objects.filter(isfarah=isfarah, date__year=year, isaccount=True).order_by('-facture_no')[start:end]
 
-        trs=''
-        for i in bons:
-            trs+=f'''
-                <tr class="ord {"text-danger" if i.ispaid else ''}
-                 fc-row"
-                    style="color:{"blue" if i.bon else ""} " comptable="1" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                    <td>{ i.facture_no }</td>
-                    <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                    <td>{ i.total}</td>
-                    <td>{ i.tva}</td>
-                    <td>{ i.client.name }</td>
-                    <td>{ i.client.code }</td>
-                    <td>{ i.client.region}</td>
-                    <td>{ i.client.city}</td>
-                    <td>{ i.client.soldfacture}</td>
-                    <td>{ i.salseman }</td>
-                    <td class="d-flex justify-content-between">
-                    <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                    <button title="Facture Comptabilisé" class="btn border border-success border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                    </td>
-                    <td >
-                        {i.note}
-                    </td>
+        # trs=''
+        # for i in bons:
+        #     trs+=f'''
+        #         <tr class="ord {"text-danger" if i.ispaid else ''}
+        #          fc-row"
+        #             style="color:{"blue" if i.bon else ""} " comptable="1" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+        #             <td>{ i.facture_no }</td>
+        #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
+        #             <td>{ i.total}</td>
+        #             <td>{ i.tva}</td>
+        #             <td>{ i.client.name }</td>
+        #             <td>{ i.client.code }</td>
+        #             <td>{ i.client.region}</td>
+        #             <td>{ i.client.city}</td>
+        #             <td>{ i.client.soldfacture}</td>
+        #             <td>{ i.salseman }</td>
+        #             <td class="d-flex justify-content-between">
+        #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+        #             <button title="Facture Comptabilisé" class="btn border border-success border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
+        #             </td>
+        #             <td >
+        #                 {i.note}
+        #             </td>
 
-                    <td>
-                    {i.bon.bon_no if i.bon else "--"}
-                    </td>
-                    <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                    </td>
-                </tr>
-                '''
+        #             <td>
+        #             {i.bon.bon_no if i.bon else "--"}
+        #             </td>
+        #             <td class="d-flex">
+        #             <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
+        #             <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
+        #             </td>
+        #         </tr>
+        #         '''
+        
         return JsonResponse({
-            'trs':trs,
+            'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page,
         })
     if term != '0':
@@ -7617,50 +7652,51 @@ def loadlistfc(request):
 
         if startdate=='0' and enddate=='0':
 
-            bons=Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no')[start:end]
-            total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-            totaltva=round(Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+            bons=Facture.objects.filter(q_objects).filter(isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
+            total=round(Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            totaltva=round(Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
         else:
             print('>>>>>daterange ')
-            bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
+            bons=Facture.objects.filter(q_objects).filter(isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
             total=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
             totaltva=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''}
-             fc-row"
-                style="color:{"blue" if i.bon else ""} "
-              year={year} term={term} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                </td>
-                <td >
-                    {i.note}
-                </td>
+        # trs=''
+        # for i in bons:
+        #     trs+=f'''
+        #     <tr class="ord {"text-danger" if i.ispaid else ''}
+        #      fc-row"
+        #         style="color:{"blue" if i.bon else ""} "
+        #       year={year} term={term} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+        #         <td>{ i.facture_no }</td>
+        #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+        #         <td>{ i.total}</td>
+        #         <td>{ i.tva}</td>
+        #         <td>{ i.client.name }</td>
+        #         <td>{ i.client.code }</td>
+        #         <td>{ i.client.region}</td>
+        #         <td>{ i.client.city}</td>
+        #         <td>{ i.client.soldfacture}</td>
+        #         <td>{ i.salseman }</td>
+        #         <td class="d-flex justify-content-between">
+        #         <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+        #         <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
+        #         </td>
+        #         <td >
+        #             {i.note}
+        #         </td>
 
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
+        #         <td>
+        #         {i.bon.bon_no if i.bon else "--"}
+        #         </td>
+        #         <td class="d-flex">
+        #             <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
+        #             <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
+        #         </td>
+        #     </tr>
+        #     '''
+        
         return JsonResponse({
-            'trs':trs,
+            'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page,
             'total':total,
             'totaltva':totaltva,
@@ -7670,135 +7706,92 @@ def loadlistfc(request):
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
         print(startdate, enddate)
-        bons=Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
+        bons=Facture.objects.filter(isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
         total=round(Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         totaltva=round(Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''}
-             fc-row"
-                style="color:{"blue" if i.bon else ""} "
-              startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture:.2f}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                </td>
-                <td>
-                    {i.note}
-                </td>
+        # trs=''
+        # for i in bons:
+        #     trs+=f'''
+        #     <tr class="ord {"text-danger" if i.ispaid else ''}
+        #      fc-row"
+        #         style="color:{"blue" if i.bon else ""} "
+        #       startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+        #         <td>{ i.facture_no }</td>
+        #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+        #         <td>{ i.total}</td>
+        #         <td>{ i.tva}</td>
+        #         <td>{ i.client.name }</td>
+        #         <td>{ i.client.code }</td>
+        #         <td>{ i.client.region}</td>
+        #         <td>{ i.client.city}</td>
+        #         <td>{ i.client.soldfacture:.2f}</td>
+        #         <td>{ i.salseman }</td>
+        #         <td class="d-flex justify-content-between">
+        #         <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+        #         <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
+        #         </td>
+        #         <td>
+        #             {i.note}
+        #         </td>
 
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
+        #         <td>
+        #         {i.bon.bon_no if i.bon else "--"}
+        #         </td>
+        #         <td class="d-flex">
+        #             <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
+        #             <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
+        #         </td>
+        #     </tr>
+        #     '''
+        
         return JsonResponse({
-            'trs':trs,
+            'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page,
             'total':total,
             'totaltva':totaltva,
         })
-    if year=="0":
-        bons= Facture.objects.filter(date__year=timezone.now().year).order_by('-facture_no')[start:end]
-        total=round(Facture.objects.filter(date__year=timezone.now().year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        totaltva=round(Facture.objects.filter(date__year=timezone.now().year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
-        print('year',bons)
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''}
-             fc-row"
-                style="color:{"blue" if i.bon else ""} "
-              year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture:.2f}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                </td>
-                <td>
-                    {i.note}
-                </td>
+    print('>> we are her', year)
+    bons= Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
+    total=round(Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    totaltva=round(Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+    # trs=''
+    # for i in bons:
+    #     trs+=f'''
+    #     <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+    #         <td>{ i.facture_no }</td>
+    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #         <td>{ i.total}</td>
+    #         <td>{ i.tva}</td>
+    #         <td>{ i.client.name }</td>
+    #         <td>{ i.client.code }</td>
+    #         <td>{ i.client.region}</td>
+    #         <td>{ i.client.city}</td>
+    #         <td>{ i.client.soldfacture:.2f}</td>
+    #         <td>{ i.salseman }</td>
+    #         <td class="d-flex justify-content-between">
+    #         <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #         <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
+    #         </td>
+    #         <td>
+    #             {i.note}
+    #         </td>
 
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
-        return JsonResponse({
-            'trs':trs,
-            'has_more': len(bons) == per_page,
-            'total':total,
-            'totaltva':totaltva,
-        })
-    else:
-        bons= Facture.objects.filter(date__year=year).order_by('-facture_no')[start:end]
-        total=round(Facture.objects.filter(date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        totaltva=round(Facture.objects.filter(date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
-        trs=''
-        for i in bons:
-            trs+=f'''
-            <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-                <td>{ i.facture_no }</td>
-                <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                <td>{ i.total}</td>
-                <td>{ i.tva}</td>
-                <td>{ i.client.name }</td>
-                <td>{ i.client.code }</td>
-                <td>{ i.client.region}</td>
-                <td>{ i.client.city}</td>
-                <td>{ i.client.soldfacture:.2f}</td>
-                <td>{ i.salseman }</td>
-                <td class="d-flex justify-content-between">
-                <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-                <button title="Facture Comptabilisé" class="btn border border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-                </td>
-                <td>
-                    {i.note}
-                </td>
-
-                <td>
-                {i.bon.bon_no if i.bon else "--"}
-                </td>
-                <td class="d-flex">
-                    <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-                    <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-                </td>
-            </tr>
-            '''
-        return JsonResponse({
-            'trs':trs,
-            'has_more': len(bons) == per_page,
-            'total':total,
-            'totaltva':totaltva,
-        })
+    #         <td>
+    #         {i.bon.bon_no if i.bon else "--"}
+    #         </td>
+    #         <td class="d-flex">
+    #             <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
+    #             <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
+    #         </td>
+    #     </tr>
+    #     '''
+    
+    return JsonResponse({
+        'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
+        'has_more': len(bons) == per_page,
+        'total':total,
+        'totaltva':totaltva,
+    })
 
 
 def searchforlistfc(request):
@@ -8065,42 +8058,45 @@ def yeardatabc(request):
 
 def yeardatafc(request):
     year=request.GET.get('year')
+    target=request.GET.get('target')
     print(year)
     # get all bls of that year
-    bls=Facture.objects.filter(date__year=year).order_by('-facture_no')[:50]
-    trs=''
-    for i in bls:
-        trs+=f'''
-        <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-            <td>{ i.facture_no }</td>
-            <td>{ i.date.strftime("%d/%m/%Y")}</td>
-            <td>{ i.total}</td>
-            <td>{ i.tva}</td>
-            <td>{ i.client.name }</td>
-            <td>{ i.client.code }</td>
-            <td>{ i.client.region}</td>
-            <td>{ i.client.city}</td>
-            <td>{ i.client.soldbl}</td>
-            <td>{ i.salseman }</td>
-            <td class="d-flex justify-content-between">
-              <div>
-              {'R0' if i.ispaid else 'N1' }
+    bls=Facture.objects.filter(date__year=year, isfarah=target=='f').order_by('-facture_no')[:50]
+    # trs=''
+    # for i in bls:
+    #     trs+=f'''
+    #     <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+    #         <td>{ i.facture_no }</td>
+    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #         <td>{ i.total}</td>
+    #         <td>{ i.tva}</td>
+    #         <td>{ i.client.name }</td>
+    #         <td>{ i.client.code }</td>
+    #         <td>{ i.client.region}</td>
+    #         <td>{ i.client.city}</td>
+    #         <td>{ i.client.soldbl}</td>
+    #         <td>{ i.salseman }</td>
+    #         <td class="d-flex justify-content-between">
+    #           <div>
+    #           {'R0' if i.ispaid else 'N1' }
 
-              </div>
-              <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #           </div>
+    #           <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-            </td>
-            <td class="text-danger">
+    #         </td>
+    #         <td class="text-danger">
 
-            </td>
+    #         </td>
 
-            <td>
-              {i.bon.bon_no if i.bon else "--"}
-            </td>
-          </tr>
-        '''
+    #         <td>
+    #           {i.bon.bon_no if i.bon else "--"}
+    #         </td>
+    #       </tr>
+    #     '''
+    
     return JsonResponse({
-        'trs':trs,
+        # 'trs':trs,
+        'trs':render(request, 'fclist.html', {'bons':bls}).content.decode('utf-8'),
         'total':round(bls.aggregate(Sum('total'))['total__sum'] or 0, 2)
     })
 

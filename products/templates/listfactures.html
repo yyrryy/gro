@@ -225,7 +225,7 @@
             <td onclick="sorttable(event)">Code client</td>
             <!-- <td onclick="sorttable(event)">Region</td> -->
             <td onclick="sorttable(event)">Ville</td>
-            <td onclick="sorttable(event)">Solde fc cl.</td>
+            <!-- <td onclick="sorttable(event)">Solde fc cl.</td> -->
             <!-- <td onclick="sorttable(event)">Repr</td> -->
             <td onclick="sorttable(event)">Reglé</td>
             <td onclick="sorttable(event)">Notes</td>
@@ -246,7 +246,7 @@
               <td>{{ order.client.code }}</td>
               <!-- <td>{{ order.client.region }}</td> -->
               <td>{{ order.client.city }}</td>
-              <td>{{ order.client.soldfacture|floatformat:2|intspace }}</td>
+              <!-- <td>{{ order.client.soldfacture|floatformat:2|intspace }}</td> -->
               <!-- <td>{{ order.salseman }}</td> -->
               <td>
               {% if order.ispaid %}
@@ -521,7 +521,7 @@
     currentPagelistfc=1
     loadinglistfc = false;
     $('.listfcholder').on('scroll', handleScrolllistfc);
-    $.get('/products/yeardatafc', {year:year}, (data)=>{
+    $.get('/products/yeardatafc?target={{target}}', {year:year}, (data)=>{
       $('.listfcbody').html(data.trs)
       $('.totalbonsfc').text(data.total)
     })
@@ -531,7 +531,7 @@
   function loadMorelistfc (year, startdate, enddate, term, comptable, mode)  {
     console.log('term and page ubr', term, currentPagelistfc)
     loadinglistfc = true;
-    $.get(`/products/loadlistfc/?page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}&mode=${mode}&target={{target}}`, (data)=>{
+    $.get(`/products/loadlistfc/?target={{target}}&page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}&mode=${mode}&target={{target}}`, (data)=>{
 
       const tbody = $('.listfctable tbody');
       tbody.append(data.trs);
@@ -556,7 +556,8 @@
 
       const lastRow = document.querySelector('.fc-row:last-child');
       const lastRowOffset = lastRow.offsetTop + lastRow.clientHeight;
-      let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      // let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      let year=$('.populateyears').val()
       let mode=lastRow.getAttribute('mode')
       let startdate=$('.startdatelistfc').val()==""?0:$('.startdatelistfc').val()
       let enddate=$('.enddatelistfc').val()==""?0:$('.enddatelistfc').val()
