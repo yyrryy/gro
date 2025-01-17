@@ -1790,7 +1790,9 @@ def bonlivraisondetails(request, id):
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     print('orderitems', orderitems)
-    reglements=PaymentClientbl.objects.filter(Q(bons__in=[order])| Q(factures__in=[order.facture]))
+    reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    reglementsfc=PaymentClientbl.objects.filter(factures__in=[order.facture])
+
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
     print('>> reglement', reglements)
@@ -1799,6 +1801,7 @@ def bonlivraisondetails(request, id):
         'order':order,
         'orderitems':orderitems,
         'reglements':reglements,
+        'reglementsfc':reglementsfc,
         'reps':Represent.objects.all(),
         'target':target
     }

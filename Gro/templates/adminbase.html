@@ -1090,8 +1090,8 @@ a .uil {
 
       function checkmax(event){
         // v as value
-        v=$(event.target).val()
-        max=$(event.target).attr('max')
+        v=parseFloat($(event.target).val())
+        max=parseFloat($(event.target).attr('max'))
         if (v<0 || v>max){
           alertify.error('Invalid quantité')
           //$('.valider').addClass('disabled')

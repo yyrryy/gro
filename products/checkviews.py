@@ -726,8 +726,10 @@ def bonsortiedetails(request, id):
     #reglements=PaymentClientbl.objects.filter(bons__in=[order])
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
+    reglements=PaymentClientbl.objects.filter(bonsortie__in=[order])
     cars=Carlogos.objects.all()
     ctx={
+        'reglements':reglements,
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
         'orderitems':orderitems,

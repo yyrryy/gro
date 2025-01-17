@@ -330,10 +330,10 @@
           alertify.error('Veuillez remplir tous les champs')
           return
         }
-        if (addqty.val()<0 || addqty.val()>max){
-          alertify.error('Qty invalid')
+        // if (addqty.val()<0 || addqty.val()>max){
+        //   alertify.error('Qty invalid')
           
-        }
+        // }
         var [ref, name, dp, stockfarah, stockfacturefarah, stockorgh, stockfactureorgh, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
         //console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
         pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie')) || []
@@ -774,7 +774,8 @@
           addqty.val('')
           addqty.focus()
           addprice.val(0)
-          addremise.val(remise)
+          addremise.val(0)
+          // addremise.val(remise)
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           $.get('/products/getqtyprice',
             {

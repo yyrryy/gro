@@ -38,6 +38,16 @@
       <input value="{% if order.note %}{{order.note}}{% endif %}">
       <button onclick="updatenotebs(event, '{{order.id}}')">+</button>
     </div>
+    {% for i in reglements %}
+    <div class="alert alert-danger">
+      Reglement de bon: REG#{{i.id}} <br>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+    </div>
+    {% endfor %}
     <!-- <strong class="mt-2">Reprenant</strong>
     <div class="d-flex">
       <select>
