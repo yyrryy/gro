@@ -4,7 +4,6 @@ from time import sleep
 import subprocess
 import sys
 
-print('>> test')
 def runserver():
     os.system('python manage.py runserver 192.168.1.8:8000')
 

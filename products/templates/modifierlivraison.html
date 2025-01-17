@@ -384,7 +384,7 @@ margin: 0;
         minimumInputLength:1,
         placeholder: 'Select un client',
         ajax: {
-          url: "{% url 'products:searchclient' %}",
+          url: '/products/searchclient?target={{target}}',
           type: 'GET',
           dataType: 'json',
           data: function (params) {
