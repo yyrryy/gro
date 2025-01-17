@@ -2765,3 +2765,16 @@ def deletereglementsupplier(request):
     return JsonResponse({
         'success':True
     })
+
+def updatebonsoffacture(request):
+    factureid=request.GET.get('factureid')
+    facture=Facture.objects.get(pk=factureid)
+    
+    bons=json.loads(request.GET.get('bons'))
+    print('>> facture, bons', facture, bons)
+    livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    # livraison_ids = livraisons.values_list('id', flat=True)
+    facture.bons.add(*livraisons)
+    return JsonResponse({
+        'success':True
+    })

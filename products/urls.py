@@ -378,7 +378,7 @@ urlpatterns = [
     path('removeavoirfromregl', checkviews.removeavoirfromregl, name='removeavoirfromregl'),
     path('removeavancefromregl', checkviews.removeavancefromregl, name='removeavancefromregl'),
     path('deletereglementclient', checkviews.deletereglementclient, name='deletereglementclient'),
-    # path('removebonfromfacture', checkviews.removebonfromfacture, name='removebonfromfacture'),
+    path('updatebonsoffacture', checkviews.updatebonsoffacture, name='updatebonsoffacture'),
     # path('removebonfromfacture', checkviews.removebonfromfacture, name='removebonfromfacture'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
 ]

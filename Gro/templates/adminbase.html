@@ -1007,6 +1007,46 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function updatebonsoffacture(target, factureid){
+        selectedValues = $("input[name='bonstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        
+        
+        if (selectedValues.length==0){
+          alertify.error('Champs vide')
+          return
+        }
+        $(this).addClass('disabled')
+        $.get('/products/updatebonsoffacture?target='+target, {
+          'factureid':factureid,
+          'bons':JSON.stringify(selectedValues),
+        }, (data)=>{
+          if (data.success){
+            ajaxpage('add', '+ Article', '/products/facturedetails/'+factureid+'?target='+target)
+          }else{
+            alertify.error(data.error)
+            $(this).removeClass('disabled')
+            
+          }
+        })
+      }
+      
+      function getclientbonsforfacture(target, clientid){
+        $.post('/products/getclientbonsforfacture', {
+            clientid:clientid,
+            target:target,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function(data){
+                console.log(data)
+                $('.loadingscreen').addClass('d-none')
+                $('.reglementclientbonholder').html(data.trs)
+                $('.totalbonsbl').text(data.total)
+                // $('.soldblregl').text((data.soldbl).toFixed(2))
+                // $('.select2').select2()
+            // populate bons multiselect
+        })
+      }
       function removebonfromfacture(event, factureid, bonid){
         alertify.confirm('Confirmer', ()=>{
 
