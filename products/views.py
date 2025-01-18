@@ -833,7 +833,7 @@ def addsupply(request):
         # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
         netwithremise1=round(buyprice-(buyprice*(remise1/100)), 2)
         netprice=round(float(i['total'])/float(i['qty']), 2)
-        
+        print('>>> net price', netprice)
         #product.isnew=True
         
         # if isfacture:
@@ -926,6 +926,7 @@ def addsupply(request):
                 print('>> has stock')
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
                 actualtotal=product.stocktotalfarah*product.frnetbuyprice
+                print('totalqty, actualtotal', totalqtys, actualtotal)
                 # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
                 # for b in remainingstock:
                 #     actualtotal+=float(b.price)*float(b.qtyofprice)
@@ -935,7 +936,9 @@ def addsupply(request):
                 pondire=round(totalprices/totalqtys, 2)
                 product.frcoutmoyen=pondire
                 product.save()
+                print('>> coout m', pondire)
             else:
+                print('>> cooutm', netprice)
                 product.frcoutmoyen=netprice
             product.frremise1=remise1
             product.frremise2=remise2
@@ -1000,7 +1003,9 @@ def addsupply(request):
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
+                print('>> coout m', pondire)
             else:
+                print('>> cooutm', netprice)
                 product.coutmoyen=netprice
             product.remise1=remise1
             product.remise2=remise2
