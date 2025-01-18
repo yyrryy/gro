@@ -44,11 +44,11 @@
   
   
   
-  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 21cm;width: 14.8cm">
+  <div id="printbl{{order.id}}" class="bonbody position-relative" >
   {% for i in orderitems %}
   {% if forloop.counter == orderitems|length %}
   <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="margin:auto;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm">
       <!-- header -->
       <div class="row">
         <div class="col-2">
@@ -109,7 +109,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 11cm;">
+              <td class="text-center" style="height: 8cm;">
                 {% for v in i %}
 
                 {{v.qty}}
@@ -190,8 +190,7 @@
 
     {% else %}
     <!-- other pages -->
-    <div>
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm; margin:auto;">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm">
       <!-- header -->
       <div class="row">
         <div class="col-2">
@@ -252,7 +251,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 11cm;">
+              <td class="text-center" style="height: 8cm;">
                 {% for v in i %}
 
                 {{v.qty}}
@@ -304,7 +303,6 @@
       <p>
         عدم تجاوز أسبوع لإرجاع البضاعة و شكرا
       </p>
-    </div>
     </div>
     {% endif %}
   </div>
