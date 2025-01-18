@@ -776,8 +776,8 @@ def addsupply(request):
     
 
     supplier=Supplier.objects.get(pk=supplierid)
-    supplier.rest=float(supplier.rest)+float(totalbon)
-    supplier.save()
+    # supplier.rest=float(supplier.rest)+float(totalbon)
+    # supplier.save()
     tva=0
     # if isfacture:
     #     print('>> creating facture')
@@ -925,18 +925,18 @@ def addsupply(request):
             if product.stocktotalfarah>0:
                 print('>> has stock')
                 totalqtys=int(product.stocktotalfarah)+int(i['qty'])
-                actualtotal=product.stocktotalfarah*product.frbuyprice
+                actualtotal=product.stocktotalfarah*product.frnetbuyprice
                 # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
                 # for b in remainingstock:
                 #     actualtotal+=float(b.price)*float(b.qtyofprice)
-                thistotal=int(i['qty'])*buyprice
+                thistotal=int(i['qty'])*netprice
                 print('>>>>>> thistotal', thistotal)
-                totalprices=round(thistotal+actualtotal, 2)
+                totalprices=round(float(i['total'])+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.frcoutmoyen=pondire
                 product.save()
             else:
-                product.frcoutmoyen=buyprice
+                product.frcoutmoyen=netprice
             product.frremise1=remise1
             product.frremise2=remise2
             product.frremise3=remise3
@@ -945,8 +945,8 @@ def addsupply(request):
             product.frnetbuyprice=netprice
             print('>> addin qty')
             product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
-            product.frsellprice=buyprice
-            product.frremisesell=remise1
+            # product.frsellprice=buyprice
+            # product.frremisesell=remise1
             # if isfacture:
             #     product.stockfacturefarah=int(product.stockfacturefarah)+int(i['qty'])
         else:
@@ -991,17 +991,17 @@ def addsupply(request):
             
             if product.stocktotalorgh>0:
                 totalqtys=int(product.stocktotalorgh)+int(i['qty'])
-                actualtotal=product.stocktotalorgh*product.buyprice
+                actualtotal=product.stocktotalorgh*product.netbuyprice
                 # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
                 # for i in remainingstock:
                 #     actualtotal+=float(i.price)*float(i.qtyofprice)
                 thistotal=int(i['qty'])*buyprice
-                totalprices=round(thistotal+actualtotal, 2)
+                totalprices=round(float(i['total'])+actualtotal, 2)
                 pondire=round(totalprices/totalqtys, 2)
                 product.coutmoyen=pondire
                 product.save()
             else:
-                product.coutmoyen=buyprice
+                product.coutmoyen=netprice
             product.remise1=remise1
             product.remise2=remise2
             product.remise3=remise3
@@ -1009,11 +1009,11 @@ def addsupply(request):
             product.buyprice=buyprice
             product.netbuyprice=netprice
             product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
-            product.sellprice=buyprice
-            product.remisesell=remise1
+            # product.sellprice=buyprice
+            # product.remisesell=remise1
         
-            if isfacture:
-                product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
+            # if isfacture:
+            #     product.stockfactureorgh=int(product.stockfactureorgh)+int(i['qty'])
         # recodrd remise 1, 2, 3, 4
         product.save()
     # # update cout moyen, it will be calculated by deviding total prices by total qty
@@ -1023,41 +1023,42 @@ def addsupply(request):
         #product.coutmoyen=round(totalprices/totalqty, 2)
         product.qtycommande=0
         product.save()
-        totalamount=sum(x if x is not None else 0 for x in mantant)
-        if float(totalamount)==float(totalbon):
-            if isfacture:
-                facture.ispaid=True
-                facture.save()
-            else: 
-                bon.ispaid=True
-                bon.save()
+        ### this was reglement
+        # totalamount=sum(x if x is not None else 0 for x in mantant)
+        # if float(totalamount)==float(totalbon):
+        #     if isfacture:
+        #         facture.ispaid=True
+        #         facture.save()
+        #     else: 
+        #         bon.ispaid=True
+        #         bon.save()
 
-        else:
-            diff=float(totalbon)-float(totalamount)
-            if isfacture:
-                facture.rest=diff 
-                facture.save()
-            else: 
-                bon.rest=diff
-                bon.save()
+        # else:
+        #     diff=float(totalbon)-float(totalamount)
+        #     if isfacture:
+        #         facture.rest=diff 
+        #         facture.save()
+        #     else: 
+        #         bon.rest=diff
+        #         bon.save()
 
-        if totalamount>0:
-            for m, mod, np, ech, bk in zip(mantant, moderegl, npiece, echeance, bank):
-                if m is not None:
-                    p=PaymentSupplier.objects.create(
-                        supplier_id=supplierid,
-                        amount=m,
-                        date=timezone.now(),
-                        echeance=ech,
-                        mode=mod,
-                        npiece=np,
-                        bank=bk,
-                        isfarah=isfarah,
-                    )
-                    if isfacture:
-                        p.set.facture([facture])
-                    else:
-                        p.set.bons([bon])
+        # if totalamount>0:
+        #     for m, mod, np, ech, bk in zip(mantant, moderegl, npiece, echeance, bank):
+        #         if m is not None:
+        #             p=PaymentSupplier.objects.create(
+        #                 supplier_id=supplierid,
+        #                 amount=m,
+        #                 date=timezone.now(),
+        #                 echeance=ech,
+        #                 mode=mod,
+        #                 npiece=np,
+        #                 bank=bk,
+        #                 isfarah=isfarah,
+        #             )
+        #             if isfacture:
+        #                 p.set.facture([facture])
+        #             else:
+        #                 p.set.bons([bon])
 
     return JsonResponse({
         'success':True
