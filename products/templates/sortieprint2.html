@@ -44,11 +44,11 @@
   
   
   
+  <div id="printbl{{order.id}}" class="bonbody position-relative">
   {% for i in orderitems %}
-  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 14cm;width: 10.5cm">
   {% if forloop.counter == orderitems|length %}
   <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="margin:auto;">
+    <div class="postion-relative px-5 facture{{facture.id}}holder p-3" style="min-height: 14.8cm;width: 10.5cm;">
       <!-- header -->
       <div class="row">
         <div class="col-2">
@@ -190,7 +190,7 @@
 
     {% else %}
     <!-- other pages -->
-    <div>
+    <div class="postion-relative px-5 facture{{facture.id}}holder p-3" style="min-height: 14.8cm;width: 10.5cm;">
     <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm; margin:auto;">
       <!-- header -->
       <div class="row">
@@ -307,8 +307,8 @@
     </div>
     </div>
     {% endif %}
-  </div>
     {% endfor %}
+  </div>
 
 
 
