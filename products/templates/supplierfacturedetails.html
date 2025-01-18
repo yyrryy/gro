@@ -310,6 +310,16 @@
       <strong>N° piece: {{i.npiece}}</strong> <br>
       <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
       <strong>Mode: {{i.mode}}</strong> <br>
+      {% for avoir in i.avoirs.all %}
+      <strong>
+        Avoir N° {{avoir.no}}: {{avoir.total}}
+      </strong> <br>
+      {% endfor %}
+      {% for avance in i.avances.all %}
+      <strong>
+        avance N° AVANCEF#{{avance.id}}: {{avance.amount}}
+      </strong>
+      {% endfor %}
     </div>
     {% endfor %}
     <br>

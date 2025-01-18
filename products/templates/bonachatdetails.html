@@ -28,7 +28,7 @@
     {% endif %} -->
     <strong>Reglements:</strong>
     {% for i in payments %}
-    <div class="mt-2">
+    <!-- <div class="mt-2">
 
       <table class="table table-bordered" style="font-size: 12px;">
         <tr>
@@ -36,9 +36,28 @@
           <td>{{i.amount|floatformat:2}} DH</td>
           <td>{{i.mode}}</td>
           <td>{{i.echeance|date:"d/m/Y"}}</td>
+
         </tr>
 
       </table>
+    </div> -->
+    <div class="alert alert-danger">
+      Reglement de bon: REG#{{i.id}} <br>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      {% for avoir in i.avoirs.all %}
+      <strong>
+        Avoir N° {{avoir.no}}: {{avoir.total}}
+      </strong> <br>
+      {% endfor %}
+      {% for avance in i.avances.all %}
+      <strong>
+        avance N° AVANCEF#{{avance.id}}: {{avance.amount}}
+      </strong>
+      {% endfor %}
     </div>
       {% endfor %}
 
