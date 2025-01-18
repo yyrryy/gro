@@ -1989,7 +1989,7 @@ def factureachatmultiple(request):
         facture=facture
     else:
         facture=Factureachat.objects.create(
-        facture_no=receipt_no,
+        facture_no=fc_no,
         supplier_id=supplierid,
         isfarah=isfarah,
         date=date
