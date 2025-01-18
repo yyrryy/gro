@@ -329,8 +329,10 @@
     {% for i in facture.bons.all %}
     <div class="alert alert-success">
       <strong>N°: {{i.nbon}}</strong> <br>
+      {% if facture.bons.all|length > 1%}
       {% if not facture.ispaid %}
       <button class="w-100" onclick="removebonfromfactureachat(event, '{{facture.id}}', '{{i.id}}')">Decrocher</button>
+      {% endif %}
       {% endif %}
     </div>
     

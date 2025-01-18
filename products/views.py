@@ -1798,7 +1798,8 @@ def bonlivraisondetails(request, id):
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     print('orderitems', orderitems)
     reglements=PaymentClientbl.objects.filter(bons__in=[order])
-    reglementsfc=PaymentClientbl.objects.filter(factures__in=[order.facture])
+    facture=order.facture
+    reglementsfc=PaymentClientbl.objects.filter(factures__in=[facture])
 
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
@@ -3802,11 +3803,11 @@ def addavoirsupp(request):
     else:
         prefix = f'FAV{year}'
     try:
-        avoirsuppliers = Avoirsupplier.objects.filter(no__startswith=prefix).last()
-        latest_receipt_no = int(avoirsuppliers.no.split('/')[1])
-        receipt_no = f"{prefix}{year}/{latest_receipt_no + 1}"
+        lastid = Avoirsupplier.objects.last().id
+        
     except:
-        receipt_no = f"{prefix}{year}/1"
+        lastid = 0
+    receipt_no = f"{prefix}/{lastid+1}"
     print(receipt_no)
     avoir=Avoirsupplier.objects.create(
         no=receipt_no,
@@ -10222,20 +10223,34 @@ def boncmndprint(request, id):
     return render(request, 'boncmndprint.html', ctx)
 
 def factureprint(request, id):
+    names=request.GET.get('names')=='1'
     order=Facture.objects.get(pk=id)
-    orderitems=Outfacture.objects.filter(facture=order).order_by('product__name')
+    orderitems=Livraisonitem.objects.filter(bon__in=order.bons.all())
     # split the orderitems into chunks of 10 items
     orderitems=list(orderitems)
-    orderitems=[orderitems[i:i+30] for i in range(0, len(orderitems), 30)]
-
+    orderitems=[orderitems[i:i+25] for i in range(0, len(orderitems), 25)]
+    hasespece=PaymentClientbl.objects.filter(factures__in=[order], mode='espece').exists()
+    print('>> hasespece')
+    ht=order.total/1.2
+    tva=ht*0.2
+    if hasespece:
+        dr=round(PaymentClientbl.objects.filter(factures__in=[order], mode='espece')[0].amount*.25/100, 2)
+        netapy=order.total+dr
     ctx={
+        'names':names,
+        'hasespece':hasespece,
         'title':f'Facture {order.facture_no}',
         'facture':order,
         'orderitems':orderitems,
-        # 'tva':order.tva,
-        # 'ttc':order.total,
-        # 'ht':round(order.total-order.tva, 2),
+        'tva':tva,
+        'ttc':order.total,
+        'ht':ht,
     }
+    if hasespece:
+        ctx['dr']=dr
+        ctx['netapy']=netapy
+    else:
+        ctx['netapy']=order.total
     return render(request, 'factureprint.html', ctx)
 
 def achatprint(request, id):

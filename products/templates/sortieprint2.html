@@ -36,19 +36,21 @@
 </head>
 <body>
 
-  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 29.7; width: 21;">
-
-
-    
-    {% for i in orderitems %}
-    {% if forloop.counter == orderitems|length %}
-    <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm;margin:auto;">
+  
+  
+  
+  {% for i in orderitems %}
+  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 14cm;width: 10.5cm">
+  {% if forloop.counter == orderitems|length %}
+  <!-- last iteration -->
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="margin:auto;">
       <!-- header -->
-      <div class="">
-        
+      <div class="row">
+        <div class="col-2">
+          <img src="/media/facturebody.jpg" style="width: 100%;" alt="">
+        </div>
 
-        <div class="d-flex justify-content-between" style="font-size: 13px;">
+        <div class="col-10 d-flex justify-content-between" style="font-size: 13px;">
           <div class="">
             <b>
               Bon de Sortie
@@ -159,6 +161,7 @@
               </strong>
             </div>
           </div>
+          {% if order.remise %}
           <div class="text-center d-flex justify-content-between">
 
             <div>Remise</div>
@@ -168,6 +171,7 @@
               </strong>
             </div>
           </div>
+          {% endif %}
           </div>
           
 
@@ -181,13 +185,15 @@
 
     {% else %}
     <!-- other pages -->
-     <div style="height: 29.7cm;">
+    <div>
     <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14cm;width: 10.5cm; margin:auto;">
       <!-- header -->
-      <div class="">
-        
+      <div class="row">
+        <div class="col-2">
+          <img src="/media/facturebody.jpg" style="width: 100%;" alt="">
+        </div>
 
-        <div class="d-flex justify-content-between" style="font-size: 13px;">
+        <div class="col-10 d-flex justify-content-between" style="font-size: 13px;">
           <div class="">
             <b>
               Bon de Sortie
@@ -196,7 +202,6 @@
               {{order.car}}-{{order.note}}
             </div>
           </div>
-
           <div class="">
 
               <div>
@@ -295,10 +300,10 @@
         عدم تجاوز أسبوع لإرجاع البضاعة و شكرا
       </p>
     </div>
-  </div>
+    </div>
     {% endif %}
+  </div>
     {% endfor %}
-</div>
 
 
 

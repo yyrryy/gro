@@ -1,9 +1,12 @@
 {% load global_tags %}
 <div class="d-flex mb-5" style="position: sticky;top: 0; background: white;z-index: 999;">
   <div>
-     <button class="btn btn-success" onclick="printfacture('{{facture.id}}')">
-    Telecharger
-  </button>
+    <button class="btn btn-success" onclick="printfacture('{{facture.id}}')">
+      Telecharger (Categorie)
+    </button>
+    <button class="btn btn-success" onclick="printfactureproductname('{{facture.id}}')">
+      Telecharger (Designation)
+    </button>
   <button class="btn btn-sm btn-success" onclick="entete()">
     entette
   </button>
@@ -343,8 +346,10 @@
     {% for i in facture.bons.all %}
     <div class="alert alert-success">
       <strong>N°: {{i.bon_no}}</strong> <br>
+      {% if facture.bons.all|length > 1%}
       {% if not facture.ispaid %}
       <button class="w-100" onclick="removebonfromfacture(event, '{{facture.id}}', '{{i.id}}')">Decrocher</button>
+      {% endif %}
       {% endif %}
     </div>
     
