@@ -7,29 +7,34 @@
     <title>Print Example</title>
     <style>
       @media print {
-         .livraison-holder {
-             height: 14cm; /* Slightly less than the maximum printable height */
-             width: 10.5cm; /* Full width of A4 */
-             border: 1px solid black; /* For debugging and visibility */
-             page-break-after: always; /* Ensures each div starts on a new page */
-             box-sizing: border-box; /* Include padding and border in the element's total width and height */
-         }
-
-         /* Reset margins and paddings for printing */
-         body {
-             margin: 0;
-             padding: 0;
-         }
-         td > div{
-           margin:4px;
-         }
-
-         /* Optional: If you need to adjust margins more precisely */
-         @page {
-             margin: 0; /* Remove any default margins */
-         }
-     }
-    </style>
+          .livraison-holder {
+              height: 14.8cm; /* Exact height of A6 */
+              width: 10.5cm; /* Exact width of A6 */
+              border: 1px solid black; /* For debugging */
+              page-break-after: always; /* Ensure each .livraison-holder prints on a new page */
+              box-sizing: border-box; /* Ensure padding and borders are included in width and height */
+              margin: 0;
+              padding: 0;
+          }
+      
+          /* Reset margins and paddings for printing */
+          body {
+              margin: 0;
+              padding: 0;
+          }
+      
+          td > div {
+              margin: 4px; /* Ensure inner spacing for table cells */
+          }
+      
+          /* Optional: Adjust margins for precise alignment */
+          @page {
+              size: A6;
+              margin: 0; /* Remove any default margins */
+          }
+      }
+      </style>
+      
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/jquerySpellingNumber.js"></script>
     <link href="/static/css/minified.css" rel="stylesheet" />
