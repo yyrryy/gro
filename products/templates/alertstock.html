@@ -91,15 +91,7 @@
 
 
 <script>
-    function filterlow(event){
-    target=$(event.target).val()
-    if (target==""){
-      $('.lowstockbody > tr').removeClass('d-none')
-    }else{
-      $('.lowstockbody > tr').addClass('d-none')
-      $(`.mark${target}`).removeClass('d-none')
-    }
-  }
+    
     function commandsupplier(productid, classname, tdclassname){
       console.log('commandsupplier')
       var qty = $(`.${classname}`).val()

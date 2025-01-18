@@ -3829,28 +3829,27 @@ def addavoirsupp(request):
                 total=i['total'],
                 isfarah=isfarah
             )
-    print(">>> len, amounr",len(mantant), mantant)
-    if len(mantant)>0:
-            totalamount=sum([i for i in mantant if i is not None])
-            print('totalamount', totalamount)
-            avoir.ispaid=True
-            avoir.save()
-            for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
-                print(m)
-                if m is not None:
-                    regl=PaymentSupplier.objects.create(
-                        supplier_id=supplierid,
-                        amount=m,
-                        #today
-                        date=timezone.now().date(),
-                        echeance=ech,
-                        bank=bk,
-                        mode=mod,
-                        npiece=np,
-                        isfarah=isfarah,
-                        isavoir=True
-                    )
-                    regl.avoirs.set([avoir])
+    totalamount=sum([i for i in mantant if i is not None])
+    if totalamount>0:
+        print('totalamount', totalamount)
+        avoir.ispaid=True
+        avoir.save()
+        for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+            print(m)
+            if m is not None:
+                regl=PaymentSupplier.objects.create(
+                    supplier_id=supplierid,
+                    amount=m,
+                    #today
+                    date=timezone.now().date(),
+                    echeance=ech,
+                    bank=bk,
+                    mode=mod,
+                    npiece=np,
+                    isfarah=isfarah,
+                    isavoir=True
+                )
+                regl.avoirs.set([avoir])
 
     # increment it
     return JsonResponse({

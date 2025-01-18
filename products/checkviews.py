@@ -1947,41 +1947,40 @@ def factureachatmultiple(request):
     allpaid = all(livraison.ispaid for livraison in livraisons)
     
     print('target', target, 'livraisons', livraisons, len(livraisons), len(livraisons)==1, 'date', date)
-    isfarah=False
+    isfarah=target=='f'
     
-    if target=='f':
-        isfarah=True
-        latest_receipt = Factureachat.objects.filter(
-            facture_no__startswith=f'FR-AFC{year}'
-        ).last()
-        # latest_receipt = Bonsortie.objects.filter(
-        #     facture_no__startswith=f'FR-BL{year}'
-        # ).order_by("-bon_no").first()
-        if latest_receipt:
-            latest_receipt_no = int(latest_receipt.facture_no[-9:])
-            receipt_no = f"FR-AFC{year}{latest_receipt_no + 1:09}"
-        else:
-            receipt_no = f"FR-AFC{year}000000001"
-    else:
-        latest_receipt = Factureachat.objects.filter(
-            facture_no__startswith=f'AFC{year}'
-        ).last()
-        # latest_receipt = Bonsortie.objects.filter(
-        #     facture_no__startswith=f'FR-BL{year}'
-        # ).order_by("-bon_no").first()
-        if latest_receipt:
-            latest_receipt_no = int(latest_receipt.facture_no[-9:])
-            receipt_no = f"AFC{year}{latest_receipt_no + 1:09}"
-        else:
-            receipt_no = f"AFC{year}000000001"
-    fc_no=request.GET.get('factureno').upper()
+    # if target=='f':
+    #     isfarah=True
+    #     latest_receipt = Factureachat.objects.filter(
+    #         facture_no__startswith=f'FR-AFC{year}'
+    #     ).last()
+    #     # latest_receipt = Bonsortie.objects.filter(
+    #     #     facture_no__startswith=f'FR-BL{year}'
+    #     # ).order_by("-bon_no").first()
+    #     if latest_receipt:
+    #         latest_receipt_no = int(latest_receipt.facture_no[-9:])
+    #         receipt_no = f"FR-AFC{year}{latest_receipt_no + 1:09}"
+    #     else:
+    #         receipt_no = f"FR-AFC{year}000000001"
+    # else:
+    #     latest_receipt = Factureachat.objects.filter(
+    #         facture_no__startswith=f'AFC{year}'
+    #     ).last()
+    #     # latest_receipt = Bonsortie.objects.filter(
+    #     #     facture_no__startswith=f'FR-BL{year}'
+    #     # ).order_by("-bon_no").first()
+    #     if latest_receipt:
+    #         latest_receipt_no = int(latest_receipt.facture_no[-9:])
+    #         receipt_no = f"AFC{year}{latest_receipt_no + 1:09}"
+    #     else:
+    #         receipt_no = f"AFC{year}000000001"
+    # fc_no=request.GET.get('factureno').upper()
     # check iffacture with numlber already exist
-    if not fc_no=='':
-        receipt_no=fc_no
+    fc_no=request.GET.get('fc_no')
     facture=Factureachat.objects.filter(facture_no=fc_no).first()
-    print('>> facture ans items if exist',fc_no, facture, facture.bons)
     # there is a facture with the same number and has no bons
     if facture and facture.bons.exists():
+        print('>> facture ans items if exist',fc_no, facture, facture.bons)
         return JsonResponse({
             'success':False,
             'error':'Numero deja exist'

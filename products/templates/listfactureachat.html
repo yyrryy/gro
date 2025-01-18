@@ -586,7 +586,11 @@
         supplierid=$('[name="addreglementclientsbl"]').val()
         
         date=$(".dateoffacture").val()
-
+        fc_no=$(".facture_no").val()
+        if (fc_no==''){
+          alertify.error('Facture numero')
+          return
+        }
        
         if (selectedValues.length==0 || supplierid==null){
           alertify.error('Champs vide')
@@ -599,7 +603,7 @@
           'supplierid':supplierid,
           'bons':JSON.stringify(selectedValues),
           'date':date,
-          'factureno':$('.facture_no').val()
+          'fc_no':$('.facture_no').val()
         }, (data)=>{
           if (data.success){
             ajaxpage('add', '+ Article', '/products/achatfacture?target={{target}}')

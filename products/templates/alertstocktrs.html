@@ -11,7 +11,7 @@
         {%endfor%}
     </select>
 </div>
-<table class="mb-5 table table-bordered table-advance item-table">
+<table class="mb-5 table table-bordered table-advance item-table table-hover">
     <thead>
         <tr>
             <th>
@@ -62,7 +62,8 @@
                         </td>
                         <td class="product_name">
                             {% if item.command %}<i class="text-success fa fa-check-circle fa-2x"></i>{% endif %}
-                            {% if item.stock == 0 %}<i class="text-danger fa fa-exclamation-circle fa-2x"></i>{% endif %}  <b>{{ item.category.name.upper}} - {{ item.car.upper }}</b>
+                            <!-- {% if item.stock == 0 %}<i class="text-danger fa fa-exclamation-circle fa-2x"></i>{% endif %}   -->
+                            <b>{{ item.category.name.upper}} - {{ item.name.upper }}</b>
                         </td>
                         <!-- <td class="#">{{ item.unit_type }}</td> -->
                         <td>{{ item.originsupp.name }}</td>
@@ -75,8 +76,9 @@
                             
                             {% else %}
                             <td>
-                            <div class="">
-                                <input placeholder="Quantité" type="number" class="form-control" data-id="{{item.id}}" data-categoryid="{{item.category.id}}" onchange="commandepdct(event, '{{item.id}}')"">
+                            <div class="d-flex">
+                                <input placeholder="Quantité" type="number" class="form-control" data-id="{{item.id}}" data-categoryid="{{item.category.id}}">
+                                <button class="btn btn-success bi bi-cart-plus-fill" onclick="commandepdct(event, '{{item.id}}')"></button>
                                 
                                
                             </div>
@@ -93,4 +95,23 @@
         {% endfor %}
         </tbody>
 </table>
+<script>
+    function commandepdct(event, itemid){
+        supplierid=$('[name="supplier"]').val()
+        supplier=$('[name="supplier"]').find('option:selected').text();
+        $(event.target).closest('td').html(`
+        <i class="fa fa-check text-success fa-2x"></i> <button class="fa fa-times text-danger fa-2x" id="${itemid}" categoryid="{{item.category.id}}" onclick="cancelcommand(event, '${itemid}')"></button>${supplier}
+        `)
+    }
+    function filterlow(event){
+      console.log('>>> ggdgdg')
+    target=$(event.target).val()
+    if (target==""){
+      $('.lowstockbody > tr').removeClass('d-none')
+    }else{
+      $('.lowstockbody > tr').addClass('d-none')
+      $(`.mark${target}`).removeClass('d-none')
+    }
+  }
 
+</script>
