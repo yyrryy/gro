@@ -922,24 +922,24 @@ def addsupply(request):
 
                     
             # calcul pondiré, stock needs to be more than 0
-            if product.stocktotalfarah>0:
-                print('>> has stock')
-                totalqtys=int(product.stocktotalfarah)+int(i['qty'])
-                actualtotal=product.stocktotalfarah*product.frnetbuyprice
-                print('totalqty, actualtotal', totalqtys, actualtotal)
-                # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
-                # for b in remainingstock:
-                #     actualtotal+=float(b.price)*float(b.qtyofprice)
-                thistotal=int(i['qty'])*netprice
-                print('>>>>>> thistotal', thistotal)
-                totalprices=round(float(i['total'])+actualtotal, 2)
-                pondire=round(totalprices/totalqtys, 2)
-                product.frcoutmoyen=pondire
-                product.save()
-                print('>> coout m', pondire)
-            else:
-                print('>> cooutm', netprice)
-                product.frcoutmoyen=netprice
+            # if product.stocktotalfarah>0:
+            #     print('>> has stock')
+            #     totalqtys=int(product.stocktotalfarah)+int(i['qty'])
+            #     actualtotal=product.stocktotalfarah*product.frnetbuyprice
+            #     print('totalqty, actualtotal', totalqtys, actualtotal)
+            #     # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=True, isavoir=False)
+            #     # for b in remainingstock:
+            #     #     actualtotal+=float(b.price)*float(b.qtyofprice)
+            #     thistotal=int(i['qty'])*netprice
+            #     print('>>>>>> thistotal', thistotal)
+            #     totalprices=round(float(i['total'])+actualtotal, 2)
+            #     pondire=round(totalprices/totalqtys, 2)
+            #     product.frcoutmoyen=pondire
+            #     product.save()
+            #     print('>> coout m', pondire)
+            # else:
+            #print('>> cooutm', netprice)
+            #product.frcoutmoyen=netprice
             product.frremise1=remise1
             product.frremise2=remise2
             product.frremise3=remise3
@@ -992,21 +992,21 @@ def addsupply(request):
             #             product.isnegative=False
             #         product.save()
             
-            if product.stocktotalorgh>0:
-                totalqtys=int(product.stocktotalorgh)+int(i['qty'])
-                actualtotal=product.stocktotalorgh*product.netbuyprice
-                # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
-                # for i in remainingstock:
-                #     actualtotal+=float(i.price)*float(i.qtyofprice)
-                thistotal=int(i['qty'])*buyprice
-                totalprices=round(float(i['total'])+actualtotal, 2)
-                pondire=round(totalprices/totalqtys, 2)
-                product.coutmoyen=pondire
-                product.save()
-                print('>> coout m', pondire)
-            else:
-                print('>> cooutm', netprice)
-                product.coutmoyen=netprice
+            # if product.stocktotalorgh>0:
+            #     totalqtys=int(product.stocktotalorgh)+int(i['qty'])
+            #     actualtotal=product.stocktotalorgh*product.netbuyprice
+            #     # remainingstock=Stockin.objects.filter(qtyofprice__gt=0, product=product, isfarah=False)
+            #     # for i in remainingstock:
+            #     #     actualtotal+=float(i.price)*float(i.qtyofprice)
+            #     thistotal=int(i['qty'])*buyprice
+            #     totalprices=round(float(i['total'])+actualtotal, 2)
+            #     pondire=round(totalprices/totalqtys, 2)
+            #     product.coutmoyen=pondire
+            #     product.save()
+            #     print('>> coout m', pondire)
+            # else:
+            #     print('>> cooutm', netprice)
+            #product.coutmoyen=netprice
             product.remise1=remise1
             product.remise2=remise2
             product.remise3=remise3
@@ -3937,19 +3937,19 @@ def relevclient(request):
     if target=="f":
         print('>>> here in farah', clientid, )
         bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True, isavoir=False)
     elif target=="s":
         bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, isavoir=False)
     else:
         bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True, isavoir=False)
         #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
@@ -3985,28 +3985,40 @@ def relevclient(request):
 def relevsupplier(request):
     supplierid=request.POST.get('supplierid')
     target=request.POST.get('target')
+    isrelevefacture=request.POST.get('facture')=='1'
+    print('>> isfacture releve', request.POST.get('facture'))
     supplier=Supplier.objects.get(pk=supplierid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    print('>> is facture', isrelevefacture)
     if target=="f":
-        avoirs=Avoirsupplier.objects.filter(isfarah=True, supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
-        reglementsbl=PaymentSupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate])
-
-        bons=Itemsbysupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate])
+        avoirs=Avoirsupplier.objects.filter(isfarah=True, supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate], ispaid=False)
+        reglementsbl=PaymentSupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False)
+        avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=True, date__range=[startdate, enddate])
+        if isrelevefacture:
+            bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=True)
+            print('>>>>>>>>>>>< infacture relve farah', bons)
+        else:
+            bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=True)
         print('rr', supplierid)
     else:
-        avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
-        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
-
-        bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
+        # orgh
+        avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate], ispaid=False)
+        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False)
+        avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=False, date__range=[startdate, enddate])
+        if isrelevefacture:
+            bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
+        else:
+            bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
         print('rr', supplierid)
     # chain all the data based on dates
     # first get all dates
     releve = chain(*[
-    ((bon, 'Itemsbysupplier') for bon in bons),
+    ((bon, 'factureachat') for bon in bons) if isrelevefacture else ((bon, 'Itemsbysupplier') for bon in bons),
     ((avoir, 'Avoirsupplier') for avoir in avoirs),
+    ((avance, 'avancesupplier') for avance in avances),
     ((reglementbl, 'Paymentsupplier') for reglementbl in reglementsbl),
     ])
 

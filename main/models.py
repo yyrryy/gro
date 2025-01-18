@@ -283,6 +283,8 @@ class Stockin(models.Model):
     name=models.CharField(max_length=500, default='-', null=True, blank=True)
     # to delete stock facture is stock in is facture
     isfacture=models.BooleanField(default=False)
+    # how much sold in this qty
+    soldqty=models.IntegerField(default=0)
     # qtyofprice will be used to track qty of this price
     qtyofprice=models.IntegerField(default=0)
     remise1=models.FloatField(default=0.00, null=True, blank=

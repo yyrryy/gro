@@ -1226,6 +1226,10 @@
         whattopay=parseFloat($('.whattopay').text())
         totalregl=parseFloat($('.totalreglblfields').text())
         console.log('>>', !whattopay==totalregl)
+        if (whattopay<=0){
+            alertify.error('Selectionner bon')
+            return
+        }
         if (whattopay!=totalregl){
             alertify.error('Mantant a payé doit etre egale a mantant total')
             return

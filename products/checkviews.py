@@ -2812,12 +2812,31 @@ def deleteavanceclient(request):
 def updatebonsoffacture(request):
     factureid=request.GET.get('factureid')
     facture=Facture.objects.get(pk=factureid)
-    
     bons=json.loads(request.GET.get('bons'))
     print('>> facture, bons', facture, bons)
     livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    total=livraisons.aggregate(Sum('total'))['total__sum'] or 0
     livraisons.update(isfacture=True)
     livraisons.update(facture=facture)
+    facture.total+=total
+    facture.save()
+    # livraison_ids = livraisons.values_list('id', flat=True)
+    facture.bons.add(*livraisons)
+    return JsonResponse({
+        'success':True
+    })
+
+def updatebonsoffactureachat(request):
+    factureid=request.GET.get('factureid')
+    facture=Factureachat.objects.get(pk=factureid)
+    bons=json.loads(request.GET.get('bons'))
+    print('>> facture, bons', facture, bons)
+    livraisons=Itemsbysupplier.objects.filter(pk__in=bons)
+    total=livraisons.aggregate(Sum('total'))['total__sum'] or 0
+    livraisons.update(isfacture=True)
+    livraisons.update(facture=facture)
+    facture.total+=total
+    facture.save()
     # livraison_ids = livraisons.values_list('id', flat=True)
     facture.bons.add(*livraisons)
     return JsonResponse({

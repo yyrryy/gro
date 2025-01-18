@@ -19,6 +19,7 @@
         </div>
 
         <button class="btn btn-success w-100 mt-2 genererrelvesupplier">Generer BL</button>
+        <button class="btn btn-success w-100 mt-2 genererrelvefcsupplier">Generer FC</button>
         <button class="btn btn-success w-100 mt-2" onclick="printsituationsupp()">Imprimer</button>
         
     </div>
@@ -206,13 +207,15 @@
             return
         }
         $.ajax({
-            url: '/products/relevsupplierfc',
+            url: '/products/relevsupplier',
             type: 'POST',
             data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                'supplierid': supplierid,
-                'datefrom': datefrom,
-                'dateto': dateto,
+              'target':'{{target}}',
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+              'supplierid': supplierid,
+              'facture': '1',
+              'datefrom': datefrom,
+              'dateto': dateto,
             },
             success: function(data){
                 $('.loader').addClass('d-none')

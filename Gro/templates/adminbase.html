@@ -1007,16 +1007,7 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
-      function filterlow(event){
-      console.log('>>> ggdgdg')
-    target=$(event.target).val()
-    if (target==""){
-      $('.lowstockbody > tr').removeClass('d-none')
-    }else{
-      $('.lowstockbody > tr').addClass('d-none')
-      $(`.mark${target}`).removeClass('d-none')
-    }
-  }
+      
       function updatebonsoffacture(target, factureid){
         selectedValues = $("input[name='bonstopay']:checked").map(function() {
             return this.value;
@@ -1042,6 +1033,32 @@ a .uil {
         })
       }
       
+      function updatebonsoffactureachat(target, factureid){
+        selectedValues = $("input[name='bonstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        
+        
+        if (selectedValues.length==0){
+          alertify.error('Champs vide')
+          return
+        }
+        $(this).addClass('disabled')
+        $.get('/products/updatebonsoffactureachat?target='+target, {
+          'factureid':factureid,
+          'bons':JSON.stringify(selectedValues),
+        }, (data)=>{
+          if (data.success){
+            ajaxpage('add', '+ Article', '/products/supplierfacturedetails/'+factureid+'?target='+target)
+          }else{
+            alertify.error(data.error)
+            $(this).removeClass('disabled')
+            
+          }
+        })
+      }
+      
+
       function getclientbonsforfacture(target, clientid){
         $.post('/products/getclientbonsforfacture', {
             clientid:clientid,
@@ -1051,6 +1068,21 @@ a .uil {
                 console.log(data)
                 $('.loadingscreen').addClass('d-none')
                 $('.reglementclientbonholder').html(data.trs)
+                $('.totalbonsbl').text(data.total)
+                // $('.soldblregl').text((data.soldbl).toFixed(2))
+                // $('.select2').select2()
+            // populate bons multiselect
+        })
+      }
+      function getsupplierbonsforfacture(target, supplierid){
+        $.post('/products/getsupplierbonsforfacture', {
+            supplierid:supplierid,
+            target:target,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function(data){
+                console.log(data)
+                $('.loadingscreen').addClass('d-none')
+                $('.reglementsupplierbonholder').html(data.trs)
                 $('.totalbonsbl').text(data.total)
                 // $('.soldblregl').text((data.soldbl).toFixed(2))
                 // $('.select2').select2()

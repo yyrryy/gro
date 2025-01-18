@@ -719,8 +719,13 @@ function submitupdatereglementsupp(event){
         // }
 
         whattopay=parseFloat($('.whattopay').text())
+        totalregl=parseFloat($('.totalreglsupp').text())
         if (whattopay<=0){
-            alertify.error('Mantant a payé doit etre superieur a 0')
+            alertify.error('Selectionner bon')
+            return
+        }
+        if (whattopay!=totalregl){
+            alertify.error('Mantant a payé doit etre egal au payment')
             return
         }
         $(this).addClass('disabled')
