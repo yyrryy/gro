@@ -3832,11 +3832,7 @@ def addavoirsupp(request):
     if len(mantant)>0:
             totalamount=sum([i for i in mantant if i is not None])
             print('totalamount', totalamount)
-            if float(totalamount)==float(totalbon):
-                avoir.ispaid=True
-            elif totalamount>0:
-                diff=float(totalbon)-float(totalamount)
-                avoir.rest=diff
+            avoir.ispaid=True
             avoir.save()
             for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
                 print(m)
@@ -4520,7 +4516,7 @@ def getsuppbons(request):
         for i in bons:
             trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} {f"Total: {i.total} Rest=>" if i.rest>0 else ""}</td><td>{i.rest if i.rest>0 else i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
     print('isfarah', isfarah)
-    avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, date__range=[datestart, dateend])
+    avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, ispaid=False, date__range=[datestart, dateend])
     print('avoirs', avoirs)
     avances=Avancesupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, date__range=[datestart, dateend])
 
@@ -6432,6 +6428,13 @@ def updatebonavoir(request):
     isfarah=target=='f'
     avoir=Avoirclient.objects.get(pk=id)
     client=Client.objects.get(pk=request.POST.get('clientid'))
+    mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     # we need avoir n° cause delete avoir will delete id, id is used in avoir n°
     avoirno=avoir.no
     avoiritems=Stockin.objects.filter(avoir=avoir)
@@ -6462,35 +6465,35 @@ def updatebonavoir(request):
 
     # # delete old avoir
     # # create new avoir
-    if avoir.client==client:
-        thisclient.soldtotal=round(float(thisclient.soldtotal)+float(avoir.total)-float(totalbon), 2)
-        if avoir.avoirfacture:
-            thisclient.soldfacture=round(float(thisclient.soldfacture)+float(avoir.total), 2)
-        else:
-            thisclient.soldbl=round(float(thisclient.soldbl)+float(avoir.total), 2)
-        if isfacture:
-            thisclient.soldfacture=round(float(thisclient.soldfacture)-float(totalbon), 2)
-        else:
-            thisclient.soldbl=round(float(thisclient.soldbl)-float(totalbon), 2)
+    # if avoir.client==client:
+    #     thisclient.soldtotal=round(float(thisclient.soldtotal)+float(avoir.total)-float(totalbon), 2)
+    #     if avoir.avoirfacture:
+    #         thisclient.soldfacture=round(float(thisclient.soldfacture)+float(avoir.total), 2)
+    #     else:
+    #         thisclient.soldbl=round(float(thisclient.soldbl)+float(avoir.total), 2)
+    #     if isfacture:
+    #         thisclient.soldfacture=round(float(thisclient.soldfacture)-float(totalbon), 2)
+    #     else:
+    #         thisclient.soldbl=round(float(thisclient.soldbl)-float(totalbon), 2)
 
-        thisclient.save()
-    else:
-        # not the same client
-        thisclient.soldtotal=round(float(thisclient.soldtotal)+float(avoir.total), 2)
-        # add sold to old client
-        if avoir.avoirfacture:
-            thisclient.soldfacture=round(float(thisclient.soldfacture)+float(avoir.total), 2)
-        else:
-            thisclient.soldbl=round(float(thisclient.soldbl)+float(avoir.total), 2)
-        thisclient.save()
-        # add sold to new client
-        client.soldtotal=round(float(client.soldtotal)- float(totalbon), 2)
-        if isfacture:
-            client.soldfacture=round(float(client.soldfacture)- float(totalbon), 2)
-        else:
-            client.soldbl=round(float(client.soldbl)- float(totalbon), 2)
-        client.save()
-        print('new', client.soldtotal)
+    #     thisclient.save()
+    # else:
+    #     # not the same client
+    #     thisclient.soldtotal=round(float(thisclient.soldtotal)+float(avoir.total), 2)
+    #     # add sold to old client
+    #     if avoir.avoirfacture:
+    #         thisclient.soldfacture=round(float(thisclient.soldfacture)+float(avoir.total), 2)
+    #     else:
+    #         thisclient.soldbl=round(float(thisclient.soldbl)+float(avoir.total), 2)
+    #     thisclient.save()
+    #     # add sold to new client
+    #     client.soldtotal=round(float(client.soldtotal)- float(totalbon), 2)
+    #     if isfacture:
+    #         client.soldfacture=round(float(client.soldfacture)- float(totalbon), 2)
+    #     else:
+    #         client.soldbl=round(float(client.soldbl)- float(totalbon), 2)
+    #     client.save()
+    #     print('new', client.soldtotal)
     items=Stockin.objects.filter(avoir=avoir)
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
@@ -6509,11 +6512,7 @@ def updatebonavoir(request):
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
     avoir.date=datebon
     #avoir.no=request.POST.get('orderno')
-    if isfacture:
-        avoir.avoirfacture=True
-        #client.soldbl=5
-    else:
-        avoir.avoirfacture=False
+
         #client.soldbl=5
     avoir.save()
     # update this items
@@ -6543,6 +6542,29 @@ def updatebonavoir(request):
                 qtyofprice=i['qty'],
                 date=datebon,
             )
+    
+    totalamount=sum([i for i in mantant if i is not None])
+    if totalamount>0:
+        print('totalamount', totalamount)
+        avoir.ispaid=True
+        avoir.save()
+        for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+            if m is not None:
+                regl=PaymentClientbl.objects.create(
+                    client=client,
+                    amount=m,
+                    #today
+                    date=timezone.now().date(),
+                    echance=ech,
+                    bank=bk,
+                    mode=mod,
+                    npiece=np,
+                    isfarah=target=='f',
+                    isorgh=target=='o',
+                    issortie=target=='s',
+                    isavoir=True
+                )
+                regl.avoirs.set([avoir])
 
     return JsonResponse({
         'success':True

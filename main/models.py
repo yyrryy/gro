@@ -42,6 +42,8 @@ class Carlogos(models.Model):
 
 class Caisse(models.Model):
     # this will hold the initial amount of the caisse
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
     amountinitial=models.FloatField(default=0.00)
     amount=models.FloatField(default=0.00)
 # model of money out
@@ -529,7 +531,7 @@ class PaymentSupplier(models.Model):
     #bankname
     bank=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
-    isoargh=models.BooleanField(default=False)
+    isorgh=models.BooleanField(default=False)
     usedinfacture=models.BooleanField(default=False)
     # avoir fornisseur I5lls i bo lmahal
     isavoir=models.BooleanField(default=False)
@@ -1193,6 +1195,38 @@ class Outfactureachat(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     stockin=models.ForeignKey(Stockin, on_delete=models.SET_NULL, default=None, null=True)
+
+class Bank(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+
+# caisse farah
+class Caissefarah(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+class Caisseorgh(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+class Caissepos(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+class Bankfarah(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+class Bankorgh(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+class Bankpos(models.Model):
+    name=models.CharField(max_length=500, default='', null=True)
+    total=models.FloatField(default=0.0)
+
+
 
 class Config(models.Model):
     caissesortie=models.FloatField(default=0.00)

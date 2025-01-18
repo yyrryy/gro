@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config
 from django.http import JsonResponse, HttpResponse
 import qrcode
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
@@ -2046,6 +2046,13 @@ def factureachatmultiple(request):
 
 
 def updatebonavoirsupp(request):
+    mantant=json.loads(request.POST.get('mantant'))
+    bank=json.loads(request.POST.get('bank'))
+    mode=json.loads(request.POST.get('mode'))
+    npiece=json.loads(request.POST.get('npiece'))
+    # date=datetime.strptime(request.POST.get('date'), '%Y-%m-%d')
+    echeance=json.loads(request.POST.get('echeance'))
+    echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     id=request.POST.get('bonid')
     orderno=request.POST.get('orderno')
     note=request.POST.get('note')
@@ -2102,6 +2109,27 @@ def updatebonavoirsupp(request):
                 total=i['total'],
                 isfarah=isfarah
             )
+    totalamount=sum([i for i in mantant if i is not None])
+    if totalamount>0:
+        print('totalamount', totalamount)
+        avoir.ispaid=True
+        avoir.save()
+        for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+            if m is not None:
+                regl=PaymentSupplier.objects.create(
+                    supplier=supplier,
+                    amount=m,
+                    #today
+                    date=timezone.now().date(),
+                    echeance=ech,
+                    bank=bk,
+                    mode=mod,
+                    npiece=np,
+                    isfarah=target=='f',
+                    isorgh=target=='o',
+                    isavoir=True
+                )
+                regl.avoirs.set([avoir])
             
 
     return JsonResponse({
@@ -2807,7 +2835,20 @@ def printbulk(request):
     orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
     return render(request, 'printbulk.html', {'bons':bons, 'orderitems':orderitems, 'total':bons.aggregate(Sum('total'))['total__sum'] or 0, 'today':timezone.now().date()})
 
-def caisse(request):
-    target=request.GET.get('target')
-    isfarah=target=='f'
-    pass
+# def caisse(request):
+    # target=request.GET.get('target')
+    # isfarah=target=='f'
+    # if target=='f':
+    #     caisse=Config.objects.first().caissefarah
+    #     ins=PaymentClientbl.objects.filter(mode='espece', isfarah=True)
+    #     outs=[]
+    # if target=="o":
+    #     caisse=Config.objects.first().caisseorgh
+    #     ins=PaymentClientbl.objects.filter(mode='espece', isfarah=True)
+    #     outs=[]
+    # else:
+    #     if target=="o":
+    #     caisse=Config.objects.first().caisseorgh
+    #     ins=PaymentClientbl.objects.filter(mode='espece', isfarah=True)
+    #     outs=[]
+    # return render(request, 'caisse.html')

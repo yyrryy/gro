@@ -55,6 +55,7 @@
             <td>{{ order.supplier.name }}</td>
             <td>{{ order.total|floatformat:2|intspace}}</td>
             <td>
+              
               {% if order.ispaid %}
               <div  style="text-align: center; background: lightgreen;">
                 Payé
@@ -70,15 +71,7 @@
           </tr>
         {% endfor %}
       </tbody>
-      <thead style="position: sticky; bottom: 0; z-index: 99;">
-        <tr style="background: white;">
-          <td style="width: 8%;"></td>
-          <td style="width: 5%; background: yellowgreen;" class="totalavsupp">{{total|floatformat:2|intspace}}</td>
-          <td style="width: 8%;"></td>
-          <td style="width: 12%;"></td>
-          <td style="width: 12%;"></td>
-        </tr>
-      </thead>
+      
 
     </table>
   </div>

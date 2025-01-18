@@ -180,6 +180,39 @@ margin: 0;
         </div>
     </div>
     {{avoir.id}}
+    <div class="reglementbonsholder border position-relative mt-5">
+
+      <div class="inputsholder">
+          <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
+          <strong class="totalreglblfields">0.00</strong>
+              <div class="d-flex align-items-center justify-content-between">
+                    <div class="">
+                        <small>Mantant:</small> <br>
+
+                    </div>
+                    <div class="">
+                        <small>N° piece:</small> <br>
+
+                    </div>
+                    <div class="">
+                        <small>Mode Paiment:</small> <br>
+
+                    </div>
+                    <div class="">
+                      <small>Echeance:</small> <br>
+
+                  </div>
+                  <div class="">
+                    <small>Bank:</small> <br>
+
+                </div>
+                </div>
+              <div class="reglements">
+                <div class="d-flex justify-content-between align-items-center mt-2"><div class=""> <input type="number" name="mantantreglementclient" onkeyup="totalreglementbl(event)" class="w-100 notempty" placeholder="Mantant"></div><div class=""> <input type="text" name="npiece" class="w-100 notempty" placeholder="N° piece"></div><div class=""> <select name="modereglementclient" class="w-100 notempty" onchange="checkmodereglement(event)"><option value="cheque">Cheque</option><option value="effet">effet</option><option value="espece">espece</option><option value="avoir">avoir</option></select></div><div> <input type="date" name="echeance" class="w-100 notempty" value="${currentDate}"></div><div class="d-flex"><div><input type="text" name="bank" class="w-100" placeholder="Nom bank"></div>
+                </div></div>
+              </div>
+          </div>
+    </div>
 </div>
 
 <script>
@@ -423,7 +456,6 @@ margin: 0;
               return
           }
 
-        $('.submitupdateavoirsupp{{avoir.id}}').addClass('disabled')
         trs=$('.avoirsuppbodyupdate{{avoir.id}} tr')
         let avsuppproducts = []
         trs.each(function(){
@@ -454,6 +486,27 @@ margin: 0;
         let datebon = $('.datebonavoirsupp{{avoir.id}}').val()
         let orderno = $('.ordernoavoirsupp{{avoir.id}}').val()
         let totalbon=parseFloat($('.totalupdateavoirsupp{{avoir.id}}').text())
+        if (parseFloat($('.totalreglblfields').text())>0 && parseFloat($('.totalreglblfields').text())!=totalbon){
+          alertify.error('Total payement doit etre egale au total bon')
+          return
+        }
+        $('.submitupdateavoirsupp{{avoir.id}}').addClass('disabled')
+
+        mantant=parentdiv.find('[name="mantantreglementclient"]').map(function() {
+              return parseFloat(this.value);
+          }).get();
+          mode=parentdiv.find('[name="modereglementclient"]').map(function() {
+              return this.value;
+          }).get();
+          npiece=parentdiv.find('[name="npiece"]').map(function() {
+              return this.value;
+          }).get();
+          bank=parentdiv.find('[name="bank"]').map(function() {
+              return this.value;
+          }).get();
+          echeance=parentdiv.find('[name="echeance"]').map(function() {
+              return this.value;
+          }).get();
         console.log(totalbon)
         console.log('sending')
         localStorage.removeItem('pdctsinupdateavoirsupp{{avoir.id}}')
@@ -462,11 +515,15 @@ margin: 0;
             url: "{% url 'products:updatebonavoirsupp' %}",
             type: 'POST',
             data: {
+              'mantant':JSON.stringify(mantant),
+              'mode':JSON.stringify(mode),
+              'npiece':JSON.stringify(npiece),
+              'echeance':JSON.stringify(echeance),
+              'bank':JSON.stringify(bank),
               'target':'{{target}}',
               'bonid': '{{avoir.id}}',
               'totalbon': totalbon,
               'supplierid': supplierid,
-              'mode':mode,
               'datebon': datebon,
               'orderno': orderno,
               'note':$('.noteavoir').val(),
