@@ -1295,7 +1295,7 @@ a .uil {
           alertify.error('Veuillez remplir tous les champs');
           return;
         }
-        $.get('products/duplicate', {'productid':productid, 'ref':ref, 'mark':mark, 'minstock':minstock}, function(data){
+        $.get('/products/duplicate', {'productid':productid, 'ref':ref, 'mark':mark, 'minstock':minstock}, function(data){
           if(data.success){
             alertify.success('Produit dupliqué');
             parent.find('.ref').val('');

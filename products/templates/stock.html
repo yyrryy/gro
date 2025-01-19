@@ -54,7 +54,10 @@
   </div>
   <!-- <button class="btn btn-sm bi bi-plus btn-success" onclick="ajaxpage('add', '+ Article', '/products/addproductspage')"></button> -->
   <!-- <div class="d-flex" > -->
-  <div class="d-none" >
+  <div class="d-flex" >
+    <button class="btn-success btn-sm" onclick="excelqtypdcts(event)" style="
+      height: 36px;
+    ">Quantité</button>
     <input type="file" class="form-control excelfile">
     <button class="btn-success btn-sm" onclick="excelpdcts(event)" style="
       height: 36px;
@@ -77,7 +80,7 @@
             <li class="list-group-item cat{{i.id}}" onclick="getproductsbycategory('{{i.id}}', '{{i.name}}', 'cat{{i.id}}')" style="background: #676767; color:white;">
                 <b type="button" class="categoriesbtn" data-catgoryid="{{i.id}}">
 
-                        {{i.name}} ({{i.produit_set.all.count}})
+                  {{i.name}} ({{i.produit_set.all.count}})
 
                 </b>
             </li>
@@ -282,7 +285,7 @@
 
     // Attach the scroll event listener
     $('.listproductsholder').on('scroll', handleScroll)
-  function excelpdcts(event){
+    function excelpdcts(event){
         let parentdiv=$(event.target).parent().parent()
         excelfile=parentdiv.find('.excelfile')
         // send excel file data in a ajax request
@@ -291,11 +294,12 @@
         // Append the Excel file to the FormData object
         formData.append('excelFile', excelfile[0].files[0]);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('target', '{{ target }}');
       // Make an AJAX request to send the file data
-        $('.loadingscreen').removeClass('d-none')
+        //$('.loadingscreen').removeClass('d-none')
         $.ajax({
-          //url: '/products/excelpdcts', // to get products to databese
-          url: '/products/updatestockinv', // Replace with your server endpoint
+          url: '/products/excelpdcts', // to get products to databese
+          //url: '/products/updatestockinv', // Replace with your server endpoint
           type: 'POST', // Use POST or other HTTP method as needed
           data: formData,
           processData: false,
@@ -304,7 +308,7 @@
             // Handle the success response from the server
             $('.loadingscreen').addClass('d-none')
             alertify.success('File uploaded successfully')
-            updatetab('pducts', '/products/stock')
+            //updatetab('pducts', '/products/stock')
 
           },
           error: function(xhr, status, error) {
@@ -314,6 +318,43 @@
           }
         });
     }
+
+    function excelqtypdcts(event){
+        let parentdiv=$(event.target).parent().parent()
+        excelfile=parentdiv.find('.excelfile')
+        // send excel file data in a ajax request
+        let formData = new FormData();
+
+        // Append the Excel file to the FormData object
+        formData.append('excelFile', excelfile[0].files[0]);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('target', '{{ target }}');
+      // Make an AJAX request to send the file data
+        //$('.loadingscreen').removeClass('d-none')
+        $.ajax({
+          url: '/products/excelqtypdcts', // to get products to databese
+          //url: '/products/updatestockinv', // Replace with your server endpoint
+          type: 'POST', // Use POST or other HTTP method as needed
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            // Handle the success response from the server
+            $('.loadingscreen').addClass('d-none')
+            alertify.success('File uploaded successfully')
+            //updatetab('pducts', '/products/stock')
+
+          },
+          error: function(xhr, status, error) {
+            $('.loadingscreen').addClass('d-none')
+            // Handle errors if the AJAX request fails
+            alertify.error('Error uploading file');
+          }
+        });
+    }
+
+
+    
 
   function totalsproductslist(){
     // let totalstock=0

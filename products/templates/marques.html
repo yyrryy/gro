@@ -17,6 +17,14 @@
                     <button class="btn btn-primary w-100 mt-2 createmarquebtn">Ajouter</button>
                 
                 </form>
+
+                <div class="mt-5" >
+                    <input type="file" class="form-control excelfile">
+                    <button class="btn-success btn-sm w-100" onclick="excelmarks(event)" style="
+                      height: 36px;
+                    ">Excel marks</button>
+                
+                </div>
             </div>
         </div>
         <div class="col-9">
@@ -51,6 +59,40 @@
 </div>
 
 <script>
+    function excelmarks(event){
+        let parentdiv=$(event.target).parent().parent()
+        excelfile=parentdiv.find('.excelfile')
+        // send excel file data in a ajax request
+        let formData = new FormData();
+
+        // Append the Excel file to the FormData object
+        formData.append('excelFile', excelfile[0].files[0]);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('target', '{{ target }}');
+      // Make an AJAX request to send the file data
+        //$('.loadingscreen').removeClass('d-none')
+        $.ajax({
+          url: '/products/excelmarks', // to get products to databese
+          //url: '/products/updatestockinv', // Replace with your server endpoint
+          type: 'POST', // Use POST or other HTTP method as needed
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            // Handle the success response from the server
+            $('.loadingscreen').addClass('d-none')
+            alertify.success('File uploaded successfully')
+            //updatetab('pducts', '/products/stock')
+
+          },
+          error: function(xhr, status, error) {
+            $('.loadingscreen').addClass('d-none')
+            // Handle errors if the AJAX request fails
+            alertify.error('Error uploading file');
+          }
+        });
+    }
+
     $(function(){
      $('.select').select2()
     })

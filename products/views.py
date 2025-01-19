@@ -5938,43 +5938,52 @@ def sortdownfc(request):
     })
 
 def excelclients(request):
+    target=request.POST.get('target')
+    isfarah=target=='f'
+    isorgh=target=='o'
+    issortie=target=='s'
+    print('isfarah', target=='f')
+    print('isorgh', target=='o')
+    print('issortie', target=='s')
     myfile = request.FILES['excelFile']
     df = pd.read_excel(myfile)
     df = df.fillna('')
+    if isfarah:
+        prfx='CF-'
+    elif isorgh:
+        prfx='CO-'
+    else:
+        prfx='CP-'
+    ids=1
     for d in df.itertuples():
         name=d.name
-        code=d.code
-        try:
-            # this needs to be lowercase
-            region=d.region.lower().strip()
-        except:
-            region=d.region
         city=d.city
-        phone=str(d.phone)
-        rep=d.rep
-        ice=str(d.ice)
-        address=None if pd.isna(d.address) else d.address
-        try:
-            client=Client.objects.get(Q(name=name) | Q(code=code))
-            with open('error.txt', 'a') as f:
-                f.write(f'{name} - {code} exist déja \n')
-        except Client.DoesNotExist:
-            print('client not exist')
-            client=Client.objects.create(
-                represent_id=rep,
-                code=code,
-                name=name,
-                city=city,
-                ice=ice,
-                region=region,
-                phone=phone,
-                address=address
-            )
+        code=f'{prfx}{ids}'
+        phone2="" if pd.isna(d.phone2) else str(d.phone2)
+        phone="" if pd.isna(d.phone) else str(d.phone)
+        ice="" if pd.isna(d.ice) else str(d.ice)
+        
+
+        print('>> there is no cli')
+        client=Client.objects.create(
+            code=code,
+            name=name,
+            city=city,
+            ice=ice,
+            phone=phone,
+            phone2=phone2,
+            clientorgh=isorgh,
+            clientfarah=isfarah,
+            clientsortie=issortie
+        )
+        print('>> created')
+        ids+=1
     return JsonResponse({
         'success':True
     })
 
 def excelpdcts(request):
+    #target=request.GET.get('targt')
     myfile = request.FILES['excelFile']
     df = pd.read_excel(myfile)
     entries=0
@@ -5984,26 +5993,82 @@ def excelpdcts(request):
         except:
             ref=d.ref
         #reps=json.dumps(d.rep)
-        #name = d.name
-        #mark = None if pd.isna(d.mark) else d.mark
-        #refeq = '' if pd.isna(d.refeq) else d.refeq
+        farahref=f'fr-{ref}'
+        name = d.name
+        mark = None if pd.isna(d.mark) else d.mark
+        category = None if pd.isna(d.category) else d.category
+        refeq = '' if pd.isna(d.refeq) else d.refeq
         #status = False if pd.isna(d.status) else True
         #coderef = '' if pd.isna(d.code) else d.code
         #diam = '' if pd.isna(d.diam) else d.diam
         #qty = 0 if pd.isna(d.qty) else d.qty
+        qtyjeu = 0 if pd.isna(d.qtyjeu) else d.qtyjeu
+        unite = 0 if pd.isna(d.unite) else d.unite
         #buyprice = 0 if pd.isna(d.buyprice) else d.buyprice
         #devise = 0 if pd.isna(d.devise) else d.devise
-        # car = None if pd.isna(d.car) else d.car
+        
         #prixbrut = 0 if pd.isna(d.prixbrut) else d.prixbrut
         #ctg = None if pd.isna(d.ctg) else d.ctg
         #order = '' if pd.isna(d.order) else d.order
         #img = None if pd.isna(d.img) else d.img
-        remise = 0 if pd.isna(d.remise) else d.remise
         #prixnet=0 if pd.isna(d.prixnet) else d.prixnet
         try:
             print('entering', ref)
             product=Produit.objects.get(ref=ref)
-            product.representremise=int(remise)
+            # product.ref=ref
+            # product.name=name
+            # product.category_id=category
+            # product.unite=unite
+            # product.mark_id=mark
+            # product.sellprice=0
+            # product.qtyjeu=qtyjeu
+            # product.minstock=minstock
+            # product.equivalent=refeq
+            # product.cars=cars
+            # product.save()
+            entries+=1
+
+        except Exception as e:
+            print('>>',e, ref)
+            with open('error.txt', 'a') as ff:
+                ff.write(f'>> {e} {ref}')
+            product=Produit.objects.create(
+                ref=ref,
+                name=name,
+                category_id=category,
+                unite=unite,
+                mark_id=mark,
+                qtyjeu=qtyjeu,
+                minstock=1,
+                equivalent=refeq,
+                farahref=farahref
+            )
+
+    print('>>>', entries)
+    return JsonResponse({
+        'success':True
+    })
+
+def excelqtypdcts(request):
+    target=request.POST.get('target')
+    isfarah=target=='f'
+    print('>> isfarah', isfarah, )
+    myfile = request.FILES['excelFile']
+    df = pd.read_excel(myfile)
+    entries=0
+    for d in df.itertuples():
+        try:
+            ref = d.ref.lower().strip()
+        except:
+            ref=d.ref
+        qty = 0 if pd.isna(d.qty) else d.qty
+        try:
+            print('entering', ref)
+            product=Produit.objects.get(ref=ref)
+            if isfarah:
+                product.stocktotalfarah=qty
+            else:
+                product.stocktotalorgh=qty
             product.save()
             entries+=1
 
@@ -6011,29 +6076,57 @@ def excelpdcts(request):
             print('>>',e, ref)
             with open('error.txt', 'a') as ff:
                 ff.write(f'>> {e} {ref}')
-            # product=Produit.objects.create(
-            #     ref=ref,
-            #     equivalent=refeq,
-            #     isactive=False,
-            #     coderef=coderef,
-            #     name=name,
-            #     mark_id=mark,
-            #     sellprice=prixbrut,
-            #     prixnet=prixnet,
-            #     remise=remise,
-            #     category_id=ctg,
-            #     image=img,
-            #     stockfacture=qty,
-            #     #diametre=diam,
-            #     buyprice=buyprice,
-            #     devise=devise
-            # )
-
+            
     print('>>>', entries)
     return JsonResponse({
         'success':True
     })
 
+def excelmarks(request):
+    #target=request.GET.get('targt')
+    myfile = request.FILES['excelFile']
+    df = pd.read_excel(myfile)
+    entries=0
+    for d in df.itertuples():
+        try:
+            name = d.mark.lower().strip()
+        except:
+            name=d.mark
+        #reps=json.dumps(d.rep)
+        try:
+            product=Mark.objects.get(name=name)
+            
+        except Exception as e:
+            
+            Mark.objects.create(name=name)
+            
+    print('>>>', entries)
+    return JsonResponse({
+        'success':True
+    })
+
+def excelcategories(request):
+    #target=request.GET.get('targt')
+    myfile = request.FILES['excelFile']
+    df = pd.read_excel(myfile)
+    entries=0
+    for d in df.itertuples():
+        try:
+            name = d.category.lower().strip()
+        except:
+            name=d.category
+        #reps=json.dumps(d.rep)
+        try:
+            product=Category.objects.get(name=name)
+            
+        except Exception as e:
+            
+            Category.objects.create(name=name)
+            
+    print('>>>', entries)
+    return JsonResponse({
+        'success':True
+    })
 
 def deactivateaccount(request):
     userid=request.GET.get('userid')

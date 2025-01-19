@@ -288,6 +288,7 @@
         // Append the Excel file to the FormData object
         formData.append('excelFile', excelfile[0].files[0]);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        formData.append('target', '{{target}}');
       // Make an AJAX request to send the file data
         $('.loadingscreen').removeClass('d-none')
         $.ajax({
@@ -300,7 +301,7 @@
             // Handle the success response from the server
             $('.loadingscreen').addClass('d-none')
             alertify.success('File uploaded successfully')
-            updatetab('clientstab', '/products/clientspage')
+            ajaxpage('xx', 'clientstab', '/products/clientspage?target={{target}}')
 
           },
           error: function(xhr, status, error) {

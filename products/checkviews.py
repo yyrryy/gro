@@ -48,14 +48,13 @@ def duplicate(request):
     Produit.objects.create(
         ref=ref,
         name=product.name,
+        cars=product.cars,
+        equivalent=product.equivalent,
         mark_id=mark,
         category=product.category,
         minstock=minstock,
         image=product.image,
-        stocktotal=0,
-        stockfacture=0,
-        buyprice=0,
-        netprice=0,
+        farahref=f'fr-{ref}'
     )
     return JsonResponse({
         'success':True
