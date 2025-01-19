@@ -5982,6 +5982,36 @@ def excelclients(request):
         'success':True
     })
 
+def excelclients(request):
+    
+    myfile = request.FILES['excelFile']
+    df = pd.read_excel(myfile)
+    df = df.fillna('')
+    
+    for d in df.itertuples():
+        name=d.name
+        city=d.city
+        phone2="" if pd.isna(d.phone2) else str(d.phone2)
+        phone="" if pd.isna(d.phone) else str(d.phone)
+        email="" if pd.isna(d.email) else str(d.email)
+        ice="" if pd.isna(d.ice) else str(d.ice)
+        
+        print('>> there is no cli')
+        supp=Supplier.objects.create(
+            name=name,
+            city=city,
+            ice=ice,
+            email=email,
+            phone=phone,
+            phone2=phone2
+        )
+        print('>> created')
+        ids+=1
+    return JsonResponse({
+        'success':True
+    })
+
+
 def excelpdcts(request):
     #target=request.GET.get('targt')
     myfile = request.FILES['excelFile']
