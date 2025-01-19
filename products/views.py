@@ -241,6 +241,14 @@ def checkref(request):
     #     })
 
 def supplierspage(request):
+    lastid=Supplier.objects.last()
+    print(lastid)
+    if lastid:
+        lastid=lastid.id
+    else:
+        lastid=0
+    code=f'FOR{lastid+1}'
+    print(code)
     ctx={
         'suppliers':Supplier.objects.all(),
         'title':'List des fournisseurs'
@@ -249,10 +257,12 @@ def supplierspage(request):
 
 def addsupplier(request):
     name=request.POST.get('suppnameinp')
+    
     if Supplier.objects.filter(name=name).exists():
         return JsonResponse({
             'success':False
         })
+
     personalname=request.POST.get('supppersonalnameinp')
     # dont di this error again
     #image=request.POST.get('suppimageinp')
@@ -271,7 +281,15 @@ def addsupplier(request):
     plafon=request.POST.get('supplierplafon') or 0
     modereglement=request.POST.get('modereglement')
     print('>> name', name, 'phone', phone, 'address', address, 'image', image, 'personalname', personalname, 'phone2', phone2, 'rest', sold, 'note', note, 'city', city, 'email', email, 'ice', ice, 'suppif', suppif, 'rc', rc, 'modereglement', modereglement, 'plafon', plafon)
+    lastid=Supplier.objects.last()
+    print(lastid)
+    if lastid:
+        lastid=lastid.id
+    else:
+        lastid=0
+    code=f'FOR{lastid+1}'
     Supplier.objects.create(
+        code=code,
         name=name,
         phone=phone,
         address=address,
@@ -682,12 +700,14 @@ def recevoir(request):
     target=request.GET.get('target')
     isfarah=target=='f'
     lastid=Itemsbysupplier.objects.last()
+    print(lastid)
     if lastid:
         lastid=lastid.id
     else:
         lastid=0
     if isfarah:
         bonno=f'FR-BA00{lastid+1}'
+
 
     else:
         bonno=f'BA00{lastid+1}'
@@ -5982,15 +6002,16 @@ def excelclients(request):
         'success':True
     })
 
-def excelclients(request):
+def excelsupp(request):
     
     myfile = request.FILES['excelFile']
     df = pd.read_excel(myfile)
     df = df.fillna('')
-    
+    id=1
     for d in df.itertuples():
+        code=f'FOR{id}'
         name=d.name
-        city=d.city
+        city="" if pd.isna(d.city) else str(d.city)
         phone2="" if pd.isna(d.phone2) else str(d.phone2)
         phone="" if pd.isna(d.phone) else str(d.phone)
         email="" if pd.isna(d.email) else str(d.email)
@@ -5999,6 +6020,7 @@ def excelclients(request):
         print('>> there is no cli')
         supp=Supplier.objects.create(
             name=name,
+            code=code,
             city=city,
             ice=ice,
             email=email,
@@ -6006,7 +6028,7 @@ def excelclients(request):
             phone2=phone2
         )
         print('>> created')
-        ids+=1
+        id+=1
     return JsonResponse({
         'success':True
     })

@@ -226,6 +226,7 @@ class Attribute(models.Model):
 
 class Supplier(models.Model):
     name=models.CharField(max_length=500)
+    code=models.CharField(max_length=500, default='', null=True)
     personalname=models.CharField(max_length=500, null=True)
     address=models.CharField(max_length=500, default=None, null=True, blank=True)
     ice=models.CharField(max_length=500, default=None, null=True, blank=True)
@@ -990,8 +991,6 @@ class CommandItem(models.Model):
     # to track ligns that are facture
     isorgh=models.BooleanField(default=False)
     date=models.DateField(default=None, null=True, blank=True)
-    def __str__(self) -> str:
-        return f'{self.devi.bon_no} - {self.product.ref}'
 
 
 # devi becom bonsorie, then bl
@@ -1066,9 +1065,6 @@ class CommandItemsupplier(models.Model):
     # to track ligns that are facture
     isorgh=models.BooleanField(default=False)
     date=models.DateField(default=None, null=True, blank=True)
-    def __str__(self) -> str:
-        return f'{self.devi.bon_no} - {self.product.ref}'
-
 
 # devi becom bonsorie, then bl
 class Devisupplier(models.Model):
