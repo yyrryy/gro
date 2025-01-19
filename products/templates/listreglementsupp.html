@@ -69,6 +69,7 @@
                 <div class="card-body border shadow rounded">
                     <div class="row">
 
+                        
                         <div class="col-3">
                             <div class="">
                                 <small>Du:</small> <br>
@@ -283,15 +284,22 @@
 
     <div class="d-flex justify-content-between">
         <div class="d-flex">
-          <div class="me-2">
+            <select name="yearsreglbl" class="populateyears" onchange="yeardatareglbl()" style="background: #eaeaea;
+                margin: 0 6px 10px;
+                width: 5em;
+                border-radius: 10px;">
+
+
+                </select>
+          <!-- <div class="me-2">
             Du <br>
             <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="startdate">
-          </div>
-          <div>
+          </div> -->
+          <!-- <div>
             Au <br>
             <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="enddate">
           </div>
-          <button class="btn btn-sm bg-dark text-white filterreglsuppdate">Filtrer</button>
+          <button class="btn btn-sm bg-dark text-white filterreglsuppdate">Filtrer</button> -->
 
         </div>
         <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistreglsupp">
@@ -555,36 +563,23 @@ function submitupdatereglementsupp(event){
         })
     }
 
-    $('.searchinputlistreglsupp').on("keyup", function() {
+    $('.searchinputlistreglsupp').on("change", function() {
     // Get the values from all filter input fields
         var filterValue = $(this).val().toLowerCase();
 
-        // Split the filter value into individual terms based on the '&' sign
-        var filterTerms = filterValue.split('+').map(function(term) {
-            return term.trim();
-        });
 
-        // Iterate through the table rows
-        $(".reglsupptable tbody tr").each(function() {
-            var rowText = $(this).text().toLowerCase();
-            var showRow = true;
+        if (filterValue.length > 1){
+          year=$('[name="yearsreglbl"]').val()
+            //$('.reglbltableholder').on('scroll', handleScrollinregl);
+            currentPagereglbl=1
+            loadingreglbl = false;
+            $.get('/products/searchreglsupp', {'term':filterValue.trim(), 'year':year, 'target':'{{target}}'}, (data)=>{
+                console.log('eee')
+                $('.reglsupptable tbody').html(data.trs)
+                //$('.totalreglbl').text(data.total)
 
-            // Check if all filter terms are present in the row text
-            $.each(filterTerms, function(index, term) {
-                if (term !== '' && rowText.indexOf(term) === -1) {
-                    showRow = false;
-                    return false; // Exit the loop early if a mismatch is found
-                }
-            });
-
-            // Toggle the visibility of the row based on the filter criteria
-            $(this).toggle(showRow);
-        });
-        total=0
-        $('.reglsupptable tbody tr:visible').each(function(){
-        total+=parseFloat($(this).find('td:nth-child(4)').text())
-        })
-        $('.totalbbonachat').text(total.toFixed(2))
+            })
+        }
     });
 
 

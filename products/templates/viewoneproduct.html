@@ -583,8 +583,9 @@
                             <td>01/01/2024</td>
                             <td>inventaire 2023</td>
                             <td>stock inital</td>
-                            <td>{{product.stockinitial}}</td>
-                            <td>--</td>
+                            <td>{%if isfarah%}{{product.frstockinitial}}{%else%}{{product.stockinitial}}{%endif%}</td>
+                            <td>{%if isfarah%}{{product.frpriceinitial}}{%else%}{{product.priceinitial}}{%endif%}</td>
+                            <!-- <td>--</td> -->
                           </tr>
                           {% for entry in product.stockin_set.all %}
                           {% endfor %}

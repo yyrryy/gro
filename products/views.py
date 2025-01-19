@@ -5352,7 +5352,7 @@ def searchclientrep(request):
 def searchsupplier(request):
     term=request.GET.get('term')
     print(term)
-    suppliers=Supplier.objects.filter(Q(name__icontains=term) | Q(phone__icontains=term)| Q(address__icontains=term))
+    suppliers=Supplier.objects.filter(Q(name__icontains=term) | Q(phone__icontains=term)| Q(address__icontains=term)| Q(code__icontains=term))
     print('suppliers', suppliers)
     results=[]
     for i in suppliers:
@@ -6094,13 +6094,18 @@ def excelqtypdcts(request):
         except:
             ref=d.ref
         qty = 0 if pd.isna(d.qty) else d.qty
+        price = 0 if pd.isna(d.price) else d.price
         try:
             print('entering', ref)
             product=Produit.objects.get(ref=ref)
             if isfarah:
                 product.stocktotalfarah=qty
+                product.frstockinitial=qty
+                product.frpriceinitial=price
             else:
                 product.stocktotalorgh=qty
+                product.stockinitial=qty
+                product.priceinitial=price
             product.save()
             entries+=1
 
@@ -8857,6 +8862,8 @@ def searchclientblsupdatereg(request):
 
 def searchregl(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
+    
     regex_search_term = term.replace('+', '*')
 
     # Split the term into individual words separated by '*'
@@ -8868,11 +8875,43 @@ def searchregl(request):
     for term in search_terms:
         if term:
             q_objects &= (Q(client__name__icontains=term) | Q(client__code__icontains=term) | Q(mode__icontains=term) | Q(npiece__icontains=term) | Q(amount__icontains=term))
-    regls=PaymentClientbl.objects.filter(q_objects)[:50]
+    if target=='f':
+        regls=PaymentClientbl.objects.filter(isfarah=True).filter(q_objects)[:50]
+    if target=='o':
+        regls=PaymentClientbl.objects.filter(isorgh=True).filter(q_objects)[:50]
+    if target=='s':
+        regls=PaymentClientbl.objects.filter(issortie=True).filter(q_objects)[:50]
     return JsonResponse({
         'trs':render(request, 'reglbllist.html', {'bons':regls}).content.decode('utf-8'),
 
     })
+
+def searchreglsupp(request):
+    term=request.GET.get('term')
+    target=request.GET.get('target')
+    year=request.GET.get('year')
+    
+    regex_search_term = term.replace('+', '*')
+
+    # Split the term into individual words separated by '*'
+    search_terms = regex_search_term.split('*')
+    print(search_terms)
+
+    # Create a list of Q objects for each search term and combine them with &
+    q_objects = Q()
+    for term in search_terms:
+        if term:
+            q_objects &= (Q(supplier__name__icontains=term) |Q(supplier__code__icontains=term) | Q(mode__icontains=term) | Q(npiece__icontains=term) | Q(amount__icontains=term))
+    if target=='f':
+        regls=PaymentSupplier.objects.filter(isfarah=True).filter(q_objects)[:50]
+    if target=='o':
+        regls=PaymentSupplier.objects.filter(isfarah=False).filter(q_objects)[:50]
+    return JsonResponse({
+        'trs':render(request, 'reglsupplist.html', {'reglements':regls}).content.decode('utf-8'),
+
+    })
+
+
 
 
 def searchreglfc(request):

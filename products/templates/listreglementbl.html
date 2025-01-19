@@ -545,6 +545,7 @@
 
 
 <script>
+    readingqrcode=false
   populateyears()
     function deletereglementclient(reglid){
         alertify.confirm(
@@ -860,7 +861,7 @@
             $('.reglbltableholder').on('scroll', handleScrollinregl);
             currentPagereglbl=1
             loadingreglbl = false;
-            $.get('/products/searchregl', {'term':filterValue.trim(), 'year':year}, (data)=>{
+            $.get('/products/searchregl', {'term':filterValue.trim(), 'year':year, 'target':'{{target}}'}, (data)=>{
                 console.log('eee')
                 $('.reglbltable tbody').html(data.trs)
                 $('.totalreglbl').text(data.total)

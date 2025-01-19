@@ -309,10 +309,10 @@
 
           if (event.which === 13) {  // Enter key detected
             clientid = $('.clientselectbl').val()
-            if (clientid==null && readingqrcode){
-              alertify.error('Veuillez choisir un client')
-              return
-            }
+            // if (clientid==null && readingqrcode){
+            //   alertify.error('Veuillez choisir un client')
+            //   return
+            // }
               if (barcode) {
                 // get the product with the ref in the qrcode
                 $.get('products/barcodepdct', {'ref':barcode, 'target':'{{target}}'}, (data)=>{
