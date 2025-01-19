@@ -8623,6 +8623,7 @@ def showdeactivated(request):
 
 def searchforlistclient(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
     if(term==''):
         clients=Client.objects.all()[:50]
         return JsonResponse({
@@ -8650,7 +8651,12 @@ def searchforlistclient(request):
                 Q(code__icontains=term) |
                 Q(represent__name__icontains=term) |
                 Q(address__icontains=term))
-    clients=Client.objects.filter(q_objects)
+    if target=='f':
+        clients=Client.objects.filter(clientfarah=True).filter(q_objects)
+    elif target=='o':
+        clients=Client.objects.filter(clientorgh=True).filter(q_objects)
+    else:
+        clients=Client.objects.filter(clientsortie=True).filter(q_objects)
     return JsonResponse({
         'trs':render(request, 'clienttrs.html', {
         'clients':clients

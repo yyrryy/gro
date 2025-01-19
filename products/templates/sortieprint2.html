@@ -51,35 +51,41 @@
     <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm">
       <!-- header -->
       <div class="row">
-        <div class="col-2">
+        <div class="col-3">
           <img src="/media/facturebody.jpg" style="width: 100%;" alt="">
         </div>
 
         <div class="col-10 d-flex justify-content-between" style="font-size: 13px;">
-          <div class="">
-            <b>
-              Bon de Sortie
-            </b>
+          <div class="d-flex justify-content-between">
             <div>
-              {{order.car}}-{{order.note}}
+              <strong></strong>Bon de Sortie N°: {{ order.bon_no }}</strong>
             </div>
+            <div>
+              <strong>Date: {{ order.date|date:"d/m/Y" }}</strong>
+            </div>
+            
           </div>
+
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong></strong>Client: {{order.client.name.upper}}</strong>
+            </div>
+            <div>
+              <strong></strong>Client: {{order.client.code.upper}}</strong>
+            </div>
+            
+            
+          </div>
+
+
           <div class="">
 
               <div>
-                <strong>Date: {{ order.date|date:"d/m/Y" }}</strong>
-              </div>
-              <div>
-                <strong>N°: {{ order.bon_no }}</strong>
+                <strong>{{ order.note }} {{order.car}}</strong>
               </div>
           </div>
           
 
-          <div style="text-align: center">
-            <div>{{order.client.name.upper}}</div>
-            <div>{{order.client.code.upper}}</div>
-            <div>{{order.client.city.upper}}</div>
-          </div>
         </div>
 
 
@@ -89,13 +95,7 @@
 
       <!-- livraison items -->
       <div class="orderitems bg-white rounded p-2 position-relative">
-        <img width="1000em" class="bgbl" src="/media/logos/dd.png" style="
-          position: absolute !important;
-          right: 9.3em;
-          opacity: 0.1;
-          top: 5em;
-          visibility: hidden;
-          ">
+        
         <table class="table table-bordered blitems" style="font-size: 13px; font-family: serif; border-color: black;">
           <thead style="background: #c9c9c967; font-size: 10px;
         font-weight: 800;" class="text-center">
