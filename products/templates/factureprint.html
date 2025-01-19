@@ -45,8 +45,9 @@
 
     <!-- facture header -->
     <div class="">
+      {% if not isfarah %}
       <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
-      
+      {% endif %}
       <div class="d-flex justify-content-between">
         <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
           Date: <strong>{{facture.date|date:"d/m/Y"}}</strong><br>
@@ -81,6 +82,7 @@
 
     <!-- facture items -->
     <div class="orderitems mt-3 bg-white rounded p-2 position-relative">
+      {% if not isfarah %}
       <img width="1000em" class="bgfacture" src="/media/facturebody.jpg" style="
       position: absolute !important;
       right: 4.3em;
@@ -88,6 +90,7 @@
       top: 3em;
       width: 81%;  
     ">
+    {% endif %}
       <table class="table table-bordered fcitems" style="border-color: black;font-family: serif; font-size:13px;">
         <thead style="background: #c9c9c9; font-size: 10px;
         font-weight: 800;" class="text-center">
@@ -132,7 +135,7 @@
                   </td>
                   <td class="text-center">
                     {% for v in i %}
-                    {{v.remise}}%
+                    {% if v.remise %}{{v.remise}}%{% endif %}
                     {% if not forloop.counter == i|length %}<br>{% endif %}
                     {% endfor %}
                   </td>
@@ -156,9 +159,14 @@
       <div class="d-flex">
         <div class="col-7">
           Arreter la presente facture à la somme de: <br> <span class="totalfactureprint" style="font-size:10px ;"></span>
+          <div style="border:1px solid; height: 6em; width: 60%;">
+            <span>
+              Cachet et signature
+            </span>
+          </div>
         </div>
         <div class="col-5">
-          <table class="table table-bordered text-start">
+          <table style="border-color: black;" class="table table-bordered text-start" >
           <tr>
             <td>
               <strong style="font-size: 13px" >
@@ -226,13 +234,14 @@
         </div>
         
       </div>
+      {% if not isfarah %}
       <div class="text-center">
         <div class="text-center" style="font-size:11px; margin-top: 5px;">
 
-          Siege: Lot Dounia II N°118 OULED TEIMA Code Postal 83350 Patente: 49901722 Ice: 002394334000087 RC: 6513 CNSS: 1858196 IF: 39498717 Email: orghpieceauto@gmail.com Fix: 0528521331
+          Siege: Lot Dounia II N°118 OULED TEIMA Code Postal 83350 Patente: 49901722 ICE: 002394334000087 RC: 6513 CNSS: 1858196 IF: 39498717 Email: orghpieceauto@gmail.com Fix: 0528521331
       </div>
     </div>
-    
+    {% endif %}
   </div>
   {% else %}
   <div class="postion-relative px-5 facture{{facture.id}}holder p-3" style="min-height: 29.7cm;width: 21cm; border:1px solid;">
@@ -240,7 +249,9 @@
 
     <!-- facture header -->
     <div class="">
+      {% if not isfarah %}
       <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
+      {% endif %}
       <div class="d-flex justify-content-between">
         <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
           Date: <strong>{{facture.date|date:"d/m/Y"}}</strong><br>
@@ -271,14 +282,15 @@
 
     <!-- facture items -->
     <div class="orderitems mt-3 bg-white rounded p-2 position-relative">
+      {% if not isfarah %}
       <img width="1000em" class="bgfacture" src="/media/facturebody.jpg" style="
       position: absolute !important;
       right: 4.3em;
       opacity: 0.04;
       top: 3em;
       width: 81%;
-      
     ">
+    {% endif %}
       <table class="table table-bordered fcitems" style="border-color: black;font-family: serif; font-size:13px;">
         <thead style="background: #c9c9c9; font-size: 10px;
         font-weight: 800;" class="text-center">

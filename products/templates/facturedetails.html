@@ -1,10 +1,10 @@
 {% load global_tags %}
 <div class="d-flex mb-5" style="position: sticky;top: 0; background: white;z-index: 999;">
   <div>
-    <button class="btn btn-success" onclick="printfacture('{{facture.id}}')">
+    <button class="btn btn-success" onclick="printfacture('{{target}}', '{{facture.id}}')">
       Telecharger (Categorie)
     </button>
-    <button class="btn btn-success" onclick="printfactureproductname('{{facture.id}}')">
+    <button class="btn btn-success" onclick="printfactureproductname('{{target}}', '{{facture.id}}')">
       Telecharger (Designation)
     </button>
   <button class="btn btn-sm btn-success" onclick="entete()">

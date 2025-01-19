@@ -13,11 +13,11 @@
       Valider Bon sortie (prix de produit)
     </button> -->
     {% endif %}
-    {% if not order.ispaid %}
+    <!-- {% if not order.ispaid %}
     <button class="btn w-100 btn-info" onclick="paybonsortie(event, '{{order.id}}')">
       Payé
     </button>
-    {% endif %}
+    {% endif %} -->
     {% if not order.generated and not order.ispaid %}
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
       Modifier

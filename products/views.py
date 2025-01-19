@@ -5102,7 +5102,7 @@ def loadjournalventefc(request):
 def searchproductbonsortie(request):
     # get url pams
     term=request.GET.get('term').lower().strip()
-    products=Produit.objects.filter(Q(ref=term) |Q(farahref=term))
+    products=Produit.objects.filter(Q(ref__startswith=term) |Q(farahref__startswith=term))
 
     results=[]
     for i in products:
@@ -10182,17 +10182,17 @@ def tsgs(request):
         'rr':'rr'
     })
 def bonlivraisonprint(request, id):
+    isfarah=request.GET.get('target')=='f'
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     reglements=PaymentClientbl.objects.filter(bons__in=[order])
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
     ctx={
+        'isfarah':isfarah,
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
         'orderitems':orderitems,
-        'reglements':reglements,
-        'reps':Represent.objects.all()
     }
     return render(request, 'bonlivraisonprint.html', ctx)
 
@@ -10224,6 +10224,7 @@ def boncmndprint(request, id):
 
 def factureprint(request, id):
     names=request.GET.get('names')=='1'
+    isfarah=request.GET.get('target')=='f'
     order=Facture.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon__in=order.bons.all())
     # split the orderitems into chunks of 10 items
@@ -10237,6 +10238,7 @@ def factureprint(request, id):
         dr=round(PaymentClientbl.objects.filter(factures__in=[order], mode='espece')[0].amount*.25/100, 2)
         netapy=order.total+dr
     ctx={
+        'isfarah':isfarah,
         'names':names,
         'hasespece':hasespece,
         'title':f'Facture {order.facture_no}',
@@ -11035,9 +11037,9 @@ def getqtyprice(request):
     if target=='s':
         term=request.GET.get('term')
         if (term.startswith('fr-')):
-            histyory=Stockin.objects.filter(product_id=id, isfarah=True, isavoir=False).order_by('id')[:5]
+            histyory=Stockin.objects.filter(product_id=id, isfarah=True, isavoir=False).order_by('-date')[:20]
         else:
-            histyory=Stockin.objects.filter(product_id=id, isfarah=False, isavoir=False).order_by('id')[:5]
+            histyory=Stockin.objects.filter(product_id=id, isfarah=False, isavoir=False).order_by('-date')[:20]
     else:
-        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False).order_by('id')[:5]
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False).order_by('-date')[:20]
     return render(request, 'qtyprice.html', {'history':histyory})

@@ -1306,7 +1306,9 @@ a .uil {
           }
         })
       }
-      function refreshselectproducts(){
+      function refreshselectproducts(event, target){
+        selection=$(event.target).parent().find('.selection')
+        selection.remove()
         $('#productsselect2').select2({
           ajax: {
             type:'get',
@@ -1409,7 +1411,7 @@ a .uil {
         localStorage.setItem(target, JSON.stringify(items));
         localStorage.setItem(`total${target}`, $('.'+target+'parentdiv').find('.totalbon').text());
       }
-      function refreshselectclient(event){
+      function refreshselectclient(event, target){
       selection=$(event.target).parent().find('.selection')
       console.log($(event.target).parent().find('.select2client'))
       selection.remove()
@@ -1419,7 +1421,7 @@ a .uil {
           ajax: {
             type:'get',
             dataType: 'json',
-            url: '/products/searchclient',
+            url: '/products/searchclient?target'+target,
             data: function (params) {
               var query = {
                 term: params.term,
@@ -1717,7 +1719,7 @@ a .uil {
     }, 1000); // 1000 milliseconds = 1 seconds
   }, false);
 }
-    function printfacture(bonid){
+    function printfacture(target, bonid){
          /*var printContents = document.getElementById(divName).innerHTML;
          var originalContents = document.body.innerHTML;
          document.body.innerHTML = printContents;
@@ -1727,7 +1729,7 @@ a .uil {
          window.print();
          document.body.innerHTML = originalContents;*/
          url = window.location.pathname.split( '/' );[0]
-         var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/factureprint/'+bonid, '', 'width=900,height=900');
+         var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/factureprint/'+bonid+'?target='+target, '', 'width=900,height=900');
 
           myWindow.focus();
 
@@ -1747,10 +1749,10 @@ a .uil {
         }, 300); // 1000 milliseconds = 1 seconds
       }, false);
     }
-    function printfactureproductname(bonid){
+    function printfactureproductname(target, bonid){
          
          url = window.location.pathname.split( '/' );[0]
-         var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/factureprint/'+bonid+'?names=1', '', 'width=900,height=900');
+         var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/factureprint/'+bonid+'?names=1&target='+target, '', 'width=900,height=900');
 
           myWindow.focus();
 
