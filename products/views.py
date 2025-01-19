@@ -6064,37 +6064,17 @@ def excelpdcts(request):
         #order = '' if pd.isna(d.order) else d.order
         #img = None if pd.isna(d.img) else d.img
         #prixnet=0 if pd.isna(d.prixnet) else d.prixnet
-        try:
-            print('entering', ref)
-            product=Produit.objects.get(ref=ref)
-            # product.ref=ref
-            # product.name=name
-            # product.category_id=category
-            # product.unite=unite
-            # product.mark_id=mark
-            # product.sellprice=0
-            # product.qtyjeu=qtyjeu
-            # product.minstock=minstock
-            # product.equivalent=refeq
-            # product.cars=cars
-            # product.save()
-            entries+=1
-
-        except Exception as e:
-            print('>>',e, ref)
-            with open('error.txt', 'a') as ff:
-                ff.write(f'>> {e} {ref}')
-            product=Produit.objects.create(
-                ref=ref,
-                name=name,
-                category_id=category,
-                unite=unite,
-                mark_id=mark,
-                qtyjeu=qtyjeu,
-                minstock=1,
-                equivalent=refeq,
-                farahref=farahref
-            )
+        product=Produit.objects.create(
+            ref=ref,
+            name=name,
+            category_id=category,
+            unite=unite,
+            mark_id=mark,
+            qtyjeu=qtyjeu,
+            minstock=1,
+            equivalent=refeq,
+            farahref=farahref
+        )
 
     print('>>>', entries)
     return JsonResponse({
@@ -6140,17 +6120,8 @@ def excelmarks(request):
     df = pd.read_excel(myfile)
     entries=0
     for d in df.itertuples():
-        try:
-            name = d.mark.lower().strip()
-        except:
-            name=d.mark
-        #reps=json.dumps(d.rep)
-        try:
-            product=Mark.objects.get(name=name)
-            
-        except Exception as e:
-            
-            Mark.objects.create(name=name)
+        name=d.mark
+        Mark.objects.create(name=name)
             
     print('>>>', entries)
     return JsonResponse({
@@ -6163,17 +6134,8 @@ def excelcategories(request):
     df = pd.read_excel(myfile)
     entries=0
     for d in df.itertuples():
-        try:
-            name = d.category.lower().strip()
-        except:
-            name=d.category
-        #reps=json.dumps(d.rep)
-        try:
-            product=Category.objects.get(name=name)
-            
-        except Exception as e:
-            
-            Category.objects.create(name=name)
+        name=d.category
+        Category.objects.create(name=name)
             
     print('>>>', entries)
     return JsonResponse({
@@ -8459,41 +8421,22 @@ def laodreglfc(request):
 
 def loadclients(request):
     page = int(request.GET.get('page', 1))
+    target=request.GET.get('target')
     per_page = 50  # Adjust as needed
 
     start = (page - 1) * per_page
     end = page * per_page
-
-    products = Client.objects.all().order_by('-soldtotal')[start:end]
-    trs=''
-    for i in products:
-        trs+=f'''
-        <tr class="client-row" style="background:{'#a8dfc5' if i.diver else ''};">
-            <td>
-                <button class="btn editsuppbtn border" id="{i.id}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields({i.id})">
-                    ✐
-                </button>
-            </td>
-            <td onclick="ajaxpage('client{i.id}', 'Client: {i.name} ', '/products/client/{i.id}')">{i.name} </td>
-            <td>{i.code}</td>
-            <td>{i.phone}</td>
-            <td>{i.city}</td>
-            <td>{i.region}</td>
-            <td>
-
-                {i.represent.name if i.represent else ''}
-
-
-            </td>
-            <td>{i.soldtotal:.2f}</td>
-            <td style="background: yellowgreen;">{i.soldbl:.2f}</td>
-            <td style="background: aliceblue;">{i.soldfacture:.2f}</td>
-            <td>{i.ice}</td>
-        </tr>
-        '''
+    if target=='f':
+        clients = Client.objects.filter(clientfarah=True).order_by('-soldtotal')[start:end]
+    elif target=='o':
+        clients = Client.objects.filter(clientorgh=True).order_by('-soldtotal')[start:end]
+    else:
+        clients = Client.objects.filter(clientsortie=True).order_by('-soldtotal')[start:end]
     return JsonResponse({
-        'trs':trs,
-        'has_more': len(products) == per_page
+        'trs':render(request, 'clienttrs.html', {
+            'clients':clients
+        }).content.decode('utf-8'),
+        'has_more': len(clients) == per_page
     })
 
 
@@ -8676,33 +8619,11 @@ def showdeactivated(request):
 def searchforlistclient(request):
     term=request.GET.get('term')
     if(term==''):
-        products=Client.objects.all()[:50]
-        trs=''
-        for i in products:
-            trs+=f'''
-            <tr class="client-row" style="background:{'#a8dfc5' if i.diver else ''};">
-                <td>
-                    <button class="btn editsuppbtn border" id="{i.id}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields({i.id})">
-                        ✐
-                    </button>
-                </td>
-                <!-- <a href="onclick="ajaxpage('client{i.id}', 'client: {i.name}', '/products/clientlier/{i.id}')""></a> -->
-                <td onclick="ajaxpage('client{i.id}', 'Client: {i.name}', '/products/client/{i.id}')">{i.name}</td>
-                <td >{i.code}</td>
-                <td>{i.phone}</td>
-                <td>{i.city}</td>
-                <td>{i.region.upper}</td>
-                <td>
-                    {i.represent.name if i.represent else ''}
-                </td>
-                <td>{i.soldtotal}</td>
-                <td style="background: yellowgreen;">{i.soldbl}</td>
-                <td style="background: aliceblue;">{i.soldfacture}</td>
-                <td>{i.ice}</td>
-            </tr>
-        '''
+        clients=Client.objects.all()[:50]
         return JsonResponse({
-            'trs':trs
+            'trs':render(request, 'clienttrs.html', {
+            'clients':clients
+            }).content.decode('utf-8')
         })
     regex_search_term = term.replace('+', '*')
 
@@ -8724,33 +8645,11 @@ def searchforlistclient(request):
                 Q(code__icontains=term) |
                 Q(represent__name__icontains=term) |
                 Q(address__icontains=term))
-    products=Client.objects.filter(q_objects)
-    trs=''
-    for i in products:
-        trs+=f'''
-        <tr class="client-row" style="background:{'#a8dfc5' if i.diver else ''};">
-            <td>
-                <button term={term} class="btn editsuppbtn border" id="{i.id}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields({i.id})">
-                    ✐
-                </button>
-            </td>
-            <!-- <a href="onclick="ajaxpage('client{i.id}', 'client: {i.name}', '/products/clientlier/{i.id}')""></a> -->
-            <td onclick="ajaxpage('client{i.id}', 'Client: {i.name}', '/products/client/{i.id}')">{i.name}</td>
-            <td >{i.code}</td>
-            <td>{i.phone}</td>
-            <td>{i.city}</td>
-            <td>{i.region.upper() if i.region else ''}</td>
-            <td>
-                {i.represent.name if i.represent else ''}
-            </td>
-            <td>{i.soldtotal}</td>
-            <td style="background: yellowgreen;">{i.soldbl}</td>
-            <td style="background: aliceblue;">{i.soldfacture}</td>
-            <td>{i.ice}</td>
-        </tr>
-        '''
+    clients=Client.objects.filter(q_objects)
     return JsonResponse({
-        'trs':trs
+        'trs':render(request, 'clienttrs.html', {
+        'clients':clients
+        }).content.decode('utf-8')
     })
 
 
