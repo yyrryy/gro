@@ -55,13 +55,13 @@
           <img src="/media/facturebody.jpg" style="width: 100%;" alt="">
         </div>
 
-        <div class="col-10 d-flex justify-content-between" style="font-size: 13px;">
+        <div class="col-9" style="font-size: 13px;">
           <div class="d-flex justify-content-between">
             <div>
-              <strong></strong>Bon de Sortie N°: {{ order.bon_no }}</strong>
+              <strong></strong>BS N°: {{ order.bon_no }}</strong>
             </div>
             <div>
-              <strong>Date: {{ order.date|date:"d/m/Y" }}</strong>
+              <strong>{{ order.date|date:"d/m/Y" }}</strong>
             </div>
             
           </div>
@@ -173,6 +173,15 @@
             <div style="font-size: 16px; margin-right: 13px;">
               <strong>
                 {{order.remiseamount|floatformat:2|intspace}}
+              </strong>
+            </div>
+          </div>
+          <div class="text-center d-flex justify-content-between">
+
+            <div>Net</div>
+            <div style="font-size: 16px; margin-right: 13px;">
+              <strong>
+                {{net|floatformat:2|intspace}}
               </strong>
             </div>
           </div>

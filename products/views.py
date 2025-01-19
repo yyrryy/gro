@@ -10290,11 +10290,15 @@ def sortieprint2(request, id):
     orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+15] for i in range(0, len(orderitems), 15)]
+    
     ctx={
         'title':f'Bon de Sortie {order.bon_no}',
         'order':order,
         'orderitems':orderitems
     }
+    if order.remise:
+        ctx['isremise']=True
+        ctx['net']=round(order.total-order.remiseamount, 2)
     return render(request, 'sortieprint2.html', ctx)
 
 def boncmndprint(request, id):
