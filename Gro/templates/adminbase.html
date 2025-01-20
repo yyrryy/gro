@@ -1910,9 +1910,15 @@ a .uil {
         }
       }
       function validatebonsortie(event, blid){
-        $.get('/products/validatebonsortie', {'bonid':blid}, (data)=>{
-          ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
-        })
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+          if (value=='ORGHAD'){
+            $.get('/products/validatebonsortie', {'bonid':blid}, (data)=>{
+              ajaxpage(`bonl${blid}`, 'rr', `/products/bonsortiedetails/${blid}`)
+            })
+          }else{
+            alertify.error('Mot de passe')
+          } }
+          , function() { alertify.error('Cancel') });
       }
       function validatebonsortieproductprice(event, blid){
         $.get('/products/validatebonsortieproductprice', {'bonid':blid}, (data)=>{
