@@ -8,13 +8,13 @@
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <meta content="telephone=no" name="format-detection" />
     <!-- favicon -->
-    <link href="/media/logos/favicon.ico" rel="icon" />
+    <link href="/media/facturebody.jpg" rel="icon" />
     {% block meta %}
     {% endblock %}
     {% if title %}
     <title>{{title}} - system</title>
     {% endif %}
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
+    <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" /> -->
     <!-- css -->
     <script src="{% static 'js/jquery.min.js'%}"></script>
     <script src="{% static 'js/jquerySpellingNumber.js'%}"></script>
@@ -996,9 +996,9 @@ a .uil {
           </table>
         </div>
     </div>
-  </div> -->
+  </div> 
 
-  <audio id="notificationSound" src="/media/notif.wav" style="display: none"></audio>
+  <audio id="notificationSound" src="/media/notif.wav" style="display: none"></audio>-->
   <!-- scripts -->
     <script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
     <script src="{% static 'js/select2.min.js'%}"></script>
@@ -1616,6 +1616,29 @@ a .uil {
   function printsortie2(bonid){
        url = window.location.pathname.split( '/' );[0]
        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/sortieprint2/'+bonid, '', 'width=900,height=900');
+
+        myWindow.focus();
+
+        myWindow.addEventListener('load', function() {
+      console.log('New window loaded.');
+
+      // Wait for 5 seconds before printing
+      setTimeout(function() {
+        try {
+          myWindow.print();
+          console.log('Print command issued.');
+          myWindow.close();
+          console.log('New window closed.');
+        } catch (e) {
+          console.error('Failed to print and close the window:', e);
+        }
+      }, 1000); // 1000 milliseconds = 1 seconds
+    }, false);
+  }
+
+  function printsortieA6(bonid){
+       url = window.location.pathname.split( '/' );[0]
+       var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/sortieprint2/'+bonid+'?a6=1', '', 'width=900,height=900');
 
         myWindow.focus();
 

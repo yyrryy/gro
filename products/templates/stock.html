@@ -331,26 +331,34 @@
         formData.append('target', '{{ target }}');
       // Make an AJAX request to send the file data
         //$('.loadingscreen').removeClass('d-none')
-        $.ajax({
-          url: '/products/excelqtypdcts', // to get products to databese
-          //url: '/products/updatestockinv', // Replace with your server endpoint
-          type: 'POST', // Use POST or other HTTP method as needed
-          data: formData,
-          processData: false,
-          contentType: false,
-          success: function(response) {
-            // Handle the success response from the server
-            $('.loadingscreen').addClass('d-none')
-            alertify.success('File uploaded successfully')
-            //updatetab('pducts', '/products/stock')
+        alertify.prompt( 'Confirmer', 'Mot de pass', '*****', function(evt, value) { 
+          if (value=='ORGHAD'){
+            $.ajax({
+              url: '/products/excelqtypdcts', // to get products to databese
+              //url: '/products/updatestockinv', // Replace with your server endpoint
+              type: 'POST', // Use POST or other HTTP method as needed
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                // Handle the success response from the server
+                $('.loadingscreen').addClass('d-none')
+                alertify.success('File uploaded successfully')
+                //updatetab('pducts', '/products/stock')
 
-          },
-          error: function(xhr, status, error) {
-            $('.loadingscreen').addClass('d-none')
-            // Handle errors if the AJAX request fails
-            alertify.error('Error uploading file');
+              },
+              error: function(xhr, status, error) {
+                $('.loadingscreen').addClass('d-none')
+                // Handle errors if the AJAX request fails
+                alertify.error('Error uploading file');
+              }
+            });
+          }else{
+            alertify.error('Mot de passe')
           }
-        });
+      }
+      , function() { alertify.error('Cancel') });
+        
     }
 
 

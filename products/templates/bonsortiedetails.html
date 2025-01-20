@@ -2,9 +2,15 @@
 
 <div class="row">
   <div class="col-3 bg-white rounded">
-    <button class="btn w-100 btn-primary mb-2" onclick="printsortie2('{{order.id}}')">
-      Imprimer
-    </button>
+    <div class="d-flex">
+      <button class="btn w-100 btn-primary mb-2" onclick="printsortie2('{{order.id}}')">
+        Imprimer (A5)
+      </button>
+      <button class="btn w-100 btn-primary mb-2" onclick="printsortieA6('{{order.id}}')">
+        Imprimer (A6)
+      </button>
+
+    </div>
     {% if not order.generated %}
     <button class="btn w-100 btn-success" onclick="validatebonsortie(event, '{{order.id}}')">
       Valider Bon sortie (prix bon sortie)

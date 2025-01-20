@@ -48,7 +48,7 @@
   {% for i in orderitems %}
   {% if forloop.counter == orderitems|length %}
   <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}">
       <!-- header -->
       <div class="row">
         <div class="col-3">
@@ -109,7 +109,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 8cm;">
+              <td class="text-center" style="height: {% if A6%}8cm;{% else %}12cm{%endif%}">
                 {% for v in i %}
 
                 {{v.qty}}
@@ -199,7 +199,7 @@
 
     {% else %}
     <!-- other pages -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 14.8cm;width: 10.5cm">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}">
       <!-- header -->
       <div class="row">
         <div class="col-2">
@@ -260,7 +260,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-center" style="height: 8cm;">
+              <td class="text-center" style="height: {% if A6%}8cm;{% else %}12cm{%endif%}">
                 {% for v in i %}
 
                 {{v.qty}}

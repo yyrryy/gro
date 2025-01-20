@@ -1,5 +1,6 @@
+this.sqlite3
 db.sqlite3
 *.sqlite3
 __pycache__/
 migrations/
-this.sqlite3
+questions.txt

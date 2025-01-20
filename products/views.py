@@ -6047,15 +6047,11 @@ def excelpdcts(request):
         #reps=json.dumps(d.rep)
         farahref=f'fr-{ref}'
         name = d.name
-        mark = None if pd.isna(d.mark) else d.mark
-        category = None if pd.isna(d.category) else d.category
         refeq = '' if pd.isna(d.refeq) else d.refeq
         #status = False if pd.isna(d.status) else True
         #coderef = '' if pd.isna(d.code) else d.code
         #diam = '' if pd.isna(d.diam) else d.diam
         #qty = 0 if pd.isna(d.qty) else d.qty
-        qtyjeu = 0 if pd.isna(d.qtyjeu) else d.qtyjeu
-        unite = 0 if pd.isna(d.unite) else d.unite
         #buyprice = 0 if pd.isna(d.buyprice) else d.buyprice
         #devise = 0 if pd.isna(d.devise) else d.devise
         
@@ -6064,17 +6060,47 @@ def excelpdcts(request):
         #order = '' if pd.isna(d.order) else d.order
         #img = None if pd.isna(d.img) else d.img
         #prixnet=0 if pd.isna(d.prixnet) else d.prixnet
-        product=Produit.objects.create(
+        print('>> adding ', ref)
+        product=Notavailable.objects.create(
             ref=ref,
             name=name,
-            category_id=category,
-            unite=unite,
-            mark_id=mark,
-            qtyjeu=qtyjeu,
-            minstock=1,
-            equivalent=refeq,
-            farahref=farahref
+            equiv=refeq,
         )
+        # try:
+        #     ref = d.ref.lower().strip()
+        # except:
+        #     ref=d.ref
+        # #reps=json.dumps(d.rep)
+        # farahref=f'fr-{ref}'
+        # name = d.name
+        # mark = None if pd.isna(d.mark) else d.mark
+        # category = None if pd.isna(d.category) else d.category
+        # refeq = '' if pd.isna(d.refeq) else d.refeq
+        # #status = False if pd.isna(d.status) else True
+        # #coderef = '' if pd.isna(d.code) else d.code
+        # #diam = '' if pd.isna(d.diam) else d.diam
+        # #qty = 0 if pd.isna(d.qty) else d.qty
+        # qtyjeu = 0 if pd.isna(d.qtyjeu) else d.qtyjeu
+        # unite = 0 if pd.isna(d.unite) else d.unite
+        # #buyprice = 0 if pd.isna(d.buyprice) else d.buyprice
+        # #devise = 0 if pd.isna(d.devise) else d.devise
+        
+        # #prixbrut = 0 if pd.isna(d.prixbrut) else d.prixbrut
+        # #ctg = None if pd.isna(d.ctg) else d.ctg
+        # #order = '' if pd.isna(d.order) else d.order
+        # #img = None if pd.isna(d.img) else d.img
+        # #prixnet=0 if pd.isna(d.prixnet) else d.prixnet
+        # product=Produit.objects.create(
+        #     ref=ref,
+        #     name=name,
+        #     category_id=category,
+        #     unite=unite,
+        #     mark_id=mark,
+        #     qtyjeu=qtyjeu,
+        #     minstock=1,
+        #     equivalent=refeq,
+        #     farahref=farahref
+        # )
 
     print('>>>', entries)
     return JsonResponse({
@@ -6099,11 +6125,11 @@ def excelqtypdcts(request):
             print('entering', ref)
             product=Produit.objects.get(ref=ref)
             if isfarah:
-                product.stocktotalfarah=qty
+                product.stocktotalfarah+=qty
                 product.frstockinitial=qty
                 product.frpriceinitial=price
             else:
-                product.stocktotalorgh=qty
+                product.stocktotalorgh+=qty
                 product.stockinitial=qty
                 product.priceinitial=price
             product.save()
@@ -10286,12 +10312,17 @@ def bonlivraisonprint(request, id):
     return render(request, 'bonlivraisonprint.html', ctx)
 
 def sortieprint2(request, id):
+    a6=request.GET.get('a6')=='1'
     order=Bonsortie.objects.get(pk=id)
     orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
     orderitems=list(orderitems)
-    orderitems=[orderitems[i:i+15] for i in range(0, len(orderitems), 15)]
+    if a6:
+        orderitems=[orderitems[i:i+15] for i in range(0, len(orderitems), 15)]
+    else:
+        orderitems=[orderitems[i:i+25] for i in range(0, len(orderitems), 25)]
     
     ctx={
+        'A6':a6,
         'title':f'Bon de Sortie {order.bon_no}',
         'order':order,
         'orderitems':orderitems
