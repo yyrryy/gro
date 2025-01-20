@@ -743,7 +743,12 @@ def checkplafon(request):
     clientid=request.GET.get('clientid')
     client=Client.objects.get(pk=clientid)
     plafon=client.plafon
-    soldtotal=client.soldtotal
+    totalbons=Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0
+    totalavoirs=Avoirclient.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0
+    totalavances=Avanceclient.objects.filter(client_id=clientid).aggregate(Sum('amount')).get('amount__sum')or 0
+    totalreglements=PaymentClientbl.objects.filter(client_id=clientid).aggregate(Sum('amount')).get('amount__sum')or 0
+    soldtotal=round(totalbons-totalavoirs-totalavances-totalreglements, 2)
+    print('totalbons-totalavoirs-totalavances-totalreglements', totalbons-totalavoirs-totalavances-totalreglements)
     return JsonResponse({
         'plafon':plafon,
         'soldtotal':soldtotal
