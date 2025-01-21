@@ -123,10 +123,10 @@ class Produit(models.Model):
     refeq4=models.CharField(max_length=500, default=None, null=True, blank=True)
     stockprincipal=models.IntegerField(default=None, null=True, blank=True)
     stockdepot=models.IntegerField(default=None, null=True, blank=True)
-    stocktotalfarah=models.IntegerField(default=0, null=True, blank=True)
-    stockfacturefarah=models.IntegerField(default=0, null=True, blank=True)
-    stocktotalorgh=models.IntegerField(default=0, null=True, blank=True)
-    stockfactureorgh=models.IntegerField(default=0, null=True, blank=True)
+    stocktotalfarah=models.FloatField(default=0.0, null=True, blank=True)
+    stockfacturefarah=models.FloatField(default=0.0, null=True, blank=True)
+    stocktotalorgh=models.FloatField(default=0.0, null=True, blank=True)
+    stockfactureorgh=models.FloatField(default=0.0, null=True, blank=True)
     stockbon=models.IntegerField(default=None, null=True, blank=True)
     # check if product is farah product
     farahproduct=models.BooleanField(default=False)
@@ -281,7 +281,7 @@ class Stockin(models.Model):
     issortie=models.BooleanField(default=False)
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
     date=models.DateField()
-    quantity=models.IntegerField()
+    quantity=models.FloatField(default=0.00)
     price=models.FloatField(default=0.00)
     ref=models.CharField(max_length=500, default='-', null=True, blank=True)
     name=models.CharField(max_length=500, default='-', null=True, blank=True)
@@ -712,7 +712,7 @@ class Livraisonitem(models.Model):
     remise=models.CharField(max_length=100, null=True, default=None)
     ref=models.CharField(max_length=100, null=True, default=None)
     name=models.CharField(max_length=100, null=True, default=None)
-    qty=models.IntegerField()
+    qty=models.FloatField(default=0.00)
     # this total represents the revenue of this product
     price=models.FloatField(default=0.00)
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
@@ -795,7 +795,7 @@ class Avoirclient(models.Model):
 
 class Returned(models.Model):
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
-    qty=models.IntegerField()
+    qty=models.FloatField(default=0.00)
     remise=models.IntegerField(null=True, blank=True, default=None)
     total=models.FloatField(default=0.00)
     price=models.FloatField(default=0.00)
@@ -832,7 +832,7 @@ class Avoirsupplier(models.Model):
     rest= models.FloatField(default=0, blank=True, null=True)
 class Returnedsupplier(models.Model):
     product=models.ForeignKey(Produit, on_delete=models.CASCADE, default=None)
-    qty=models.IntegerField()
+    qty=models.FloatField(default=0.00)
     total=models.FloatField(default=0.00)
     price=models.FloatField(default=0.00)
     avoir=models.ForeignKey(Avoirsupplier, related_name='avoir_supplier', on_delete=models.CASCADE, default=None, null=True, blank=True)
@@ -1154,7 +1154,7 @@ class Sortieitem(models.Model):
     remise=models.CharField(max_length=100, null=True, default=None)
     ref=models.CharField(max_length=100, null=True, default=None)
     name=models.CharField(max_length=100, null=True, default=None)
-    qty=models.IntegerField()
+    qty=models.FloatField(default=0.00)
     # this total represents the revenue of this product
     price=models.FloatField(default=0.00)
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
