@@ -8465,7 +8465,7 @@ def loadclients(request):
         clients = Client.objects.filter(clientsortie=True).order_by('-soldtotal')[start:end]
     return JsonResponse({
         'trs':render(request, 'clienttrs.html', {
-            'clients':clients
+            'clients':clients, 'target':target
         }).content.decode('utf-8'),
         'has_more': len(clients) == per_page
     })

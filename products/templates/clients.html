@@ -176,7 +176,7 @@
                           <td>{{i.region}}</td>
                           
                           <!-- <td>{{i.soldtotal|floatformat:2}}</td> -->
-                          <td style="background: yellowgreen;">{{i.sold|floatformat:2}}</td>
+                          <td style="background: yellowgreen;">{%if target=='s'%}{{i.soldbs|floatformat:2}}{%else%}{{i.sold|floatformat:2}}{%endif%}</td>
                           <td>{{i.ice}}</td>
                       </tr>
                       {% endfor %}

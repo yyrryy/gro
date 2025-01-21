@@ -362,7 +362,12 @@ class Client(models.Model):
         avancess=Avanceclient.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
         reglements=PaymentClientbl.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
         return round(bons-avancess-avoirs-reglements, 2)
-        
+    def soldbs(self):
+        totalbons=Bonsortie.objects.filter(client_id=self).aggregate(Sum('total')).get('total__sum')or 0
+        totalavoirs=Avoirclient.objects.filter(client_id=self).aggregate(Sum('total')).get('total__sum')or 0
+        totalavances=Avanceclient.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
+        totalreglements=PaymentClientbl.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
+        return round(totalbons-totalavoirs-totalavances-totalreglements, 2)
     def __str__(self) -> str:
         return self.name+'-'+str(self.city)
 
