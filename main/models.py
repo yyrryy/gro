@@ -290,7 +290,7 @@ class Stockin(models.Model):
     # how much sold in this qty
     soldqty=models.IntegerField(default=0)
     # qtyofprice will be used to track qty of this price
-    qtyofprice=models.IntegerField(default=0)
+    qtyofprice=models.FloatField(default=0.0)
     remise1=models.FloatField(default=0.00, null=True, blank=
     True)
     remise2=models.FloatField(default=0.00, null=True, blank=

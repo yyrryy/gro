@@ -76,6 +76,19 @@ ajaxpage('listbl', 'list bon livraison', '/products/listbonachat?target={{target
 
 
 
+stock add
+bonachat
+updatebonachat
+avoirclient
+updateavoirclient
+
+stocksortie
+bon sortir
+update bon sortir
+bonlivraison
+updatebonlivraison
+avoirsupp
+updateavoirsupp
 
 
 

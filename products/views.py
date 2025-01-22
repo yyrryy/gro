@@ -967,7 +967,7 @@ def addsupply(request):
             product.frbuyprice=buyprice
             product.frnetbuyprice=netprice
             print('>> addin qty')
-            product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+            product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
             # product.frsellprice=buyprice
             # product.frremisesell=remise1
             # if isfacture:
@@ -1033,7 +1033,7 @@ def addsupply(request):
             product.remise4=remise4
             product.buyprice=buyprice
             product.netbuyprice=netprice
-            product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+            product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
             # product.sellprice=buyprice
             # product.remisesell=remise1
         
@@ -1177,7 +1177,7 @@ def addbonlivraison(request):
             qtyofout=[]
             if isfarah:
                 print('>>> we are in farah')
-                product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
+                product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
                 # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
                 # thisqty=int(i['qty'])
                 # for pr in prices:
@@ -1201,8 +1201,8 @@ def addbonlivraison(request):
 
 
             else:
-                thisqty=int(i['qty'])
-                product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
+                thisqty=float(i['qty'])
+                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
                 # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product, isavoir=False)
                 # for pr in prices:
                 #     if not thisqty<=0:
@@ -1240,9 +1240,9 @@ def addbonlivraison(request):
             )
     #order.pricesofout=pricesofout
     order.save()
-    client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
-    client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
-    client.save()
+    # client.soldtotal=round(float(client.soldtotal)+float(totalbon), 2)
+    # client.soldbl=round(float(client.soldbl)+float(totalbon), 2)
+    # client.save()
     # if mantant=="":
     #     return JsonResponse({
     #         "success":True
@@ -2660,11 +2660,11 @@ def updatebonlivraison(request):
         product=Produit.objects.get(pk=i.product_id)
         if target=='f':
             print('>>> deleting old bon items')
-            product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+            product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
             
             
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
+            product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
             # st=Stockin.objects.filter(isfarah=False, product=product).last()
             # st.qtyofprice=st.qtyofprice+int(i.qty)
             # st.save()
@@ -2686,12 +2686,12 @@ def updatebonlivraison(request):
         #     Clientprices.objects.create(client_id=livraison.client.id, product_id=i['productid'], price=i['price'])
 
 
-        qty=int(i['qty'])
+        qty=float(i['qty'])
         product=Produit.objects.get(pk=i['productid'])
         pricesofout=[]
         qtyofout=[]
         if target=='f':
-            product.stocktotalfarah=int(product.stocktotalfarah)-qty
+            product.stocktotalfarah=float(product.stocktotalfarah)-qty
             # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
             # thisqty=int(i['qty'])
             # for pr in prices:
@@ -2714,7 +2714,7 @@ def updatebonlivraison(request):
             #         break
         
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)-qty
+            product.stocktotalorgh=float(product.stocktotalorgh)-qty
             # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product).order_by('id')
 
             # thisqty=int(i['qty'])
@@ -3662,7 +3662,7 @@ def addavoirclient(request):
             # if isfacture:
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
             if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+                product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
                 #prices=Stockin.objects.filter(product=product, isfarah=True)
                 bonid=i['bonid']
                 #if bonid:
@@ -3691,7 +3691,7 @@ def addavoirclient(request):
                 #         if p.qtyofprice<p:
                 #             p.quantity+=thisqty
             if isorgh:
-                product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+                product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
                 bonid=i['bonid']
                 #if bonid:
                 bon=Bonlivraison.objects.get(pk=bonid)
@@ -3837,15 +3837,15 @@ def addavoirsupp(request):
         # avoirfacture=avoirfacture,
         isfarah=isfarah
     )
-    supplier.rest-=float(totalbon)
-    supplier.save()
+    # supplier.rest-=float(totalbon)
+    # supplier.save()
     with transaction.atomic():
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
+                product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
             else:
-                product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
+                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
             product.save()
             Returnedsupplier.objects.create(
                 avoir=avoir,
@@ -4249,6 +4249,8 @@ def updatebonachat(request):
     print('>>> target', target)
     isfarah=target=='f'
     bon=Itemsbysupplier.objects.get(pk=id)
+    # we need to see if this bon is the last bon, to edit the prices and rmises
+    
     bon.date=datetime.strptime(request.POST.get('datebon'), '%Y-%m-%d')
     bon.nbon=request.POST.get('orderno')
     isfacture= True if request.POST.get('mode')=='facture' else False
@@ -4281,9 +4283,9 @@ def updatebonachat(request):
         product=i.product
         print('removing from total')
         if isfarah:
-            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.quantity)
+            product.stocktotalfarah=float(product.stocktotalfarah)-float(i.quantity)
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.quantity)
+            product.stocktotalorgh=float(product.stocktotalorgh)-float(i.quantity)
         # if bon.isfacture:
         #     print('removing from facture')
         #     product.stockfacture=int(product.stockfacture)-int(i.quantity)
@@ -4307,7 +4309,7 @@ def updatebonachat(request):
             # netprice=round(float(buyprice)-(float(buyprice)*float(remise)/100), 2)
             netwithremise1=round(buyprice-(buyprice*(float(remise1)/100)), 2)
             netprice=round(float(i['total'])/float(i['qty']), 2)
-            qty=0 if i['qty']=="" else int(i['qty'])
+            qty=0 if i['qty']=="" else float(i['qty'])
             product=Produit.objects.get(pk=i['productid'])
             #product.originsupp=
             print('>>>>>>>adding total')
@@ -4353,55 +4355,60 @@ def updatebonachat(request):
             # print(totalprices, totalqty)
             #product.coutmoyen=round(totalprices/totalqty, 2)
             if isfarah:
-                if product.stocktotalfarah>0:
-                    print('>> has stock')
-                    totalqtys=int(product.stocktotalfarah)+int(i['qty'])
-                    lastbuyprice=Stockin.objects.filter(product=product, isfarah=True).last()
-                    if lastbuyprice:
-                        actualtotal=product.stocktotalfarah*lastbuyprice.price
-                        thistotal=int(i['qty'])*buyprice
-                        totalprices=round(thistotal+actualtotal, 2)
-                        pondire=round(totalprices/totalqtys, 2)
-                        product.frcoutmoyen=pondire
-                        #product.save()
-                    else:
-                        product.frcoutmoyen=buyprice
-                else:
-                    product.frcoutmoyen=buyprice
-                product.stocktotalfarah=int(product.stocktotalfarah)+qty
-                product.frbuyprice=0 if i['price']=="" else i['price']
-                product.frremise1=0 if i['remise1']=="" else i['remise1']
-                product.frremise2=0 if i['remise2']=="" else i['remise2']
-                product.frremise3=0 if i['remise3']=="" else i['remise3']
-                product.frremise4=0 if i['remise4']=="" else i['remise4']
-                product.frsellprice=0 if i['price']=="" else i['price']
-                product.frremisesell=0 if i['remise1']=="" else i['remise1']
-                product.frnetbuyprice=netprice
+                # if product.stocktotalfarah>0:
+                #     print('>> has stock')
+                #     totalqtys=int(product.stocktotalfarah)+int(i['qty'])
+                #     lastbuyprice=Stockin.objects.filter(product=product, isfarah=True).last()
+                #     if lastbuyprice:
+                #         actualtotal=product.stocktotalfarah*lastbuyprice.price
+                #         thistotal=int(i['qty'])*buyprice
+                #         totalprices=round(thistotal+actualtotal, 2)
+                #         pondire=round(totalprices/totalqtys, 2)
+                #         product.frcoutmoyen=pondire
+                #         #product.save()
+                #     else:
+                #         product.frcoutmoyen=buyprice
+                # else:
+                #     product.frcoutmoyen=buyprice
+                product.stocktotalfarah=float(product.stocktotalfarah)+qty
+                islastbon = bon == Itemsbysupplier.objects.filter(isfarah=True).last()
+                if islastbon:
+                    product.frbuyprice=0 if i['price']=="" else i['price']
+                    product.frremise1=0 if i['remise1']=="" else i['remise1']
+                    product.frremise2=0 if i['remise2']=="" else i['remise2']
+                    product.frremise3=0 if i['remise3']=="" else i['remise3']
+                    product.frremise4=0 if i['remise4']=="" else i['remise4']
+                    product.frsellprice=0 if i['price']=="" else i['price']
+                    product.frremisesell=0 if i['remise1']=="" else i['remise1']
+                    product.frnetbuyprice=netprice
             else:
-                if product.stocktotalorgh>0:
-                    print('>> has stock')
-                    totalqtys=int(product.stocktotalorgh)+int(i['qty'])
-                    lastbuyprice=Stockin.objects.filter(product=product, isfarah=False).last()
-                    if lastbuyprice:
-                        actualtotal=product.stocktotalorgh*lastbuyprice.price
-                        thistotal=int(i['qty'])*buyprice
-                        totalprices=round(thistotal+actualtotal, 2)
-                        pondire=round(totalprices/totalqtys, 2)
-                        product.coutmoyen=pondire
-                        #product.save()
-                    else:
-                        product.coutmoyen=buyprice
-                else:
-                    product.coutmoyen=buyprice
-                product.stocktotalorgh=int(product.stocktotalorgh)+qty
-                product.buyprice=0 if i['price']=="" else i['price']
-                product.remise1=0 if i['remise1']=="" else i['remise1']
-                product.remise2=0 if i['remise2']=="" else i['remise2']
-                product.remise3=0 if i['remise3']=="" else i['remise3']
-                product.remise4=0 if i['remise4']=="" else i['remise4']
-                product.sellprice=0 if i['price']=="" else i['price']
-                product.remisesell=0 if i['remise1']=="" else i['remise1']
-                product.netbuyprice=netprice
+                # claculate cout moyen
+                # if product.stocktotalorgh>0:
+                #     print('>> has stock')
+                #     totalqtys=int(product.stocktotalorgh)+int(i['qty'])
+                #     lastbuyprice=Stockin.objects.filter(product=product, isfarah=False).last()
+                #     if lastbuyprice:
+                #         actualtotal=product.stocktotalorgh*lastbuyprice.price
+                #         thistotal=int(i['qty'])*buyprice
+                #         totalprices=round(thistotal+actualtotal, 2)
+                #         pondire=round(totalprices/totalqtys, 2)
+                #         product.coutmoyen=pondire
+                #         #product.save()
+                #     else:
+                #         product.coutmoyen=buyprice
+                # else:
+                #     product.coutmoyen=buyprice
+                product.stocktotalorgh=float(product.stocktotalorgh)+qty
+                islastbon = bon == Itemsbysupplier.objects.filter(isfarah=False).last()
+                if islastbon:
+                    product.buyprice=0 if i['price']=="" else i['price']
+                    product.remise1=0 if i['remise1']=="" else i['remise1']
+                    product.remise2=0 if i['remise2']=="" else i['remise2']
+                    product.remise3=0 if i['remise3']=="" else i['remise3']
+                    product.remise4=0 if i['remise4']=="" else i['remise4']
+                    product.sellprice=0 if i['price']=="" else i['price']
+                    product.remisesell=0 if i['remise1']=="" else i['remise1']
+                    product.netbuyprice=netprice
             product.save()
 
     return JsonResponse({
@@ -6654,9 +6661,9 @@ def updatebonavoir(request):
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
         if isfarah:
-            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.quantity)
+            product.stocktotalfarah=float(product.stocktotalfarah)-float(i.quantity)
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.quantity)
+            product.stocktotalorgh=float(product.stocktotalorgh)-float(i.quantity)
         # if avoir.avoirfacture:
         #     product.stockfacture=int(product.stockfacture)-int(i.qty)
         product.save()
@@ -6679,9 +6686,9 @@ def updatebonavoir(request):
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)+int(i['qty'])
+                product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
             else:
-                product.stocktotalorgh=int(product.stocktotalorgh)+int(i['qty'])
+                product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
             # if isfacture:
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
             product.save()

@@ -2076,9 +2076,9 @@ def updatebonavoirsupp(request):
     for i in avoiritems:
         product=Produit.objects.get(pk=i.product_id)
         if isfarah:
-            product.stocktotalfarah=int(product.stocktotalfarah)+int(i.qty)
+            product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)+int(i.qty)
+            product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
         product.save()
         i.delete()
     avoir.supplier=supplier
@@ -2099,9 +2099,9 @@ def updatebonavoirsupp(request):
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
             if isfarah:
-                product.stocktotalfarah=int(product.stocktotalfarah)-int(i['qty'])
+                product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
             else:
-                product.stocktotalorgh=int(product.stocktotalorgh)-int(i['qty'])
+                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
             
             product.save()
             Returnedsupplier.objects.create(
@@ -2517,9 +2517,9 @@ def updatebonsortie(request):
         product=i.product
         # stock
         if i.isfarah:
-            product.stocktotalfarah+=i.qty
+            product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
         else:
-            product.stockfactureorgh+=i.qty
+            product.stockfactureorgh=float(product.stockfactureorgh)+float(i.qty)
         product.save()
         #print('>> qtyofprice, qties', json.loads(i.pricesofout), json.loads(i.qtyofout))
         # prices and qties of prices
