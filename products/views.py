@@ -1702,49 +1702,49 @@ def addclient(request):
 
 def getclientdata(request):
     id=request.POST.get('id')
+    target=request.POST.get('target')
+    print('>> target getdata client', target)
     client=Client.objects.get(pk=id)
-    return JsonResponse({
-        'personalname':client.clientname,
-        'name':client.name,
-        'phone':client.phone,
-        'phone2':client.phone2,
-        'address':client.address,
-        'id':client.id,
-        'code':client.code,
-        'city':client.city,
-        #'location':client.location,
-        'region':client.region,
-        'ice':client.ice,
-        'plafon':client.plafon,
-        #'rep':client.represent_id,
-    })
+    return render(request, 'clientmodaldata.html', {'client':client, 'target':target})
+    # return JsonResponse({
+    #     'personalname':client.clientname,
+    #     'name':client.name,
+    #     'phone':client.phone,
+    #     'phone2':client.phone2,
+    #     'address':client.address,
+    #     'id':client.id,
+    #     'code':client.code,
+    #     'city':client.city,
+    #     #'location':client.location,
+    #     'region':client.region,
+    #     'ice':client.ice,
+    #     'plafon':client.plafon,
+    #     #'rep':client.represent_id,
+    # })
 
 
 def updateclient(request):
     id=request.POST.get('updateclientid')
     code=request.POST.get('updateclientcode')
     name=request.POST.get('updateclientname')
-
-
     client=Client.objects.get(pk=id)
-    if Client.objects.filter(Q(name=name) | Q(code=code)).exclude(pk=id).exists():
+    if Client.objects.filter(name=name).exclude(pk=id).exists():
          return JsonResponse({
              'success':False,
              'error':'Code ou Nom exist deja'
          })
-    oldcode=client.code
-
     client.name=request.POST.get('updateclientname')
     client.phone=request.POST.get('updateclientphone')
+    client.city=request.POST.get('updateclientcity')
     client.clientname=request.POST.get('updateclientpersonalname')
     client.phone2=request.POST.get('updateclientphone2')
-    client.address=request.POST.get('updateclientaddress')
     client.ice=request.POST.get('updateclientice')
-    client.code=request.POST.get('updateclientcode')
+    client.plafon=request.POST.get('updateclientplafon')
+    client.clientrc=request.POST.get('updateclientrc')
+    client.clientif=request.POST.get('updateclientif')
     client.city=request.POST.get('updateclientcity')
-    client.location=request.POST.get('updateclientlocation')
+    client.modereglement=request.POST.get('modereglement')
     client.address=request.POST.get('updateclientaddress')
-    client.region=request.POST.get('updateclientregion').lower().strip()
     client.save()
     # req.get('http://serverip/products/updateclient', {
     #     'clientcode':oldcode,

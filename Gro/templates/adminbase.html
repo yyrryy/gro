@@ -2653,29 +2653,31 @@ a .uil {
           });
       }
 
-      const populateclientfields=(id)=>{
+      const populateclientfields=(id, target)=>{
           $.ajax({
               url: "{% url 'products:getclientdata' %}",
               type: "post",
               data: {
                   'id':id,
+                  'target':target,
                   'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
               success: function (data) {
                 console.log('client',data)
-                  $('input[name="updateclientname"]').val(data.name);
-                  $('input[name="updateclientphone"]').val(data.phone);
-                  $('input[name="updateclientpersonalname"]').val(data.personalname);
-                  $('input[name="updateclientphone2"]').val(data.phone2);
-                  $('input[name="updateclientcity"]').val(data.city);
-                  $('input[name="updateclientlocation"]').val(data.location);
-                  $('input[name="updateclientregion"]').val(data.region);
-                  $('input[name="updateclientaddress"]').val(data.address);
-                  $('input[name="updateclientice"]').val(data.ice);
-                  $('select[name="updateclientrep"]').val(data.rep);
-                  $('input[name="updateclientid"]').val(data.id);
-                  $('input[name="updateclientcode"]').val(data.code);
-                  $('input[name="updateclientmoderegl"]').val(data.moderegl);
+                $('.clientmodaldata').html(data)
+                  // $('input[name="updateclientname"]').val(data.name);
+                  // $('input[name="updateclientphone"]').val(data.phone);
+                  // $('input[name="updateclientpersonalname"]').val(data.personalname);
+                  // $('input[name="updateclientphone2"]').val(data.phone2);
+                  // $('input[name="updateclientcity"]').val(data.city);
+                  // $('input[name="updateclientlocation"]').val(data.location);
+                  // $('input[name="updateclientregion"]').val(data.region);
+                  // $('input[name="updateclientaddress"]').val(data.address);
+                  // $('input[name="updateclientice"]').val(data.ice);
+                  // $('select[name="updateclientrep"]').val(data.rep);
+                  // $('input[name="updateclientid"]').val(data.id);
+                  // $('input[name="updateclientcode"]').val(data.code);
+                  // $('input[name="updateclientmoderegl"]').val(data.moderegl);
               },
               error: function (data) {
                   console.log(data);

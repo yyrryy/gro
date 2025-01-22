@@ -8,40 +8,10 @@
   </div>
 <div class="modal fade" id="editclientmodal" tabindex="-1" aria-labelledby="editclientmodalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content bg-white">
+        <div class="modal-content bg-white" style="width: 50em;">
 
-            <div class="modal-body">
-                <form class="form-horizontal add-ledger-form" id="updateclientform" autocomplete="off">
-                    <div class="form-group">
-                        {% csrf_token %}
-                        <input type="text" name="updateclientname" class="form-control mb-2" placeholder="client">
-                        <input type="text" name="updateclientcode" class="form-control mb-2" placeholder="Code">
-                        <!-- <div class="mb-2">
-                            <small>Representant</small>
-                        <select name="updateclientrep" class="form-select">
-                            <option value="">--</option>
-                            {% for i in commerciaux %}
-                            <option value="{{i.id}}">{{i.name}}</option>
-                            {% endfor %}
-                        </select>
-                        </div> -->
-                        <input type="text" name="updateclientplafon" class="form-control mb-2" placeholder="plafon">
-                        <input type="text" name="updateclientphone" class="form-control mb-2" placeholder="phone">
-                        <input type="text" name="updateclientpersonalname" class="form-control mb-2" placeholder="NOM PERSONNEL">
-                        <input type="text" name="updateclientlocation" class="form-control mb-2" placeholder="localisation">
-                        <input type="text" name="updateclientphone2" class="form-control mb-2" placeholder="phone 2">
-                        <input type="text" name="updateclientice" class="form-control mb-2" placeholder="ICE">
-                        <input type="text" name="updateclientcity" class="form-control mb-2" placeholder="Ville">
-                        <input type="text" name="updateclientaddress" class="form-control mb-2" placeholder="Addresse">
-                        <input type="text" name="updateclientregion" class="form-control mb-2" placeholder="Region">
-                        <input hidden type="text" name="updateclientid">
-                        <hr>
-                        <small>Mode reglement (1: espece):</small>
-                        <input type="text" name="updateclientmoderegl" class="form-control mb-2">
-
-                            <button class="w-100 btn btn-primary updateclientbtn">Ajouter</button>
-                    </div>
-                </form>
+            <div class="modal-body clientmodaldata">
+                
             </div>
             <div class="modal-footer">
               <button type="button" class="w-100 btn btn-secondary" data-dismiss="modal">Fermer</button>
@@ -64,7 +34,7 @@
                   <div class="clientcodeerror alert alert-danger d-none">
                       Code/Client deja existe
                   </div>
-                  <input type="text" name="clientcode" class="form-control mb-2 " placeholder="Code" value="{{lastcode}}">
+                  <input readonly type="text" name="clientcode" class="form-control mb-2 " placeholder="Code" value="{{lastcode}}">
                   <input type="text" name="clientnameinp" class="form-control mb-2" placeholder="Nom STE">
                   <input type="text" name="clientnamepersinp" class="form-control mb-2" placeholder="Nom contact">
                   <!-- <div class="mb-2">
@@ -163,7 +133,7 @@
                       {% for i in clients %}
                       <tr class="client-row" {% if i.diver %} style="background: #a8dfc5" {% endif %}>
                           <td>
-                              <button class="btn editsuppbtn border" id="{{i.id}}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields('{{i.id}}')">
+                              <button class="btn editsuppbtn border" id="{{i.id}}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields('{{i.id}}', '{{target}}')">
                                   ✐
                               </button>
                           </td>
@@ -378,34 +348,6 @@
     // })
 
 
-    $('.updateclientbtn').on('click', function(event){
-        event.preventDefault()
-        if ($('[name="updateclientname"]').val()=="" || $('[name="updateclientcode"]').val()==""){
-            $('#updateclientform').css('border', '1px solid red')
-            return
-        }
-        $(this).addClass('disabled')
-        $('#editclientmodal').modal('hide')
-        $('.modal-backdrop').remove()
-        var formData = new FormData($('#updateclientform')[0]);
-        $.ajax({
-            type: 'POST',
-            url: '{% url "products:updateclient" %}',  // Replace with your Django URL
-            data: formData,
-            processData: false,
-            contentType: false,
-            success:((data)=>{
-                if (data.success){
-                    ajaxpage('addclientstab', 'list clients', '/products/clientspage?target={{target}}')
-
-                }else{
-                    alertify.error(data.error)
-                }
-
-
-            })
-        })
-    })
     $('.submitaddclientbtn').on('click', function(event){
         $(this).addClass('disabled')
         event.preventDefault()
