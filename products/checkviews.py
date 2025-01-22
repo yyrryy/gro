@@ -95,7 +95,7 @@ def bonsortie(request):
     
     return render(request, 'bonsortie.html', {
         'title':'Bon de Sortie',
-        'cars':Carlogos.objects.all()
+        'cars':Carlogos.objects.all().order_by('id')
         # 'clients':Client.objects.all(),
         # # 'products':Produit.objects.all(),
         # 'commercials':Represent.objects.all(),
@@ -2481,7 +2481,7 @@ def modifierbonsortie(request):
         'title':'Modifier '+bon.bon_no,
         'items':items,
         'bon':bon,
-        'cars':Carlogos.objects.all(),
+        'cars':Carlogos.objects.all().order_by('id'),
         # 'products':Produit.objects.all(),
         # 'clients':Client.objects.all(),
     }
