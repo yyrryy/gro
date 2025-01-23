@@ -2421,7 +2421,7 @@ def printbarcode(request):
         #     thisbarcodes.append([ref, name, price, barcode_base64])
         #     buffer.close()
         # barcodes.append(thisbarcodes)
-        for _ in range(qty):
+        for _ in range(int(qty)):
             buffer = BytesIO()
             qr = qrcode.QRCode(
                 version=1,  # Controls the size of the QR code
