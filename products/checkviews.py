@@ -2399,7 +2399,7 @@ def printbarcode(request):
         net=float(price)-(float(price)*int(remise1)/100)
         price=round(net*2, 2)
         #price=str(price).replace('.', '')
-        qty=i['qty']
+        qty=float(i['qty'])
         print('>>>', supplierid, date)
         # # List to hold the barcodes in base64 format
         
@@ -2421,7 +2421,7 @@ def printbarcode(request):
         #     thisbarcodes.append([ref, name, price, barcode_base64])
         #     buffer.close()
         # barcodes.append(thisbarcodes)
-        for _ in range(int(qty)):
+        for _ in range(qty):
             buffer = BytesIO()
             qr = qrcode.QRCode(
                 version=1,  # Controls the size of the QR code

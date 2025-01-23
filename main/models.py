@@ -246,7 +246,12 @@ class Supplier(models.Model):
     rest=models.FloatField(default=0.00)
     image=models.ImageField(upload_to='supplierimages/', null=True, blank=True, default=None)
     note=models.TextField(default=None, null=True)
-    
+    def sold(self):
+        bons=Itemsbysupplier.objects.filter(supplier=self).aggregate(Sum('total'))['total__sum'] or 0
+        avoirs=Avoirsupplier.objects.filter(supplier=self).aggregate(Sum('total'))['total__sum'] or 0
+        avancess=Avancesupplier.objects.filter(supplier=self).aggregate(Sum('amount'))['amount__sum'] or 0
+        reglements=PaymentSupplier.objects.filter(supplier=self).aggregate(Sum('amount'))['amount__sum'] or 0
+        return round(bons-avancess-avoirs-reglements, 2)
     def __str__(self) -> str:
         return self.name
 
