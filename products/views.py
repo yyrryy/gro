@@ -474,7 +474,7 @@ def viewoneproduct(request, id):
         stockout=Livraisonitem.objects.filter(product=product, isorgh=True, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product, isorgh=True).exclude(facture__bon__isnull=True).order_by('-id')
     else:
-        stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
+        stockout=Sortieitem.objects.filter(product=product, isfacture=False).order_by('-id')
         stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
     # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
