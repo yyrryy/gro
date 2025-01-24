@@ -309,9 +309,9 @@
                 $(event.target).parent().remove()
                 // remove id from localstorage
 
-                pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie'))
-                pdcts.splice(pdcts.indexOf(id.toString()), 1)
-                localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
+                // pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie'))
+                // pdcts.splice(pdcts.indexOf(id.toString()), 1)
+                // localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
                 // update total
                 let totalbon = parseFloat(parentdiv.find('.totalbonsortie').text())
                 let totalrow = parseFloat($(event.target).parent().find('.total').text())
