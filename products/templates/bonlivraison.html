@@ -37,8 +37,8 @@
          <div class="bg-white rounded shadow p-2 mb-3 data d-flex justify-content-between">
             <div class="col-5">
                 <div class="mb-2 clientselectblholder">
-                    <div class="alert alert-danger p-2 d-none oldbonswarning">
-                      CLIENT ANCIEN BONS/FACTURE
+                    <div class="alert alert-danger p-2">
+                      Sold: <strong class="sold"></strong>
                     </div>
                     <small>Clients:
                     </small>
@@ -652,12 +652,10 @@
       parentdiv=$(this).parent().parent().parent()
       parentdiv.find('.productsholder').removeClass('d-none')
         console.log('check for old unpaid bons')
-        $.get('products/checkoldunpaidbons', {"clientid":$(this).val()}, (data)=>{
-          if (data.exist){
-          $('.oldbonswarning').removeClass('d-none')
-          }else{
-            $('.oldbonswarning').addClass('d-none')
-          }
+        $.get('/products/getclientdata', {"id":$('.clientselectbl')
+        .val()}, (data)=>{
+          $('.sold').text(data.sold)
+          
         })
         $('#productsselect2').select2({
 

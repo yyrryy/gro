@@ -241,6 +241,7 @@ def checkref(request):
     #     })
 
 def supplierspage(request):
+    target=request.GET.get('target')
     lastid=Supplier.objects.last()
     print(lastid)
     if lastid:
@@ -251,6 +252,7 @@ def supplierspage(request):
     print(code)
     ctx={
         'suppliers':Supplier.objects.all(),
+        'target':target,
         'title':'List des fournisseurs'
     }
     return render(request, 'suppliers.html', ctx)
@@ -1701,11 +1703,16 @@ def addclient(request):
         })
 
 def getclientdata(request):
-    id=request.POST.get('id')
-    target=request.POST.get('target')
+    id=request.GET.get('id')
+    print('>>> id cilent data ', id)
+    target=request.GET.get('target')
     print('>> target getdata client', target)
     client=Client.objects.get(pk=id)
-    return render(request, 'clientmodaldata.html', {'client':client, 'target':target})
+    return JsonResponse({
+        'html':render(request, 'clientmodaldata.html', {'client':client, 'target':target}).content.decode('utf-8'),
+        'sold':client.sold()
+    })
+
     # return JsonResponse({
     #     'personalname':client.clientname,
     #     'name':client.name,
@@ -1739,7 +1746,7 @@ def updateclient(request):
     client.clientname=request.POST.get('updateclientpersonalname')
     client.phone2=request.POST.get('updateclientphone2')
     client.ice=request.POST.get('updateclientice')
-    client.plafon=request.POST.get('updateclientplafon')
+    client.plafon=request.POST.get('updateclientplafon') or 0
     client.clientrc=request.POST.get('updateclientrc')
     client.clientif=request.POST.get('updateclientif')
     client.city=request.POST.get('updateclientcity')

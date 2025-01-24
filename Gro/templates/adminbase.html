@@ -2656,7 +2656,7 @@ a .uil {
       const populateclientfields=(id, target)=>{
           $.ajax({
               url: "{% url 'products:getclientdata' %}",
-              type: "post",
+              type: "get",
               data: {
                   'id':id,
                   'target':target,
@@ -2664,7 +2664,7 @@ a .uil {
               },
               success: function (data) {
                 console.log('client',data)
-                $('.clientmodaldata').html(data)
+                $('.clientmodaldata').html(data.html)
                   // $('input[name="updateclientname"]').val(data.name);
                   // $('input[name="updateclientphone"]').val(data.phone);
                   // $('input[name="updateclientpersonalname"]').val(data.personalname);
