@@ -2519,7 +2519,7 @@ def updatebonsortie(request):
         if i.isfarah:
             product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
         else:
-            product.stockfactureorgh=float(product.stockfactureorgh)+float(i.qty)
+            product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
         product.save()
         #print('>> qtyofprice, qties', json.loads(i.pricesofout), json.loads(i.qtyofout))
         # prices and qties of prices
