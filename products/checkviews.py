@@ -2876,30 +2876,30 @@ def printbulk(request):
     # return render(request, 'caisse.html')
 
 def zz(request):
-    products=Produit.objects.filter(stocktotalfarah__lt=0)
-    data=[]
-    for i in products:
-        sorti=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
-        entr=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
-        dd=entr-sorti
-        i.stocktotalfarah=dd
-        i.save()
-        data.append(['farah', i.ref, i.stocktotalfarah, sorti, entr])
+    # products=Produit.objects.filter(stocktotalfarah__lt=0)
+    # data=[]
+    # for i in products:
+    #     sorti=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
+    #     entr=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+    #     dd=entr-sorti
+    #     i.stocktotalfarah=dd
+    #     i.save()
+    #     data.append(['farah', i.ref, i.stocktotalfarah, sorti, entr])
     return JsonResponse({
-        'ss':data
+        'ss':True
     })
 
 def zzz(request):
-    products=Produit.objects.filter(stocktotalorgh__lt=0)
-    data=[]
-    for i in products:
-        sorti=Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
-        entr=Stockin.objects.filter(product=i, isfarah=False).aggregate(Sum('quantity'))['quantity__sum'] or 0
-        dd=entr-sorti
-        i.stocktotalorgh=dd
-        i.save()
-        data.append(['ogh', i.ref, i.stocktotalorgh, dd])
+    # products=Produit.objects.filter(stocktotalorgh__lt=0)
+    # data=[]
+    # for i in products:
+    #     sorti=Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
+    #     entr=Stockin.objects.filter(product=i, isfarah=False).aggregate(Sum('quantity'))['quantity__sum'] or 0
+    #     dd=entr-sorti
+    #     i.stocktotalorgh=dd
+    #     i.save()
+    #     data.append(['ogh', i.ref, i.stocktotalorgh, dd])
     return JsonResponse({
-        'ss':data
+        'ss':True
     })
         
