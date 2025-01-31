@@ -7235,7 +7235,7 @@ def loadlistbl(request):
             #     start_date = datetime.strptime(date_range[0].strip(), '%d/%m/%Y')
             #     end_date = datetime.strptime(date_range[1].strip(), '%d/%m/%Y')
             #     q_objects &= (Q(client__name__iregex=term) |
-            #         Q(salseman__name__iregex=term) |
+            #         
             #         Q(bon_no__iregex=term) |
             #         Q(client__region__iregex=term)|
             #         Q(client__city__iregex=term)|
@@ -7245,7 +7245,7 @@ def loadlistbl(request):
             #     )
             # else:
             #     q_objects &= (Q(client__name__iregex=term) |
-            #         Q(salseman__name__iregex=term) |
+            #         
             #         Q(bon_no__iregex=term) |
             #         Q(client__region__iregex=term)|
             #         Q(client__city__iregex=term)|
@@ -7253,13 +7253,13 @@ def loadlistbl(request):
             #         Q(total__iregex=term)
             #     )
             q_objects &= (Q(client__name__iregex=term) |
-                    Q(salseman__name__iregex=term) |
+                    
                 Q(bon_no__iregex=term) |
                 Q(client__region__iregex=term)|
                 Q(client__city__iregex=term)|
                 Q(client__code__iregex=term)|
                 Q(total__iregex=term)|
-                Q(commande__order_no__iregex=term)|
+                
                 Q(statusreg__iregex=term)|
                 Q(note__iregex=term)
                 )
@@ -7437,6 +7437,152 @@ def loadlistbl(request):
         'has_more': len(bons) == per_page
     })
 
+def loadlistbs(request):
+    page = int(request.GET.get('page', 1))
+    target =request.GET.get('target')
+    isfarah=target=='f'
+    all=request.GET.get('all')=='1'
+    valid=request.GET.get('valid')=='1'
+    year =request.GET.get('year')
+    startdate =request.GET.get('startdate')
+    enddate =request.GET.get('enddate')
+    term =request.GET.get('term')
+    per_page = 50  # Adjust as needed
+    print(term, year, startdate, enddate)
+    trs=''
+    start = (page - 1) * per_page
+    end = page * per_page
+    if term != '0':
+        print('>>term', term)
+        # Split the term into individual words separated by '*'
+
+        print('>>>>>>>>> here bl')
+        # Split the term into individual words separated by '*'
+        search_terms = term.split('+')
+        print(search_terms)
+
+        # Create a list of Q objects for each search term and combine them with &
+        q_objects = Q()
+        for term in search_terms:
+
+            # if '-' in term:
+            #     date_range = term.split('-')
+            #     start_date = datetime.strptime(date_range[0].strip(), '%d/%m/%Y')
+            #     end_date = datetime.strptime(date_range[1].strip(), '%d/%m/%Y')
+            #     q_objects &= (Q(client__name__iregex=term) |
+            #         
+            #         Q(bon_no__iregex=term) |
+            #         Q(client__region__iregex=term)|
+            #         Q(client__city__iregex=term)|
+            #         Q(client__code__iregex=term)|
+            #         Q(total__iregex=term)|
+            #         Q(date__range=[start_date, end_date])
+            #     )
+            # else:
+            #     q_objects &= (Q(client__name__iregex=term) |
+            #         
+            #         Q(bon_no__iregex=term) |
+            #         Q(client__region__iregex=term)|
+            #         Q(client__city__iregex=term)|
+            #         Q(client__code__iregex=term)|
+            #         Q(total__iregex=term)
+            #     )
+            q_objects &= (Q(client__name__iregex=term) |
+                    
+                Q(bon_no__iregex=term) |
+                Q(client__region__iregex=term)|
+                Q(client__city__iregex=term)|
+                Q(client__code__iregex=term)|
+                Q(total__iregex=term)|
+                
+                Q(statusreg__iregex=term)|
+                Q(note__iregex=term)
+                )
+        print(startdate, enddate)
+        if startdate=='0' and enddate=='0':
+            if all:
+                bons=Bonsortie.objects.exclude(isvalid=True).filter(date__year=thisyear).filter(q_objects).order_by('-bon_no')[start:end]
+            if valid:
+                bons=Bonsortie.objects.filter(isvalid=True, date__year=thisyear).filter(q_objects).order_by('-bon_no')[start:end]
+            #total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        else:
+            if all:
+                bons=Bonsortie.objects.exclude(isvalid=True).filter(date__range=[startdate, enddate]).filter(q_objects).order_by('-bon_no')[start:end]
+            if valid:
+                bons=Bonsortie.objects.filter(isvalid=True, date__range=[startdate, enddate]).filter(q_objects).order_by('-bon_no')[start:end]
+            # bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
+            # total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        # for i in bons:
+            # trs+=f'''
+            # <tr
+            # style="background: {"lightgreen;" if i.isdelivered else ""} color:{"blue" if i.isfacture else ""} "
+            # class="ord {"text-danger" if i.ispaid else ''} bl-row"
+            # year={year}
+            # orderid="{i.id}"
+            # ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/Bonsortiedetails/{i.id}')"
+            # term="{term}">
+            #     <td>{ i.bon_no }</td>
+            #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+            #         <td>{ i.client.name }</td>
+            #         <td>{ i.client.code }</td>
+            #         <td style="color: blue;">{ i.total}</td>
+            #         <td>{ i.client.region}</td>
+            #         <td>{ i.client.city}</td>
+            #         <td>{ "%.2f" % i.client.soldbl} </td>
+            #         <td>{ i.salseman }</td>
+            #         <td class="d-flex justify-content-between">
+            #         <div>
+            #         {'R0' if i.ispaid else 'N1' }
+
+            #         </div>
+            #         <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+
+            #         </td>
+            #         <td>
+            #         {'OUI' if i.isfacture else 'NON'}
+            #         </td>
+
+            #         <td>
+            #             {i.commande.order_no if i.commande else "---"}
+            #         </td>
+            #         <td>
+            #         {i.modlvrsn}
+            #         </td>
+            #         <td>
+            #         {i.note}
+            #         </td>
+            #         <td class="d-flex">
+            #       <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
+            #     <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
+            #         </td>
+
+            #   </tr>
+            # '''
+        print('>>>load bl term')
+        return JsonResponse({
+            'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+            'has_more': len(bons) == per_page
+        })
+    if startdate != '0' and enddate != '0':
+        startdate = datetime.strptime(startdate, '%Y-%m-%d')
+        enddate = datetime.strptime(enddate, '%Y-%m-%d')
+        bons=Bonsortie.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
+        total=round(Bonsortie.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        print('>>>load bl date f')
+        return JsonResponse({
+            'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+            'has_more': len(bons) == per_page
+        })
+    bons= Bonsortie.objects.filter(date__year=year).order_by('-bon_no')[start:end]
+    total=round(Bonsortie.objects.filter(date__year=year).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+
+    return JsonResponse({
+        'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+        'has_more': len(bons) == per_page
+    })
+
+
+
 
 def loadlistbc(request):
     # each block needs a return statement
@@ -7463,7 +7609,7 @@ def loadlistbc(request):
         q_objects = Q()
         for term in search_terms:
             if term:
-                q_objects &= (Q(client__name__iregex=term) | Q(salseman__name__iregex=term) | Q(order_no__iregex=term) | Q(total__iregex=term))
+                q_objects &= (Q(client__name__iregex=term) |  Q(order_no__iregex=term) | Q(total__iregex=term))
         if startdate=='0' and enddate=='0':
             print("in  term  no filter data")
             bons=Order.objects.filter(q_objects).filter(date__year=thisyear).order_by('-order_no')[start:end]
@@ -8847,7 +8993,7 @@ def searchclientfcs(request):
     q_objects = Q()
     for term in search_terms:
         if term:
-            q_objects &= (Q(salseman__name__iregex=term) | Q(facture_no__iregex=term) | Q(total__iregex=term))
+            q_objects &= ( Q(facture_no__iregex=term) | Q(total__iregex=term))
     bons=Facture.objects.filter(client_id=clientid).filter(q_objects)[:10]
     print(bons)
     trs=''
@@ -8871,7 +9017,7 @@ def searchclientfcsupdatereg(request):
     q_objects = Q()
     for term in search_terms:
         if term:
-            q_objects &= (Q(salseman__name__iregex=term) | Q(facture_no__iregex=term) | Q(total__iregex=term))
+            q_objects &= ( Q(facture_no__iregex=term) | Q(total__iregex=term))
     bons=Facture.objects.filter(client_id=clientid).filter(q_objects)[:10]
     print(bons)
     trs=''
@@ -8894,7 +9040,7 @@ def searchclientblsupdatereg(request):
     q_objects = Q()
     for term in search_terms:
         if term:
-            q_objects &= (Q(salseman__name__iregex=term) | Q(bon_no__iregex=term) | Q(total__iregex=term))
+            q_objects &= ( Q(bon_no__iregex=term) | Q(total__iregex=term))
     bons=Bonlivraison.objects.filter(client_id=clientid).filter(q_objects)[:10]
     print(bons, clientid)
     trs=''

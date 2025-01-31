@@ -370,7 +370,7 @@
     function handleScrolllistbl () {
       const container = $('.listblholder')[0]; // Get the native DOM element
       const lastRow = document.querySelector('.bl-row:last-child');
-      let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      let year=$('name=["yearsbl"]').val()
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
       let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0
