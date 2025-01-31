@@ -2876,14 +2876,14 @@ def printbulk(request):
     # return render(request, 'caisse.html')
 
 def zz(request):
-    products=Produit.objects.all()
-    data=[]
-    for i in products:
-        sorti=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
-        entr=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
-        dd=entr-sorti
-        i.stocktotalfarah=dd
-        i.save()
+    # products=Produit.objects.all()
+    # data=[]
+    # for i in products:
+    #     sorti=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
+    #     entr=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+    #     dd=entr-sorti
+    #     i.stocktotalfarah=dd
+    #     i.save()
     #     data.append(['farah', i.ref, i.stocktotalfarah, sorti, entr])
     return JsonResponse({
         'ss':True
