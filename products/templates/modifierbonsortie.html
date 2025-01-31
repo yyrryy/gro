@@ -59,7 +59,7 @@
                     </select>
                 </div> -->
                 <div class="mb-2 col-4">
-                    <input type="date" class="form-control datebonbl" name="datebon" placeholder="Date bon">
+                    <input type="date" class="form-control datebonbl" name="datebon" placeholder="Date bon" value="{{bon.date|date:'Y-m-d'}}">
                 </div>
                 <div class="mb-2 col-4">
                   <input placeholder="transport" type="text" class="form-control transport" name="transport">
@@ -653,21 +653,21 @@
 
     // })
     //     // fill today's date in .datebon input
-        var dateInput = document.querySelector('.datebonbl');
+//         var dateInput = document.querySelector('.datebonbl');
 
-// Create a new Date object for today
-        var today = new Date();
+// // Create a new Date object for today
+//         var today = new Date();
 
-        // Get the current date in the "yyyy-mm-dd" format
-        var yyyy = today.getFullYear();
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
-        var dd = String(today.getDate()).padStart(2, '0');
+//         // Get the current date in the "yyyy-mm-dd" format
+//         var yyyy = today.getFullYear();
+//         var mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
+//         var dd = String(today.getDate()).padStart(2, '0');
 
-        // Format the date as "yyyy-mm-dd"
-        var currentDate = yyyy + '-' + mm + '-' + dd;
+//         // Format the date as "yyyy-mm-dd"
+//         var currentDate = yyyy + '-' + mm + '-' + dd;
 
-        // Set the value of the date input to today's date
-        dateInput.value = currentDate;
+//         // Set the value of the date input to today's date
+//         dateInput.value = currentDate;
 
 
       $('.resultsholderbonsortie').on('change', function(){
