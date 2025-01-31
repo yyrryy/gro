@@ -44,11 +44,11 @@
   
   
   
-  <div id="printbl{{order.id}}" class="bonbody position-relative" >
   {% for i in orderitems %}
+  <div id="printbl{{order.id}}" class="bonbody position-relative" style="height: 21cm;width: 14.8cm">
   {% if forloop.counter == orderitems|length %}
   <!-- last iteration -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}; margin:auto;">
       <!-- header -->
       <div class="row">
         <div class="col-3">
@@ -199,7 +199,7 @@
 
     {% else %}
     <!-- other pages -->
-    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}">
+    <div class="px-2 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: {% if A6 %}14.8cm{% else %}21cm{%endif%};width: {%if A6 %}10.5cm{%else%}14.8cm{%endif%}; margin:auto;">
       <!-- header -->
       <div class="row">
         <div class="col-2">
