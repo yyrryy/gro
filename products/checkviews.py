@@ -2876,7 +2876,7 @@ def printbulk(request):
     # return render(request, 'caisse.html')
 
 def zz(request):
-    products=Produit.objects.filter(stocktotalfarah__lt=0)
+    products=Produit.objects.all()
     data=[]
     for i in products:
         sorti=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
