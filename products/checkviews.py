@@ -2892,7 +2892,8 @@ def zzz(request):
     for i in products:
         sorti=Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
         entr=Stockin.objects.filter(product=i, isfarah=False).aggregate(Sum('quantity'))['quantity__sum'] or 0
-        data.append(['ogh', i.ref, i.stocktotalfarah, sorti, entr])
+        dd=entr-sorti
+        data.append(['ogh', i.ref, i.stocktotalorgh, dd])
     return JsonResponse({
         'ss':data
     })
