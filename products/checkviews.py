@@ -2443,6 +2443,8 @@ def printbarcode(request):
         barcodes.append(thisbarcodes)
         
         # if achat means the request is coming from bon achat, date will be today
+    
+    
     return render(request, 'barcode.html', {
         'barcodes': barcodes,
     })

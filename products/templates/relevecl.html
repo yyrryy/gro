@@ -71,7 +71,11 @@
                     <td>
                         {% for v in i %}
                         {% if v.1 == 'Bonlivraison' %}
-                        {{v.0.bon_no}}{{v.0.facture_no}}<br>
+                        {{v.0.bon_no}}{{v.0.facture_no}}
+                        {% if v.0.remise %}
+                        (Remise)
+                        {% endif %}
+                        <br>
                         {% elif v.1 == 'PaymentClientbl' %}
                             {% if v.0.mode == espece %}
                             Espece<br>
@@ -116,6 +120,9 @@
                         {% for v in i %}
                         {% if v.1 == 'Bonlivraison' %}
                         <span class="creditsoldbl">
+                            {% if v.0.remise %}
+                            {{v.0.remiseamount|floatformat:2|intspace}}
+                            {% endif %}
                         </span>
                         <br>
                         {% elif v.1 == 'PaymentClientbl' %}
@@ -246,7 +253,11 @@
                     <td>
                         {% for v in i %}
                         {% if v.1 == 'Bonlivraison' %}
-                        {{v.0.bon_no}}<br>
+                        {{v.0.bon_no}}{{v.0.facture_no}}
+                        {% if v.0.remise %}
+                        (Remise)
+                        {% endif %}
+                        <br>
                         {% elif v.1 == 'PaymentClientbl' %}
                             {% if v.0.mode == espece %}
                             Espece<br>
@@ -291,6 +302,9 @@
                         {% for v in i %}
                         {% if v.1 == 'Bonlivraison' %}
                         <span class="creditsoldbl">
+                            {% if v.0.remise %}
+                            {{v.0.remiseamount|floatformat:2|intspace}}
+                            {% endif %}
                         </span>
                         <br>
                         {% elif v.1 == 'PaymentClientbl' %}

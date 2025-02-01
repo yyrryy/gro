@@ -4010,6 +4010,66 @@ def relevclient(request):
     })
 
 
+def relevclientnr(request):
+    clientid=request.POST.get('clientid')
+    target=request.POST.get('target')
+    client=Client.objects.get(pk=clientid)
+    startdate=request.POST.get('datefrom')
+    enddate=request.POST.get('dateto')
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    print('>> target', target)
+    if target=="f":
+        print('>>> here in farah', clientid, )
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True, ispaid=False)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True, isavoir=False)
+    elif target=="s":
+        bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, ispaid=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True, ispaid=False)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, inreglement=False)
+        reglementsbl=[]
+        #reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, isavoir=False, inreglement=False)
+    else:
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True, ispaid=False)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True, isavoir=False)
+        #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
+    # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
+    # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
+    # sold=round(totaldebit-totalcredit, 2)
+
+    # chain all the data based on dates
+    # first get all dates
+    # print('>> avances', avances[0].amount)
+    releve = chain(*[
+    ((bon, 'Bonlivraison') for bon in bons),
+    ((avoir, 'Avoirclient') for avoir in avoirs),
+    ((avance, 'avanceclient') for avance in avances),
+    ((reglementbl, 'PaymentClientbl') for reglementbl in reglementsbl),
+    ])
+
+    # Sort the items by date
+    sorted_releve = sorted(releve, key=lambda item: item[0].date)
+
+
+    return JsonResponse({
+        'html':render(request, 'relevecl.html', {
+            'releve':[sorted_releve[i:i+32] for i in range(0, len(sorted_releve), 32)],
+            'client':client,
+
+            'startdate':startdate,
+            'enddate':enddate,
+
+        }).content.decode('utf-8'),
+        #'soldfc':client.soldfacture,
+    })
+
+
+
+
 def relevsupplier(request):
     supplierid=request.POST.get('supplierid')
     target=request.POST.get('target')
