@@ -185,13 +185,14 @@
             </td>
             <td class="d-flex">
               <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
-              <button class="btn btn-sm bi bi-download" onclick="printsortie2('{{order.id}}')"></button>
+              <button class="btn btn-sm bi bi-download" onclick="printsortie2('{{order.id}}')">A5</button>
+              <button class="btn btn-sm bi bi-download" onclick="printsortieA6('{{order.id}}')">A6</button>
             </td>
           
           </tr>
         {% endfor %}
       </tbody>
-      <thead style="position: sticky; bottom: 0; background: white;">
+      <!-- <thead style="position: sticky; bottom: 0; background: white;">
         <tr>
           <td style="width: 8%;"></td>
           <td style="width: 8%;"></td>
@@ -211,7 +212,7 @@
           <td style="width: 5%;"></td>
           <td></td>
         </tr>
-      </thead>
+      </thead> -->
       <!-- <tfoot>
         <tr>
           <td>N° bon</td>
