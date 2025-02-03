@@ -46,10 +46,16 @@
           <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target=o')">
             Alert Stock
           </div>
-    
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/produits?target=o')">
-            Produits
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target={{target}}')">
+            Journal acahts
           </div>
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target={{target}}')">
+            Journal Vente
+          </div>
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target={{target}}')">
+             Stock general
+          </div>
+          
         </div>
       </div>
 

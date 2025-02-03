@@ -59,6 +59,7 @@ class Incaisse(models.Model):
 
 class Produit(models.Model):
     # negative stock
+    replacedby=models.ForeignKey("Produit", on_delete=models.SET_NULL, default=None, null=True, blank=True)
     isnegativeinfr=models.BooleanField(default=False)
     isnegative=models.BooleanField(default=False)
     frnegative=models.TextField(default='[]')
@@ -378,7 +379,8 @@ class Client(models.Model):
         totalavoirs=Avoirclient.objects.filter(client_id=self).aggregate(Sum('total')).get('total__sum')or 0
         totalavances=Avanceclient.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
         totalreglements=PaymentClientbl.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
-        return round(totalbons-totalavoirs-totalavances-totalreglements, 2)
+        remise=Bonsortie.objects.filter(client_id=self).aggregate(Sum('remiseamount')).get('remiseamount__sum')or 0
+        return round(totalbons-totalavoirs-totalavances-totalreglements-remise, 2)
     def __str__(self) -> str:
         return self.name+'-'+str(self.city)
 

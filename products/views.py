@@ -5336,6 +5336,23 @@ def filterbldate(request):
         ctx['total']=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 
+def filterbsdate(request):
+    target=request.GET.get('target')
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+    print(startdate, enddate)
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    bons=Bonsortie.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
+    ctx={
+        'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8')
+    }
+    if bons:
+        ctx['total']=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
+
+
+
 def searchclient(request):
     term=request.GET.get('term')
     target=request.GET.get('target')
@@ -8905,7 +8922,8 @@ def searchforlistclient(request):
         clients=Client.objects.filter(clientsortie=True).filter(q_objects)
     return JsonResponse({
         'trs':render(request, 'clienttrs.html', {
-        'clients':clients
+        'clients':clients,
+        'target':target
         }).content.decode('utf-8')
     })
 

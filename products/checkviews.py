@@ -744,10 +744,11 @@ def checkplafon(request):
     client=Client.objects.get(pk=clientid)
     plafon=client.plafon
     totalbons=Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0
+    remise=Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('remiseamount')).get('remiseamount__sum')or 0
     totalavoirs=Avoirclient.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0
     totalavances=Avanceclient.objects.filter(client_id=clientid).aggregate(Sum('amount')).get('amount__sum')or 0
     totalreglements=PaymentClientbl.objects.filter(client_id=clientid).aggregate(Sum('amount')).get('amount__sum')or 0
-    soldtotal=round(totalbons-totalavoirs-totalavances-totalreglements, 2)
+    soldtotal=round(totalbons-totalavoirs-totalavances-totalreglements-remise, 2)
     print('totalbons-totalavoirs-totalavances-totalreglements', totalbons-totalavoirs-totalavances-totalreglements)
     return JsonResponse({
         'plafon':plafon,
@@ -2382,6 +2383,7 @@ def validation(request):
 def printbarcode(request):
     products=json.loads(request.GET.get('products'))
     supplierid=request.GET.get('supplierid')
+    suppliercode=Supplier.objects.get(pk=supplierid).code
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
@@ -2400,7 +2402,6 @@ def printbarcode(request):
         price=round(net*2, 2)
         #price=str(price).replace('.', '')
         qty=float(i['qty'])
-        print('>>>', supplierid, date)
         # # List to hold the barcodes in base64 format
         
         # Generate barcodes for the specified quantity
@@ -2438,11 +2439,13 @@ def printbarcode(request):
             
             # Convert the image to base64 and append it to the list
             qr_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            thisbarcodes.append([ref, name, f"{price:.2f}".replace('.', ''), qr_base64, supplierid, date])
+            
+            barcodes.append([ref, name, f"{price:.2f}".replace('.', ''), qr_base64, suppliercode, date])
+            #thisbarcodes.append([ref, name, f"{price:.2f}".replace('.', ''), qr_base64, supplierid, date])
             buffer.close()
-        barcodes.append(thisbarcodes)
-        
+        #barcodes.append(thisbarcodes)
         # if achat means the request is coming from bon achat, date will be today
+    barcodes=[barcodes[i:i+65] for i in range(0, len(barcodes), 65)]
     
     
     return render(request, 'barcode.html', {
@@ -2904,4 +2907,29 @@ def zzz(request):
     return JsonResponse({
         'ss':True
     })
-        
+
+def replaceproduct(request):
+    oldproduct=Produit.objects.get(pk=request.GET.get('producttoreplace'))
+    newproduct=Produit.objects.get(pk=request.GET.get('replacewith'))
+    # adjuct stock of old to new
+    newproduct.stocktotalfarah+=oldproduct.stocktotalfarah
+    newproduct.stocktotalorgh+=oldproduct.stocktotalorgh
+    # replace old in bon sortie
+    sorti=Sortieitem.objects.filter(product=oldproduct)
+    sorti.update(product=newproduct)
+    # replace old in bon livraison
+    livraisons=Livraisonitem.objects.filter(product=oldproduct)
+    livraisons.update(product=newproduct)
+    # replace old in bon achat
+    stockin=Stockin.objects.filter(product=oldproduct)
+    stockin.update(product=newproduct)
+    # replace old in bon achat
+    avoirsupp=Returnedsupplier.filter(product=oldproduct)
+    avoirsupp.update(product=newproduct)
+    # replace old in bon avoir supp
+    oldproduct.replacedby=newproduct
+    oldproduct.save()
+    newproduct.save()
+    return JsonResponse({
+        'success':True
+    })
