@@ -7736,6 +7736,9 @@ def loadlistbc(request):
 
 def searchforlistachat(request):
     term=request.GET.get('term')
+    target=request.GET.get('target')
+    year=request.GET.get('year')
+    isfarah=target=="f"
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     search_terms = term.split('+')
@@ -7752,36 +7755,35 @@ def searchforlistachat(request):
         )
     print(term, startdate, enddate)
     if startdate=='0' and enddate=='0':
-        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__year=thisyear).order_by('-date')
-        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__year=thisyear).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah).order_by('-date')
+        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
     else:
-        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-date')
-        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
-    print(bons)
-    trs=''
-    for order in bons:
-        trs+=f'''
-            <tr class="ord " orderid="{order.id}" ondblclick="ajaxpage('bonachat{order.id}', 'Bon achat {order.nbon}', '/products/bonachatdetails/{order.id}')">
-            <td>{ order.nbon }</td>
-            <td>{ order.date.strftime("%d/%m/%Y") }</td>
-            <td>{ order.supplier.name }</td>
-            <td>{ order.total}</td>
-            <td>{ order.tva}</td>
-            <td>{"Facture"if order.isfacture else "Bl"}</td>
-            <td>{ round(order.supplier.rest, 2) }</td>
-            <td class="d-flex">
-                <div>{"R0"if order.ispaid else "N1"}</div>
-                <div style="width:15px; height:15px; border-radius:50%; background:{"green"if order.ispaid else "red"};" ></div>
-            </td>
-            <td>
-              <button class="btn bi bi-download" onclick="printbonachat('{order.id}')"></button>
-            </td>
+        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-date')
+        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # trs=''
+    # for order in bons:
+    #     trs+=f'''
+    #         <tr class="ord " orderid="{order.id}" ondblclick="ajaxpage('bonachat{order.id}', 'Bon achat {order.nbon}', '/products/bonachatdetails/{order.id}')">
+    #         <td>{ order.nbon }</td>
+    #         <td>{ order.date.strftime("%d/%m/%Y") }</td>
+    #         <td>{ order.supplier.name }</td>
+    #         <td>{ order.total}</td>
+    #         <td>{ order.tva}</td>
+    #         <td>{"Facture"if order.isfacture else "Bl"}</td>
+    #         <td>{ round(order.supplier.rest, 2) }</td>
+    #         <td class="d-flex">
+    #             <div>{"R0"if order.ispaid else "N1"}</div>
+    #             <div style="width:15px; height:15px; border-radius:50%; background:{"green"if order.ispaid else "red"};" ></div>
+    #         </td>
+    #         <td>
+    #           <button class="btn bi bi-download" onclick="printbonachat('{order.id}')"></button>
+    #         </td>
 
-          </tr>
-            '''
+    #       </tr>
+    #         '''
 
     return JsonResponse({
-        'trs':trs,
+        'trs':render(request, 'bonachatrs.html', {'bons':bons}).content.decode('utf-8'),
         'total':total
     })
 
