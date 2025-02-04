@@ -4845,17 +4845,15 @@ def loadjournalachat(request):
 
 
 def journalvente(request):
-    items=Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).order_by('-date')[:50]
-    bons=Bonlivraison.objects.filter(date__year=thisyear)
-    totaltotal=round(bons.aggregate(Sum('total'))['total__sum'] or 0, 2)
-    total2=round(Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
-    print('>>>>>', totaltotal, total2)
+    target=request.GET.get('target')
+    # items=Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).order_by('-date')[:50]
+    # bons=Bonlivraison.objects.filter(date__year=thisyear)
+    # totaltotal=round(bons.aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # total2=round(Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # print('>>>>>', totaltotal, total2)
     ctx={
         'title':'Journal vente',
-        'items':items,
-        'totalqty':Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).aggregate(Sum('qty'))['qty__sum'] or 0,
-        'totaltotal':round(Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2),
-        'today':timezone.now().date()
+        'target':target
     }
     return render(request, 'journalvente.html', ctx)
 
@@ -9405,34 +9403,41 @@ def searchforjvfc(request):
     })
 
 def filterjvdate(request):
+    target=request.GET.get('target')
+    productid=request.GET.get('productid')
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Livraisonitem.objects.filter(isfacture=False, date__range=[startdate, enddate]).order_by('-date')[:50]
-    trs=''
-    for i in bons:
-        trs+=f'''
-        <tr class="journalvente-row" startdate={startdate} enddate={enddate}>
-            <td>{i.date.strftime('%d/%m/%Y')}</td>
-            <td>{i.bon.bon_no}</td>
-            <td>{i.product.ref}</td>
-            <td>{i.product.name}</td>
-            <td>{i.price}</td>
-            <td class="prnetjv">{i.product.prixnet if i.product.prixnet else 0}</td>
-            <td style="color:blue" class="coutmoyenjv">{i.product.coutmoyen if i.product.coutmoyen else 0}</td>
-            <td class="text-danger">{i.product.buyprice if i.product.buyprice else 0}</td>
-            <td class="text-danger qtyjv">{i.qty}</td>
-            <td class="totaljv">{i.total}</td>
-            <td>{i.bon.client.name}</td>
-            <td>{i.bon.salseman.name}</td>
-            <td class="text-success margejv">
+    if target=='f':
+        bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')[:50]
+    else:
+        bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')[:50]
+    #elif target=='o':
+    
+    # trs=''
+    # for i in bons:
+    #     trs+=f'''
+    #     <tr class="journalvente-row" startdate={startdate} enddate={enddate}>
+    #         <td>{i.date.strftime('%d/%m/%Y')}</td>
+    #         <td>{i.bon.bon_no}</td>
+    #         <td>{i.product.ref}</td>
+    #         <td>{i.product.name}</td>
+    #         <td>{i.price}</td>
+    #         <td class="prnetjv">{i.product.prixnet if i.product.prixnet else 0}</td>
+    #         <td style="color:blue" class="coutmoyenjv">{i.product.coutmoyen if i.product.coutmoyen else 0}</td>
+    #         <td class="text-danger">{i.product.buyprice if i.product.buyprice else 0}</td>
+    #         <td class="text-danger qtyjv">{i.qty}</td>
+    #         <td class="totaljv">{i.total}</td>
+    #         <td>{i.bon.client.name}</td>
+    #         <td>{i.bon.salseman.name}</td>
+    #         <td class="text-success margejv">
 
-            </td>
-        </tr>
-        '''
+    #         </td>
+    #     </tr>
+    #     '''
     ctx={
-        'trs':trs
+        'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
     }
     if bons:
         ctx['total']=round(Livraisonitem.objects.filter(isfacture=False, date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)

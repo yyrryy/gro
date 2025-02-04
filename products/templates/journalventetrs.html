@@ -1,0 +1,25 @@
+{% for i in bons %}
+<tr>
+    <td>
+        {{i.bon.date|date:"d/m/Y"}}
+    </td>
+    <td>
+        {{i.bon.bon_no}}
+    </td>
+    <td>
+        {{i.price}}
+    </td>
+    <td>
+        {{i.qty}}
+    </td>
+    <td>
+        {{i.total}}
+    </td>
+    <td>
+        {{i.bon.client.name}}
+    </td>
+    <td>
+        {{i.bon.client.code}}
+    </td>
+</tr>
+{% endfor %}
