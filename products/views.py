@@ -5348,7 +5348,7 @@ def filterbsdate(request):
         'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8')
     }
     if bons:
-        ctx['total']=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['total']=round(Bonsortie.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 
 
