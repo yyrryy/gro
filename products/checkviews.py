@@ -1780,8 +1780,8 @@ def getsupplierbonsforfacture(request):
         bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, isfacture=False, isfarah=True)
         total=round(Itemsbysupplier.objects.filter(supplier_id=supplierid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(supplier_id=supplierid, isfacture=False, isfarah=False)
-        total=round(Bonlivraison.objects.filter(supplier_id=supplierid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, isfacture=False, isfarah=False)
+        total=round(Itemsbysupplier.objects.filter(supplier_id=supplierid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
         # old code, if reglement is paid it's checked from here
