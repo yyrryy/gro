@@ -308,6 +308,7 @@ urlpatterns = [
     path('relevclientnr', views.relevclientnr, name='relevclientnr'),
     path('filterbsdate', views.filterbsdate, name='filterbsdate'),
     path('loadlistbs', views.loadlistbs, name='loadlistbs'),
+    # path('loadlistbs', views.loadlistbs, name='loadlistbs'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
