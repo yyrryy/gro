@@ -1643,7 +1643,7 @@ def addclient(request):
     modereglement=request.POST.get('modereglement')
     note=request.POST.get('note')
     clientsold=request.POST.get('clientsold') or 0
-    region=request.POST.get('clientregion').lower().strip()
+    #region=request.POST.get('clientregion').lower().strip()
     plafon=request.POST.get('clientplafon') or 0
     isfarah=target=='f'
     if Client.objects.filter(Q(name=name) | Q(code=code), clientfarah=isfarah).exists():
@@ -1667,7 +1667,7 @@ def addclient(request):
         client=Client.objects.create(
             city=city,
             ice=ice,
-            region=region,
+            #region=region,
             plafon=plafon,
             code=code,
             name=name,
