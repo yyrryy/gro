@@ -9440,8 +9440,8 @@ def filterjvdate(request):
         'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
     }
     if bons:
-        ctx['total']=round(Livraisonitem.objects.filter(isfacture=False, date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
-        ctx['qty']=round(Livraisonitem.objects.filter(isfacture=False, date__range=[startdate, enddate]).aggregate(Sum('qty')).get('qty__sum'), 2)
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['totalqty']=round(bons.aggregate(Sum('qty')).get('qty__sum'), 2)
     return JsonResponse(ctx)
 
 def filterjvfcdate(request):
