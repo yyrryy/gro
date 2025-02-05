@@ -7,7 +7,7 @@
     <link href="/static/css/minified.css" rel="stylesheet" />
 
 </head>
-<body>
+<body class="p-5" style="font-family: sans-serif;">
     <h4>Stock general {% if target == "f" %}Farah{%else%} Orgh {%endif%}</h4>
     <table class="table table-bordered table-hover">
         <thead>
@@ -24,12 +24,22 @@
                 <tr>
                     <td>{{product.ref}}</td>
                     <td>{{product.name}}</td>
-                    <td>{% if target == "f" %}stocktotalfarah{%else%} stocktotalforgh {%endif%}</td>
+                    <!-- <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td> -->
+                    <td>{{product.stock}}</td>
                     <td>{{product.coutmoyen}}</td>
-                    <td>{{product.selling_price}}</td>
+                    <td>{{product.totalstock}}</td>
                 </tr>
             {% endfor %}
         </tbody>
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>{{totalgeneral}}</th>
+            </tr>
+        </thead>
     </table>
 </body>
 </html>
