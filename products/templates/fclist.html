@@ -56,7 +56,8 @@
       {% if order.isaccount %}
       <i class="bi bi-check h3"></i>c
       {% endif %}
-      <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{{order.id}}')"></button>
+      <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{{target}}', '{{order.id}}')">C</button>
+      <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfactureproductname('{{target}}', '{{order.id}}')">N</button>
     </td>
 </tr>
 {% endfor %}

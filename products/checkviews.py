@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config
 from django.http import JsonResponse, HttpResponse
 import qrcode
-from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
+from django.db.models import Count, F, Sum, Q, Window, Case, When, Value, FloatField, ExpressionWrapper
 from datetime import datetime, date, timedelta
 from django.utils import timezone
 import json
@@ -2933,3 +2933,123 @@ def replaceproduct(request):
     return JsonResponse({
         'success':True
     })
+
+def stockgeneral(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    if isfarah:
+        products=Produit.objects.filter(stocktotalfarah__gt=0)
+        for i in products:
+            
+            
+            stock_needed = i.stocktotalfarah
+            # stockins = (
+            #     Stockin.objects.filter(isavoir=False, product=i, isfarah=True)
+            #     .annotate(
+            #         running_total=Window(
+            #             expression=Sum('quantity'), 
+            #             order_by=F('date').desc()
+            #         )
+            #     )
+            #     .filter(running_total__lte=stock_needed)
+            # )
+            qs = (
+                Stockin.objects.filter(isavoir=False, product=i, isfarah=True)
+                # Compute the running total ordered by latest date first.
+                .annotate(
+                    running_total=Window(
+                        expression=Sum('quantity'),
+                        order_by=F('date').desc()
+                    )
+                )
+                # Compute "previous total" as running_total minus the current row's quantity.
+                .annotate(
+                    prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())
+                )
+                # Compute how much quantity to "take" from each row.
+                .annotate(
+                    taken_quantity=Case(
+                        # If the entire row is needed (running_total is still less than or equal to stock_needed)
+                        When(running_total__lte=stock_needed, then=F('quantity')),
+                        # Otherwise, if part of this row is needed: previous total is less than needed, but adding some of this row exceeds it.
+                        When(
+                            Q(prev_total__lt=stock_needed) & Q(running_total__gt=stock_needed),
+                            then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
+                        ),
+                        default=Value(0),
+                        output_field=FloatField()
+                    )
+                )
+                # Only keep rows where we actually need to take something.
+                .filter(taken_quantity__gt=0)
+                # Retrieve only the fields we care about.
+                .values('id', 'taken_quantity', 'price')
+            )
+            qties=0
+            prices=0
+            for entry in qs:
+                qty+=entry['taken_quantity']
+                prices+=entry['taken_quantity']*entry['price']
+            coutmoyen=prices/qties
+            i.coutmoyen=coutmoyen
+            print('>>>', qs)
+
+    else:
+        products=Produit.objects.filter(stocktotalorgh__gt=0)
+        for i in products:
+            
+            
+            stock_needed = i.stocktotalfarah
+            # stockins = (
+            #     Stockin.objects.filter(isavoir=False, product=i, isfarah=True)
+            #     .annotate(
+            #         running_total=Window(
+            #             expression=Sum('quantity'), 
+            #             order_by=F('date').desc()
+            #         )
+            #     )
+            #     .filter(running_total__lte=stock_needed)
+            # )
+            qs = (
+                Stockin.objects.filter(isavoir=False, product=i, isfarah=False)
+                # Compute the running total ordered by latest date first.
+                .annotate(
+                    running_total=Window(
+                        expression=Sum('quantity'),
+                        order_by=F('date').desc()
+                    )
+                )
+                # Compute "previous total" as running_total minus the current row's quantity.
+                .annotate(
+                    prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())
+                )
+                # Compute how much quantity to "take" from each row.
+                .annotate(
+                    taken_quantity=Case(
+                        # If the entire row is needed (running_total is still less than or equal to stock_needed)
+                        When(running_total__lte=stock_needed, then=F('quantity')),
+                        # Otherwise, if part of this row is needed: previous total is less than needed, but adding some of this row exceeds it.
+                        When(
+                            Q(prev_total__lt=stock_needed) & Q(running_total__gt=stock_needed),
+                            then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
+                        ),
+                        default=Value(0),
+                        output_field=FloatField()
+                    )
+                )
+                # Only keep rows where we actually need to take something.
+                .filter(taken_quantity__gt=0)
+                # Retrieve only the fields we care about.
+                .values('id', 'taken_quantity', 'price')
+            )
+            print('>>> qq', qs)
+            print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
+            qties=0
+            prices=0
+            for entry in qs:
+                qty+=entry['taken_quantity']
+                prices+=entry['taken_quantity']*entry['price']
+            coutmoyen=prices/qties
+            i.coutmoyen=coutmoyen
+
+    return render(request, 'stockgeneral.html', {'products':products})

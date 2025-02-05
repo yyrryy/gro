@@ -878,7 +878,7 @@ def addsupply(request):
         #     )
         # else:
         Stockin.objects.create(
-            date=datebon,
+            date=datefacture,
             product=product,
             quantity=i['qty'],
             price=i['price'],
@@ -9404,15 +9404,35 @@ def searchforjvfc(request):
 
 def filterjvdate(request):
     target=request.GET.get('target')
-    productid=request.GET.get('productid')
-    startdate=request.GET.get('datefrom')
-    enddate=request.GET.get('dateto')
-    startdate = datetime.strptime(startdate, '%Y-%m-%d')
-    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    productid=request.GET.get('productid') or None
+    startdate=request.GET.get('datefrom') or None
+    enddate=request.GET.get('dateto') or None
+    print('>> productid, dateto, datefrom', productid, startdate, enddate, target)
+    # startdate = datetime.strptime(startdate, '%Y-%m-%d') or None
+    # enddate = datetime.strptime(enddate, '%Y-%m-%d') or None
     if target=='f':
-        bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')[:50]
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(isfarah=True, isfacture=False).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
+
+    elif target=='o':
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
     else:
-        bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')[:50]
+        bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
     #elif target=='o':
     
     # trs=''

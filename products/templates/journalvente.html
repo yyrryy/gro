@@ -1,11 +1,11 @@
 {% load global_tags %}
 <div class="row position-relative">
     <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-        <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('journalvente')">x</button>
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('journalvente')">x</button> -->
         <div>
           {{title}}
         </div>
-        <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('journalvente', '/products/journalvente')">↻</button>
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('journalvente', '/products/journalvente')">↻</button> -->
     </div>
     <div style="background: #ffc39a; padding: 5px;">
         <div class="d-flex">
@@ -36,11 +36,13 @@
                 <tr>
                     <td onclick="datesorttable(event)">Date</td>
                     <td onclick="sorttable(event)">N° bon</td>
+                    <td onclick="sorttable(event)">REF</td>
+                    <td onclick="sorttable(event)">Designation</td>
                     <td onclick="intsorttable(event)">Prix vente</td>
                     <td class="text-danger" onclick="intsorttable(event)">Qté</td>
                     <td onclick="intsorttable(event)">Total</td>
                     <td onclick="sorttable(event)">Client</td>
-                    <td onclick="sorttable(event)">Code client</td>
+                    <!-- <td onclick="sorttable(event)">Code client</td> -->
                     <!-- <td class="text-success" onclick="intsorttable(event)">Marge</td> -->
                 </tr>
             </thead>
@@ -73,9 +75,11 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
+                    <td></td>
                     <td class="bg-success totalqtyjv">{{totalqty|intspace}}</td>
                     <td class="bg-success totaltotaljv">{{totaltotal|intspace}}</td>
-                    <td></td>
+                    <!-- <td></td> -->
                     <td></td>
                     <!-- <td></td>
                     <td class="bg-success totalmargejv"></td> -->
@@ -135,14 +139,14 @@
         datefrom=$('.jvdatefrom').val()
         dateto=$('.jvdateto').val()
         productid=$('.productsearch').val()
-        if (productid==null || productid=='' || datefrom=='' || dateto==''){
-            alertify.error('Selectionner un produit/date')
-            return
-        }
+        // if (productid==null || productid=='' || datefrom=='' || dateto==''){
+        //     alertify.error('Selectionner un produit/date')
+        //     return
+        // }
         $.get('/products/filterjvdate', {
             'datefrom':datefrom, 
             'dateto':dateto,
-            'productid':productid.split('§')[5],
+            'productid':productid==null?null:productid.split('§')[5],
             'target':'{{target}}'
         }, (data)=>{
             $('.journalvtable tbody').html(data.trs)
@@ -221,7 +225,7 @@
     function getjvdatayear(event){
         currentPagejournalvente=1
         loadingjournalvente=false
-        $('.journalvtableholder').on('scroll', handleScrolljv);
+        // $('.journalvtableholder').on('scroll', handleScrolljv);
         year=$(event.target).val()
         if (year != ''){
             $.get('products/yeardatajournalv', {'year':year}, (data)=>{

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock general {% if target == "f" %}Farah{%else%} Orgh {%endif%}</title>
+    <link href="/static/css/minified.css" rel="stylesheet" />
+
+</head>
+<body>
+    <h4>Stock general {% if target == "f" %}Farah{%else%} Orgh {%endif%}</h4>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>REF</th>
+                <th>Designation</th>
+                <th>Quantité</th>
+                <th>cout moyen</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{product.ref}}</td>
+                    <td>{{product.name}}</td>
+                    <td>{% if target == "f" %}stocktotalfarah{%else%} stocktotalforgh {%endif%}</td>
+                    <td>{{product.coutmoyen}}</td>
+                    <td>{{product.selling_price}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

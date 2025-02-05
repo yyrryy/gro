@@ -67,21 +67,22 @@
 
     </div>
     
-    <div hidden>
+    <!-- <div hidden>
       <input style="width: 20em;
     background: #c3e6ff;
     border-radius: 11px;
     margin-bottom: 9px;" placeholder="TRODO" onchange="window.open(`https://www.trodo.fr/catalogsearch/result?q=${$(this).val()}&searchby=name`, '_blank')">
-    </div>
+    </div> -->
     <div>
+      
+    </div>
+    <div class="d-flex">
       <select name="yearsbl" onchange="yeardatabl()" class="populateyears">
 
       </select>
-    </div>
-    <div class="d-flex flex-column">
-      <!-- <button class="btn btn-success" style="border-radius: 10px; margin: 0 9px 9px 0;" onclick="ajaxpage('addbonsortie', '+bon livraison', '/products/bonlivraison?target={{target}}')">
-        +Ajouter
-      </button> -->
+      <button class="btn btn-success" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
+        +
+      </button>
 
     </div>
   </div>

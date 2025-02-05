@@ -37,8 +37,8 @@
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button> -->
     <div>
-      <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>
+      <!-- <button class="btn border btnselect btn-dark" style=" 
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>-->
       <button class="btn border btnselect btn-dark active" style="
       border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target={{target}}')">En attend</button>
       <button class="btn border btnselect btn-dark" style="
@@ -292,7 +292,8 @@
                   {% if order.isaccount %}
                   <i class="bi bi-check h3"></i>c
                   {% endif %}
-                  <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{{order.id}}')"></button>
+                  <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{{target}}', '{{order.id}}')">C</button>
+                  <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfactureproductname('{{target}}', '{{order.id}}')">N</button>
                 </td>
             </tr>
           {% endfor %}

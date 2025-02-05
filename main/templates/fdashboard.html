@@ -51,8 +51,8 @@
           <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/journalvente?target={{target}}')">
             Journal Vente
           </div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('alert', 'Alert stock', '/products/alertstock?target={{target}}')">
-             Stock general
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="window.open('/products/stockgeneral?target={{target}}', '_blank')">
+            Stock general
           </div>
         <!-- 
           <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/produits?target={{target}}')">
@@ -241,7 +241,7 @@
   
 </div>
 <!-- side bar -->
-<div class="p-3 seystemsection" id="maintab" style="height:92vh; overflow-y: scroll;">
+<div class="px-3 seystemsection" id="maintab" style="height:92vh; overflow-y: scroll;">
   <div class="row">
     <!-- statistics -->
     <div class="col-4 ">
