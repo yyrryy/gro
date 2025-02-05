@@ -3058,7 +3058,7 @@ def getclientbons(request):
         for i in bons:
             # old code, if reglement is paid it's checked from here
             # trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglements.exists() else ""}" class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.client.name}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglements.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)" {"checked" if i.reglements.exists() else ""}></td></tr>'
-            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} </td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} </td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
     #total=round(Bonlivraison.objects.filter(ispaid=False, client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False, ispaid=False).order_by('date')
     avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], isfarah=isfarah, inreglement=False).order_by('date')
@@ -4626,7 +4626,7 @@ def getsuppbons(request):
     else:
         bons=Factureachat.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend])
         for i in bons:
-            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no} {f"Total: {i.total} Rest=>" if i.rest>0 else ""}</td><td>{i.rest if i.rest>0 else i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.rest if i.rest>0 else i.total} onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
     print('isfarah', isfarah)
     avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, ispaid=False, date__range=[datestart, dateend])
     print('avoirs', avoirs)
