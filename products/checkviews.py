@@ -3010,6 +3010,7 @@ def stockgeneral(request):
             #     )
             #     .filter(running_total__lte=stock_needed)
             # )
+            print('>> working here', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
             qs = (
                 Stockin.objects.filter(isavoir=False, product=i, isfarah=False)
                 # Compute the running total ordered by latest date first.
