@@ -701,7 +701,7 @@
           addqty.val('')
           addqty.focus()
           addprice.val(0)
-          addremise.val(remise)
+          addremise.val(0)
           addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stocktotalfarah}§${stockfacturefarah}§${stocktotalorgh}§${stockfactureorgh}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
           $.get('/products/getqtyprice',
             {
