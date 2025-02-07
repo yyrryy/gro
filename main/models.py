@@ -287,6 +287,8 @@ class Itemsbysupplier(models.Model):
         return f'{self.nbon} - {self.id}'
 
 class Stockin(models.Model):
+    # to indicate the stock initial
+    isinitial=models.BooleanField(default=False)
     # WE NEED to distinguish between to societies
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
