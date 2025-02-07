@@ -141,7 +141,7 @@
             <td >{{ order.date|date:'d/m/Y' }}</td>
             <td >{{ order.client.name }}</td>
             <td >{{ order.client.code }}</td>
-            <td style="color: blue;">{{ order.total|floatformat:'2'}}
+            <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}
             </td>
             
             <td class="">

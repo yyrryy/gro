@@ -28,12 +28,15 @@ def intspace(value):
     if len(value)>1:
         parts = str(value).split('.')
     # Format the integer part with spaces as thousands separators
-        integer_part = "{:,}".format(int(parts[0])).replace(',', ' ')
+        try:
+            integer_part = "{:,}".format(int(parts[0])).replace(',', ' ')
 
-        # If there's a decimal part, join it back
-        formatted_number = integer_part + ('.' + parts[1] if len(parts) > 1 else '')
-    
-        return formatted_number
+            # If there's a decimal part, join it back
+            formatted_number = integer_part + ('.' + parts[1] if len(parts) > 1 else '')
+        
+            return formatted_number
+        except:
+            return value
     else:
         return value
 @register.filter(name='dateadd')
