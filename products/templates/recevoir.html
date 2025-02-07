@@ -693,6 +693,7 @@
         
         let totalbon=parseFloat(parentdiv.find('.grandtotalbonachat').text())
         $('.loadingscreen').removeClass('d-none')
+        $('.submitbon').addClass('disabled')
         $.ajax({
             url: "{% url 'products:addsupply' %}",
             type: 'POST',
