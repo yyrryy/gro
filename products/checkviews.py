@@ -3043,7 +3043,11 @@ def stockgeneral(request):
             for entry in test_qs:
                 qties+=entry['taken_quantity']
                 prices+=entry['taken_quantity']*entry['net']
-            coutmoyen=round(prices/qties, 2)
+            coutmoyen=0
+            try:
+                coutmoyen=round(prices/qties, 2)
+            except Exception as e:
+                print('>> error, ref', e, i.ref)
             i.coutmoyen=coutmoyen
             totalstock=i.stocktotalorgh*coutmoyen
             totalgeneral+=totalstock
