@@ -14,7 +14,7 @@
             <tr>
                 <th>REF</th>
                 <th>Designation</th>
-                <th>Quantité</th>
+                <th>Stock</th>
                 <th>cout moyen</th>
                 <th>Total</th>
             </tr>
@@ -22,8 +22,8 @@
         <tbody>
             {% for product in products %}
                 <tr>
-                    <td>{{product.ref}}</td>
-                    <td>{{product.name}}</td>
+                    <td>{{product.ref.upper}}</td>
+                    <td>{{product.name.upper}}</td>
                     <!-- <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td> -->
                     <td>{{product.stock}}</td>
                     <td>{{product.coutmoyen}}</td>

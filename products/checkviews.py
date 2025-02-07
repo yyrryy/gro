@@ -3003,6 +3003,7 @@ def stockgeneral(request):
         totalgeneral=0
         for i in products:
             stock_needed = i.stocktotalorgh  # The quantity of stock needed
+            print('>> stock needed', stock_needed)
             test_qs = (
                 Stockin.objects.filter(isavoir=False, product=i, isfarah=False)  # Exclude isavoir=True and filter by product_id
                 .annotate(
