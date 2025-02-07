@@ -2937,6 +2937,7 @@ def replaceproduct(request):
 def stockgeneral(request):
     target=request.GET.get('target')
     isfarah=target=='f'
+    errorref=''
     if isfarah:
         data=[]
         totalgeneral=0
@@ -3035,9 +3036,9 @@ def stockgeneral(request):
             )
     
             # Output the results
-            print("Stockin results:", list(test_qs))
+            # print("Stockin results:", list(test_qs))
 
-            print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
+            # print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
             qties=0
             prices=0
             for entry in test_qs:
@@ -3048,8 +3049,9 @@ def stockgeneral(request):
                 coutmoyen=round(prices/qties, 2)
             except Exception as e:
                 print('>> error, ref', e, i.ref)
+                errorref+=' '+i.ref
             i.coutmoyen=coutmoyen
-            totalstock=i.stocktotalorgh*coutmoyen
+            totalstock=round(i.stocktotalorgh*coutmoyen, 2)
             totalgeneral+=totalstock
             data.append({
                 'ref':i.ref,
@@ -3059,4 +3061,4 @@ def stockgeneral(request):
                 'totalstock':totalstock
             })
     
-    return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target})
+    return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
