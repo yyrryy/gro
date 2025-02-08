@@ -14,7 +14,7 @@
       Modifier
     </button>
     {% endif %}
-    <button class="w-100" onclick="printbarcode()">Borcode</button>
+    <button class="w-100" onclick="printbarcode()">Barcode</button>
     <!-- {% if order.isfacture %}
     <button class="btn w-100 btn-danger" onclick="degenerer(event, {{bon.id}}, 'bonl{{bon.id}}', '/products/bonbonachatdetails/{{bon.id}}')">
       Dégenerer Facture
@@ -224,11 +224,8 @@
   function printbarcode(){
     console.log(">>>fff, {{bon.supplier.id}}")
     supplierid="{{bon.supplier.id}}"
-    datebonachat="{{bon.date|date:'Y-m-y'}}"
-    if (supplierid=='' || datebonachat==''){
-      alertify.error('Fourniseur ou date invalid')
-      return
-    }
+    datebonachat="{{bon.date|date:'Y-m-d'}}"
+    
     trs=$('.bonachatbody tr')
     let products = []
     trs.each(function(){
