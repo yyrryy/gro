@@ -3062,3 +3062,27 @@ def stockgeneral(request):
             })
     
     return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
+
+def commandepdctorgh(request):
+    pdctid=request.GET.get('pdctid')
+    supplierid=request.GET.get('supplierid')
+    qty=request.GET.get('qty')
+    pdct=Produit.objects.get(pk=pdctid)
+    pdct.iscommanded=True
+    pdct.qtycommande=qty
+    pdct.suppliercommand_id=supplierid
+    pdct.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def cancelcommandorgh(request):
+    pdctid=request.GET.get('pdctid')
+    pdct=Produit.objects.get(pk=pdctid)
+    pdct.iscommanded=False
+    pdct.qtycommande=0
+    pdct.suppliercommand=None
+    pdct.save()
+    return JsonResponse({
+        'success':True
+    })

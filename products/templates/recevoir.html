@@ -782,28 +782,28 @@
 
     $(document).ready(function(){
       // edit this localstorage
-      // pdcts=JSON.parse(localStorage.getItem('bonachat{{target}}')) || []
-      // for (let i=0; i<pdcts.length; i++){
-      //   item=pdcts[i]
-      //   $('.bonachatbody').prepend(`<tr class="itemrow">
-      //   <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removeline(event, id, 'bonachat{{target}}')">${item.ref}</td>
-      //   <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
-      //   <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
-      //   <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>
-      //   <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${item.devise}" style="width:65px;"></td>
-      //   <td><input class="qtybarcode" style="width:65px;"></td>
+      pdcts=JSON.parse(localStorage.getItem('bonachat{{target}}')) || []
+      for (let i=0; i<pdcts.length; i++){
+        item=pdcts[i]
+        $('.bonachatbody').prepend(`<tr class="itemrow">
+        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removeline(event, id, 'bonachat{{target}}')">${item.ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
+        <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
+        <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>
+        <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${item.devise}" style="width:65px;"></td>
+        <td><input class="qtybarcode" style="width:65px;"></td>
 
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise2}" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise3}" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
-      //   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise4}" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
-      //   <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
-      //   <input type="hidden" name="productid" value="${item.id}">
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" value="${item.qty}" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" value="${item.price}" step=0.01 style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise1}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise2}" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise3}" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+        <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise4}" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
+        <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
+        <input type="hidden" name="productid" value="${item.id}">
         
-      //   </tr>`)}
-      // $('.totalbon').text(localStorage.getItem('totalbonachat{{target}}') || '0.00')
+        </tr>`)}
+      $('.totalbon').text(localStorage.getItem('totalbonachat{{target}}') || '0.00')
     $('.searchref').focus()
     $('.searchref').on('keyup', ()=>{
         let ref = $('.searchref').val()

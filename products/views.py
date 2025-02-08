@@ -651,10 +651,19 @@ def getlowbycategory(request):
     if isfarah:
         products = Produit.objects.filter(category_id=category, stocktotalfarah__lte=F('minstock')).annotate(
         is_preferred_supplier=Case(
-            When(originsupp_id=supplierid, then=Value(True)),
+            When(froriginsupp_id=supplierid, then=Value(True)),
             default=Value(False),
             output_field=BooleanField(),
         )).order_by('-is_preferred_supplier')
+        marks=set([i.mark for i in products])
+        marks=[{"name":i.name if i else '', 'id':i.id if i else ''} for i in marks]
+        ctx={
+            'products':products,
+            'marks':marks
+        }
+        return JsonResponse({
+        'data':render(request, 'fralertstocktrs.html', ctx).content.decode('utf-8')
+    })
     else:
         products = Produit.objects.filter(category_id=category, stocktotalorgh__lte=F('minstock')).annotate(
         is_preferred_supplier=Case(
@@ -844,7 +853,6 @@ def addsupply(request):
             cmnd.save()
     for i in json.loads(products):
         product=Produit.objects.get(pk=i['productid'])
-        product.originsupp=supplier
         remise1=0 if i['remise1']=='' else int(i['remise1'])
         remise2=0 if i['remise2']=='' else int(i['remise2'])
         remise3=0 if i['remise3']=='' else int(i['remise3'])
@@ -967,6 +975,7 @@ def addsupply(request):
             product.frremise3=remise3
             product.frremise4=remise4
             product.frbuyprice=buyprice
+            product.froriginsupp_id=supplierid
             product.frnetbuyprice=netprice
             print('>> addin qty')
             product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
@@ -1035,6 +1044,7 @@ def addsupply(request):
             product.remise4=remise4
             product.buyprice=buyprice
             product.netbuyprice=netprice
+            product.originsupp_id=supplierid
             product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
             # product.sellprice=buyprice
             # product.remisesell=remise1
@@ -4448,6 +4458,7 @@ def updatebonachat(request):
                     product.frsellprice=0 if i['price']=="" else i['price']
                     product.frremisesell=0 if i['remise1']=="" else i['remise1']
                     product.frnetbuyprice=netprice
+                    product.froriginsupp=supplier
             else:
                 # claculate cout moyen
                 # if product.stocktotalorgh>0:
@@ -4476,6 +4487,8 @@ def updatebonachat(request):
                     product.sellprice=0 if i['price']=="" else i['price']
                     product.remisesell=0 if i['remise1']=="" else i['remise1']
                     product.netbuyprice=netprice
+                    product.originsupp=supplier
+
             product.save()
 
     return JsonResponse({
@@ -7781,7 +7794,7 @@ def searchforlistachat(request):
     #         '''
 
     return JsonResponse({
-        'trs':render(request, 'bonachatrs.html', {'bons':bons}).content.decode('utf-8'),
+        'trs':render(request, 'bonachatrs.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
         'total':total
     })
 

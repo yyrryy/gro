@@ -166,7 +166,10 @@ class Produit(models.Model):
     # commande
     iscommanded=models.BooleanField(default=False)
     suppliercommand=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='suppliercommand')
+    friscommanded=models.BooleanField(default=False)
+    frsuppliercommand=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='farahsuppliercommand')
     originsupp=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='lastsupplier')
+    froriginsupp=models.ForeignKey('Supplier', on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='farahlastsupplier')
     near=models.BooleanField(default=False)
     # stock facture
     # stock bon
