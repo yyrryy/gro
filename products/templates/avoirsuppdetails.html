@@ -196,11 +196,8 @@
 
       </table>
 
-      <div
-        style="width: 8em;
-        float: right;">
-          <div class="text-center d-flex justify-content-between" style="background: #aeaeae8c;
-          font-size: 13px;">
+      
+          <div class=" d-flex justify-content-between" style="border:1px solid black; padding: 2px;">
             <div>Total</div>
             <div style="font-size: 16px;">
               <strong>
@@ -210,7 +207,6 @@
           </div>
 
 
-        </div>
         <!--<div class="text-center" style="font-size: 13px">
 
           adress <br>
@@ -218,8 +214,13 @@
           Fixe: +212 500000000 - Tel: 06 0000
         </div>-->
     </div>
-
-
+    {% if not isfarah %}
+    <div class="text-center" style="font-size:11px; margin-top: 5px;">
+      <strong style="font-size: 14px;">
+        Siege: Lot Dounia II N°118 Bd. Rabia OULED TEIMA Code Postal 83350 Patente: 49901722 ICE: 002394334000087 RC: 6513 CNSS: 1858196 IF: 39498717 Email: orghpieceauto@gmail.com Fix: 0528521331
+      </strong>
+    </div>
+    {% endif %}
   </div>
   {% else %}
   <div class="postion-relative p-2 avoir{{avoir.id}}holder p-3" style="min-height: 29.7cm;width: 21cm;">

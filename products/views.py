@@ -1938,6 +1938,7 @@ def avoirsuppdetails(request, id):
     ctx={
         'title':f'avoir {order.no}',
         'target':target,
+        'isfarah':target=='f',
         'avoir':order,
         'orderitems':orderitems,
         'reglement':PaymentSupplier.objects.filter(avoirs__id=order.id)
