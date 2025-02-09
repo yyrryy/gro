@@ -1352,10 +1352,19 @@ a .uil {
         function formatRepoSelection (repo) {
           return repo.text;
         }
-      function populateavoir(event, price, remise, bonid){
+        function populateavoir(event, price, remise, bonid){
         console.log('>> ddd')
         $('[name="addprice"]').val(price);
         $('[name="addremise"]').val(remise);
+        $('[name="addbonid"]').val(bonid);
+      }
+      function populateavoirsupp(event, price, remise1, remise2, remise3, remise4, bonid){
+        console.log('>> ddd')
+        $('[name="addprice"]').val(price);
+        $('[name="addremise1"]').val(remise1);
+        $('[name="addremise2"]').val(remise2);
+        $('[name="addremise3"]').val(remise3);
+        $('[name="addremise4"]').val(remise4);
         $('[name="addbonid"]').val(bonid);
       }
       function savetolocalstorage(item, total, target){

@@ -856,7 +856,11 @@ class Returnedsupplier(models.Model):
     avoir=models.ForeignKey(Avoirsupplier, related_name='avoir_supplier', on_delete=models.CASCADE, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
-
+    remise1=models.CharField(max_length=100, null=True, default=None)
+    remise2=models.CharField(max_length=100, null=True, default=None)
+    remise3=models.CharField(max_length=100, null=True, default=None)
+    remise4=models.CharField(max_length=100, null=True, default=None)
+    
 class Ordersnotif(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     isread=models.BooleanField(default=False)

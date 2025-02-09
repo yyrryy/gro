@@ -2201,7 +2201,7 @@ def listavoirsupplier(request):
     bons= Avoirsupplier.objects.filter(date__year=thisyear, isfarah=target=="f").order_by('-id')
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
-        'title':'Bons de livraison',
+        'title':'Avoir Achat',
         'bons':bons,
         'total':total,
         'target':target
@@ -3864,13 +3864,22 @@ def addavoirsupp(request):
             else:
                 product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
             product.save()
+            remise1=0 if i['remise1']=="" else i['remise1']
+            remise2=0 if i['remise2']=="" else i['remise2']
+            remise3=0 if i['remise3']=="" else i['remise3']
+            remise4=0 if i['remise4']=="" else i['remise4']
+            print('>>', remise1, remise2, remise3, remise4)
             Returnedsupplier.objects.create(
                 avoir=avoir,
                 product=product,
                 qty=i['qty'],
                 price=i['price'],
                 total=i['total'],
-                isfarah=isfarah
+                isfarah=isfarah,
+                remise1=0 if i['remise1']=="" else i['remise1'],
+                remise2=0 if i['remise2']=="" else i['remise2'],
+                remise3=0 if i['remise3']=="" else i['remise3'],
+                remise4=0 if i['remise4']=="" else i['remise4']
             )
     totalamount=sum([i for i in mantant if i is not None])
     if totalamount>0:
@@ -5731,7 +5740,7 @@ def getlastsuppprice(request):
         'price':price,
         'remise':remise,
         # 'facture':lastprice.facture,
-        'table':render(request, 'prodctprices.html', {'producthistory':prices.order_by('-date')[:10]}).content.decode('utf-8')
+        'table':render(request, 'suppprodctprices.html', {'producthistory':prices.order_by('-date')[:10]}).content.decode('utf-8')
     })
 
 

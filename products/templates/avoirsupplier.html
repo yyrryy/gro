@@ -68,7 +68,16 @@
                 <div class="addclientprice text-danger"></div>
               </div>
               <div class="col-3">
-                <input type="number" class="form-control" placeholder="Remise" name="addremise">
+                <input type="number" class="form-control" placeholder="Remise1" name="addremise1">
+              </div>
+              <div class="col-3">
+                <input type="number" class="form-control" placeholder="Remise2" name="addremise2">
+              </div>
+              <div class="col-3">
+                <input type="number" class="form-control" placeholder="Remise3" name="addremise3">
+              </div>
+              <div class="col-3">
+                <input type="number" class="form-control" placeholder="Remise4" name="addremise4">
               </div>
               <div class="col-3">
                 <button class="btn btn-secondary" onclick="addrowavoirsupp(event)">Ajouter</button>
@@ -112,11 +121,14 @@
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">REF</td>
                       <td style="padding: 2px 0; font-size: 13px;">Article</td>
 
-                      <td style="padding: 2px 0; font-size: 13px;">Stock</td>
+                      <!-- <td style="padding: 2px 0; font-size: 13px;">Stock</td> -->
 
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Quantité</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix unit.</td>
-                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise1</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise2</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise3</td>
+                      <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise4</td>
                       <td style="padding: 2px 0; font-size: 13px;">Total</td>
                   </tr>
               </thead>
@@ -223,40 +235,56 @@
       // ids of products in bon stored in localstorage
       let bonachatbody = parentdiv.find('.bonavsuppbody')
       let addname=parentdiv.find('[name="addname"]')
+      let addremise1=parentdiv.find('[name="addremise1"]')
+      let addremise2=parentdiv.find('[name="addremise2"]')
+      let addremise3=parentdiv.find('[name="addremise3"]')
+      let addremise4=parentdiv.find('[name="addremise4"]')
+
+      
       let isfacture=parentdiv.find('[name="isfacture"]')
       let addqty=parentdiv.find('[name="addqty"]')
       let addprice=parentdiv.find('[name="addprice"]')
-      let addremise=parentdiv.find('[name="addremise"]')
+      
       let priceclient=parentdiv.find('.addclientprice ').text()
-      if (addqty.val()=='' || addprice.val()=='' || addremise.val()==''){
+      if (addqty.val()=='' || addprice.val()==''){
         alertify.error('Veuillez remplir tous les champs')
         return
       }
       var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
       console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
-      pdcts=JSON.parse(localStorage.getItem('pdctsinavoirsupp')) || []
+      pdcts=JSON.parse(localStorage.getItem('pdctsinavoirsupp{{target}}')) || []
       console.log(id, pdcts, pdcts.includes(id))
       if (pdcts.includes(id)){
         addqty.val('')
         addname.val('')
-        addremise.val('')
+        addremise1.val('')
+        addremise2.val('')
+        addremise3.val('')
+        addremise4.val('')
         addprice.val('')
         alertify.error('Ce produit est deja dans le bon')
         return
       }
 
       pdcts.push(id)
-      localStorage.setItem('pdctsinavoirsupp', JSON.stringify(pdcts))
-      let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
-      let addtotal=(parseFloat(addqty.val())*parseFloat(net)).toFixed(2)
+      localStorage.setItem('pdctsinavoirsupp{{target}}', JSON.stringify(pdcts))
+      let netp1=(addprice.val()-(addprice.val()*addremise1.val()/100))
+      netp2=netp1-(netp1*addremise2.val()/100).toFixed(4)
+      netp3=netp2-(netp2*addremise3.val()/100).toFixed(4)
+      netp4=netp3-(netp3*addremise4.val()/100).toFixed(4)
+      console.log('netp1', netp1, netp2, netp3, netp4)
+      let addtotal=(addqty.val()*netp4).toFixed(2)
+      //<td style="padding: 2px 0; font-size: 13px;">${stock}</td>
       let tr = `
-      <tr class="itemrow ${stock<=0? "text-danger":"" }">: 2
+      <tr class="itemrow">
           <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="checkConsecutiveClicks(event)">${ref}</td>
           <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
-          <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
           <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptyavsupp" onkeyup="calculate(event)" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
           <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptyavsupp" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
-          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event)" name="remise" style="height:23px; width:100%;">
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise2.val()}" class="calculate remise2" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise3.val()}" class="calculate remise3" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
+          <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise4.val()}" class="calculate remise4" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td>
           <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
           <input type="hidden" name="productid" value="${id}">
           <input type="hidden" name="isfacture" value="${isfacture.val()}">
@@ -268,7 +296,10 @@
       // delete selected option
       addqty.val('')
       addname.val('')
-      addremise.val('')
+      addremise1.val('')
+      addremise2.val('')
+      addremise3.val('')
+      addremise4.val('')
       addprice.val('')
       totals=parentdiv.find('.total')
       totalbon=parentdiv.find('.totalbon')
@@ -350,7 +381,7 @@
             let addname=$(this).parent().parent().find('input[name="addname"]')
             let isfacture=$(this).parent().parent().find('input[name="isfacture"]')
             let addprice=$(this).parent().parent().find('input[name="addprice"]')
-            let addremise=$(this).parent().parent().find('input[name="addremise"]')
+            let addremise=$(this).parent().parent().find('input[name="addremise1"]')
             let addqty=$(this).parent().parent().find('input[name="addqty"]')
             console.log('qty of change',addqty)
             $(this).parent().parent().find('.addstock').text(stock)
@@ -389,8 +420,8 @@
             // selected.remove()
             // delect selected option
         })
-    localStorage.removeItem('pdctsinavoirsupp')
-    localStorage.setItem('pdctsinavoirsupp', '[]')
+    localStorage.removeItem('pdctsinavoirsupp{{target}}')
+    localStorage.setItem('pdctsinavoirsupp{{target}}', '[]')
     $(document).ready(function(){
       $('.supplierselectavoir').select2('open')
     })
@@ -465,7 +496,10 @@
               let name = tr.find('.name').text()
               let ref = tr.find('.ref').text()
               let price = tr.find('.price').val()
-              let remise = tr.find('.remise').val()
+              let remise1 = tr.find('.remise1').val()
+              let remise2 = tr.find('.remise2').val()
+              let remise3 = tr.find('.remise3').val()
+              let remise4 = tr.find('.remise4').val()
               let total = tr.find('.total').text()
               let productid = tr.find('input[name="productid"]').val()
               let isfacture = tr.find('input[name="isfacture"]').val()
@@ -474,7 +508,10 @@
                   'name': name,
                   'ref': ref,
                   'price': price,
-                  'remise': remise,
+                  'remise1': remise1,
+                  'remise2': remise2,
+                  'remise3': remise3,
+                  'remise4': remise4,
                   'total': total,
                   'productid': productid,
                   'isfacture': isfacture,
@@ -537,7 +574,7 @@
                   // remove list in localstorage
                   // $('#addavoirsupp').html('')
                   // $('#addavoirsupp').html(data.html)
-                  localStorage.removeItem('pdctsinavoirsupp')
+                  localStorage.removeItem('pdctsinavoirsupp{{target}}')
 
                   ajaxpage('avoirsupp', 'AvoirFR', '/products/listavoirsupplier?target={{target}}')
 

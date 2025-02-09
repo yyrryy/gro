@@ -2095,7 +2095,6 @@ def updatebonavoirsupp(request):
     # update this items
 
 
-    print('client:', avoir.supplier.id)
     with transaction.atomic():
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
@@ -2111,7 +2110,11 @@ def updatebonavoirsupp(request):
                 qty=i['qty'],
                 price=i['price'],
                 total=i['total'],
-                isfarah=isfarah
+                isfarah=isfarah,
+                remise1=0 if i['remise1']=="" else i['remise1'],
+                remise2=0 if i['remise2']=="" else i['remise2'],
+                remise3=0 if i['remise3']=="" else i['remise3'],
+                remise4=0 if i['remise4']=="" else i['remise4']
             )
     totalamount=sum([i for i in mantant if i is not None])
     if totalamount>0:

@@ -106,7 +106,7 @@
                 <td  onclick="intsorttable(event)">Remise Vente</td>
                 <td  onclick="sorttable(event)">Stock</td>
                 <td class=""  onclick="sorttable(event)">block</td>
-                <td  onclick="sorttable(event)">Coutmoyen</td>
+                <!-- <td  onclick="sorttable(event)">Coutmoyen</td> -->
                 <td  onclick="sorttable(event)">Marque</td>
                 <!-- <td>%</td> -->
               </tr>
@@ -149,9 +149,9 @@
                       {{i.block}}
                   </td>
                   
-                  <td style="padding: 5px; font-weight: bold;" class="text-danger">
+                  <!-- <td style="padding: 5px; font-weight: bold;" class="text-danger">
                     {%if i.coutmoyen%}{{i.coutmoyen}}{%endif%}
-                </td>
+                </td> -->
                    
                     <td style="padding: 5px; font-weight: bold;">
                       {{i.mark.name}}
@@ -387,21 +387,20 @@
     $('.totalprachstockfc').text(totalprachstockfc.toFixed(2))
   }
   totalsproductslist()
-  $('.searchinputlistproducts').on("change", function() {
+  $('.searchinputlistproducts').on("input", function() {
     $('.listproductsholder').css('filter', 'blur(3px)')
     // Get the values from all filter input fields
     var filterValue = $(this).val().toLowerCase();
-    loadingproducts=false
-    currentPage=1
-    $('.listproductsholder').on('scroll', handleScroll);
-    // Split the filter value into individual terms based on the '&' sign
-    // var filterTerms = filterValue.split('+').map(function(term) {
-    //     return term.trim();
-    // });
     if (filterValue==""){
-        ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
-    }else
-      {$.get('/products/searchproductsforstock?target={{target}}', {'term':filterValue.trim()}, (data)=>{
+      ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
+    }
+    if (filterValue.length>=2){
+      
+      loadingproducts=false
+      currentPage=1
+      $('.listproductsholder').on('scroll', handleScroll);
+    
+      $.get('/products/searchproductsforstock?target={{target}}', {'term':filterValue.trim()}, (data)=>{
 
               $(".productstable tbody").html('')
               $(".productstable tbody").html(data.trs)

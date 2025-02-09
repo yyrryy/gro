@@ -76,29 +76,36 @@
 
     <!-- avoir header -->
     <div class="">
-      <img src="" alt="" style="width: 40%;" >
-        <div class="d-flex justify-content-between mt-5">
-          <div>
-            <h5 style="
-              border: 3px solid;
-              padding: 8px;
-              box-shadow: 4px 3px black;
-              border-radius: 12px;
-              width: 9em;
-              "
-              >avoir N°: <strong>{{avoir.no}}</strong></h5><br>
-              <h5 style="
-              border: 1px solid;
-              border-radius: 10px;
-              padding: 8px;
-          ">Date: <strong>{{avoir.date|date:"d/m/Y"}}</strong></h5>
-          </div>
-          <div style="width: 22em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <h5>Fournisseur: <strong>{{avoir.supplier.name.upper}}</strong></h5>
-            <p>
-              {{avoir.supplier.ice}} <br> Adresse: {{avoir.supplier.address}} <br>Ville: {{avoir.supplier.city}}
-            </p>
-          </div>
+      {% if not isfarah %}
+      <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
+      {% endif %}
+      <div class="d-flex justify-content-between">
+        <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
+          Date: <strong>{{avoir.date|date:"d/m/Y"}}</strong><br>
+          Avoir N°:<strong>{{avoir.no}}</strong><br>
+        
+          page: {{forloop.counter}}/{{orderitems|length}}<br>
+        
+      </div>
+        <div style="width: 60%; border: 1px solid; padding: 5px; border-radius: 10px;">
+        
+          Code: <strong>
+            {{avoir.supplier.code}}
+          </strong>
+          
+          <br>
+          Fourn.: <strong>{{avoir.supplier.name.upper}}</strong><br>
+          ICE: <strong>
+             {% if avoir.supplier.ice %}{{avoir.supplier.ice}} {% endif %}
+          </strong><br>
+          Address: <strong>{{supplier.address}} {{avoir.supplier.city}}</strong><br>
+          Note: <strong>{{avoir.note.upper}}</strong>
+      </div>
+      
+      </div>
+        <div class="d-flex justify-content-between">
+          
+          
         </div>
 
 
@@ -120,6 +127,10 @@
             <td>Designation</td>
             <td style="width: 6%;">Qté</td>
             <td style="width: 7%;">P.U</td>
+            <td style="width: 7%;">Remise1</td>
+            <td style="width: 7%;">Remise2</td>
+            <td style="width: 7%;">Remise3</td>
+            <td style="width: 7%;">Remise4</td>
             <td style="width: 9%;">Mantant</td>
           </tr>
         </thead>
@@ -146,6 +157,30 @@
                   <td class="text-center">
                     {% for v in i %}
                     {{v.price|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise1|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise2|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise3|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise4|floatformat:2}}
                     <br>
                     {% endfor %}
                   </td>
@@ -191,29 +226,36 @@
 
     <!-- avoir header -->
     <div class="">
-      <img src="" alt="" style="width: 40%;" >
-        <div class="d-flex justify-content-between mt-5">
-          <div>
-            <h5 style="
-              border: 3px solid;
-              padding: 8px;
-              box-shadow: 4px 3px black;
-              border-radius: 12px;
-              width: 9em;
-              "
-              >avoir N°: <strong>{{avoir.no}}</strong></h5><br>
-              <h5 style="
-              border: 1px solid;
-              border-radius: 10px;
-              padding: 8px;
-          ">Date: <strong></strong></h5>
-          </div>
-          <div style="width: 22em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <h5>Fournisseur: {{avoir.supplier.name.upper}}</h5>
-            <p>
-              {{avoir.supplier.ice}} <br> Adresse: {{avoir.supplier.address}} <br>Ville: {{avoir.supplier.city}}
-            </p>
-          </div>
+      {% if not isfarah %}
+      <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
+      {% endif %}
+      <div class="d-flex justify-content-between">
+        <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
+          Date: <strong>{{avoir.date|date:"d/m/Y"}}</strong><br>
+          Avoir N°:<strong>{{avoir.no}}</strong><br>
+        
+          page: {{forloop.counter}}/{{orderitems|length}}<br>
+        
+      </div>
+        <div style="width: 60%; border: 1px solid; padding: 5px; border-radius: 10px;">
+        
+          Code: <strong>
+            {{avoir.supplier.code}}
+          </strong>
+          
+          <br>
+          Fourn.: <strong>{{avoir.supplier.name.upper}}</strong><br>
+          ICE: <strong>
+             {% if avoir.supplier.ice %}{{avoir.supplier.ice}} {% endif %}
+          </strong><br>
+          Address: <strong>{{supplier.address}} {{avoir.supplier.city}}</strong><br>
+          Note: <strong>{{avoir.note.upper}}</strong>
+      </div>
+      
+      </div>
+        <div class="d-flex justify-content-between">
+          
+          
         </div>
 
 
@@ -228,51 +270,80 @@
           top: 5em;
           visibility: hidden;
           ">
-      <table class="table table-bordered avitems" style="font-size: 13px; font-family: serif; border-color: black;">
+      <table class="table table-bordered avitems" style="font-size: 13px; border-color: black;">
         <thead style="background: #c9c9c9;" class="text-center">
           <tr>
             <td style="width: 13%;">Ref</td>
             <td>Designation</td>
-            <td style="width: 5%;">Qté</td>
+            <td style="width: 6%;">Qté</td>
             <td style="width: 7%;">P.U</td>
+            <td style="width: 7%;">Remise1</td>
+            <td style="width: 7%;">Remise2</td>
+            <td style="width: 7%;">Remise3</td>
+            <td style="width: 7%;">Remise4</td>
             <td style="width: 9%;">Mantant</td>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td style="height: 170mm;">
-              {% for v in i %}
-              {{v.product.ref.upper}}
-              <br>
-              {% endfor %}
-            </td>
-            <td>
-              {% for v in i %}
-                {{v.product.name.upper}}
-                <br>
-              {% endfor %}
-          </td>
-          <td class="text-center">
-            {% for v in i %}
-            {{v.qty}}
-            <br>
-            {% endfor %}
-          </td>
-          <td class="text-center">
-            {% for v in i %}
-            {{v.price|floatformat:2}}
-            <br>
-            {% endfor %}
-          </td>
-          <td class="text-center">
-            {% for v in i %}
-            {{v.total|floatformat:2}}
-            <br>
-            {% endfor %}
-          </td>
+                <tr>
+                    <td style="height: 170mm;">
+                      {% for v in i %}
+                      {{v.product.ref.upper}}
+                      <br>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for v in i %}
+                        {{v.product.name.upper}}
+                        <br>
+                      {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.qty}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.price|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise1|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise2|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise3|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.remise4|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% for v in i %}
+                    {{v.total|floatformat:2}}
+                    <br>
+                    {% endfor %}
+                  </td>
 
-        </tr>
+                </tr>
         </tbody>
+
       </table>
     </div>
 
