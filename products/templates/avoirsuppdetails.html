@@ -144,7 +144,7 @@
                     </td>
                     <td>
                       {% for v in i %}
-                        {{v.product.name.upper}}
+                        {{v.product.name.upper|slice:"30"}}
                         <br>
                       {% endfor %}
                   </td>
@@ -295,7 +295,7 @@
                     </td>
                     <td>
                       {% for v in i %}
-                        {{v.product.name.upper}}
+                        {{v.product.name.upper|slice:"30"}}
                         <br>
                       {% endfor %}
                   </td>
