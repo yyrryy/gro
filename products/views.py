@@ -9442,7 +9442,7 @@ def filterjvdate(request):
             if enddate==None:
                 bons=Livraisonitem.objects.filter(isfarah=True, isfacture=False).order_by('-date')
             else:
-                bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Livraisonitem.objects.filter(isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
             bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
@@ -9458,7 +9458,17 @@ def filterjvdate(request):
             print('>> produuct is not none')
             bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
     else:
-        bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Sortieitem.objects.order_by('-date')
+            else:
+                bons=Sortieitem.objects.filter(date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+
+        #bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
     #elif target=='o':
     
     # trs=''
