@@ -4433,7 +4433,8 @@ def updatebonachat(request):
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
                 qtyofprice=qty,
-                isfarah=isfarah,
+                isfarah=target=='f',
+                isorgh=target=='o',
                 net=netwithremise1
             )
             
@@ -4762,13 +4763,15 @@ def reglebonsachat(request):
 
 
 def journalachat(request):
-    items=Stockin.objects.order_by('-id')[:50]
+    target=request.GET.get('target')
+    # items=Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).order_by('-date')[:50]
+    # bons=Bonlivraison.objects.filter(date__year=thisyear)
+    # totaltotal=round(bons.aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # total2=round(Livraisonitem.objects.filter(isfacture=False, date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # print('>>>>>', totaltotal, total2)
     ctx={
         'title':'Journal Achat',
-        'items':items,
-        'today':timezone.now().date(),
-        'totaljach':round(Stockin.objects.aggregate(Sum('total'))['total__sum'] or 0, 2),
-        'totalqtyjach':round(Stockin.objects.aggregate(Sum('quantity'))['quantity__sum'] or 0, 2),
+        'target':target
     }
     return render(request, 'journalachat.html', ctx)
 
@@ -9524,31 +9527,49 @@ def filterjvfcdate(request):
     return JsonResponse(ctx)
 
 def filterjachdate(request):
-    startdate=request.GET.get('datefrom')
-    enddate=request.GET.get('dateto')
-    startdate = datetime.strptime(startdate, '%Y-%m-%d')
-    enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Stockin.objects.filter(date__range=[startdate, enddate]).order_by('-date')[:50]
-    trs=''
-    for i in bons:
-        trs+=f'''
-        <tr class="journalacha-row" startdat={startdate} enddate={enddate}>
-            <td>{i.date.strftime('%d/%m/%Y')}</td>
-            <td>{i.product.ref}</td>
-            <td>{i.product.name}</td>
-            <td>{i.price}</td>
-            <td>{i.supplier.name}</td>
-            <td>{i.devise}</td>
-            <td class="qtyjournalachat">{i.quantity}</td>
-            <td class="totaljournalachat">{i.total}</td>
-        </tr>
-        '''
+    target=request.GET.get('target')
+    productid=request.GET.get('productid') or None
+    startdate=request.GET.get('datefrom') or None
+    enddate=request.GET.get('dateto') or None
+    print('>> productid, dateto, datefrom', productid, startdate, enddate, target)
+    # startdate = datetime.strptime(startdate, '%Y-%m-%d') or None
+    # enddate = datetime.strptime(enddate, '%Y-%m-%d') or None
+    if target=='f':
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Stockin.objects.filter(isfarah=True, isavoir=False).order_by('-date')
+            else:
+                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            if enddate==None:
+                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False).order_by('-date')
+            else:
+                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+
+    elif target=='o':
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Stockin.objects.filter(isfarah=False, isavoir=False).order_by('-date')
+            else:
+                bons=Stockin.objects.filter(isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            if enddate==None:
+                bons=Stockin.objects.filter(product_id=productid, isfarah=False, isavoir=False).order_by('-date')
+            else:
+                bons=Stockin.objects.filter(product_id=productid, isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+    else:
+        bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+    
     ctx={
-        'trs':trs,
+        'trs':render(request, 'journalachattrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
     }
     if bons:
-        ctx['total']=round(Stockin.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'], 2)
-        ctx['totalqty']=Stockin.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('quantity'))['quantity__sum']
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['totalqty']=round(bons.aggregate(Sum('quantity')).get('quantity__sum'), 2)
     return JsonResponse(ctx)
 
 def searchforjach(request):

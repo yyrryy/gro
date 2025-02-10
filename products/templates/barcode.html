@@ -38,7 +38,10 @@
           
     </style>
 </head>
-<body>
+<body id="printbody">
+    <div class="emptyspaceholder d-flex">
+        <input type="number" class="emtyspaces"><button onclick="addspaces()">+</button><button class="bi bi-download" onclick="print()">X</button>
+    </div>
     {% for barcode in barcodes %}
     <div class="print-area" style="padding:11mm 10mm 10mm 10mm; {% if not forloop.counter == barcodes|length %}min-height: 29.7cm;{%endif%}width: 21cm;">
         <!-- Example: Loop over barcode images -->
@@ -74,6 +77,19 @@
         {% endfor %}
     </div>
     {% endfor %}
-
+<script src="/static/js/jquery.min.js"></script>
+<script>
+    function print() {
+        $('.emptyspaceholder').addClass('d-none');
+        
+    }
+    function addspaces() {
+        let spaces = $('.emtyspaces').val();
+        let holder = $('.print-area');
+        for (let i = 0; i < spaces; i++) {
+            holder.prepend('<div class="label"></div>');
+        }
+    }
+</script>
 </body>
 </html>
