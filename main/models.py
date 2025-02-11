@@ -538,6 +538,12 @@ class Facture(models.Model):
     statusreg=models.CharField(max_length=50, null=True, default='b1', blank=True)
     # if we have more than one bon for the same facture
     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name='bonsoffactures')
+    def ht(self):
+        return round(self.total/1.2, 2)
+    def thistva(self):
+        return round((self.total/1.2)*.2, 2)
+    def reglements(self):
+        return PaymentClientbl.objects.filter(factures__in=[self])
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)

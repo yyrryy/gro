@@ -9466,7 +9466,10 @@ def filterjvdate(request):
                 bons=Sortieitem.objects.filter(date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
-            bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+            if enddate==None:
+                bons=Sortieitem.objects.filter(product_id=productid).order_by('-date')
+            else:
+                bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
 
         #bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
     #elif target=='o':

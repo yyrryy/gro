@@ -219,7 +219,8 @@
                 <!-- <button class="btn btn-sm" style="font-size: 6px; background: #f06623; color: white;" onclick="sortdownfc(event)">↓</button>  -->
               </div>
             </td>
-            <td onclick="sorttable(event)">Total</td>
+            <td onclick="sorttable(event)">Total TTC</td>
+            <td onclick="sorttable(event)">HT</td>
             <td onclick="sorttable(event)">TVA</td>
             <td onclick="sorttable(event)">Client</td>
             <td onclick="sorttable(event)">Code client</td>
@@ -236,12 +237,13 @@
         </thead>
         <tbody class="listfcbody">
           {% for order in bons %}
-            <tr class="ord {% if order.ispaid %}text-danger{% endif %} fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}?target={{target}}')" mode="waiting"
+            <tr class="ord fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}?target={{target}}')" mode="waiting"
             >
               <td>{{ order.facture_no }}</td>
               <td>{{ order.date|date:'d/m/Y' }}</td>
               <td>{{ order.total|floatformat:2|intspace}}</td>
-              <td>{{ order.tva|floatformat:2|intspace}}</td>
+              <td>{{ order.ht|floatformat:2|intspace}}</td>
+              <td>{{ order.thistva|floatformat:2|intspace}}</td>
               <td>{{ order.client.name }}</td>
               <td>{{ order.client.code }}</td>
               <!-- <td>{{ order.client.region }}</td> -->
@@ -264,8 +266,26 @@
               <td>
                 {{order.note}}
               </td>
-              <td style="white-space:nowrap;">
-                {{order.getreglement|slice:'16' }}
+              <td>
+                
+                <div class="accordion" id="accordionrr{{order.id}}">
+
+                  <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsrr{{order.id}}" aria-expanded="true" aria-controls="collapsrr{{order.id}}">
+
+                    REGLEMENTS
+                  </button>
+
+                  <div id="collapsrr{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionrr{{order.id}}">
+                      {% for i in order.reglements %}
+                      -Momde: {{ i.mode }} <br>
+                      -N° piece: {{ i.npiece }} <br>
+                      -Mantant {{ i.amount }} <br>
+                      -Echeance: {{ i.echance|date:'d/m/Y' }} <br>
+                      {% endfor %}
+
+
+                  </div>
+                </div>
               </td>
                 <td>
                   {% if order.bon %}
