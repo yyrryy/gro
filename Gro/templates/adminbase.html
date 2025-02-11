@@ -1599,9 +1599,9 @@ a .uil {
 
     })
     $('.connectedholder').on('mouseleave', ()=>{$('.connectedusersbar').addClass('collapsed'); $('#collapsconnected').removeClass('show')})
-  function printlivraison(bonid){
+  function printlivraison(bonid, target){
        url = window.location.pathname.split( '/' );[0]
-       var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/bonlivraisonprint/'+bonid, '', 'width=900,height=900');
+       var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/bonlivraisonprint/'+bonid+'?target='+target, '', 'width=900,height=900');
 
         myWindow.focus();
 

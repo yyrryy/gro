@@ -50,34 +50,40 @@
     <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
       <!-- header -->
       <div class="">
-        <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
-
-        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
-          <div class="">
-
-              <div>
-                <strong>Date: {{ order.date|date:"d/m/Y" }}</strong>
-              </div>
-              <div>
-                <strong>N°: {{ order.bon_no }}</strong>
-              </div>
-          </div>
-          <h3>
-              <b>
-                Bon de Livraison
-              </b>
-            </h3>
-
-          <div style="width: 15em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <div>{{order.client.name.upper}}</div>
-            <div>{{order.client.code.upper}}</div>
-            <div>{{order.client.city.upper}}</div>
-          </div>
+        {% if not isfarah %}
+        <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
+        {% endif %}
+        <div class="d-flex justify-content-between">
+          <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
+            Date: <strong>{{order.date|date:"d/m/Y"}}</strong><br>
+            Bon N°:<strong>{{order.bon_no}}</strong><br>
+          
+            page: {{forloop.counter}}/{{orderitems|length}}<br>
+          
         </div>
-
-
-
-
+          <div style="width: 60%; border: 1px solid; padding: 5px; border-radius: 10px;">
+          
+            Code: <strong>
+              {{order.client.code}}
+            </strong>
+            
+            <br>
+            Client: 
+            <strong>{{order.client.name.upper}}</strong><br>
+            ICE: <strong>
+               {% if order.client.ice %}{{order.client.ice}} {% endif %}
+            </strong><br>
+            Address: <strong>{{client.address}} {{order.client.city}}</strong><br>
+            Note: <strong>{{order.note.upper}}</strong>
+        </div>
+        
+        </div>
+          <div class="d-flex justify-content-between">
+            
+            
+          </div>
+  
+  
       </div>
 
       <!-- livraison items -->
@@ -103,7 +109,7 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 195mm;white-space: nowrap; padding:3px">
+              <td style="height: 175mm;white-space: nowrap; padding:3px">
                   {% for v in i %}
 
                   {{v.ref.upper}}
@@ -183,34 +189,40 @@
     <div class="px-5 d-flex flex-column postion-relative livraison{{order.id}}holder p-3" style="height: 1123px;width: 21cm; page-break-before: always;">
       <!-- header -->
       <div class="">
-        <img src="" alt="" style="width: 40%; visibility: hidden;" class="bllogo">
-
-        <div class="d-flex justify-content-between" style="margin-top:3.5em;">
-          <div class="">
-
-              <div>
-                <strong>Date: {{ order.date|date:"d/m/Y" }}</strong>
-              </div>
-              <div>
-                <strong>N°: {{ order.bon_no }}</strong>
-              </div>
-          </div>
-          <h3>
-              <b>
-                Bon de Livraison
-              </b>
-            </h3>
-
-          <div style="width: 15em; text-align: center;margin-right: 10px; border: 3px solid; padding: 3px; box-shadow: 4px 3px black;border-radius: 12px">
-            <div>{{order.client.name.upper}}</div>
-            <div>{{order.client.code.upper}}</div>
-            <div>{{order.client.city.upper}}</div>
-          </div>
+        {% if not isfarah %}
+        <img src="/media/factureheader.jpg" style="width: 100%;" alt="" class="factureheader">
+        {% endif %}
+        <div class="d-flex justify-content-between">
+          <div style="border: 1px solid; padding: 5px; border-radius: 10px;">
+            Date: <strong>{{order.date|date:"d/m/Y"}}</strong><br>
+            Bon N°:<strong>{{order.bon_no}}</strong><br>
+          
+            page: {{forloop.counter}}/{{orderitems|length}}<br>
+          
         </div>
-
-
-
-
+          <div style="width: 60%; border: 1px solid; padding: 5px; border-radius: 10px;">
+          
+            Code: <strong>
+              {{order.client.code}}
+            </strong>
+            
+            <br>
+            Client: 
+            <strong>{{order.client.name.upper}}</strong><br>
+            ICE: <strong>
+               {% if order.client.ice %}{{order.client.ice}} {% endif %}
+            </strong><br>
+            Address: <strong>{{client.address}} {{order.client.city}}</strong><br>
+            Note: <strong>{{order.note.upper}}</strong>
+        </div>
+        
+        </div>
+          <div class="d-flex justify-content-between">
+            
+            
+          </div>
+  
+  
       </div>
 
       <!-- livraison items -->
@@ -236,7 +248,7 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 195mm;white-space: nowrap; padding:3px">
+              <td style="height: 175mm;white-space: nowrap; padding:3px">
                   {% for v in i %}
 
                   {{v.ref.upper}}

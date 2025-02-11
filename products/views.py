@@ -10620,6 +10620,7 @@ def tsgs(request):
     })
 def bonlivraisonprint(request, id):
     isfarah=request.GET.get('target')=='f'
+    print('<>> target', request.GET.get('target'))
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
     reglements=PaymentClientbl.objects.filter(bons__in=[order])

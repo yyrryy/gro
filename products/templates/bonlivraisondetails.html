@@ -4,7 +4,7 @@
 
   <div class="col-3 bg-white rounded">
     <button class="btn bi bi-arrow-left" onclick="ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')">List bons</button>
-    <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}')">
+    <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}', '{{target}}')">
       Imprimer
     </button>
     <button 
