@@ -46,6 +46,7 @@ class Caisse(models.Model):
     total=models.FloatField(default=0.0)
     amountinitial=models.FloatField(default=0.00)
     amount=models.FloatField(default=0.00)
+    target=models.CharField(max_length=500, default=None, null=True)
 # model of money out
 class Outcaisse(models.Model):
     date=models.DateField(auto_now_add=True)
@@ -445,6 +446,7 @@ class Avanceclient(models.Model):
     bon=models.ForeignKey('Bonlivraison', on_delete=models.CASCADE, default=None, null=True)
     facture=models.ForeignKey('Facture', on_delete=models.CASCADE, default=None, null=True)
     mode=models.CharField(max_length=10, default=None, null=True)
+    note=models.TextField(default='', null=True)
     echeance=models.DateField(default=None, null=True, blank=True)
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
     bank=models.CharField(max_length=50, default=None, null=True, blank=True)
@@ -1233,6 +1235,8 @@ class Outfactureachat(models.Model):
 class Bank(models.Model):
     name=models.CharField(max_length=500, default='', null=True)
     total=models.FloatField(default=0.0)
+    initialamount=models.FloatField(default=0.0)
+    target=models.CharField(max_length=500, default='', null=True)
 
 
 # caisse farah

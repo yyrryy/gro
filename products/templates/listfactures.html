@@ -182,24 +182,19 @@
       </div>
 
       <div class="d-flex flex-column">
-        <select name="yearsfc" class="populateyears" onchange="yeardatafc()">
+        <select name="yearsfc" class="populateyears rounded" onchange="yeardatafc()">
 
 
         </select>
-        <!-- <button class="btn btn-success" onclick="getcompatbilse()">
-          Comptabilisé
-        </button> -->
+        <button class="btn btn-success bi bi-download" onclick="downloafactures('{{target}}')">
+          
+        </button>
       </div>
       <!-- <div style="color: red; cursor: pointer; padding: 7px; border-radius: 12px; height: 2.5em; width: 4em;" title="BON 3 MOIS" class="bg-white text-center" onclick="getnotpaidfc(event)">
         {{depasserfc}}
 
       </div> -->
-      <div class="d-flex flex-column">
-        <!-- <button class="btn btn-success" style="border-radius: 10px;" onclick="ajaxpage('addfacture', '+ Facture', '/products/facture?target={{target}}')">
-          + Facture
-        </button> -->
-        <!-- <button class="btn bi bi-download bg-white mt-2" style="border-radius: 10px;" onclick="$('.exportfcholder').css('top', '10vh')"></button> -->
-      </div>
+      
 
     </div>
     <div class="d-flex">

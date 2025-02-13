@@ -144,7 +144,7 @@
                     <div class="reglementbonsholder col-9 border position-relative">
 
                         <div class="inputsholder">
-                            <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button>
+                            <!-- <button style="background: #f06623;" class="btn btn-sm text-white" onclick="addfieldsreglement(event)">+</button> -->
                             <strong class="totalreglblfields">0.00</strong>
                                 <div class="d-flex justify-content-between align-items-center">
                                       <div class="me-2">
@@ -190,6 +190,9 @@
                                         </div>
                                         <div class="me-2">
                                             <input type="text" name="bank" class="w-100" placeholder="Nom du bank">
+                                        </div>
+                                        <div class="me-2">
+                                            <input type="text" name="note" class="w-100" placeholder="Note">
                                         </div>
                                     </div>
                                 </div>
@@ -304,6 +307,10 @@
                 Banque
             </th>
             <th onclick="sorttable(event)">
+                Note
+            </th>
+            
+            <th onclick="sorttable(event)">
                 Status
             </th>
               
@@ -342,6 +349,9 @@
                      <td>
                         {{i.bank.upper}}
                    </td>
+                   <td>
+                    {{i.note.upper}}
+               </td>
                    <td>
                     {% if i.inreglement %}
                     <div class="" style="text-align: center; background: rgb(179, 255, 0);">
@@ -968,6 +978,9 @@
         mode=parentdiv.find('[name="modereglementclient"]').map(function() {
             return this.value;
         }).get();
+        note=parentdiv.find('[name="note"]').map(function() {
+            return this.value;
+        }).get();
         npiece=parentdiv.find('[name="npiece"]').map(function() {
             return this.value;
         }).get();
@@ -989,6 +1002,7 @@
             target:'{{target}}',
             mantant:JSON.stringify(mantant),
             mode:JSON.stringify(mode),
+            note:JSON.stringify(note),
             npiece:JSON.stringify(npiece),
             echeance:JSON.stringify(echeance),
             bank:JSON.stringify(bank),

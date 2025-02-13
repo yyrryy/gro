@@ -2921,11 +2921,12 @@ def addavanceclient(request):
     bank=json.loads(request.GET.get('bank'))
     mode=json.loads(request.GET.get('mode'))
     npiece=json.loads(request.GET.get('npiece'))
+    note=json.loads(request.GET.get('note'))
     # date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
     echeance=json.loads(request.GET.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     print("clientid", clientid, "target", target, "mantant", mantant, "bank",bank, "mode", mode, "npiece", npiece, "echeance", echeance,)
-    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+    for m, mod, np, ech, bk, nt in zip(mantant, mode, npiece, echeance, bank, note):
         Avanceclient.objects.create(
             client_id=clientid,
             amount=m,
@@ -2934,6 +2935,7 @@ def addavanceclient(request):
             echeance=ech,
             bank=bk,
             mode=mod,
+            note=nt,
             npiece=np,
             isfarah=target=='f',
             isorgh=target=='o',
@@ -9456,7 +9458,10 @@ def filterjvdate(request):
                 bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
-            bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
     else:
         if productid==None:
             print('>> produuct is none')
