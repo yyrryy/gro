@@ -7,9 +7,9 @@
     <button class="btn btn-success" onclick="printfactureproductname('{{target}}', '{{facture.id}}')">
       Telecharger (Designation)
     </button>
-  <button class="btn btn-sm btn-success" onclick="entete()">
+  <!-- <button class="btn btn-sm btn-success" onclick="entete()">
     entette
-  </button>
+  </button> -->
   {% if not facture.bons.all %}
   <button class="btn btn-danger" onclick="ajaxpage('addmodifierfacture{{facture.id}}', 'Modifier facture {{facture.facture_no}}', '/products/modifierfacture/{{facture.id}}')">
     Modifier
@@ -24,12 +24,7 @@
   </button>
   <input placeholder="Note" class="notefacture{{facture.id}}input" value="{%if facture.note%}{{facture.note}}{%endif%}"><button class="btn btn-info" onclick="updatenotefacture('{{facture.id}}')">+</button>
   </div>
-  <select class="ms-2 updaterepfacture{{facture.id}}">
-    <option value="{{facture.salseman.id}}">{{facture.salseman.name}}</option>
-    {% for i in reps %}
-    <option value="{{i.id}}">{{i.name}}</option>
-    {% endfor %}
-  </select>
+  
 
   {% if not facture.printed %}
   <button class="ms-2 btn btn-success" onclick="printed(event, '{{facture.id}}')">
@@ -38,7 +33,22 @@
   {% endif %}
 </div>
 <div class="d-flex justify-content-between">
+  
   <div id="printfc{{facture.id}}" style="position:relative;">
+    <div class="row">
+      <div class="col-6">
+        <select class="ms-2 updatefactureclient" style="width: 100%;">
+        
+        </select>
+        <button class="btn btn-dark w-100" onclick="updatefactureclient()">Modifier client</button>
+      </div>
+      <div class="col-6">
+        <input type="date" class="ms-2 updatefacturedate form-control" value="{{facture.date|date:'Y-m-d'}}">
+        
+        <button class="btn btn-dark w-100" onclick="updatefacturedate()">Modifier date</button>
+      </div>
+      
+    </div>
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
@@ -473,6 +483,52 @@
 
 
 <script>
+  $(function(){
+      
+      $('.updatefactureclient').select2({
+
+        ajax: {
+          type:'get',
+          dataType: 'json',
+          url: '/products/searchclient?target={{target}}',
+          data: function (params) {
+            var query = {
+              term: params.term,
+            }
+            // Query parameters will be ?search=[term]&type=public
+            return query;
+          },
+          proccessresults: function (data) {
+              return {
+                results:data.results
+              }
+          },
+          cache:true
+        },
+        minimumInputLength: 1,
+        placeholder:'Chercher client',
+        templateResult: formatclientfc,
+        templateSelection: formatclientSelectionfc,
+      });
+      function formatclientfc (client) {
+          if (client.loading) {
+            return client.text;
+          }
+
+          var $container = $(
+            `<strong style="color:${client.diver>0?"red":""};">${client.text}</div>`
+            );
+
+
+
+            return $container;
+        }
+
+        function formatclientSelectionfc (client) {
+          return client.text;
+        }
+
+    })
   $('.updaterepfacture{{facture.id}}').on('change', function(){
     console.log(">>>>>>>>up")
     rep=$(this).val()
@@ -489,8 +545,33 @@
       'factureid':'{{facture.id}}',
       'note':$('.notefacture{{facture.id}}input').val()
     },(data)=>{
-      deletetab('facture{{facture.id}}')
       ajaxpage('addlistfactures', 'Factures', '/products/listfactures')
+    }
+  )}
+  function updatefactureclient(id){
+    clientid=$('.updatefactureclient').val()
+    if (clientid==null){
+      alertify.error('Selectionner un client')
+      return
+    }
+    $.get('/products/updatefactureclient', {
+      'factureid':'{{facture.id}}',
+      'clientid':clientid
+    },(data)=>{
+      ajaxpage('facture2', 'Facture FR-FC25000000001', '/products/facturedetails/{{facture.id}}?target={{target}}')
+    }
+  )}
+  function updatefacturedate(id){
+    date=$('.updatefacturedate').val()
+    if (date==""){
+      alertify.error('Selectionner un client')
+      return
+    }
+    $.get('/products/updatefacturedate', {
+      'factureid':'{{facture.id}}',
+      'date':date
+    },(data)=>{
+      ajaxpage('facture2', 'Facture FR-FC25000000001', '/products/facturedetails/{{facture.id}}?target={{target}}')
     }
   )}
   // facture is comptablisé

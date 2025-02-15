@@ -3126,5 +3126,22 @@ def addbank(request):
         'success':True
     })
     
+def updatefactureclient(request):
+    factureid=request.GET.get('factureid')
+    clientid=request.GET.get('clientid')
+    facture=Facture.objects.get(pk=factureid)
+    facture.client_id=clientid
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })
 
-
+def updatefacturedate(request):
+    factureid=request.GET.get('factureid')
+    date=request.GET.get('date')
+    facture=Facture.objects.get(pk=factureid)
+    facture.date=date
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })
