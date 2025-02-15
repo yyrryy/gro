@@ -186,7 +186,7 @@
 
 
         </select>
-        <button class="btn btn-success bi bi-download" onclick="downloafactures('{{target}}')">
+        <button class="btn btn-success bi bi-download" onclick="exportfc(event)">
           
         </button>
       </div>
@@ -505,27 +505,20 @@
     )
   }
   function exportfc(event){
-    let startdate=$('.fcexportdatefrom').val()
-    let enddate=$('.fcexportdateto').val()
-    let rep=$('.fcrepexport').val()
-    let regionfcexport=$('.regionfcexport').val()
-    if (startdate!='' || enddate!=''){
-      let url = `/products/exportfc?rep=${rep}&startdate=${startdate}&enddate=${enddate}&region=${regionfcexport}`;
+    let year=$('.populateyears').val()
+    let url = `/products/exportfc?year=${year}&target={{target}}`;
 
-      // Create a hidden iframe to trigger the file download
-      var iframe = $('<iframe>', {
-          id: 'download-frame',
-          src: url,
-          style: 'display: none;',
-      }).appendTo('body');
+    // Create a hidden iframe to trigger the file download
+    var iframe = $('<iframe>', {
+        id: 'download-frame',
+        src: url,
+        style: 'display: none;',
+    }).appendTo('body');
 
-      // Remove the iframe after download
-      iframe.on('load', function () {
-          iframe.remove();
-      });
-    }else{
-      alertify.error('Date')
-    }
+    // Remove the iframe after download
+    iframe.on('load', function () {
+        iframe.remove();
+    });
   }
   function yeardatafc(){
     let year=$('select[name="yearsfc"]').val()

@@ -2120,41 +2120,16 @@ def exportbl(request):
 
 
 def exportfc(request):
-    rep=request.GET.get('rep')
-    region=request.GET.get('region')
-    datefrom=request.GET.get('startdate')
-    dateto=request.GET.get('enddate')
-    print('>>>>>>', rep, datefrom, dateto)
-    if rep and region:
-        print('rep and region')
-        bons=Facture.objects.filter(salseman_id=rep,client__region=region, date__range=[datefrom, dateto]).order_by('-date')
-    if rep and not region:
-        print('rep and not region')
-        bons=Facture.objects.filter(salseman_id=rep, date__range=[datefrom, dateto]).order_by('-date')
-    if not rep and region:
-        print('not rep and region')
-        bons=Facture.objects.filter(client__region=region, date__range=[datefrom, dateto]).order_by('-date')
-    if not region and not rep:
-        print('nothing')
-        bons=Facture.objects.filter(date__range=[datefrom, dateto]).order_by('-date')
+    target=request.GET.get('target')
+    year=request.GET.get('year')
+    # today in d/m/Y
+    today=timezone.now().strftime("%d-%m-%Y")
+    society='FARAH' if target=='f' else 'ORGH'
+    if target=='f':
+        bons=Facture.objects.filter(isfarah=True, date__year=year)
+    else:
+        bons=Facture.objects.filter(isfarah=False, date__year=year)
 
-    # if rep and datefrom and dateto:
-    #     print('date and rep')
-    #     # convert date to datetime
-    #     datefrom=datetime.strptime(datefrom, '%Y-%m-%d')
-    #     dateto=datetime.strptime(dateto, '%Y-%m-%d')
-    #     bons=Facture.objects.filter(salseman_id=rep, date__range=[datefrom, dateto])
-    # if rep and not datefrom and not dateto:
-    #     print('only rep')
-    #     bons=Facture.objects.filter(salseman_id=rep, date__year=timezone.now().year)
-    # if not rep and datefrom and dateto:
-    #     print('only date')
-    #     datefrom=datetime.strptime(datefrom, '%Y-%m-%d')
-    #     dateto=datetime.strptime(dateto, '%Y-%m-%d')
-    #     bons=Facture.objects.filter(date__range=[datefrom, dateto])
-    # if not rep and not datefrom and not dateto:
-    #     print('nothing')
-    #     bons=Facture.objects.filter(date__year=timezone.now().year)
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
@@ -2163,14 +2138,23 @@ def exportfc(request):
     ws = wb.active
 
     # Write column headers
-    ws.append(['N° facture', 'Date', 'Client', 'Code cl.', 'total', 'region', 'ville', 'soldfc', 'rep.', 'status', ])
+    ws.append(['N° facture', 'Date', 'Client', 'Code cl.', 'TOTAL TTC', 'HT', 'TVA', 'Reglement', 'Bons'])
 
     # Write product data
     for bon in bons:
         ws.append([
-            bon.facture_no, bon.date.strftime("%d/%m/%Y"), bon.client.name if bon.client else '--', bon.client.code, bon.total, bon.client.region, bon.client.city, bon.client.soldfacture, bon.salseman.name if bon.salseman else '--', 'R0' if bon.ispaid else 'N1'])
+            bon.facture_no,
+            bon.date.strftime("%d/%m/%Y"),
+            bon.client.name if bon.client else '--',
+            bon.client.code if bon.client else '--',
+            bon.total,
+            bon.ht(),
+            bon.thistva(),
+            ' '.join([f'{p.amount} {p.mode} N°{p.npiece} {p.echance.strftime("%d/%m/%Y")}' for p in bon.reglements()]),
+            ' '.join([p.bon_no for p in bon.bons.all()]),
+        ])
 
-    response['Content-Disposition'] = f'attachment; filename="facture.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="facture{society}{today}.xlsx"'
     # Save the workbook to the response
     wb.save(response)
     return response

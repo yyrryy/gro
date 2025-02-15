@@ -188,9 +188,18 @@
                   <strong>Payment Espece</strong>
                 </div>
               </div>
+              
               <div class="">
                 <div>
                   <input type="number" class="form-control payment" placeholder="Payment" value="0.00" onkeyup="paymentbon()">
+                </div>
+                <div class="mt-2">
+                  <b>Caisse</b>
+                  <select class="form-select caissetarget" name="caissetarget">
+                    {% for i in caisses %}
+                    <option value="{{i.id}}">{{i.name}}</option>
+                    {% endfor %}
+                  </select>
                 </div>
                 <div>
                   Rondu: <strong class="rondu"></strong>

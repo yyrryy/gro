@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config, Caisse, Bank
 from django.http import JsonResponse, HttpResponse
 import qrcode
 from django.db.models import Count, F, Sum, Q, Window, Case, When, Value, FloatField, ExpressionWrapper
@@ -95,7 +95,8 @@ def bonsortie(request):
     
     return render(request, 'bonsortie.html', {
         'title':'Bon de Sortie',
-        'cars':Carlogos.objects.all().order_by('id')
+        'cars':Carlogos.objects.all().order_by('id'),
+        'caisses':Caisse.objects.filter(target='s'),
         # 'clients':Client.objects.all(),
         # # 'products':Produit.objects.all(),
         # 'commercials':Represent.objects.all(),
@@ -117,6 +118,7 @@ def addbonsortie(request):
     #transport=request.POST.get('transport')
     note=request.POST.get('note')
     payment=request.POST.get('payment') or 0
+    caissetarget=request.POST.get('caissetarget')
     print('>>>>>>', products, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
@@ -251,6 +253,14 @@ def addbonsortie(request):
             issortie=True
         )
         regl.bonsortie.set([order])
+        if caissetarget:
+            print('>> add to caisse', caissetarget)
+            # caisse=Caisse.objects.get(pk=caissetarget)
+            # caisse+=payment
+            # caisse.save()
+            # regl.caissetarget_id=caissetarget
+            # regl.save()
+
     
     
     # if float(payment)>0:
@@ -3089,3 +3099,32 @@ def cancelcommandorgh(request):
     return JsonResponse({
         'success':True
     })
+
+def caissepage(request):
+    target=request.GET.get('target')
+    caisses=Caisse.objects.filter(target=target)
+    print('>> caisses', caisses)
+    banks=Bank.objects.filter(target=target)
+    return render(request, 'caissepage.html', {'caisses':caisses, 'banks':banks, 'target':target})
+def addcaisse(request):
+    name=request.GET.get('name')
+    mantant=request.GET.get('montant')
+    target=request.GET.get('target')
+    print('name', name, mantant, target)
+    Caisse.objects.create(name=name, amount=mantant, target=target)
+    return JsonResponse({
+        'success':True
+    })
+
+def addbank(request):
+    name=request.GET.get('name')
+    mantant=request.GET.get('mantant')
+    target=request.GET.get('target')
+    print('name', name, mantant, target)
+    #Caisse.objects.create(name=name, amount=mantant, target=target)
+    return JsonResponse({
+        'success':True
+    })
+    
+
+

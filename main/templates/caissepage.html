@@ -1,0 +1,148 @@
+{% load global_tags %}
+<div class="container">
+    <div class="row">
+        <div class="col-1">
+            <button class="btn w-100 mb-2 bg-darkblue alternatebtn text-white" onclick="$('.bankssession').addClass('d-none'); $('.caissesession').removeClass('d-none')">Cisses</button>
+            <button class="btn w-100 mb-2 alternatebtn" onclick="$('.caissesession').addClass('d-none'); $('.bankssession').removeClass('d-none')">Banques</button>
+        </div>
+        <div class="col-11">
+            <!-- caisse -->
+            <div class="card caissesession">
+                <div class="card-header d-flex justify-content-between">
+                    <h4 class="card-title">Caisse</h4>
+                    <!-- accordion add caisse -->
+                    <div>
+                        <button class="btn btn-primary" data-toggle="collapse" data-target="#addcaisse">Ajouter une caisse</button>
+                        <div id="addcaisse" class="collapse">
+                            <div class="form-group">
+                                <label for="name">Nom de la caisse</label>
+                                <input type="text" name="name" class="form-control caissename">
+                            </div>
+                            <div class="form-group
+                            ">
+                                <label for="montant">Montant</label>
+                                <input type="number" name="initialcaisse" class="form-control initialcaisse">
+                            </div>
+                            <button class="btn btn-dark mt-2" onclick="addcaisse()">Ajouter caisse</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                    <thead class=" text-primary">
+                        <th>
+                        Description
+                        </th>
+                        <th>
+                        Montant
+                        </th>
+                        <th>
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for item in caisses %}
+                        <tr>
+                        
+                        <td>
+                            {{ item.name }}
+                        </td>
+                        <td>
+                            {{ item.amount }}
+                        </td>
+                        <td>
+                            
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+
+            <!-- bank -->
+            <div class="card bankssession d-none">
+                <div class="card-header d-flex justify-content-between">
+                    <h4 class="card-title">Banques</h4>
+                    <!-- accordion add caisse -->
+                    <div>
+                        <button class="btn btn-primary" data-toggle="collapse" data-target="#addcaisse">Ajouter une banque</button>
+                        <div id="addcaisse" class="collapse">
+                            <div class="form-group">
+                                <label for="name">Nom de la banque</label>
+                                <input type="text" name="name" class="form-control">
+                            </div>
+                            <div class="form-group
+                            ">
+                                <label for="montant">Montant initial</label>
+                                <input type="number" name="initialcaisse" class="form-control initialbank">
+                            </div>
+                            <div class="form-group
+                            ">
+                                <label for="montant">RIB</label>
+                                <input type="number" name="montant" class="form-control">
+                            </div>
+                            <button class="btn btn-dark mt-2">Ajouter banque</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                    <thead class=" text-primary">
+                        <th>
+                        Description
+                        </th>
+                        <th>
+                        Montant
+                        </th>
+                        <th>
+                        </th>
+                    </thead>
+                    <tbody>
+                        {% for item in banks %}
+                        <tr>
+                        
+                        <td>
+                            {{ item.name }}
+                        </td>
+                        <td>
+                            {{ item.montant }}
+                        </td>
+                        <td>
+                            
+                        </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function addcaisse(){
+        var name = $('.caissename').val();
+        var montant = $('.initialcaisse').val();
+        if (name == '' || montant == ''){
+            alertify.error('Veuillez remplir tous les champs');
+            return;
+        }
+        $.get('/products/addcaisse',{
+                name: name,
+                montant: montant,
+                'target': '{{target}}'
+            }, function(data){
+                console.log(data);
+                ajaxpage('addpducts', 'ARTICLES', '/products/caissepage?target={{target}}')
+            }
+        )
+    }
+    $('.alternatebtn').click(function(){
+        $('.alternatebtn').removeClass('bg-darkblue text-white');
+        $(this).addClass('bg-darkblue text-white');
+    })
+</script>
