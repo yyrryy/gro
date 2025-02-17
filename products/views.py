@@ -2138,7 +2138,7 @@ def exportfc(request):
     ws = wb.active
 
     # Write column headers
-    ws.append(['N° facture', 'Date', 'Client', 'TOTAL TTC', 'HT', 'TVA', 'Mode reglement', 'N° piece'])
+    ws.append(['N° facture', 'Date', 'Client', 'TOTAL TTC', 'HT', 'TVA', 'Mode reglement', 'N° piece', 'Banque'])
 
     # Write product data
     for bon in bons:
@@ -2151,7 +2151,8 @@ def exportfc(request):
             bon.ht(),
             bon.thistva(),
             bon.reglements()[0].mode if len(bon.reglements())>0 else '--',
-            bon.reglements()[0].npiece if len(bon.reglements())>0 else '--'
+            bon.reglements()[0].npiece if len(bon.reglements())>0 else '--',
+            bon.reglements()[0].bank if len(bon.reglements())>0 else '--'
         ])
 
     response['Content-Disposition'] = f'attachment; filename="facture{society}{today}.xlsx"'
