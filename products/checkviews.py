@@ -119,7 +119,7 @@ def addbonsortie(request):
     note=request.POST.get('note')
     payment=request.POST.get('payment') or 0
     caissetarget=request.POST.get('caissetarget')
-    print('>>>>>>', products, totalbon, payment)
+    print('>>>>>> caisse', caissetarget, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
     client=Client.objects.get(pk=clientid)
@@ -255,11 +255,11 @@ def addbonsortie(request):
         regl.bonsortie.set([order])
         if caissetarget:
             print('>> add to caisse', caissetarget)
-            # caisse=Caisse.objects.get(pk=caissetarget)
-            # caisse+=payment
-            # caisse.save()
-            # regl.caissetarget_id=caissetarget
-            # regl.save()
+            caisse=Caisse.objects.get(pk=caissetarget)
+            caisse.amount+=float(payment)
+            caisse.save()
+            regl.caissetarget_id=caissetarget
+            regl.save()
 
     
     
@@ -3132,6 +3132,8 @@ def updatefactureclient(request):
     facture=Facture.objects.get(pk=factureid)
     facture.client_id=clientid
     facture.save()
+    bons=facture.bons
+    bons.update(client_id=clientid)
     return JsonResponse({
         'success':True
     })

@@ -197,6 +197,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <div>
+                                caisse
+                                <select name="" id="" class="caissetarget">
+                                    <option value="">--</option>
+                                    {% for i in caisses %}
+                                    <option value="{{i.id}}">{{i.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                Banque
+                                <select name="" id="" class="banktarget">
+                                    <option value="">--</option>
+                                    {% for i in banks %}
+                                    <option value="{{i.id}}">{{i.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
