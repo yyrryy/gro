@@ -131,7 +131,7 @@
                   </thead>
                   <tbody class="clientstablebody">
                       {% for i in clients %}
-                      <tr class="client-row" {% if i.diver %} style="background: #a8dfc5" {% endif %}>
+                      <tr ondblclick="ajaxpage('rr', 'rr', '/products/client/{{i.id}}?target={{target}}')" class="client-row" {% if i.diver %} style="background: #a8dfc5" {% endif %}>
                           <td>
                               <button class="btn editsuppbtn border" id="{{i.id}}" data-toggle="modal" data-target="#editclientmodal" onclick="populateclientfields('{{i.id}}', '{{target}}')">
                                   ✐

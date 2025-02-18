@@ -336,6 +336,13 @@
                         <div>
                             Mantant a payé <strong class="whattopay">0.00</strong>DH
                         </div>
+                        <div class="row">
+                            <small>Date reglement:</small>
+                            <div class="col-4">
+                                <input type="date" name="" id="" value="{{today|date:'Y-m-d'}}" class="form-control mb-2 datereglement">
+                            </div>
+
+                        </div>
                         <button class="btn text-white w-100 submitaddreglemntclientbtn disabled" style="background: #00538c;">
                             Valider
                         </button>
@@ -1165,6 +1172,11 @@
 
 
     $('.submitaddreglemntclientbtn').on('click', function(event){
+        datereglement=$('.datereglement').val()
+        if (datereglement==''){
+            alertify.error('Date')
+            return
+        }
         event.preventDefault()
         //$(event.target).addClass('disabled')
         let parentdiv=$(this).parent().parent()
@@ -1246,7 +1258,7 @@
             npiece:JSON.stringify(npiece),
             echeance:JSON.stringify(echeance),
             bank:JSON.stringify(bank),
-            //date:date,
+            date:datereglement,
             bons:JSON.stringify(selectedValues),
             avoirs:JSON.stringify(selectedavoirs),
             avances:JSON.stringify(selectedavances),

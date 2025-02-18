@@ -5,13 +5,13 @@
             <table class="table table-bordered">
                 <tr>
                     <td>
-                        Sold Bl
+                        Sold Client
                     </td>
                     <td>
-                        {{client.mehtodsoldbl|floatformat:2|intspace}}
+                        {{client.sold|floatformat:2|intspace}}
                     </td>
                 </tr>
-                <tr>
+                <!-- <tr>
 
                     <td>
                         Sold Facture
@@ -20,7 +20,7 @@
                         {{client.methodsoldfc|floatformat:2|intspace}}
                     </td>
                 </tr>
-                <!-- <tr>
+                <tr>
 
                     <td>
                         Sold total
@@ -28,7 +28,7 @@
                     <td>
                         {{client.soldtotal|floatformat:2|intspace}}
                     </td>
-                </tr> -->
+                </tr> 
                 <tr>
 
                     <td>
@@ -72,13 +72,13 @@
                         </button>
                         {% endif %}
                     </td>
-                </tr>
+                </tr>-->
                 <tr>
                 </tr>
                 <tr>
                 </tr>
             </table>
-            {{client.accesscatalog}}
+            <!-- {{client.accesscatalog}}
             {% if client.accesscatalog %}
                 <button class="btn w-100 btn-danger" onclick="allowcatalog('{{client.code}}')">
                     Fermer catalog
@@ -87,7 +87,7 @@
                 <button class="btn w-100 btn-success" onclick="allowcatalog('{{client.code}}')">
                     Ouvrir catalog
                 </button>
-            {% endif %}
+            {% endif %} -->
             <div class="mt-5 p-2 creteacc{{client.id}} d-none">
 
                 <div class="align-items-center">

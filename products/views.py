@@ -332,21 +332,42 @@ def getsupplierdata(request):
 
 
 def updatesupplier(request):
-    id=request.POST.get('pid')
-    name=request.POST.get('pname')
-    phone=request.POST.get('pphone')
-    address=request.POST.get('paddress')
-    supplier=Supplier.objects.get(pk=id)
+    supplierid=request.POST.get('updatesuppid')
+    image=request.FILES.get('updatesuppimage')
+    name=request.POST.get('updatesuppname')
+    personalname=request.POST.get('updatesupppersonalname')
+    phone=request.POST.get('updatesuppphone')
+    phone2=request.POST.get('updatesuppphone2')
+    plafon=request.POST.get('updatesuppplafon') or 0
+    ice=request.POST.get('updatesuppice')
+    rc=request.POST.get('updatesupprc')
+    suppif=request.POST.get('updatesuppname')
+    city=request.POST.get('updatesuppcity')
+    email=request.POST.get('updatesuppemail')
+    address=request.POST.get('updatesuppaddress')
+    modereglement=request.POST.get('updatesuppmodereglement')
+    note=request.POST.get('updatesuppnote')
+    print('>> suppid, name, phone, address, image, personalname, phone2, plafon, ice, rc, suppif, city, email, modereglement, note', supplierid, name, phone, address, image, personalname, phone2, plafon, ice, rc, suppif, city, email, modereglement, note, image)
+    supplier=Supplier.objects.get(pk=supplierid)
     supplier.name=name
     supplier.phone=phone
     supplier.address=address
+    supplier.personalname=personalname
+    supplier.phone2=phone2
+    supplier.plafon=plafon
+    supplier.ice=ice
+    supplier.rc=rc
+    supplier.suppif=suppif
+    supplier.city=city
+    supplier.email=email
+    supplier.modereglement=modereglement
+    supplier.note=note
+    if image:
+        print('>> image', image)
+        supplier.image=image
     supplier.save()
-    ctx={
-        'suppliers':Supplier.objects.all(),
-        'title':'List des fournisseurs'
-    }
     return JsonResponse({
-        'html':render(request, 'suppliers.html', ctx).content.decode('utf-8')
+        'success':True
     })
 
 def addoneproduct(request):
@@ -1431,14 +1452,17 @@ def supplierinfo(request, id):
     return render(request, 'supplierinfo.html', ctx)
 
 def clientinfo(request, id):
+    target=request.GET.get('targegt')
+    isfarah=target=='f'
     client=Client.objects.get(pk=id)
     ctx={
+        'target':target,
         'client':client,
-        'totalavoirs':Avoirclient.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
-        'totalpayments':PaymentClientbl.objects.filter(client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'totaltr':Bonlivraison.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
-        'bons':Bonlivraison.objects.filter(client=client, total__gt=0),
-        'payments':PaymentClientbl.objects.filter(client=client)
+        'totalavoirs':Avoirclient.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalpayments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
+        'totaltr':Bonlivraison.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
+        'bons':Bonlivraison.objects.filter(isfarah=isfarah, client=client, total__gt=0),
+        'payments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client)
     }
     return render(request, 'clientinfo.html', ctx)
 
@@ -3236,6 +3260,7 @@ def reglefactures(request):
 
 def reglebons(request):
     clientid=request.POST.get('clientid')
+    date=request.POST.get('date')
     whattopay=float(request.POST.get('whattopay'))
     print('>> whatt', whattopay)
     moderegl=request.POST.get('moderegl')
@@ -3275,7 +3300,8 @@ def reglebons(request):
         Avanceclient.objects.create(
             client_id=clientid,
             amount=diff,
-            date=timezone.now().date(),
+            # date=timezone.now().date(),
+            date=date,
             isfarah=target=='f',
             isorgh=target=='o'
         )
@@ -3293,7 +3319,8 @@ def reglebons(request):
         Avanceclient.objects.create(
             client_id=clientid,
             amount=totalmantant,
-            date=timezone.now().date(),
+            # date=timezone.now().date(),
+            date=date,
             isfarah=target=='f',
             isorgh=target=='o'
         )
@@ -3303,7 +3330,8 @@ def reglebons(request):
             client_id=clientid,
             amount=m,
             #today
-            date=timezone.now().date(),
+            # date=timezone.now().date(),
+            date=date,
             echance=ech,
             bank=bk,
             mode=mod,
