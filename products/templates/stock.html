@@ -387,7 +387,7 @@
     $('.totalprachstockfc').text(totalprachstockfc.toFixed(2))
   }
   totalsproductslist()
-  $('.searchinputlistproducts').on("keyup", function() {
+  $('.searchinputlistproducts').on("change", function() {
     $('.listproductsholder').css('filter', 'blur(3px)')
     // Get the values from all filter input fields
     var filterValue = $(this).val().toLowerCase();
