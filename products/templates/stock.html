@@ -387,12 +387,12 @@
     $('.totalprachstockfc').text(totalprachstockfc.toFixed(2))
   }
   totalsproductslist()
-  $('.searchinputlistproducts').on("input", function() {
+  $('.searchinputlistproducts').on("keyup", function() {
     $('.listproductsholder').css('filter', 'blur(3px)')
     // Get the values from all filter input fields
     var filterValue = $(this).val().toLowerCase();
     if (filterValue==""){
-      ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
+      //ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
     }
     if (filterValue.length>=2){
       
