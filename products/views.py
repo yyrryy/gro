@@ -2227,6 +2227,7 @@ def listfactures(request):
     # get only the last 100 orders of the current year
     if target=='f':
         bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
+        lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FR-FC{year}'
         ).last()
@@ -2240,6 +2241,7 @@ def listfactures(request):
             receipt_no = f"FR-FC{year}000000001"
     else:
         bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
+        lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FC{year}'
         ).last()
@@ -2258,7 +2260,8 @@ def listfactures(request):
         'depasserfc':depasser,
         'today':timezone.now().date(),
         'target':target,
-        'receipt_no':receipt_no
+        'receipt_no':receipt_no,
+        'lastdatefacture':lastdatefacture
     }
     if bons:
         ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)
