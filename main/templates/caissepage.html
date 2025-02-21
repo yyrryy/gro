@@ -48,7 +48,7 @@
                             {{ item.name }}
                         </td>
                         <td>
-                            {{ item.amount }}
+                            {{ item.total }}
                         </td>
                         <td>
                             
@@ -83,7 +83,7 @@
                                 <label for="montant">RIB</label>
                                 <input type="number" class="form-control rib">
                             </div>
-                            <button class="btn btn-dark mt-2">Ajouter banque</button>
+                            <button class="btn btn-dark mt-2" onclick="addbank()">Ajouter banque</button>
                         </div>
                     </div>
                 </div>
@@ -111,10 +111,10 @@
                             {{ item.name }}
                         </td>
                         <td>
-                            {{ item.montant }}
+                            {{ item.total }}
                         </td>
                         <td>
-                            
+                            {{item.rib}}
                         </td>
                         </tr>
                         {% endfor %}
@@ -144,6 +144,28 @@
             }
         )
     }
+    
+    function addbank(){
+        var name = $('.bankname').val();
+        var montant = $('.initialbank').val();
+        var rib = $('.rib').val();
+        if (name == '' || montant == ''){
+            alertify.error('Veuillez remplir tous les champs');
+            return;
+        }
+        $.get('/products/addbank',{
+                name: name,
+                rib: rib,
+                montant: montant,
+                'target': '{{target}}'
+            }, function(data){
+                console.log(data);
+                ajaxpage('addpducts', 'ARTICLES', '/products/caissepage?target={{target}}')
+            }
+        )
+    }
+    
+    
     $('.alternatebtn').click(function(){
         $('.alternatebtn').removeClass('bg-darkblue text-white');
         $(this).addClass('bg-darkblue text-white');

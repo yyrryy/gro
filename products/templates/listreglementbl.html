@@ -98,7 +98,6 @@
 
     <div class="card">
     <div class="border p-2 position-relative updatereglementbl position-fixed shadow rounded d-none" style="z-index: 999;overflow: scroll; height: 85vh;background: aliceblue; width: 85%;">
-        <button onclick="$(this).parent().addClass('d-none')" >X</button>
         
         <div class="row reglebldata">
 
@@ -193,6 +192,7 @@
                                                 <option value="cheque">Cheque</option>
                                                 <option value="effet">effet</option>
                                                 <option value="espece">espece</option>
+                                                <option value="remise">remise</option>
                                                 <option value="verement">verement</option>
                                                 <option value="versement">versement</option>
                                                 <option value="carte">carte banquaire</option>
@@ -552,6 +552,21 @@
 
 
 <script>
+    function payreglementclient(reglid){
+        banktarget=$('.banktarget').val()
+        if (banktarget==''){
+            alertify.error('Bank is required')
+            return
+        }
+        $.get('/products/payreglementclient', {
+            'reglid':reglid,
+            'banktarget':banktarget,
+        }, (data)=>{
+            if (data.success){
+                updatereglementbl(reglid)
+            }
+        })
+    }
     readingqrcode=false
   populateyears()
     function deletereglementclient(reglid){
@@ -1023,7 +1038,7 @@
         //console.log(date, mantant)
         // get regl data
         $.get('/products/getreglementbl/'+reglementid, {
-
+            'target':'{{target}}'
             }, function(data){
                 console.log(data)
                 $('.reglebldata').html(data.html)

@@ -455,6 +455,10 @@ class Avanceclient(models.Model):
     issortie=models.BooleanField(default=False)
     # avance selected in an rglement
     inreglement=models.BooleanField(default=False)
+    targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+
+
 
 class Avancesupplier(models.Model):
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
@@ -469,6 +473,8 @@ class Avancesupplier(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     inreglement=models.BooleanField(default=False)
+    targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
 
 
 class Bonlivraison(models.Model):
@@ -572,7 +578,14 @@ class PaymentSupplier(models.Model):
     usedinfacture=models.BooleanField(default=False)
     # avoir fornisseur I5lls i bo lmahal
     isavoir=models.BooleanField(default=False)
-    
+    targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    # if regl is paid if it has echeaance
+    ispaid=models.BooleanField(default=False)
+    #refused means impyé
+    refused=models.BooleanField(default=False)
+
+
     # we need somthin to track if the reglement
 class Notesrepresentant(models.Model):
     represent=models.ForeignKey('Represent', on_delete=models.SET_NULL, default=None, null=True)
@@ -1237,6 +1250,7 @@ class Outfactureachat(models.Model):
 
 class Bank(models.Model):
     name=models.CharField(max_length=500, default='', null=True)
+    rib=models.CharField(max_length=500, default='', null=True)
     total=models.FloatField(default=0.0)
     initialamount=models.FloatField(default=0.0)
     target=models.CharField(max_length=500, default='', null=True)

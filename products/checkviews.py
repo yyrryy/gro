@@ -2783,6 +2783,11 @@ def deletereglementclient(request):
     factures.update(ispaid=False)
     factures.update(rest=0)
     reglement.delete()
+    if reglement.targetcaisse:
+        reglement.targetcaisse.total-=reglement.amount
+        reglement.targetcaisse.save()
+
+
     return JsonResponse({
         'success':True
     })
@@ -3111,16 +3116,19 @@ def addcaisse(request):
     mantant=request.GET.get('montant')
     target=request.GET.get('target')
     print('name', name, mantant, target)
-    Caisse.objects.create(name=name, amount=mantant, target=target)
+    Caisse.objects.create(name=name, amount=mantant, target=target, amountinitial=mantant, total=mantant)
     return JsonResponse({
         'success':True
     })
 
 def addbank(request):
     name=request.GET.get('name')
-    mantant=request.GET.get('mantant')
+    mantant=request.GET.get('montant')
+    rib=request.GET.get('rib')
     target=request.GET.get('target')
     print('name', name, mantant, target)
+    Bank.objects.create(name=name, rib=rib, target=target, initialamount=mantant, total=mantant)
+
     #Caisse.objects.create(name=name, amount=mantant, target=target)
     return JsonResponse({
         'success':True
@@ -3144,6 +3152,35 @@ def updatefacturedate(request):
     facture=Facture.objects.get(pk=factureid)
     facture.date=date
     facture.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def payreglementclient(request):
+    reglid=request.GET.get('reglid')
+    banktarget=request.GET.get('banktarget')
+    bank=Bank.objects.get(pk=banktarget)
+    regl=PaymentClientbl.objects.get(pk=reglid)
+    regl.targetbank=bank
+    regl.ispaid=True
+    bank.total+=regl.amount
+    regl.save()
+    bank.save()
+    return JsonResponse({
+        'success':True
+    })
+
+
+def payreglementsupp(request):
+    reglid=request.GET.get('reglid')
+    banktarget=request.GET.get('banktarget')
+    bank=Bank.objects.get(pk=banktarget)
+    regl=PaymentSupplier.objects.get(pk=reglid)
+    regl.targetbank=bank
+    regl.ispaid=True
+    bank.total-=regl.amount
+    regl.save()
+    bank.save()
     return JsonResponse({
         'success':True
     })

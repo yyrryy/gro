@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Config
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Caisse, Bank
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -2939,7 +2939,7 @@ def addavanceclient(request):
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     print("clientid", clientid, "target", target, "mantant", mantant, "bank",bank, "mode", mode, "npiece", npiece, "echeance", echeance,)
     for m, mod, np, ech, bk, nt in zip(mantant, mode, npiece, echeance, bank, note):
-        Avanceclient.objects.create(
+        av=Avanceclient.objects.create(
             client_id=clientid,
             amount=m,
             #today
@@ -2953,6 +2953,13 @@ def addavanceclient(request):
             isorgh=target=='o',
             issortie=target=='s'
         )
+        caisse=Caisse.objects.filter(target=target).first()
+        if mod=='espece':
+            if caisse:
+                caisse.total+=m
+                av.targetcaisse=caisse
+                av.save()
+                caisse.save()
     return JsonResponse({
         'success':True
     })
@@ -2971,7 +2978,7 @@ def addavancesupplier(request):
     echeance=json.loads(request.GET.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
-        Avancesupplier.objects.create(
+        av=Avancesupplier.objects.create(
             supplier_id=supplierid,
             amount=m,
             #today
@@ -2983,6 +2990,13 @@ def addavancesupplier(request):
             isfarah=target=='f',
             isorgh=target=='o'
         )
+        caisse=Caisse.objects.filter(target=target).first()
+        if mod=='espece':
+            if caisse:
+                caisse.total-=m
+                av.targetcaisse=caisse
+                av.save()
+                caisse.save()
     return JsonResponse({
         'success':True
     })
@@ -3351,6 +3365,14 @@ def reglebons(request):
             regl.save()
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
+        caisse=Caisse.objects.filter(target=target).first()
+        if mod=='espece':
+            if caisse:
+                caisse.total+=m
+                regl.targetcaisse=caisse
+                regl.save()
+                caisse.save()
+
         # for i in livraisons:
         #     Bonsregle.objects.create(
         #         payment=regl,
@@ -3438,6 +3460,13 @@ def reglebonsortie(request):
         
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
+        caisse=Caisse.objects.filter(target=target).first()
+        if mod=='espece':
+            if caisse:
+                caisse.total+=m
+                regl.targetcaisse=caisse
+                regl.save()
+                caisse.save()
         # for i in livraisons:
         #     Bonsregle.objects.create(
         #         payment=regl,
@@ -3791,6 +3820,13 @@ def addavoirclient(request):
                         isavoir=True
                     )
                     regl.avoirs.set([avoir])
+                    caisse=Caisse.objects.filter(target=target).first()
+                    if mod=='espece':
+                        if caisse:
+                            caisse.total-=m
+                            regl.targetcaisse=caisse
+                            regl.save()
+                            caisse.save()
     except Exception as e:
         print('>>error av cl:', e)
         return JsonResponse({
@@ -4686,7 +4722,8 @@ def getsuppbons(request):
     })
 
 def reglebonsachat(request):
-    isfarah=request.POST.get('target')=="f"
+    target=request.POST.get('target')
+    isfarah=target=="f"
     supplierid=request.POST.get('supplierid')
     whattopay=float(request.POST.get('whattopay'))
     moderegl=request.POST.get('moderegl')
@@ -4763,7 +4800,13 @@ def reglebonsachat(request):
             regl.factures.set(livraisons)
             regl.usedinfacture=True
             regl.save()
-
+        caisse=Caisse.objects.filter(target=target).first()
+        if mod=='espece':
+            if caisse:
+                caisse.total-=m
+                regl.targetcaisse=caisse
+                regl.save()
+                caisse.save()
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
         # for i in livraisons:
@@ -5603,6 +5646,7 @@ def updatereglesupp(request):
 def getreglementbl(request, id):
     reglement=PaymentClientbl.objects.get(pk=id)
     # get bons
+    target=request.GET.get('target')
     bons=reglement.bons.all()
     if bons:
         otherregl=PaymentClientbl.objects.filter(bons__in=bons).exclude(pk=reglement.id)
@@ -5638,6 +5682,8 @@ def getreglementbl(request, id):
         'avances':reglement.avances.all().order_by('date'),
         'bons':bons,
         'factures':reglement.factures.all().order_by('date'),
+        'today':timezone.now().date(),
+        'banks':Bank.objects.filter(target=target)
     }
     
     return JsonResponse({
@@ -6383,13 +6429,15 @@ def getreglementsupp(request, id):
     # trs=''
     # for i in livraisons:
     #     trs+=f'<tr style="background: {"rgb(221, 250, 237);" if i.reglementssupp.exists() else ""}" class="loadblinupdatereglsupp" reglemntid="{id}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.total}</td><td class="text-danger">{"RR" if i.reglementssupp.exists() else "NR"}</td> <td><input type="checkbox" value="{i.id}" name="facturestopay" onchange="checkreglementbox(event)"></td></tr>'
-
+    target=request.GET.get('target')
     ctx={
         'reglement':reglement,
         'avoirs':reglement.avoirs.all().order_by('date'),
         'avances':reglement.avances.all().order_by('date'),
         'bons':reglement.bons.all().order_by('date'),
         'factures':reglement.factures.all().order_by('date'),
+        'today':timezone.now().date(),
+        'banks':Bank.objects.filter(target=target)
     }
     return JsonResponse({
         'html':render(request, 'updatereglesupp.html', ctx).content.decode('utf-8')
@@ -6796,6 +6844,10 @@ def updatebonavoir(request):
         i.delete()
     avoir.client=client
     #avoir.representant_id=request.POST.get('repid')
+    # caisse=Caisse.objects.filter(target=target).first()
+    # if caisse:
+    #     caisse.total+=avoir.total
+    #     caisse.save()
     avoir.total=totalbon
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(datebon, '%Y-%m-%d')
@@ -6854,6 +6906,11 @@ def updatebonavoir(request):
                     isavoir=True
                 )
                 regl.avoirs.set([avoir])
+                # caisse=Caisse.objects.filter(target=target).first()
+                # if mod=='espece':
+                #     if caisse:
+                #         caisse.total+=m
+                #         caisse.save()
 
     return JsonResponse({
         'success':True

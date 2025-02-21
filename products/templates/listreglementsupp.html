@@ -378,6 +378,22 @@
 
 
 <script>
+    function payreglementsupp(reglid){
+        banktarget=$('.banktarget').val()
+        if (banktarget==''){
+            alertify.error('Bank is required')
+            return
+        }
+        $.get('/products/payreglementsupp', {
+            'reglid':reglid,
+            'banktarget':banktarget,
+        }, (data)=>{
+            if (data.success){
+                updatereglementsupp(reglid)
+            }
+        })
+    }
+    
     populateyears()
     function deletereglementsupplier(reglid){
         alertify.confirm(
@@ -522,7 +538,7 @@ function submitupdatereglementsupp(event){
         // console.log(date, mantant)
         // get regl data
         $.get('/products/getreglementsupp/'+reglementid, {
-
+            'target':'{{target}}'
             }, function(data){
                 console.log(data)
                 $('.reglebldata').html(data.html)
