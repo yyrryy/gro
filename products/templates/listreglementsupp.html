@@ -267,7 +267,7 @@
                             Mantant a payé <strong class="whattopay">0.00</strong>DH
                         </div>
                         <div>
-                            Date de reglement <input type="date" value="{{today|date:'Y-m-d'}}" name="datereglementsupp" class="w-100 notempty datereglementsupp mb-2">
+                            Date de reglement <input type="date" value="{{today|date:'Y-m-d'}}" class="datereglement mb-2">
                         </div>
                         <button class="btn text-white w-100 submitaddreglemntsuppbtn disabled" style="background: #00538c;">
                             Valider
@@ -715,6 +715,11 @@ function submitupdatereglementsupp(event){
 
     $('.submitaddreglemntsuppbtn').on('click', function(event){
         event.preventDefault()
+        date=$('.datereglement').val()
+        if (date==''){
+            alertify.error('Date')
+            return
+        }
         let parentdiv=$(this).parent().parent()
         var isAnyEmpty = parentdiv.find('.notempty').filter(function() { return $(this).val() == ''; }).length > 0;
         if (isAnyEmpty){
@@ -764,7 +769,7 @@ function submitupdatereglementsupp(event){
         bank=parentdiv.find('[name="bank"]').map(function() {
             return this.value;
         }).get();
-        date=parentdiv.find('[name="datereglementsupp"]').val()
+        //date=parentdiv.find('[name="datereglementsupp"]').val()
 
         bons=parentdiv.find('[name="addreglementbons"]').map(function() {
             return this.value;

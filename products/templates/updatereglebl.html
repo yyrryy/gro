@@ -5,6 +5,7 @@
         </strong>
         <button class="bi bi-download" onclick="printreglementclient('{{reglement.id}}')"></button>
     </div>    
+    
         {% if not reglement.mode == 'espece' %}
             {% if reglement.ispaid %}
                 <div class="alert alert-success">Reglement Payé</div>
@@ -12,7 +13,7 @@
                 <button class="btn btn-danger bi bi-trash" onclick="deletereglementclient('{{reglement.id}}')"></button>
 
                 
-                {% if reglement.echance == today %}
+                {% if reglement.echance <= today %}
                 <div>
                     <select class="banktarget">
                         <option value="">Selectionner une banque</option>
