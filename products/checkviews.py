@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config, Caisse, Bank
+from itertools import chain
+from operator import attrgetter
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonsortie, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, CommandItem, DeviItem, Sortieitem, Devi, Bonlivraison, Command, CommandItemsupplier, DeviItemsupplier, Devisupplier, Commandsupplier, Factureachat, Outfactureachat, Avanceclient, Avancesupplier, Config, Caisse, Bank, Transfer
 from django.http import JsonResponse, HttpResponse
 import qrcode
 from django.db.models import Count, F, Sum, Q, Window, Case, When, Value, FloatField, ExpressionWrapper
@@ -2782,10 +2784,10 @@ def deletereglementclient(request):
     bons.update(isvalid=False)
     factures.update(ispaid=False)
     factures.update(rest=0)
-    reglement.delete()
     if reglement.targetcaisse:
         reglement.targetcaisse.total-=reglement.amount
         reglement.targetcaisse.save()
+    reglement.delete()
 
 
     return JsonResponse({
@@ -2815,6 +2817,9 @@ def deletereglementsupplier(request):
     bons.update(isvalid=False)
     factures.update(ispaid=False)
     factures.update(rest=0)
+    if reglement.targetcaisse:
+        reglement.targetcaisse.total+=reglement.amount
+        reglement.targetcaisse.save()
     reglement.delete()
     return JsonResponse({
         'success':True
@@ -3110,7 +3115,9 @@ def caissepage(request):
     caisses=Caisse.objects.filter(target=target)
     print('>> caisses', caisses)
     banks=Bank.objects.filter(target=target)
-    return render(request, 'caissepage.html', {'caisses':caisses, 'banks':banks, 'target':target})
+    allcaisses=Caisse.objects.all()
+    allbanks=Bank.objects.all()
+    return render(request, 'caissepage.html', {'caisses':caisses, 'banks':banks, 'target':target, 'allbanks':allbanks, 'allcaisses':allcaisses})
 def addcaisse(request):
     name=request.GET.get('name')
     mantant=request.GET.get('montant')
@@ -3183,4 +3190,111 @@ def payreglementsupp(request):
     bank.save()
     return JsonResponse({
         'success':True
+    })
+
+def transfertfromcaisse(request):
+    sourceid=request.GET.get('sourceid')
+    caisse=Caisse.objects.get(pk=sourceid)
+    amount=request.GET.get('amount')
+    caissetarget=request.GET.get('caissetarget') or None
+    banktarget=request.GET.get('banktarget') or None
+    if caissetarget:
+        caissetarget=Caisse.objects.get(pk=caissetarget)
+        print('>> target caisse', caissetarget)
+        caisse.total-=float(amount)
+        caissetarget.total+=float(amount)
+        caissetarget.save()
+    if banktarget:
+        banktarget=Bank.objects.get(pk=banktarget)
+        print('>> target bank', banktarget)
+        caisse.total-=float(amount)
+        banktarget.total+=float(amount)
+        banktarget.save()
+    caisse.save()
+    Transfer.objects.create(caissesource=caisse, caissetarget=caissetarget, amount=amount, banktarget=banktarget)
+    return JsonResponse({
+        'success':True
+    })
+
+def transfertfrombank(request):
+    sourceid=request.GET.get('sourceid')
+    bank=Bank.objects.get(pk=sourceid)
+    amount=request.GET.get('amount')
+    caissetarget=request.GET.get('caissetarget') or None
+    banktarget=request.GET.get('banktarget') or None
+    print('ssorce', bank, 'amount', amount, 'caissetarget', caissetarget, 'banktarget', banktarget, banktarget=='')
+    if caissetarget:
+        caissetarget=Caisse.objects.get(pk=caissetarget)
+        print('>> target caisse', caissetarget)
+        bank.total-=float(amount)
+        caissetarget.total+=float(amount)
+        caissetarget.save()
+    if banktarget:
+        banktarget=Bank.objects.get(pk=banktarget)
+        print('>> target bank', banktarget)
+        bank.total-=float(amount)
+        banktarget.total+=float(amount)
+        banktarget.save()
+    bank.save()
+    Transfer.objects.create(banksource=bank, caissetarget=caissetarget, amount=amount, banktarget=banktarget)
+    return JsonResponse({
+        'success':True
+    })
+
+def caisseviewdata(request):
+    # ins
+    caisseid=request.GET.get('caisseid')
+    caisse=Caisse.objects.get(pk=caisseid)
+    reglement=PaymentClientbl.objects.filter(targetcaisse_id=caisseid).annotate(type=Value("reglement"))
+    transfer=Transfer.objects.filter(caissetarget_id=caisseid).annotate(type=Value("transfer"))
+    avance=Avanceclient.objects.filter(targetcaisse_id=caisseid).annotate(type=Value("avance"))
+    totalins=round(reglement.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(transfer.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(avance.aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+    # merge abs sort all ins in one list
+    # import
+    
+    allins=sorted(
+        chain(reglement, transfer, avance),
+        key=attrgetter('date'),
+        reverse=True
+    )
+    #outs
+    outtransfer=Transfer.objects.filter(caissesource_id=caisseid).annotate(type=Value("transfer"))
+    reglementsupp=PaymentSupplier.objects.filter(targetcaisse_id=caisseid).annotate(type=Value("reglement"))
+    totalouts=round(outtransfer.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(reglementsupp.aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+    allouts=sorted(
+        chain(outtransfer, reglementsupp),
+        key=attrgetter('date'),
+        reverse=True
+    )
+    return JsonResponse({
+        'html':render(request, 'finanaceviewdata.html', {'title':'Les donnée caisse '+caisse.name, 'ins':allins, 'outs':allouts}).content.decode('utf-8')
+    })
+
+def bankviewdata(request):
+    # ins
+    bankid=request.GET.get('bankid')
+    bank=Bank.objects.get(pk=bankid)
+    reglement=PaymentClientbl.objects.filter(targetbank_id=bankid, ispaid=True).annotate(type=Value("reglement"))
+    transfer=Transfer.objects.filter(banktarget_id=bankid).annotate(type=Value("transfer"))
+    avance=Avanceclient.objects.filter(targetbank_id=bankid).annotate(type=Value("avance"))
+    totalins=round(reglement.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(transfer.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(avance.aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+    # merge abs sort all ins in one list
+    # import
+    
+    allins=sorted(
+        chain(reglement, transfer, avance),
+        key=attrgetter('date'),
+        reverse=True
+    )
+    #outs
+    outtransfer=Transfer.objects.filter(banksource_id=bankid).annotate(type=Value("transfer"))
+    reglementsupp=PaymentSupplier.objects.filter(targetbank_id=bankid, ispaid=True).annotate(type=Value("reglement"))
+    totalouts=round(outtransfer.aggregate(Sum('amount'))['amount__sum'] or 0, 2)+round(reglementsupp.aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+    allouts=sorted(
+        chain(outtransfer, reglementsupp),
+        key=attrgetter('date'),
+        reverse=True
+    )
+    return JsonResponse({
+        'html':render(request, 'finanaceviewdata.html', {'title':'Les donnée bank '+bank.name, 'ins':allins, 'outs':allouts}).content.decode('utf-8')
     })

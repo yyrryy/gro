@@ -458,7 +458,14 @@ class Avanceclient(models.Model):
     targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
 
-
+class Transfer(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+    amount = models.FloatField()
+    caissetarget=models.ForeignKey(Caisse, on_delete=models.SET_NULL, default=None, null=True, related_name='fromcaisse')
+    caissesource=models.ForeignKey(Caisse, on_delete=models.SET_NULL, default=None, null=True, related_name='tocaisse')
+    banksource=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, related_name='frombank')
+    banktarget=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, related_name='tobank')
+    note=models.TextField(default=None, null=True, blank=True)
 
 class Avancesupplier(models.Model):
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True)
@@ -584,7 +591,7 @@ class PaymentSupplier(models.Model):
     ispaid=models.BooleanField(default=False)
     #refused means impyé
     refused=models.BooleanField(default=False)
-
+    source=models.CharField(max_length=500, default=None, null=True, blank=True)
 
     # we need somthin to track if the reglement
 class Notesrepresentant(models.Model):
@@ -627,6 +634,7 @@ class PaymentClientbl(models.Model):
     isavoir=models.BooleanField(default=False)
     targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    source=models.CharField(max_length=500, default=None, null=True, blank=True)
 
 class Bonsregle(models.Model):
     payment=models.ForeignKey(PaymentClientbl, on_delete=models.CASCADE, default=None, null=True, blank=True)

@@ -4735,7 +4735,8 @@ def reglebonsachat(request):
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
     bank=json.loads(request.POST.get('bank'))
-    date=timezone.now().date()
+    date=request.POST.get('date')
+    # date=timezone.now().date()
     echeance=json.loads(request.POST.get('echeance'))
     echeance=[datetime.strptime(i, '%Y-%m-%d') if i!='' else None for i in echeance]
     if moderegl=='bl':
@@ -4783,6 +4784,7 @@ def reglebonsachat(request):
             date=date,
             isfarah=isfarah,
         )
+    print('>> date suppp', date)
     for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
         regl=PaymentSupplier.objects.create(
             supplier_id=supplierid,

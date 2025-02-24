@@ -558,14 +558,21 @@
             alertify.error('Bank is required')
             return
         }
-        $.get('/products/payreglementclient', {
-            'reglid':reglid,
-            'banktarget':banktarget,
-        }, (data)=>{
-            if (data.success){
-                updatereglementbl(reglid)
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+            if (value=='ORGHAD'){
+            $.get('/products/payreglementclient', {
+                'reglid':reglid,
+                'banktarget':banktarget,
+            }, (data)=>{
+                if (data.success){
+                    updatereglementbl(reglid)
+                }
+            })
+            }else{
+                alertify.error('Mot de pass incorrect')
             }
-        })
+        }, function() { alertify.error('Cancel') });
+        
     }
     readingqrcode=false
   populateyears()

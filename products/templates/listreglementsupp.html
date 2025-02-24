@@ -262,8 +262,12 @@
                             </div>
 
                         </div>
+
                         <div>
                             Mantant a payé <strong class="whattopay">0.00</strong>DH
+                        </div>
+                        <div>
+                            Date de reglement <input type="date" value="{{today|date:'Y-m-d'}}" name="datereglementsupp" class="w-100 notempty datereglementsupp mb-2">
                         </div>
                         <button class="btn text-white w-100 submitaddreglemntsuppbtn disabled" style="background: #00538c;">
                             Valider
@@ -384,16 +388,20 @@
             alertify.error('Bank is required')
             return
         }
-        $.get('/products/payreglementsupp', {
-            'reglid':reglid,
-            'banktarget':banktarget,
-        }, (data)=>{
-            if (data.success){
-                updatereglementsupp(reglid)
-            }
-        })
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+            if (value=='ORGHAD'){
+                $.get('/products/payreglementsupp', {
+                    'reglid':reglid,
+                    'banktarget':banktarget,
+                }, (data)=>{
+                    if (data.success){
+                        updatereglementsupp(reglid)
+                    }
+                })
+            
+        }
+        }, function() { alertify.error('Cancel') });
     }
-    
     populateyears()
     function deletereglementsupplier(reglid){
         alertify.confirm(
