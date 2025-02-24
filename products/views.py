@@ -5382,42 +5382,43 @@ def filterbldate(request):
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[:50]
-    trs=''
-    for i in bons:
-        trs+=f'''
-        <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}?target={target}')">
-            <td>{ i.bon_no }</td>
-            <td>{ i.date.strftime("%d/%m/%Y")}</td>
-            <td>{ i.client.name }</td>
-            <td>{ i.client.code }</td>
-            <td>{ i.total}</td>
-            <td>{ i.client.region}</td>
-            <td>{ i.client.city}</td>
-            <td>{ i.client.soldbl}</td>
-            <td>{ i.salseman }</td>
-            <td class="d-flex justify-content-between">
-              <div>
-              {'R0' if i.ispaid else 'N1' }
+    # trs=''
+    # for i in bons:
+    #     trs+=f'''
+    #     <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}?target={target}')">
+    #         <td>{ i.bon_no }</td>
+    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #         <td>{ i.client.name }</td>
+    #         <td>{ i.client.code }</td>
+    #         <td>{ i.total}</td>
+    #         <td>{ i.client.region}</td>
+    #         <td>{ i.client.city}</td>
+    #         <td>{ i.client.soldbl}</td>
+    #         <td>{ i.salseman }</td>
+    #         <td class="d-flex justify-content-between">
+    #           <div>
+    #           {'R0' if i.ispaid else 'N1' }
 
-              </div>
-              <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #           </div>
+    #           <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-            </td>
-            <td class="text-danger">
-            {'OUI' if i.isfacture else 'NON'}
+    #         </td>
+    #         <td class="text-danger">
+    #         {'OUI' if i.isfacture else 'NON'}
 
-            </td>
+    #         </td>
 
-            <td>
-              {i.commande.order_no if i.commande else '--'}
-            </td>
-            <td>
-              {i.modlvrsn}
-            </td>
-          </tr>
-        '''
+    #         <td>
+    #           {i.commande.order_no if i.commande else '--'}
+    #         </td>
+    #         <td>
+    #           {i.modlvrsn}
+    #         </td>
+    #       </tr>
+    #     '''
     ctx={
-        'trs':trs
+        'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
+
     }
     if bons:
         ctx['total']=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
