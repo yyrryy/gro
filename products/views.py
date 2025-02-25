@@ -11571,3 +11571,15 @@ def getqtyprice(request):
     else:
         histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False).order_by('-date')[:20]
     return render(request, 'qtyprice.html', {'history':histyory})
+
+
+def vv(request):
+    p=Produit.objects.all()
+    for i in p:
+        ref=i.ref.lower()
+        i.ref=ref
+        i.farahref=f'fr-{ref}'
+        i.save()
+    return JsonResponse({
+        'rr':True
+    })
