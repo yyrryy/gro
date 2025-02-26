@@ -66,7 +66,11 @@
       </div>
 
     </div>
-    
+    <input style="width: 20em;
+    background: #80808038;
+    border-radius: 11px;
+    margin-bottom: 9px;
+" type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
     <!-- <div hidden>
       <input style="width: 20em;
     background: #c3e6ff;
@@ -87,16 +91,22 @@
     </div>
   </div>
   <div class="filters mt-2 d-flex justify-content-between">
-    <input style="width: 20em;
+    
+  
+  <div class="d-flex">
+    <textarea
+    style="width: 20em;
     background: #80808038;
     border-radius: 11px;
     margin-bottom: 9px;
-" type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
-  
-  <div>
-    <button class="btn btn-danger" onclick="$('.bonstoprint').val('[]'); $('.checkbon').prop('checked', false);"></button>
-    <textarea type="text" readonly class="bonstoprint" ids="[]">[]</textarea>
-  <button class="bi bi-download" onclick="printbulk()"></button>
+    min-height: 5em;
+    "
+    type="text" readonly class="bonstoprint" ids="[]">[]</textarea>
+    <div class="d-flex flex-column">
+      <button class="btn border border-danger bi bi-trash" onclick="$('.bonstoprint').val('[]'); $('.checkbon').prop('checked', false);$('.bonstoprint').attr('ids', '[]')"></button>
+      <button class="btn border border-dark bi bi-download" onclick="printbulk()"></button>
+      <button class="btn bi border border-success" onclick="validerbulk()">Valider</button>
+    </div>
   </div>
 
 
@@ -248,10 +258,72 @@
       
     }
   }
+  function validerbulk() {
+    let oldval, ids;
+    
+    try {
+        oldval = JSON.parse($('.bonstoprint').val() || '[]');
+        ids = JSON.parse($('.bonstoprint').attr('ids') || '[]');
+    } catch (e) {
+        console.error('JSON parsing error:', e);
+        alertify.error('Erreur de données');
+        return;
+    }
+
+    if (oldval.length !== 0) {
+        console.log('ids from validerbulk:', ids);
+        ids = JSON.stringify(ids);
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value'
+               , function(evt, value) { if (value=='ORGHAD'){
+                  $.get('/products/validerbulk', { ids: ids }, function(data) {
+                    console.log('Réponse du serveur:', data);
+                    if (data.success) {
+                    alertify.success('Validé');
+                    ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}');
+                    } else {
+                    alertify.error(data.error);
+                    }
+                    }).fail(function() {
+                    alertify.error('Erreur lors de la validation');
+                    });
+
+                
+               }else{
+                alertify.error('Mot de passe')
+               } }
+               , function() { alertify.error('Cancel') });
+        // alertify.prompt('Confirmer', 'Mot de passe', '', function(evt, value) {
+        //     console.log(value);
+        //     if (value === 'ORGHAD') {
+        //         console.log('Validation en cours...');
+        //         $.get('/products/validerbulk', { ids: ids }, function(data) {
+        //             console.log('Réponse du serveur:', data);
+        //             if (data.success) {
+        //                 alertify.success('Validé');
+        //                 ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}');
+        //             } else {
+        //                 alertify.error(data.error);
+        //             }
+        //         }).fail(function() {
+        //             alertify.error('Erreur lors de la validation');
+        //         });
+        //     } else {
+        //         console.log('Mot de passe incorrect');
+        //         alertify.error('Mot de passe incorrect');
+        //     }
+        // });
+    
+      } else {
+        alertify.error("Aucune donnée à valider");
+    }
+  }
+
+
   function addtoprint(id, bon_no){
     oldval=JSON.parse($('.bonstoprint').val())
     ids=JSON.parse($('.bonstoprint').attr('ids'))
     console.log('>>', oldval)
+    console.log('already', ids.includes(id))
     if (!ids.includes(id)){
       oldval.push(bon_no)
       ids.push(id)
