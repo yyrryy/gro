@@ -3399,3 +3399,23 @@ def bankviewdata(request):
     return JsonResponse({
         'html':render(request, 'finanaceviewdata.html', {'title':'Les donnée bank '+bank.name, 'ins':allins, 'outs':allouts}).content.decode('utf-8')
     })
+
+def viewbonsortie(request):
+    id=request.GET.get('id')
+    order=Bonsortie.objects.get(pk=id)
+    orderitems=Sortieitem.objects.filter(bon=order).order_by('product__name')
+    print('orderitems', orderitems)
+    #reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
+    reglements=PaymentClientbl.objects.filter(bonsortie__in=[order])
+    cars=Carlogos.objects.all()
+    ctx={
+        'reglements':reglements,
+        'title':f'Bon de livraison {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+        'bonsortie':True,
+        'cars':cars
+    }
+    return render(request, 'viewbonsortie.html', ctx)

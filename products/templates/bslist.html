@@ -52,7 +52,7 @@
     {% if order.user %} {{order.user.username}} {% endif %}
   </td>
   <td class="d-flex">
-    <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
+    <button class="btn btn-sm bi bi-eye" onclick="viewbonsortie('{{order.id}}')"></button>
     <button class="btn btn-sm bi bi-download" onclick="printsortie2('{{order.id}}')">A5</button>
     <button class="btn btn-sm bi bi-download" onclick="printsortieA6('{{order.id}}')">A6</button>
   </td>

@@ -1007,7 +1007,23 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function tvabonachat(){
+    $(".itemrow").each(function () {
+      let subtotal = parseFloat($(this).find(".total").text());
+      let tvatotal = subtotal * 1.20;
+      let price = parseFloat($(this).find(".price").val());
+      let tvaprice = price * 1.20;
+      $(this).find(".total").text(tvatotal.toFixed(2));
+      $(this).find(".price").val(tvaprice.toFixed(2));
+      // Replace or update the TVA value per row
       
+    });
+    let total=parseFloat($('.totalbon').text())
+    let tvatotal=total*1.20
+    $('.totalbon').text(tvatotal)
+
+  }
+  
       function updatebonsoffacture(target, factureid){
         selectedValues = $("input[name='bonstopay']:checked").map(function() {
             return this.value;

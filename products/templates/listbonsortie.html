@@ -90,23 +90,24 @@
 
     </div>
   </div>
-  <div class="filters mt-2 d-flex justify-content-between">
+  <div class="filters mt-2">
     
   
-  <div class="d-flex">
+  <div class="">
+    <div class="d-flex justify-content-between" >
+      <button class="btn border border-danger bi bi-trash" onclick="$('.bonstoprint').val('[]'); $('.checkbon').prop('checked', false);$('.bonstoprint').attr('ids', '[]')"></button>
+      <button class="btn border border-dark bi bi-download" onclick="printbulk()"></button>
+      <button class="btn bi border border-success validerbulk" onclick="validerbulk()">Valider</button>
+    </div>
     <textarea
-    style="width: 20em;
+    style="width: 100%;
     background: #80808038;
     border-radius: 11px;
     margin-bottom: 9px;
     min-height: 5em;
     "
     type="text" readonly class="bonstoprint" ids="[]">[]</textarea>
-    <div class="d-flex flex-column">
-      <button class="btn border border-danger bi bi-trash" onclick="$('.bonstoprint').val('[]'); $('.checkbon').prop('checked', false);$('.bonstoprint').attr('ids', '[]')"></button>
-      <button class="btn border border-dark bi bi-download" onclick="printbulk()"></button>
-      <button class="btn bi border border-success" onclick="validerbulk()">Valider</button>
-    </div>
+    
   </div>
 
 
@@ -195,7 +196,7 @@
               {% if order.user %} {{order.user.username}} {% endif %}
             </td>
             <td class="d-flex">
-              <!-- <button class="btn btn-sm btn-info" onclick="makedelivered('{{order.id}}', event)"></button> -->
+              <button class="btn btn-sm bi bi-eye" onclick="viewbonsortie('{{order.id}}')"></button>
               <button class="btn btn-sm bi bi-download" onclick="printsortie2('{{order.id}}')">A5</button>
               <button class="btn btn-sm bi bi-download" onclick="printsortieA6('{{order.id}}')">A6</button>
             </td>
@@ -249,6 +250,10 @@
 
 
 <script>
+  function viewbonsortie(id){
+    wd=window.open('/products/viewbonsortie?id='+id, '', 'width=900,height=900');
+    wd.focus();
+  }
   function printbulk(){
     oldval=JSON.parse($('.bonstoprint').val())
     ids=JSON.parse($('.bonstoprint').attr('ids'))
@@ -275,6 +280,7 @@
         ids = JSON.stringify(ids);
         alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value'
                , function(evt, value) { if (value=='ORGHAD'){
+                $('.validerbulk').addClass('disabled')
                   $.get('/products/validerbulk', { ids: ids }, function(data) {
                     console.log('Réponse du serveur:', data);
                     if (data.success) {
