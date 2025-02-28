@@ -2331,6 +2331,7 @@ def getbonvalider(request):
     ctx={
         'html':render(request, 'bllist.html', {'bons':bons, 'target':target, "mode": 'valid'}).content.decode('utf-8'),
         'total':0,
+        'valider':1
     }
     if bons:
         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
@@ -2918,13 +2919,15 @@ def validerbulk(request):
                 }
 
                 if item.isfarah:
-                    notefarah+=i.bon_no+', '
+                    if not i.bon_no in notefarah:
+                        notefarah+=i.bon_no+' '
                     totalfarah += item_total
                     livraison_data['ref']=item.ref.replace('(FR) ', '')
                     livraison_data['isfarah'] = True
                     farahitems.append(Livraisonitem(**livraison_data))
                 else:
-                    noteorgh+=i.bon_no+', '
+                    if not i.bon_no in noteorgh:
+                        noteorgh+=i.bon_no+' '
                     totalorgh += item_total
                     livraison_data['ref']=item.ref.replace('(OR) ', '')
                     livraison_data['isorgh'] = True

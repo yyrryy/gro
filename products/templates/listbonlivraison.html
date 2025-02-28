@@ -168,7 +168,19 @@
               {{order.command.bon_no}}
             </td>
             <td>
-              {{order.transport}}
+              <div class="accordion" id="accordionrr{{order.id}}">
+
+                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsrr{{order.id}}" aria-expanded="true" aria-controls="collapsrr{{order.id}}">
+
+                  
+                </button>
+
+                <div id="collapsrr{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionrr{{order.id}}">
+                    {{order.note}}
+
+
+                </div>
+              </div>
             </td>
             <td>
               {% if order.ispaid %}
@@ -318,7 +330,7 @@
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
     loadinglistbl = true;
-    $.get(`/products/loadlistbl/?target={{target}}&all=1&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    $.get(`/products/loadlistbl/?target={{target}}&all={{all}}&valider={{valider}}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
 
       const tbody = $('.listbltable tbody');
       tbody.append(data.trs);
@@ -341,7 +353,9 @@
     function handleScrolllistbl () {
       const container = $('.listblholder')[0]; // Get the native DOM element
       const lastRow = document.querySelector('.bl-row:last-child');
-      let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      // let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
+      let year=$('[name="yearsbl"]')
+
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
       let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0

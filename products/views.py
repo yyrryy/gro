@@ -2078,6 +2078,7 @@ def listbonlivraison(request):
         'title':'Bons de livraison',
         'bons':bons,
         'total':total,
+        'all':1,
         #'boncommand':Order.objects.filter(isdelivered=False).exclude(note__icontains='Reliquat').count(),
         #'depasser':depasser,
         #'reps':Represent.objects.all(),
@@ -7386,7 +7387,7 @@ def loadlistbl(request):
     target =request.GET.get('target')
     isfarah=target=='f'
     all=request.GET.get('all')=='1'
-    valid=request.GET.get('valid')=='1'
+    valider=request.GET.get('valider')=='1'
     year =request.GET.get('year')
     startdate =request.GET.get('startdate')
     enddate =request.GET.get('enddate')
@@ -7446,13 +7447,13 @@ def loadlistbl(request):
         if startdate=='0' and enddate=='0':
             if all:
                 bons=Bonlivraison.objects.exclude(isvalid=True).filter(date__year=thisyear, isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
-            if valid:
+            if valider:
                 bons=Bonlivraison.objects.filter(isvalid=True, date__year=thisyear, isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
             #total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         else:
             if all:
-                bons=Bonlivraison.objects.exclude(isvalid=True).filter(date__range=[startdate, enddate], isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
-            if valid:
+                bons=Bonlivraison.objects.filter(isvalid=False, date__range=[startdate, enddate], isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
+            if valider:
                 bons=Bonlivraison.objects.filter(isvalid=True, date__range=[startdate, enddate], isfarah=isfarah).filter(q_objects).order_by('-bon_no')[start:end]
             # bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
             # total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
@@ -7510,65 +7511,21 @@ def loadlistbl(request):
     if startdate != '0' and enddate != '0':
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
-        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
+        if all:
+            bons=Bonlivraison.objects.filter(isvalid=False, date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
+        else:
+            bons=Bonlivraison.objects.filter(isvalid=True, date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[start:end]
         total=round(Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0, 2)
-        for i in bons:
-            trs+=f'''
-            <tr
-            style="background: {"lightgreen;" if i.isdelivered else ""} color:{"blue" if i.isfacture else ""} "
-            class="ord {"text-danger" if i.ispaid else ''} bl-row"
-            year={year} orderid="{i.id}"
-            ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')"
-            startdate={startdate} enddate={enddate}>
-                <td>{ i.bon_no }</td>
-                    <td>{ i.date.strftime("%d/%m/%Y")}</td>
-                    <td>{ i.client.name }</td>
-                    <td>{ i.client.code }</td>
-                    <td style="color: blue;">{ i.total}</td>
-                    <td>{ i.client.region}</td>
-                    <td>{ i.client.city}</td>
-                    <td>{ "%.2f" % i.client.soldbl }</td>
-                    <td>{ i.salseman }</td>
-                    <td class="d-flex justify-content-between">
-                    <div>
-                    {'R0' if i.ispaid else 'N1' }
-
-                    </div>
-                    <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-                    </td>
-                    <td>
-                    {'OUI' if i.isfacture else 'NON'}
-
-                    </td>
-
-                    <td>
-
-                    </td>
-                    <td>
-                    {i.modlvrsn}
-                    </td>
-                    <td>
-                    {i.note}
-                    </td>
-                    <td class="d-flex">
-                  <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-                <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-                    </td>
-
-              </tr>
-            '''
         print('>>>load bl date f')
         return JsonResponse({
-            'trs':trs,
+            'trs':render(request, 'bllist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
-    if year=="0":
-        bons= Bonlivraison.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no')[start:end]
-        total=round(Bonlivraison.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    if all:
+        bons= Bonlivraison.objects.filter(isvalid=False, date__year=year, isfarah=isfarah).order_by('-bon_no')[start:end]
     else:
-        bons= Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no')[start:end]
-        total=round(Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons= Bonlivraison.objects.filter(isvalid=True, date__year=year, isfarah=isfarah).order_by('-bon_no')[start:end]
+    total=round(Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     for i in bons:
         trs+=f'''

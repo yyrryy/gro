@@ -34,7 +34,19 @@
         {{order.command.bon_no}}
       </td>
       <td>
-        {{order.transport}}
+        <div class="accordion" id="accordionrr{{order.id}}">
+
+          <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsrr{{order.id}}" aria-expanded="true" aria-controls="collapsrr{{order.id}}">
+
+            
+          </button>
+
+          <div id="collapsrr{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionrr{{order.id}}">
+              {{order.note}}
+
+
+          </div>
+        </div>
       </td>
       <td>
         {% if order.ispaid %}
