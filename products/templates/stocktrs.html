@@ -2,7 +2,7 @@
                 <!--
                 -->
                 <!-- style="background:{% if not i.isactive %}#f3d6d694;{% endif %}" -->
-                <tr ondblclick="ajaxpage('addpdct{{i.id}}', 'Produit {{i.ref}}', '/products/viewoneproduct/{{i.id}}?target={{target}}')"
+                <tr ondblclick="openwindow('addpdct{{i.id}}', 'Produit {{i.ref}}', '/products/viewoneproduct/{{i.id}}?target={{target}}')"
                 
                 data-product-id="{{ i.id }}" class="product-row ">
                     <td style="padding: 5px; font-weight: bold;" class="pe-2">
