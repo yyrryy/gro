@@ -1,4 +1,40 @@
 {% load global_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Example</title>
+    <style>
+      @media print {
+         .livraison-holder {
+             height: 27.5cm; /* Slightly less than the maximum printable height */
+             width: 21cm; /* Full width of A4 */
+             border: 1px solid black; /* For debugging and visibility */
+             page-break-after: always; /* Ensures each div starts on a new page */
+             box-sizing: border-box; /* Include padding and border in the element's total width and height */
+         }
+
+         /* Reset margins and paddings for printing */
+         body {
+             margin: 0;
+             padding: 0;
+         }
+         td > div{
+           margin:4px;
+         }
+
+         /* Optional: If you need to adjust margins more precisely */
+         @page {
+             margin: 0; /* Remove any default margins */
+         }
+     }
+    </style>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquerySpellingNumber.js"></script>
+    <link href="/static/css/minified.css" rel="stylesheet" />
+</head>
+<body>
 <style>
     /* The switch - the box around the slider */
 .switch {
@@ -817,8 +853,6 @@
 </div>
 
 
-
-{% block js %}
 <script>
     function replaceproduct(){
         productid=$('.refreplace').val()
@@ -907,6 +941,7 @@
             contentType: false,
             success:((data)=>{
                 if(data.success){
+                    window.close()
                     alertify.success('Modifier');
 
                     ajaxpage('addpducts', 'Articles', '/products/stock?target={{target}}')
@@ -919,4 +954,4 @@
     }
 
 </script>
-{% endblock %}
+</body>

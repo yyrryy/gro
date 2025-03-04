@@ -1007,6 +1007,11 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function openwindow(id, title, url){
+        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+url, '', 'width=900,height=900');
+
+        myWindow.focus();
+      }
       function tvabonachat(){
     $(".itemrow").each(function () {
       let subtotal = parseFloat($(this).find(".total").text());
