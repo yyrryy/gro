@@ -159,7 +159,8 @@ class Produit(models.Model):
     isnew=models.BooleanField(default=False)
     # use min to indicate the quantity commandé
     min=models.IntegerField(default=1, null=True, blank=True)
-    qtycommande=models.IntegerField(default=0, null=True, blank=True)
+    qtycommande=models.FloatField(default=0, null=True, blank=True)
+    frqtycommande=models.FloatField(default=0, null=True, blank=True)
     isoffer=models.BooleanField(default=False)
     offre=models.CharField(max_length=500, default=None, null=True, blank=True)
     category=models.ForeignKey(Category,on_delete=models.CASCADE, default=None, null=True, blank=True)
@@ -635,6 +636,9 @@ class PaymentClientbl(models.Model):
     targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     source=models.CharField(max_length=500, default=None, null=True, blank=True)
+    def __str__(self) -> str:
+        return self.mode+'-'+str(self.amount)
+
 
 class Bonsregle(models.Model):
     payment=models.ForeignKey(PaymentClientbl, on_delete=models.CASCADE, default=None, null=True, blank=True)

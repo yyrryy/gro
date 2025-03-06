@@ -1,139 +1,99 @@
-
-<div class="bg-white shadow rounded">
-  <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
-    <div>
-      {{title}}
+<div class="row">
+  <div class="col-8">
+    <div class="bg-white border p-2 rounded">
+      <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button> -->
+        <div>
+          {{title}} gg
+        </div>
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
+      </div>
+      <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistecheance">
+      <div style="height: 70vh; overflow: scroll;">
+        <table class="table table-bordered table-hover table-striped echeancestable" style="font-size: 12px;" id="addbonlivraisonle">
+          <thead style="position: sticky; top: 0;">
+            <tr>
+              <td style="width: 8%;">Date</td>
+              <td style="width: 8%;">N° piece</td>
+              <td style="width: 12%;">Client</td>
+              <td style="width: 5%;">Mode</td>
+              <td style="width: 5%;">Mantant</td>
+              <td>
+                Echance
+              </td>
+              <td></td>
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in echeances %}
+          
+              <tr class="ord" orderid="{{order.id}}" {% if order.refused %}style="background:#f37e46"{%endif%}>
+                <td>{{ order.date|date:'d/m/Y' }}</td>
+                <td>{{ order.npiece }}</td>
+                <td>{{ order.client.name }}</td>
+                <td>{{ order.mode}}</td>
+                <td>{{ order.amount|floatformat:2}}</td>
+                <td>{{ order.echance|date:'d/m/Y'}}</td>
+    
+                
+                <td class="d-flex justify-content-between">
+                  <input type="checkbox" reglid="{{order.id}}" reglmode="{{order.mode}}" rglnpiece="{{order.npiece}}">
+                </td>
+    
+    
+    
+              </tr>
+              
+            {% endfor %}
+          </tbody>
+          <thead style="position: sticky; bottom: 0; background: white;">
+            <tr>
+              <td style="width: 8%;"></td>
+              <td style="width: 8%;"></td>
+              <td style="width: 12%;"></td>
+              <td style="width: 12%;"></td>
+              <td style="width: 5%; background: yellowgreen;" class="totalbbonachat">{{total|floatformat:2}}</td>
+              <td style="width: 5%;"></td>
+              <td style="width: 5%;"></td>
+            </tr>
+          </thead>
+          <!-- <tfoot>
+            <tr>
+              <td>N° bon</td>
+              <td>Date</td>
+              <td>Client</td>
+              <td>Code client</td>
+              <td>Total</td>
+              <td>Region</td>
+              <td>Ville</td>
+              <td>Solde cl.</td>
+              <td>Repr</td>
+              <td>Reglé</td>
+              <td>Facturé</td>
+              <td>Transport</td>
+            </tr>
+          </tfoot> -->
+        </table>
+      </div>
+      <div ></div>
     </div>
-    <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button>
   </div>
-  <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistecheance">
-  <div style="height: 70vh; overflow: scroll;">
-    <table class="table table-bordered table-hover table-striped echeancestable" style="font-size: 12px;" id="addbonlivraisonle">
-      <thead style="position: sticky; top: 0; background: gray;">
-        <tr>
-          <td style="width: 8%;">Date</td>
-          <td style="width: 8%;">N° piece</td>
-          <td style="width: 12%;">Client</td>
-          <td style="width: 12%;">Representant</td>
-          <td style="width: 5%;">Mode</td>
-          <td style="width: 5%;">Mantant</td>
-          <td>
-            Echance
-          </td>
-          <td style="width: 5%;">Bons</td>
-          <td style="width: 4%;">Type</td>
-        </tr>
-      </thead>
-      <tbody>
-        {% for order in echeances %}
-        {% if order.1 == 'bl' %}
-          <tr class="ord" orderid="{{order.id}}" style="background: {% if order.0.refused %}#f37e46{%endif%};">
-            <td>{{ order.0.date|date:'d/m/Y' }}</td>
-            <td>{{ order.0.npiece }}</td>
-            <td>{{ order.0.client.name }}</td>
-            <td>{{ order.0.client.represent.name }}</td>
-            <td>{{ order.0.mode}}</td>
-            <td>{{ order.0.amount|floatformat:2}}</td>
-            <td>{{ order.0.echance|date:'d/m/Y'}}</td>
-            <td>
-              <div class="accordion" id="accordionechbl{{order.0.id}}">
 
-                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseechbl{{order.0.id}}" aria-expanded="true" aria-controls="collapseechbl{{order.0.id}}">
-
-
-                </button>
-
-                <div id="collapseechbl{{order.0.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionechbl{{order.0.id}}">
-                    {% for i in order.0.bons.all %}
-                    -{{i.bon_no}} <br>
-                    {% endfor %}
-
-
-                </div>
-              </div>
-
-            </td>
-            <td class="d-flex justify-content-between">
-              <div>Rgl. BL</div>
-              <button class="bi bi-alert-fill btn-danger" onclick="refusedreglbl(event, '{{order.0.id}}')"></button>
-              <button class="bi bi-check btn-info" onclick="payreglementbl(event, '{{order.0.id}}')"></button>
-            </td>
-
-
-          </tr>
-          {% else %}
-          <tr class="ord" orderid="{{order.id}}" {% if order.0.refused %}style="background:#f37e46"{%endif%}>
-            <td>{{ order.0.date|date:'d/m/Y' }}</td>
-            <td>{{ order.0.npiece }}</td>
-            <td>{{ order.0.client.name }}</td>
-            <td>{{ order.0.client.represent.name }}</td>
-            <td>{{ order.0.mode}}</td>
-            <td>{{ order.0.amount|floatformat:2}}</td>
-            <td>{{ order.0.echance|date:'d/m/Y'}}</td>
-
-            <td>
-
-              <div class="accordion" id="accordionechfc{{order.0.id}}">
-
-                <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseechfc{{order.0.id}}" aria-expanded="true" aria-controls="collapseechfc{{order.0.id}}">
-
-
-                </button>
-
-                <div id="collapseechfc{{order.0.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionechfc{{order.0.id}}">
-                    {% for i in order.0.factures.all %}
-                    -{{i.facture_no}} <br>
-                    {% endfor %}
-
-
-                </div>
-              </div>
-
-            </td>
-            <td class="d-flex justify-content-between">
-              <div>Rgl. FC</div>
-              <button class="bi bi-alert-fill btn-danger" onclick="refusedreglfc(event, '{{order.0.id}}')"></button>
-              <button class="bi bi-check btn-info" onclick="payreglementfc(event, '{{order.0.id}}')"></button>
-            </td>
-
-
-
-          </tr>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-      <thead style="position: sticky; bottom: 0; background: white;">
-        <tr>
-          <td style="width: 8%;"></td>
-          <td style="width: 8%;"></td>
-          <td style="width: 12%;"></td>
-          <td style="width: 12%;"></td>
-          <td style="width: 5%; background: yellowgreen;" class="totalbbonachat">{{total|floatformat:2}}</td>
-          <td style="width: 5%;"></td>
-          <td style="width: 5%;"></td>
-        </tr>
-      </thead>
-      <!-- <tfoot>
-        <tr>
-          <td>N° bon</td>
-          <td>Date</td>
-          <td>Client</td>
-          <td>Code client</td>
-          <td>Total</td>
-          <td>Region</td>
-          <td>Ville</td>
-          <td>Solde cl.</td>
-          <td>Repr</td>
-          <td>Reglé</td>
-          <td>Facturé</td>
-          <td>Transport</td>
-        </tr>
-      </tfoot> -->
-    </table>
+  <div class="col-4">
+    <div class="bg-white p-2 border">
+      <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button> -->
+        <div>
+          Transfer
+        </div>
+        <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
+      </div>
+    </div>
   </div>
-  <div ></div>
 </div>
+
+
 
 
 

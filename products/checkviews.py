@@ -3203,12 +3203,36 @@ def commandepdctorgh(request):
         'success':True
     })
 
+def commandepdctfarah(request):
+    pdctid=request.GET.get('pdctid')
+    supplierid=request.GET.get('supplierid')
+    qty=request.GET.get('qty')
+    pdct=Produit.objects.get(pk=pdctid)
+    pdct.friscommanded=True
+    pdct.frqtycommande=qty
+    pdct.frsuppliercommand_id=supplierid
+    pdct.save()
+    return JsonResponse({
+        'success':True
+    })
+
 def cancelcommandorgh(request):
     pdctid=request.GET.get('pdctid')
     pdct=Produit.objects.get(pk=pdctid)
     pdct.iscommanded=False
     pdct.qtycommande=0
     pdct.suppliercommand=None
+    pdct.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def cancelcommandfarah(request):
+    pdctid=request.GET.get('pdctid')
+    pdct=Produit.objects.get(pk=pdctid)
+    pdct.friscommanded=False
+    pdct.frqtycommande=0
+    pdct.frsuppliercommand=None
     pdct.save()
     return JsonResponse({
         'success':True
@@ -3422,3 +3446,24 @@ def viewbonsortie(request):
         'cars':cars
     }
     return render(request, 'viewbonsortie.html', ctx)
+
+def echeanceclient(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    today = timezone.now().date()
+
+
+    print(isfarah)
+    if isfarah:
+        echeances=PaymentClientbl.objects.filter(Q(mode='effet') | Q(mode='cheque'), isfarah=True, ispaid=False, echance__gte=today)
+    else:
+        echeances = PaymentClientbl.objects.filter(
+            Q(mode='effet') | Q(mode='cheque'),
+            isavoir=False,
+            issortie=False,
+            isorgh=True,
+            ispaid=False,
+            echance__lte=today
+        )
+    print('echeanses', echeances)
+    return render(request, 'listecheance.html', {'echeances':echeances, 'target':target})

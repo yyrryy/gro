@@ -66,11 +66,11 @@
                             <b>{{ item.category.name.upper}} - {{ item.name.upper }}</b>
                         </td>
                         <!-- <td class="#">{{ item.unit_type }}</td> -->
-                        <td>{{ item.originsupp.name }}</td>
+                        <td>{{ item.froriginsupp.name }}</td>
                         
-                            {% if item.iscommanded %}
+                            {% if item.friscommanded %}
                             <td>
-                            <i class="bi bi-check text-success bi-2x"></i> <button class="btn bi bi-times btn-danger bi-2x" id="{{item.id}}" categoryid="{{item.category.id}}" onclick="cancelcommandorgh(event, '{{item.id}}')"></button> {{item.suppliercommand.name}}
+                            <i class="bi bi-check text-success bi-2x"></i> <button class="btn bi bi-times btn-danger bi-2x" id="{{item.id}}" categoryid="{{item.category.id}}" onclick="cancelcommandfarah(event, '{{item.id}}')"></button> {{item.suppliercommand.name}}
                             </td>
                             
                             
@@ -78,7 +78,7 @@
                             <td>
                             <div class="d-flex">
                                 <input placeholder="Quantité" type="number" class="form-control qty" data-id="{{item.id}}" data-categoryid="{{item.category.id}}">
-                                <button class="btn btn-success bi bi-cart-plus-fill" onclick="commandepdctorgh(event, '{{item.id}}')"></button>
+                                <button class="btn btn-success bi bi-cart-plus-fill" onclick="commandepdctfarah(event, '{{item.id}}')"></button>
                                 
                                
                             </div>
@@ -96,7 +96,7 @@
         </tbody>
 </table>
 <script>
-    function commandepdctorgh(event, pdctid){
+    function commandepdctfarah(event, pdctid){
         supplierid=$('[name="supplier"]').val()
         if (supplierid==""){
             alert('choisir un fournisseur')
@@ -108,11 +108,11 @@
             return
         }
         supplier=$('[name="supplier"]').find('option:selected').text();
-        $.get('/products/commandepdctorgh',{'pdctid':pdctid, 'supplierid':supplierid, 'qty':qty} ,function(data){
+        $.get('/products/commandepdctfarah',{'pdctid':pdctid, 'supplierid':supplierid, 'qty':qty} ,function(data){
             console.log('command', data)
             if (data.success){
                 $(event.target).closest('td').html(`
-                    <i class="bi bi-check text-success bi-2x"></i> <button class="btn bi bi-times btn-danger bi-2x" id="${pdctid}" categoryid="{{item.category.id}}" onclick="cancelcommandorgh(event, '${pdctid}')"></button>${supplier}
+                    <i class="bi bi-check text-success bi-2x"></i> <button class="btn bi bi-times btn-danger bi-2x" id="${pdctid}" categoryid="{{item.category.id}}" onclick="cancelcommandfarah(event, '${pdctid}')"></button>${supplier}
                 `)
             }
         })
@@ -120,14 +120,14 @@
         // <i class="fa fa-check text-success fa-2x"></i> <button class="fa fa-times text-danger fa-2x" id="${itemid}" categoryid="{{item.category.id}}" onclick="cancelcommand(event, '${itemid}')"></button>${supplier}
         // `)
     }
-    function cancelcommandorgh(event, pdctid){
-        $.get('/products/cancelcommandorgh',{'pdctid':pdctid} ,function(data){
+    function cancelcommandfarah(event, pdctid){
+        $.get('/products/cancelcommandfarah',{'pdctid':pdctid} ,function(data){
             console.log(data)
             if (data.success){
                 $(event.target).closest('td').html(`
                     <div class="d-flex">
                         <input placeholder="Quantité" type="number" class="form-control qty" data-id="${pdctid}" data-categoryid="{{item.category.id}}">
-                        <button class="btn btn-success bi bi-cart-plus-fill" onclick="commandepdctorgh(event, '${pdctid}')"></button>
+                        <button class="btn btn-success bi bi-cart-plus-fill" onclick="commandepdctfarah(event, '${pdctid}')"></button>
                     </div>
                 `)
             }

@@ -2228,6 +2228,7 @@ def listfactures(request):
     # get only the last 100 orders of the current year
     if target=='f':
         bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
+        total=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).aggregate(Sum('total')).get('total__sum') or 0
         lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FR-FC{year}'
@@ -2242,6 +2243,7 @@ def listfactures(request):
             receipt_no = f"FR-FC{year}000000001"
     else:
         bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
+        total=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).aggregate(Sum('total')).get('total__sum') or 0
         lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(
             facture_no__startswith=f'FC{year}'
@@ -2255,6 +2257,7 @@ def listfactures(request):
         else:
             receipt_no = f"FC{year}000000001"
     ctx={
+        'total':total,
         'title':'List des factures',
         'bons':bons,
         'reps':Represent.objects.all(),
@@ -2264,9 +2267,9 @@ def listfactures(request):
         'receipt_no':receipt_no,
         'lastdatefacture':lastdatefacture
     }
-    if bons:
-        ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)
-        ctx['totaltva']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+    # if bons:
+    #     ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    #     ctx['totaltva']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('tva'))['tva__sum'] or 0, 2)
     return render(request, 'listfactures.html', ctx)
 
 def activerproduct(request):
@@ -8368,6 +8371,7 @@ def loadlistfc(request):
 
 def searchforlistfc(request):
     term=request.GET.get('term')
+    waiting=request.GET.get('waiting')== '1'
     target=request.GET.get('target')
     searchedterm=request.GET.get('term')
     startdate=request.GET.get('startdate') or '0'
@@ -8398,12 +8402,20 @@ def searchforlistfc(request):
 
     if startdate=='0' and enddate=='0':
         print('>>>> search list fc, startdate and enddate are 0')
-        bons=Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-facture_no')[:50]
-        total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        if waiting:
+            bons=Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no')[:50]
+            total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        else:
+            bons=Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=True).order_by('-facture_no')[:50]
+            total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=True).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     else:
-        bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-facture_no')[:50]
-        total=round(bons.order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        if waiting:
+            bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).order_by('-facture_no')[:50]
+            total=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        else:
+            bons=Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).order_by('-facture_no')[:50]
+            total=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     # if year=='0':
     #     bons=Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no')[:50]
