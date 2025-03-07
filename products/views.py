@@ -7851,64 +7851,13 @@ def searchforlistachat(request):
 
 def searchforlistbl(request):
     term=request.GET.get('term')
+    searchtype=request.GET.get('searchtype')
     target=request.GET.get('target')
+    isfarah=target=='f'
+    year=request.GET.get('year')
+    print('>>>', year, target, searchtype)
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
-    # we dont need this
-    # if(term==''):
-
-    #     bons=Bonlivraison.objects.filter(date__year=thisyear)[:50]
-    #     total=round(Bonlivraison.objects.filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
-    #     trs=''
-    #     for i in bons:
-    #         trs+=f'''
-    #         <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
-    #             <td>{ i.bon_no }</td>
-    #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
-    #             <td>{ i.client.name }</td>
-    #             <td>{ i.client.code }</td>
-    #             <td>{ i.total}</td>
-    #             <td>{ i.client.region}</td>
-    #             <td>{ i.client.city}</td>
-    #             <td>{ i.client.soldbl}</td>
-    #             <td>{ i.salseman }</td>
-    #             <td class="d-flex justify-content-between">
-    #             <div>
-    #             {'R0' if i.ispaid else 'N1' }
-
-    #             </div>
-    #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-    #             </td>
-    #             <td class="text-danger">
-
-    #             </td>
-    #             <td class="text-danger">
-    #             {'OUI' if i.isfacture else 'NON'}
-
-    #             </td>
-
-    #             <td>
-
-
-    #             </td>
-    #             <td>
-    #             {i.note}
-    #             </td>
-    #             <td>
-    #             {i.modlvrsn}
-    #             </td>
-    #             <td class="d-flex">
-    #               <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-    #             <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-    #             </td>
-    #         </tr>
-    #         '''
-    #     return JsonResponse({
-    #         'trs':trs
-    #     })
-
-    # Split the term into individual words separated by '*'
     search_terms = term.split('+')
     print(search_terms)
 
@@ -7928,12 +7877,26 @@ def searchforlistbl(request):
             )
     print(">> here 1",startdate, enddate)
     if startdate=='0' and enddate=='0':
-        bons=Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[:50]
-        total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        if searchtype=='waiting':
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=False).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        elif searchtype=='valid':
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=True).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        else:
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, iscanceled=True).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, iscanceled=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            
     else:
-        print(">> here 1²",startdate, enddate)
-        bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
-        total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        if searchtype=='waiting':
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        elif searchtype=='valid':
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        else:
+            bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).order_by('-bon_no')[:50]
+            total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     return JsonResponse({
         'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),

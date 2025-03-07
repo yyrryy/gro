@@ -3465,5 +3465,5 @@ def echeanceclient(request):
             ispaid=False,
             echance__lte=today
         )
-    print('echeanses', echeances)
-    return render(request, 'listecheance.html', {'echeances':echeances, 'target':target})
+    banks=Bank.objects.filter(target=target)
+    return render(request, 'listecheance.html', {'echeances':echeances, 'target':target, 'banks':banks})

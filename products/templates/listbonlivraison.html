@@ -91,7 +91,9 @@
     background: #80808038;
     border-radius: 11px;
     margin-bottom: 9px;
-" type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
+  " 
+  searchtype="waiting"
+  type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
 
   <div>
     
@@ -433,6 +435,7 @@
     }
     else{
       let year=$('select[name="yearsbl"]').val()?$('select[name="yearsbl"]').val():0
+      searchtype=$('.searchinputlistbl').attr('searchtype')
       console.log(year)
       // Split the filter value into individual terms based on the '&' sign
       // var filterTerms = filterValue.split('+').map(function(term) {
@@ -440,7 +443,7 @@
       // });
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
-      $.get('/products/searchforlistbl', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate}, (data)=>{
+      $.get('/products/searchforlistbl', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate, 'year':year, 'searchtype':searchtype, 'target':'{{target}}'}, (data)=>{
         console.log('eee')
         $(".listbltable tbody").html('')
         $(".listbltable tbody").html(data.trs)
