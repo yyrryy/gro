@@ -144,6 +144,7 @@ urlpatterns = [
     path('disablenotif', views.disablenotif, name='disablenotif'),
     path('getconnectedusers', views.getconnectedusers, name='getconnectedusers'),
     path('payreglbl', views.payreglbl, name='payreglbl'),
+    path('payreglsupp', views.payreglsupp, name='payreglsupp'),
     path('payreglfc', views.payreglfc, name='payreglfc'),
     path('boncommandes', views.boncommandes, name='boncommandes'),
     path('listeconnected', views.listeconnected, name='listeconnected'),
@@ -415,7 +416,7 @@ urlpatterns = [
     path('validerbulk', checkviews.validerbulk, name='validerbulk'),
     path('viewbonsortie', checkviews.viewbonsortie, name='viewbonsortie'),
     path('echeanceclient', checkviews.echeanceclient, name='echeanceclient'),
-    # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
+    path('echeancesupp', checkviews.echeancesupp, name='echeancesupp'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
 ]

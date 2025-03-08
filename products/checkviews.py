@@ -3455,15 +3455,43 @@ def echeanceclient(request):
 
     print(isfarah)
     if isfarah:
-        echeances=PaymentClientbl.objects.filter(Q(mode='effet') | Q(mode='cheque'), isfarah=True, ispaid=False, echance__gte=today)
+        echeances=PaymentClientbl.objects.filter(
+            Q(mode='effet') | Q(mode='cheque'), isfarah=True, 
+            ispaid=False, 
+            isavoir=False, 
+            echance__lte=today
+        )
     else:
         echeances = PaymentClientbl.objects.filter(
             Q(mode='effet') | Q(mode='cheque'),
             isavoir=False,
-            issortie=False,
             isorgh=True,
             ispaid=False,
             echance__lte=today
         )
     banks=Bank.objects.filter(target=target)
     return render(request, 'listecheance.html', {'echeances':echeances, 'target':target, 'banks':banks})
+
+def echeancesupp(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    today = timezone.now().date()
+
+
+    print(isfarah)
+    if isfarah:
+        echeances=PaymentSupplier.objects.filter(
+            Q(mode='effet') | Q(mode='cheque'), isfarah=True, 
+            ispaid=False, 
+            echeance__lte=today
+        )
+    else:
+        echeances = PaymentSupplier.objects.filter(
+            Q(mode='effet') | Q(mode='cheque'),
+            isfarah=False,
+            ispaid=False,
+            echeance__lte=today
+        )
+    print('>> echeances', echeances)
+    banks=Bank.objects.filter(target=target)
+    return render(request, 'listecheancesupp.html', {'echeances':echeances, 'target':target, 'banks':banks})

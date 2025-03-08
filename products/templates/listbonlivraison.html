@@ -444,7 +444,7 @@
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
       $.get('/products/searchforlistbl', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate, 'year':year, 'searchtype':searchtype, 'target':'{{target}}'}, (data)=>{
-        console.log('eee')
+        
         $(".listbltable tbody").html('')
         $(".listbltable tbody").html(data.trs)
         $('.totalbons').text(data.total)

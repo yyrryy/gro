@@ -4,7 +4,7 @@
       <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
         <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button> -->
         <div>
-          {{title}} gg
+          {{title}}
         </div>
         <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
       </div>
@@ -15,7 +15,7 @@
             <tr>
               <td style="width: 8%;">Date</td>
               <td style="width: 8%;">N° piece</td>
-              <td style="width: 12%;">Client</td>
+              <td style="width: 12%;">fournisseur</td>
               <td style="width: 5%;">Mode</td>
               <td style="width: 5%;">Mantant</td>
               <td>
@@ -31,7 +31,7 @@
               <tr class="ord" orderid="{{order.id}}" {% if order.refused %}style="background:#f37e46"{%endif%}>
                 <td>{{ order.date|date:'d/m/Y' }}</td>
                 <td>{{ order.npiece }}</td>
-                <td>{{ order.client.name }}</td>
+                <td>{{ order.supplier.name }}</td>
                 <td>{{ order.mode}}</td>
                 <td>{{ order.amount|floatformat:2}}</td>
                 <td>{{ order.echance|date:'d/m/Y'}}</td>
@@ -103,7 +103,7 @@
         <div class="mt-3 reglholder" ids="[]" style="height: 60vh; overflow: scroll;">
 
         </div>
-        <button class="btn bg-darkblue w-100 text-white" onclick="payreglementbl()">Transfer</button>
+        <button class="btn bg-darkblue w-100 text-white" onclick="payreglementsupp()">Transfer</button>
       </div>
 
     </div>
@@ -159,7 +159,7 @@
 
 
   }
-  function payreglementbl() {
+  function payreglementsupp() {
     nrecu=$('.nrecu').val()
     bank=$('.bank').val()
     ids=JSON.parse($('.reglholder').attr('ids'))
@@ -172,12 +172,12 @@
         // User has clicked the element four times consecutively
         // Add your code to run when there are four consecutive clicks here
     alertify.confirm('Payer', 'Payer le reglement', function(){
-      $.get('/products/payreglbl', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu}, (data)=>{
+      $.get('/products/payreglsupp', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu}, (data)=>{
         necheance=parseInt($('.echeanceindexcl').text())
         if (necheance>0){
           $('.echeanceindexcl').text(necheance-1)
         }
-        ajaxpage('add', '+ Article', '/products/echeanceclient?target={{target}}')
+        ajaxpage('add', '+ Article', '/products/echeancesupp?target={{target}}')
       })
       // Reset the count
 

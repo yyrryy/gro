@@ -581,6 +581,7 @@ class PaymentSupplier(models.Model):
     npiece=models.CharField(max_length=50, default=None, null=True, blank=True)
     #bankname
     bank=models.CharField(max_length=500, default=None, null=True, blank=True)
+    nrecu=models.CharField(max_length=500, default=None, null=True, blank=True)
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     usedinfacture=models.BooleanField(default=False)
@@ -612,6 +613,7 @@ class PaymentClientbl(models.Model):
     mode=models.CharField(max_length=10, default=None)
     # the name of the bank
     bank=models.CharField(max_length=100000, default=None, null=True, blank=True)
+    nrecu=models.CharField(max_length=100000, default=None, null=True, blank=True)
     amountofeachbon=models.CharField(max_length=100000, default=None, null=True, blank=True)
     bons=models.ManyToManyField(Bonlivraison, default=None, blank=True, related_name="reglements")
     factures=models.ManyToManyField(Facture, default=None, blank=True, related_name="fcreglements")

@@ -5998,39 +5998,39 @@ def filterfcdate(request):
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     bons=Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no')[:50]
     print('total', Facture.objects.filter(date__range=[startdate, enddate]).count(), Facture.objects.count())
-    trs=''
-    for i in bons:
-        trs+=f'''
-        <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-            <td>{ i.facture_no }</td>
-            <td>{ i.date.strftime("%d/%m/%Y")}</td>
-            <td>{ i.total}</td>
-            <td>{ i.tva}</td>
-            <td>{ i.client.name }</td>
-            <td>{ i.client.code }</td>
-            <td>{ i.client.region}</td>
-            <td>{ i.client.city}</td>
-            <td>{ i.client.soldfacture}</td>
-            <td>{ i.salseman }</td>
-            <td class="d-flex justify-content-between">
-              <div>
-              {'R0' if i.ispaid else 'N1' }
+    # trs=''
+    # for i in bons:
+    #     trs+=f'''
+    #     <tr class="ord {"text-danger" if i.ispaid else ''} fc-row" startdate={startdate} enddate={enddate} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
+    #         <td>{ i.facture_no }</td>
+    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
+    #         <td>{ i.total}</td>
+    #         <td>{ i.tva}</td>
+    #         <td>{ i.client.name }</td>
+    #         <td>{ i.client.code }</td>
+    #         <td>{ i.client.region}</td>
+    #         <td>{ i.client.city}</td>
+    #         <td>{ i.client.soldfacture}</td>
+    #         <td>{ i.salseman }</td>
+    #         <td class="d-flex justify-content-between">
+    #           <div>
+    #           {'R0' if i.ispaid else 'N1' }
 
-              </div>
-              <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
+    #           </div>
+    #           <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
 
-            </td>
-            <td class="text-danger">
+    #         </td>
+    #         <td class="text-danger">
 
-            </td>
+    #         </td>
 
-            <td>
-              {i.bon.bon_no if i.bon else "--"}
-            </td>
-          </tr>
-        '''
+    #         <td>
+    #           {i.bon.bon_no if i.bon else "--"}
+    #         </td>
+    #       </tr>
+    #     '''
     ctx={
-        'trs':trs
+        'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8')
     }
     if bons:
         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
@@ -6993,12 +6993,45 @@ def getconnectedusers(request):
         'trs':trs
     })
 
-
+# this will pay regl of clients
 def payreglbl(request):
-    reglid=request.GET.get('reglid')
-    regl=PaymentClientbl.objects.get(pk=reglid)
-    regl.ispaid=True
-    regl.save()
+    print('>>>< js', request.GET.get('bank'))
+    ids=json.loads(request.GET.get('ids'))
+    bank=request.GET.get('bank')
+    nrecu=request.GET.get('nrecu')
+    print('>>>> ids, bank, nrecu', ids, bank, nrecu)
+    regl=PaymentClientbl.objects.filter(pk__in=ids)
+    print('>>>> regl', regl)
+    bank=Bank.objects.get(pk=bank)
+    # 7iyd total 4lbanka
+    totalamount=regl.aggregate(Sum('amount'))['amount__sum']
+    bank.total+=totalamount
+    bank.save()
+    regl.update(ispaid=True)
+    regl.update(nrecu=nrecu)
+    regl.update(targetbank=bank)
+    # regl.update(targebank=Bank.objects.get)
+    return JsonResponse({
+        'success':True
+    })
+
+def payreglsupp(request):
+    print('>>>< js', request.GET.get('bank'))
+    ids=json.loads(request.GET.get('ids'))
+    bank=request.GET.get('bank')
+    nrecu=request.GET.get('nrecu')
+    print('>>>> ids, bank, nrecu', ids, bank, nrecu)
+    regl=PaymentSupplier.objects.filter(pk__in=ids)
+    print('>>>> regl', regl)
+    bank=Bank.objects.get(pk=bank)
+    # 7iyd total 4lbanka
+    totalamount=regl.aggregate(Sum('amount'))['amount__sum']
+    bank.total-=totalamount
+    bank.save()
+    regl.update(ispaid=True)
+    regl.update(nrecu=nrecu)
+    regl.update(targetbank=bank)
+    # regl.update(targebank=Bank.objects.get)
     return JsonResponse({
         'success':True
     })

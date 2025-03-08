@@ -4,7 +4,7 @@
     </strong>
     {% if not reglement.mode == 'espece' %}
             {% if reglement.ispaid %}
-                <div class="alert alert-success">Reglement Payé</div>
+                <div class="alert alert-success">Reglement Payé {% if reglement.nrecu%} N° recu:{{reglement.nrecu}}{%endif%}</div>
             {% else %}
             
             <button class="btn btn-danger bi bi-trash" onclick="deletereglementsupplier('{{reglement.id}}')"></button>
@@ -75,7 +75,7 @@
             </div>
             <div class="col-4">
                 {% if reglement.ispaid %}
-                <div class="alert alert-success">Reglement Payé</div>
+                <div class="alert alert-success">Reglement Payé {% if reglement.nrecu%} N° recu:{{reglement.nrecu}}{%endif%}</div>
                 {% else %}
                 <button class="w-100 btn btn-primary" onclick="updatereglsupp('{{reglement.id}}')">Modifier</button>
                 {% endif %}
