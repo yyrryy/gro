@@ -2412,7 +2412,7 @@ def printbarcode(request):
             ref=i['ref'].strip()
         print('>>> ref', ref)
         name=i['name']
-        remise1=0 if i['remise1']=='' else int(i['remise1'])
+        remise1=0 if i['remise1']=='' else float(i['remise1'])
         price=i['price']
         net=float(price)-(float(price)*int(remise1)/100)
         price=round(net*2, 2)
@@ -3470,8 +3470,8 @@ def echeanceclient(request):
             echance__lte=today
         )
     banks=Bank.objects.filter(target=target)
-    return render(request, 'listecheance.html', {'echeances':echeances, 'target':target, 'banks':banks})
-
+    return render(request, 'listecheance.html', {'echeances':echeances, 'target':target, 'banks':banks, 'title':'list echeance clients'})
+    
 def echeancesupp(request):
     target=request.GET.get('target')
     isfarah=target=='f'

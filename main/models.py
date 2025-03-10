@@ -567,6 +567,8 @@ class Facture(models.Model):
 
 
 class PaymentSupplier(models.Model):
+    # date dyal nhar tvalida f lbanka
+    dateregl = models.DateTimeField(default=None, null=True, blank=True)
     supplier=models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None)
     date = models.DateTimeField(default=None)
     amount = models.FloatField(default=0.00)
@@ -607,6 +609,7 @@ class Notesrepresentant(models.Model):
 
 
 class PaymentClientbl(models.Model):
+    dateregl = models.DateTimeField(default=None, null=True, blank=True)
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
     date = models.DateTimeField(default=None)
     amount = models.FloatField(default=0.00)

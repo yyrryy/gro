@@ -4,7 +4,7 @@
       <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
         <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button> -->
         <div>
-          {{title}} gg
+          {{title}} {{target}}
         </div>
         <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
       </div>
@@ -91,6 +91,8 @@
       </div>
 
       <div>
+        date:
+        <input type="date" class="form-control mb-2 dateregl">
         <input type="text" class="form-control mb-2 nrecu" placeholder="N° reçu">
         <select class="form-control bank">
           <option value="">-- Banque--</option>
@@ -162,8 +164,9 @@
   function payreglementbl() {
     nrecu=$('.nrecu').val()
     bank=$('.bank').val()
+    dateregl=$('.dateregl').val()
     ids=JSON.parse($('.reglholder').attr('ids'))
-    if (nrecu==''||bank==''||ids.length==0){
+    if (nrecu==''||bank==''||dateregl==''||ids.length==0){
       alertify.error('N° reçu, Banque, reglements')
       return
 
@@ -172,7 +175,7 @@
         // User has clicked the element four times consecutively
         // Add your code to run when there are four consecutive clicks here
     alertify.confirm('Payer', 'Payer le reglement', function(){
-      $.get('/products/payreglbl', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu}, (data)=>{
+      $.get('/products/payreglbl', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu, 'dateregl':dateregl}, (data)=>{
         necheance=parseInt($('.echeanceindexcl').text())
         if (necheance>0){
           $('.echeanceindexcl').text(necheance-1)

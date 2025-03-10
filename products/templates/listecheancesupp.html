@@ -91,6 +91,8 @@
       </div>
 
       <div>
+        date:
+        <input type="date" class="form-control mb-2 dateregl">
         <input type="text" class="form-control mb-2 nrecu" placeholder="N° reçu">
         <select class="form-control bank">
           <option value="">-- Banque--</option>
@@ -161,9 +163,10 @@
   }
   function payreglementsupp() {
     nrecu=$('.nrecu').val()
+    dateregl=$('.dateregl').val()
     bank=$('.bank').val()
     ids=JSON.parse($('.reglholder').attr('ids'))
-    if (nrecu==''||bank==''||ids.length==0){
+    if (nrecu==''||bank==''||dateregl==''||ids.length==0){
       alertify.error('N° reçu, Banque, reglements')
       return
 
@@ -172,7 +175,7 @@
         // User has clicked the element four times consecutively
         // Add your code to run when there are four consecutive clicks here
     alertify.confirm('Payer', 'Payer le reglement', function(){
-      $.get('/products/payreglsupp', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu}, (data)=>{
+      $.get('/products/payreglsupp', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu, 'dateregl':dateregl}, (data)=>{
         necheance=parseInt($('.echeanceindexcl').text())
         if (necheance>0){
           $('.echeanceindexcl').text(necheance-1)

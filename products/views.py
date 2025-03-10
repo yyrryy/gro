@@ -874,10 +874,10 @@ def addsupply(request):
             cmnd.save()
     for i in json.loads(products):
         product=Produit.objects.get(pk=i['productid'])
-        remise1=0 if i['remise1']=='' else int(i['remise1'])
-        remise2=0 if i['remise2']=='' else int(i['remise2'])
-        remise3=0 if i['remise3']=='' else int(i['remise3'])
-        remise4=0 if i['remise4']=='' else int(i['remise4'])
+        remise1=0 if i['remise1']=='' else float(i['remise1'])
+        remise2=0 if i['remise2']=='' else float(i['remise2'])
+        remise3=0 if i['remise3']=='' else float(i['remise3'])
+        remise4=0 if i['remise4']=='' else float(i['remise4'])
 
         buyprice=float(i['price'])
         print('>>> buyprice', buyprice, buyprice-(buyprice*(remise1/100)))
@@ -4596,9 +4596,9 @@ def updatefactureachat(request):
         product=i.product
         print('removing from total')
         if isfarah:
-            product.stocktotalfarah=int(product.stocktotalfarah)-int(i.qty)
+            product.stocktotalfarah=float(product.stocktotalfarah)-float(i.qty)
         else:
-            product.stocktotalorgh=int(product.stocktotalorgh)-int(i.qty)
+            product.stocktotalorgh=float(product.stocktotalorgh)-float(i.qty)
         # if bon.isfacture:
         #     print('removing from facture')
         #     product.stockfacture=int(product.stockfacture)-int(i.quantity)
@@ -6998,8 +6998,9 @@ def payreglbl(request):
     print('>>>< js', request.GET.get('bank'))
     ids=json.loads(request.GET.get('ids'))
     bank=request.GET.get('bank')
+    dateregl=request.GET.get('dateregl')
     nrecu=request.GET.get('nrecu')
-    print('>>>> ids, bank, nrecu', ids, bank, nrecu)
+    print('>>>> ids, bank, nrecu', ids, bank, nrecu, dateregl)
     regl=PaymentClientbl.objects.filter(pk__in=ids)
     print('>>>> regl', regl)
     bank=Bank.objects.get(pk=bank)
@@ -7009,6 +7010,7 @@ def payreglbl(request):
     bank.save()
     regl.update(ispaid=True)
     regl.update(nrecu=nrecu)
+    regl.update(dateregl=dateregl)
     regl.update(targetbank=bank)
     # regl.update(targebank=Bank.objects.get)
     return JsonResponse({
@@ -7019,6 +7021,7 @@ def payreglsupp(request):
     print('>>>< js', request.GET.get('bank'))
     ids=json.loads(request.GET.get('ids'))
     bank=request.GET.get('bank')
+    dateregl=request.GET.get('ateregl')
     nrecu=request.GET.get('nrecu')
     print('>>>> ids, bank, nrecu', ids, bank, nrecu)
     regl=PaymentSupplier.objects.filter(pk__in=ids)
@@ -7029,6 +7032,7 @@ def payreglsupp(request):
     bank.total-=totalamount
     bank.save()
     regl.update(ispaid=True)
+    regl.update(dateregl=dateregl)
     regl.update(nrecu=nrecu)
     regl.update(targetbank=bank)
     # regl.update(targebank=Bank.objects.get)
