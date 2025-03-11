@@ -1620,9 +1620,32 @@ a .uil {
 
     })
     $('.connectedholder').on('mouseleave', ()=>{$('.connectedusersbar').addClass('collapsed'); $('#collapsconnected').removeClass('show')})
-  function printlivraison(bonid, target){
+    function printlivraison(bonid, target){
        url = window.location.pathname.split( '/' );[0]
        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/bonlivraisonprint/'+bonid+'?target='+target, '', 'width=900,height=900');
+
+        myWindow.focus();
+
+        myWindow.addEventListener('load', function() {
+      console.log('New window loaded.');
+
+      // Wait for 5 seconds before printing
+      setTimeout(function() {
+        try {
+          myWindow.print();
+          console.log('Print command issued.');
+          myWindow.close();
+          console.log('New window closed.');
+        } catch (e) {
+          console.error('Failed to print and close the window:', e);
+        }
+      }, 1000); // 1000 milliseconds = 1 seconds
+    }, false);
+  }
+
+  function printdevi(bonid, target){
+       url = window.location.pathname.split( '/' );[0]
+       var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printdevi?deviid='+bonid+'&target='+target, '', 'width=900,height=900');
 
         myWindow.focus();
 

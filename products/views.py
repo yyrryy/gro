@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Caisse, Bank
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Caisse, Bank, DeviItem
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -5362,6 +5362,10 @@ def searchproduct(request):
     # check if term in product.ref or product.name
 
     results=[]
+    print('>> products', products)
+    print('>> products', products[0].ref)
+    print('>> products', products[0].name)
+    print('>> products', products)
     for i in products:
         results.append({
             'id':f"{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah if target=='f' else i.stocktotalorgh}§{i.stockfacturefarah if target=='f' else i.stocktotalorgh}§{i.id}§{i.frsellprice if target=='f' else i.sellprice}§{i.frremisesell if target=='f' else i.remisesell}§{i.prixnet}§{i.representprice}",
@@ -10683,6 +10687,26 @@ def bonlivraisonprint(request, id):
         'orderitems':orderitems,
     }
     return render(request, 'bonlivraisonprint.html', ctx)
+
+
+def printdevi(request):
+    isfarah=request.GET.get('target')=='f'
+    deviid=request.GET.get('deviid')
+    print('<>> target', request.GET.get('target'))
+    order=Devi.objects.get(pk=deviid)
+    orderitems=DeviItem.objects.filter(devi=order).order_by('product__name')
+    
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
+    ctx={
+        'isfarah':isfarah,
+        'title':f'devi {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+    }
+    return render(request, 'printdevi.html', ctx)
+
+
 
 def sortieprint2(request, id):
     a6=request.GET.get('a6')=='1'
