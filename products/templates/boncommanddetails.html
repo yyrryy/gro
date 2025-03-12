@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-3 bg-white rounded">
-    <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}', '{{target}}')">
+    <button class="btn w-100 btn-primary mb-2" onclick="printboncommand('{{order.id}}', '{{target}}')">
       Imprimer
     </button>
     {% if order.devi and order.devi.generatedbl %}

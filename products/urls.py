@@ -311,6 +311,7 @@ urlpatterns = [
     path('loadlistbs/', views.loadlistbs, name='loadlistbs'),
     path('vv', views.vv, name='vv'),
     path('printdevi', views.printdevi, name='printdevi'),
+    path('printboncommand', views.printboncommand, name='printboncommand'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),

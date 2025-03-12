@@ -174,6 +174,9 @@
           </div>
           <div>
             <button class="btn btn-sm bg-dark text-white filterfcdate">Filtrer</button>
+            <button class="btn btn-success bi bi-download" onclick="exportfc(event)">
+          
+            </button>
           </div>
 
         </div>
@@ -186,9 +189,7 @@
 
 
         </select>
-        <button class="btn btn-success bi bi-download" onclick="exportfc(event)">
-          
-        </button>
+        
       </div>
       <!-- <div style="color: red; cursor: pointer; padding: 7px; border-radius: 12px; height: 2.5em; width: 4em;" title="BON 3 MOIS" class="bg-white text-center" onclick="getnotpaidfc(event)">
         {{depasserfc}}
@@ -506,8 +507,15 @@
     )
   }
   function exportfc(event){
+    startdatelistfc=$('.startdatelistfc').val()
+    enddatelistfc=$('.enddatelistfc').val()
     let year=$('.populateyears').val()
-    let url = `/products/exportfc?year=${year}&target={{target}}`;
+    if (startdatelistfc==''||enddatelistfc==''){
+      alertify.error('Date')
+      return
+    }
+    console.log('date', startdatelistfc, enddatelistfc)
+    let url = `/products/exportfc?year=${year}&target={{target}}&startdate=${startdatelistfc}&enddate=${enddatelistfc}`;
 
     // Create a hidden iframe to trigger the file download
     var iframe = $('<iframe>', {
@@ -649,7 +657,7 @@ $('.filterfcdate').on('click', function(){
       alertify.error('Date')
       return
     }
-    $.get('/products/filterfcdate', {startdate:startdate, enddate:enddate},(data)=>{
+    $.get('/products/filterfcdate', {startdate:startdate, enddate:enddate, 'target':'{{target}}'},(data)=>{
       console.log(data)
       parentdiv.find('tbody').html(data.trs)
       parentdiv.find('.totalfc').text(data.total)

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Caisse, Bank, DeviItem
+from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, Devi, Notification, Modifierstock, Command, Notesrepresentant, Achathistory, Excelecheances, Bonsortie, Devisupplier, Commandsupplier, Avanceclient, Avancesupplier, Factureachat, Outfactureachat, Sortieitem, Caisse, Bank, DeviItem, CommandItem
 from django.contrib.auth import logout
 from django.http import JsonResponse, HttpResponse
 import openpyxl
@@ -2147,14 +2147,18 @@ def exportbl(request):
 def exportfc(request):
     target=request.GET.get('target')
     year=request.GET.get('year')
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    isfarah=target=='f'
     # today in d/m/Y
     today=timezone.now().strftime("%d-%m-%Y")
     society='FARAH' if target=='f' else 'ORGH'
-    if target=='f':
-        bons=Facture.objects.filter(isfarah=True, date__year=year)
-    else:
-        bons=Facture.objects.filter(isfarah=False, date__year=year)
-
+    print(">> is farah", target=='f')
+    bons=Facture.objects.filter(isfarah=isfarah, date__range=[startdate, enddate])
+    
+    print('bons', bons.count())
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
@@ -5998,10 +6002,12 @@ def getnotpaidfc(request):
 def filterfcdate(request):
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
+    target=request.GET.get('target')
+    isfarah=target=='f'
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no')[:50]
-    print('total', Facture.objects.filter(date__range=[startdate, enddate]).count(), Facture.objects.count())
+    bons=Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-facture_no')[:50]
+    
     # trs=''
     # for i in bons:
     #     trs+=f'''
@@ -10705,6 +10711,23 @@ def printdevi(request):
         'orderitems':orderitems,
     }
     return render(request, 'printdevi.html', ctx)
+
+def printboncommand(request):
+    isfarah=request.GET.get('target')=='f'
+    deviid=request.GET.get('deviid')
+    print('<>> target', request.GET.get('target'))
+    order=Command.objects.get(pk=deviid)
+    orderitems=CommandItem.objects.filter(command=order).order_by('product__name')
+    
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
+    ctx={
+        'isfarah':isfarah,
+        'title':f'devi {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+    }
+    return render(request, 'printboncommand.html', ctx)
 
 
 

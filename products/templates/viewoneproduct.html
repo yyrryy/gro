@@ -1,4 +1,5 @@
 {% load global_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -852,8 +853,34 @@
     </div>
 </div>
 
-
+<script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/select2.min.js'%}"></script>
+    <script src="{% static 'js/type.min.js'%}"></script>
+    <script src="{% static 'js/number.js'%}"></script>
+    <script src="{% static 'js/main.js'%}"></script>
+    <script src="{% static 'js/alertify.min.js'%}"></script>
 <script>
+    function duplicate(event, productid){
+        var parent=$(event.target).parent();
+        ref=parent.find('.ref').val();
+        mark=parent.find('.mark').val();
+        minstock=parent.find('.minstock').val();
+        if (ref=='' || mark==''){
+          alertify.error('Veuillez remplir tous les champs');
+          return;
+        }
+        $.get('/products/duplicate', {'productid':productid, 'ref':ref, 'mark':mark, 'minstock':minstock}, function(data){
+          if(data.success){
+            alertify.success('Produit dupliqué');
+            parent.find('.ref').val('');
+            parent.find('.mark').val('');
+            parent.find('.minstock').val('');
+          }else{
+            alertify.error(data.message);
+          }
+        })
+      }
+      
     function replaceproduct(){
         productid=$('.refreplace').val()
         if (productid==null){
