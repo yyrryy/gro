@@ -1190,8 +1190,14 @@ def addbonlivraison(request):
         note=note,
         isfarah=isfarah,
         isorgh=isorgh,
-        user=request.user
     )
+    # if user is anonym
+    if request.user.is_anonymous:
+        print('>> user is anonym')
+        order.user=None
+    else:
+        order.user=request.user
+    order.save()
     if not comndid == "":
         cmnd=Command.objects.get(pk=comndid)
         cmnd.generatedbl=True
@@ -2004,7 +2010,7 @@ def getclientprice(request):
     #     producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=True)
     else:
         print('>> farah clientprice', clientid, pdctid, isfarah)
-        producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=isfarah)
+        producthistory=Livraisonitem.objects.filter(bon__client_id=clientid, product_id=pdctid, isfarah=isfarah)
     print('producthistory', producthistory)
     clientprice=producthistory.last()
     if clientprice:
@@ -2069,10 +2075,10 @@ def listbonlivraison(request):
     # get only the last 100 orders of the current year
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
-        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).exclude(isvalid=True).exclude(iscanceled=True).order_by('-bon_no')
+        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).exclude(isvalid=True).order_by('-bon_no')
+        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
         total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
@@ -2269,7 +2275,8 @@ def listfactures(request):
         'today':timezone.now().date(),
         'target':target,
         'receipt_no':receipt_no,
-        'lastdatefacture':lastdatefacture
+        'lastdatefacture':lastdatefacture,
+        'term':0
     }
     # if bons:
     #     ctx['total']=round(Facture.objects.filter(date__year=timezone.now().year).aggregate(Sum('total'))['total__sum'] or 0, 2)
@@ -7447,7 +7454,7 @@ def loadlistbl(request):
     trs=''
     start = (page - 1) * per_page
     end = page * per_page
-    if term != '0':
+    if term != '':
         print('>>term', term)
         # Split the term into individual words separated by '*'
 
@@ -8143,53 +8150,15 @@ def loadlistfc(request):
     enddate =request.GET.get('enddate')
     term =request.GET.get('term')
     comptable =request.GET.get('comptable')
+    # request.GET.get('mode')=='1' means waiting so is valid will be not
+    isvalid = not request.GET.get('mode')=='1'
+    print('>> isvalid, isfarah', isvalid, isfarah)
     per_page = 50  # Adjust as needed
     print('>>>>> term', term)
     start = (page - 1) * per_page
     end = page * per_page
     print('>>>>>', start, end, page)
-    if comptable=='1':
-        bons=Facture.objects.filter(isfarah=isfarah, date__year=year, isaccount=True).order_by('-facture_no')[start:end]
-
-        # trs=''
-        # for i in bons:
-        #     trs+=f'''
-        #         <tr class="ord {"text-danger" if i.ispaid else ''}
-        #          fc-row"
-        #             style="color:{"blue" if i.bon else ""} " comptable="1" ondblclick="ajaxpage('bonl{i.id}', 'Facture {i.facture_no}', '/products/facturedetails/{i.id}')">
-        #             <td>{ i.facture_no }</td>
-        #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
-        #             <td>{ i.total}</td>
-        #             <td>{ i.tva}</td>
-        #             <td>{ i.client.name }</td>
-        #             <td>{ i.client.code }</td>
-        #             <td>{ i.client.region}</td>
-        #             <td>{ i.client.city}</td>
-        #             <td>{ i.client.soldfacture}</td>
-        #             <td>{ i.salseman }</td>
-        #             <td class="d-flex justify-content-between">
-        #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-        #             <button title="Facture Comptabilisé" class="btn border border-success border-success" onclick="makefacturecompta(event, '{i.id}')"></button>
-        #             </td>
-        #             <td >
-        #                 {i.note}
-        #             </td>
-
-        #             <td>
-        #             {i.bon.bon_no if i.bon else "--"}
-        #             </td>
-        #             <td class="d-flex">
-        #             <i class="bi {"bi-check" if i.isaccount else ''} h3"></i>{"c" if i.isaccount else ''}
-        #             <button title="Imprimer" class="btn btn-sm bi bi-download" onclick="printfacture('{i.id}')"></button>
-        #             </td>
-        #         </tr>
-        #         '''
-        
-        return JsonResponse({
-            'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
-            'has_more': len(bons) == per_page,
-        })
-    if term != '0':
+    if term != '':
 
         # Create a list of Q objects for each search term and combine them with &
         q_objects = Q()
@@ -8237,14 +8206,14 @@ def loadlistfc(request):
 
         if startdate=='0' and enddate=='0':
 
-            bons=Facture.objects.filter(q_objects).filter(isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
-            total=round(Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-            totaltva=round(Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+            bons=Facture.objects.filter(q_objects).filter(isvalid=isvalid, isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
+            total=round(Facture.objects.filter(q_objects).filter(isvalid=isvalid, date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            totaltva=round(Facture.objects.filter(q_objects).filter(isvalid=isvalid, date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
         else:
             print('>>>>>daterange ')
-            bons=Facture.objects.filter(q_objects).filter(isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
-            total=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-            totaltva=round(Facture.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            bons=Facture.objects.filter(q_objects).filter(isvalid=isvalid, isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
+            total=round(Facture.objects.filter(q_objects).filter(isvalid=isvalid, date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+            totaltva=round(Facture.objects.filter(q_objects).filter(isvalid=isvalid, date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         # trs=''
         # for i in bons:
         #     trs+=f'''
@@ -8291,9 +8260,9 @@ def loadlistfc(request):
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
         print(startdate, enddate)
-        bons=Facture.objects.filter(isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
-        total=round(Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        totaltva=round(Facture.objects.filter(date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+        bons=Facture.objects.filter(isvalid=isvalid, isfarah=isfarah, date__range=[startdate, enddate]).order_by('-facture_no')[start:end]
+        total=round(Facture.objects.filter(isvalid=isvalid, date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        totaltva=round(Facture.objects.filter(isvalid=isvalid, date__range=[startdate, enddate]).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
         # trs=''
         # for i in bons:
         #     trs+=f'''
@@ -8336,9 +8305,9 @@ def loadlistfc(request):
             'totaltva':totaltva,
         })
     print('>> we are her', year)
-    bons= Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
-    total=round(Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-    totaltva=round(Facture.objects.filter(isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
+    bons= Facture.objects.filter(isvalid=isvalid, isfarah=isfarah, date__year=year).order_by('-facture_no')[start:end]
+    total=round(Facture.objects.filter(isvalid=isvalid, isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    totaltva=round(Facture.objects.filter(isvalid=isvalid, isfarah=isfarah, date__year=year).order_by('-facture_no').aggregate(Sum('tva'))['tva__sum'] or 0, 2)
     # trs=''
     # for i in bons:
     #     trs+=f'''

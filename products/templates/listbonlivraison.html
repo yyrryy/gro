@@ -254,6 +254,8 @@
 
 
 <script>
+  currentPagelistbl=1
+  loadinglistbl = false;
   function getcanceledbons(){
     $('.listblbody').addClass('blurred')
     $.get('/products/getcanceledbons?target={{target}}', (data)=>{
@@ -356,16 +358,17 @@
       const container = $('.listblholder')[0]; // Get the native DOM element
       const lastRow = document.querySelector('.bl-row:last-child');
       // let year=lastRow.getAttribute('year')?lastRow.getAttribute('year'):0
-      let year=$('[name="yearsbl"]')
+      let year=$('[name="yearsbl"]').val()
 
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
-      let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0
+      // let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0
+      let term = $('.searchinputlistbl').val()
       const lastRowOffset = lastRow.offsetTop + lastRow.clientHeight;
 
       const containerBottom = container.scrollTop + container.clientHeight;
 
-      console.log(lastRow, containerBottom+900 >= lastRowOffset && !loadinglistbl)
+      console.log(lastRow, containerBottom+900 >= lastRowOffset, !loadinglistbl)
 
       if (containerBottom+900 >= lastRowOffset && !loadinglistbl) {
           currentPagelistbl++;

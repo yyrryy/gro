@@ -354,6 +354,8 @@
 
 
 <script>
+  currentPagelistfc=1
+  loadinglistfc = false;
   function getfacturevalider(){
     $('.searchinputlistfactures').attr('waiting', '0')
     $('.listfcbody').addClass('blurred')
@@ -545,7 +547,8 @@
   function loadMorelistfc (year, startdate, enddate, term, comptable, mode)  {
     console.log('term and page ubr', term, currentPagelistfc)
     loadinglistfc = true;
-    $.get(`/products/loadlistfc/?target={{target}}&page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}&mode=${mode}&target={{target}}`, (data)=>{
+    waiting=$('.searchinputlistfactures').attr('waiting')
+    $.get(`/products/loadlistfc/?target={{target}}&page=${currentPagelistfc}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&comptable=${comptable}&mode=${waiting}&target={{target}}`, (data)=>{
 
       const tbody = $('.listfctable tbody');
       tbody.append(data.trs);
@@ -575,7 +578,7 @@
       let mode=lastRow.getAttribute('mode')
       let startdate=$('.startdatelistfc').val()==""?0:$('.startdatelistfc').val()
       let enddate=$('.enddatelistfc').val()==""?0:$('.enddatelistfc').val()
-      let term=lastRow.getAttribute('term')?lastRow.getAttribute('term'):0
+      let term=$('.searchinputlistfactures').val()
       let comptable=lastRow.getAttribute('comptable')?lastRow.getAttribute('comptable'):0
       const containerBottom = container.scrollTop + container.clientHeight;
       if (containerBottom+900 >= lastRowOffset && !loadinglistfc) {

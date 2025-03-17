@@ -152,10 +152,15 @@ def addbonsortie(request):
         date=datebon,
         bon_no=receipt_no,
         note=note,
-        user=request.user,
         paidamount=payment,
         car=car
     )
+    if request.user.is_anonymous:
+        print('>> user is anonym')
+        order.user=None
+    else:
+        order.user=request.user
+    order.save()
     print('>>>>>>', len(json.loads(products))>0)
     #if len(json.loads(products))>0:
     with transaction.atomic():
