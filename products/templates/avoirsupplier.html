@@ -255,15 +255,16 @@
       pdcts=JSON.parse(localStorage.getItem('pdctsinavoirsupp{{target}}')) || []
       console.log(id, pdcts, pdcts.includes(id))
       if (pdcts.includes(id)){
-        addqty.val('')
-        addname.val('')
-        addremise1.val('')
-        addremise2.val('')
-        addremise3.val('')
-        addremise4.val('')
-        addprice.val('')
+        // addqty.val('')
+        // addname.val('')
+        // addremise1.val('')
+        // addremise2.val('')
+        // addremise3.val('')
+        // addremise4.val('')
+        // addprice.val('')
         alertify.error('Ce produit est deja dans le bon')
-        return
+        // just alertify
+        //return
       }
 
       pdcts.push(id)

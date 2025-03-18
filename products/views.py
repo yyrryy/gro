@@ -2005,7 +2005,7 @@ def getclientprice(request):
 
     # try:
     if target=='s':
-        producthistory=Sortieitem.objects.filter(client_id=clientid, product_id=pdctid)
+        producthistory=Sortieitem.objects.filter(bon__client_id=clientid, product_id=pdctid)
     # elif target=='f':
     #     producthistory=Livraisonitem.objects.filter(client_id=clientid, product_id=pdctid, isfarah=True)
     else:
