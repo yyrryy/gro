@@ -846,7 +846,7 @@ def addsupply(request):
     #     
     # 
     bon=Itemsbysupplier.objects.create(
-        user=user,
+        #user=user,
         isfarah=True if target=='f' else False,
         isorgh=True if target=='o' else False,
         supplier_id=supplierid,
@@ -854,6 +854,12 @@ def addsupply(request):
         date=datefacture,
         nbon=nbon,
     )
+    if request.user.is_anonymous:
+        print('>> user is anonym')
+        bon.user=None
+    else:
+        bon.user=request.user
+    bon.save()
     if not devid == "":
         devi=Devisupplier.objects.get(pk=devid)
         devi.generatedbl=True
