@@ -30,7 +30,7 @@
         
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
           <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('addpducts', 'List produits', '/products/stock?target={{target}}')">Stock</div>
-          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); ajaxpage('add', '+ Article', '/products/addproductspage?target={{target}}')">
+          <div class="sectionitem dropdown-item border-bottom p-2 btn w-100 text-start" onclick="$('.sectionitem').removeClass('bg-white text-success'); $(this).addClass('bg-white text-success'); openwindow('add', '+ Article', '/products/addproductspage?target={{target}}')">
             + Article
           </div>
           

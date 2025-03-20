@@ -1,4 +1,41 @@
+{% load global_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Example</title>
+    <style>
+      @media print {
+         .livraison-holder {
+             height: 27.5cm; /* Slightly less than the maximum printable height */
+             width: 21cm; /* Full width of A4 */
+             border: 1px solid black; /* For debugging and visibility */
+             page-break-after: always; /* Ensures each div starts on a new page */
+             box-sizing: border-box; /* Include padding and border in the element's total width and height */
+         }
 
+         /* Reset margins and paddings for printing */
+         body {
+             margin: 0;
+             padding: 0;
+         }
+         td > div{
+           margin:4px;
+         }
+
+         /* Optional: If you need to adjust margins more precisely */
+         @page {
+             margin: 0; /* Remove any default margins */
+         }
+     }
+    </style>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquerySpellingNumber.js"></script>
+    <link href="/static/css/minified.css" rel="stylesheet" />
+</head>
+<body>
 <div class="bg-white rounded p-2 shadow">
     <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
         <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button>
@@ -113,8 +150,13 @@
     </div>
 </div>
 
-{% block js %}
-<script>
+<script src="{% static 'js/bootstrap.bundle.min.js'%}"></script>
+    <script src="{% static 'js/select2.min.js'%}"></script>
+    <script src="{% static 'js/type.min.js'%}"></script>
+    <script src="{% static 'js/number.js'%}"></script>
+    <script src="{% static 'js/main.js'%}"></script>
+    <script src="{% static 'js/alertify.min.js'%}"></script>
+    <script>
     $('.select2').select2()
     function addmark(event){
         event.preventDefault()
@@ -246,4 +288,6 @@
     });
 
 </script>
-{% endblock %}
+</body>
+</html>
+<!-- End Path: products/templates/addproduct.html -->
