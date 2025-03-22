@@ -2493,7 +2493,9 @@ def getlastbuyprice(request):
         if isfarah:
             dp=product.frbuyprice
             remise=product.frremise1
-        
+        else:
+            dp=product.buyprice
+            remise=product.remise1
     return JsonResponse({
         'remise':remise,
         'dp':dp
