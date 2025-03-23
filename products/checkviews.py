@@ -13,6 +13,10 @@ import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
 import base64
+from django.contrib.auth.decorators import login_required, user_passes_test
+def isadmin(user):
+    return user.groups.filter(name='admin').exists()
+
 today = timezone.now().date()
 thisyear=timezone.now().year
 
@@ -63,15 +67,20 @@ def duplicate(request):
     })
 
 # ste1=Farah
+@user_passes_test(isadmin, login_url='main:home')
+@login_required(login_url='main:home')
 def ste1(request):
     #initiating config
     
     return render(request, 'fdashboard.html', {'target':'f'})
 
 # ste1=Farah
+@user_passes_test(isadmin, login_url='main:home')
+@login_required(login_url='main:home')
 def ste2(request):
     return render(request, 'odashboard.html', {'target':'o'})
-
+@user_passes_test(isadmin, login_url='main:home')
+@login_required(login_url='main:home')
 def pointdevente(request):
     return render(request, 'pos.html', {'target':'s'})
 
@@ -2382,12 +2391,14 @@ def getfactureachatvalider(request):
 def getcanceledbons(request):
     target=request.GET.get('target')
     isfarah=target=='f'
-    bons = Bonlivraison.objects.filter(isfarah=isfarah, iscanceled=True).order_by('-bon_no')[:50]
-    print('>> bons', bons)
-    return JsonResponse({
-        'html':render(request, 'bllist.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
-        'total':round(bons.aggregate(Sum('total')).get('total__sum'), 2),
-    })
+    # not gonna use 50 paginator here
+    bons = Bonlivraison.objects.filter(isfarah=isfarah, iscanceled=True).order_by('-bon_no')
+    ctx={
+        'html':render(request, 'bllist.html', {'bons':bons, 'target':target}).content.decode('utf-8')
+    }
+    if bons:
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
 
 def validation(request):
     target=request.GET.get('target')

@@ -93,7 +93,7 @@
     margin-bottom: 9px;
   " 
   searchtype="waiting"
-  type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
+  type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl" waiting="1">
 
   <div>
     
@@ -258,6 +258,8 @@
   loadinglistbl = false;
   function getcanceledbons(){
     $('.listblbody').addClass('blurred')
+    $('.listblholder').off('scroll', handleScrolllistbl);
+    $('.searchinputlistbl').attr('searchtype', 'canceled')
     $.get('/products/getcanceledbons?target={{target}}', (data)=>{
       $('.listblbody').html(data.html)
       $('.listblbody').removeClass('blurred')
@@ -266,6 +268,8 @@
   function getbonvalider(){
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonvalider?target={{target}}', (data)=>{
+      $('.searchinputlistbl').attr('waiting', '0')
+      $('.searchinputlistbl').attr('searchtype', 'valid')
       $('.listblbody').html(data.html)
       $('.listblbody').removeClass('blurred')
     })
@@ -334,7 +338,8 @@
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
     loadinglistbl = true;
-    $.get(`/products/loadlistbl/?target={{target}}&all={{all}}&valider={{valider}}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    waiting=$('.searchinputlistbl').attr('waiting')
+    $.get(`/products/loadlistbl/?target={{target}}&mode=${waiting}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
 
       const tbody = $('.listbltable tbody');
       tbody.append(data.trs);
