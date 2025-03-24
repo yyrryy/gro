@@ -152,6 +152,14 @@
                                       <div class="me-2">
                                         <input type="text" name="bank" class="w-100" placeholder="Nom du bank">
                                     </div>
+                                    <div class="me-2">
+                                        <select name="source">
+                                            <option value="">Source</option>
+                                            <option value="societe">Societe</option>
+                                            <option value="client">client</option>
+                                            <option value="personel">personel</option>
+                                        </select>
+                                    </div>
                                   </div>
                                 </div>
                             </div>
@@ -766,6 +774,9 @@ function submitupdatereglementsupp(event){
         echeance=parentdiv.find('[name="echeancereglementsupp"]').map(function() {
             return this.value;
         }).get();
+        source=parentdiv.find('[name="source"]').map(function() {
+            return this.value;
+        }).get();
         bank=parentdiv.find('[name="bank"]').map(function() {
             return this.value;
         }).get();
@@ -795,6 +806,7 @@ function submitupdatereglementsupp(event){
             mode:JSON.stringify(mode),
             npiece:JSON.stringify(npiece),
             echeance:JSON.stringify(echeance),
+            source:JSON.stringify(source),
             bank:JSON.stringify(bank),
             date:date,
             bons:JSON.stringify(selectedValues),

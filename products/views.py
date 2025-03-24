@@ -3309,6 +3309,7 @@ def reglebons(request):
     avances=json.loads(request.POST.get('avances'))
     mantant=json.loads(request.POST.get('mantant'))
     bank=json.loads(request.POST.get('bank'))
+    source=json.loads(request.POST.get('source'))
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
     print('bons', bons, 'avoirs', avoirs, 'avances', avances)
@@ -3363,7 +3364,7 @@ def reglebons(request):
             isorgh=target=='o'
         )
 
-    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+    for m, mod, np, ech, bk, s in zip(mantant, mode, npiece, echeance, bank, source):
         regl=PaymentClientbl.objects.create(
             client_id=clientid,
             amount=m,
@@ -3374,6 +3375,7 @@ def reglebons(request):
             bank=bk,
             mode=mod,
             npiece=np,
+            source=s,
             isfarah=target=='f',
             isorgh=target=='o',
             issortie=target=='s'
@@ -3421,6 +3423,7 @@ def reglebonsortie(request):
     avances=json.loads(request.POST.get('avances'))
     mantant=json.loads(request.POST.get('mantant'))
     bank=json.loads(request.POST.get('bank'))
+    source=json.loads(request.POST.get('source'))
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
     print('bons', bons, 'avoirs', avoirs, 'avances', avances)
@@ -3465,7 +3468,7 @@ def reglebonsortie(request):
     #         isorgh=target=='o'
     #     )
 
-    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+    for m, mod, np, ech, bk, s in zip(mantant, mode, npiece, echeance, bank, source):
         regl=PaymentClientbl.objects.create(
             client_id=clientid,
             amount=m,
@@ -3475,7 +3478,8 @@ def reglebonsortie(request):
             bank=bk,
             mode=mod,
             npiece=np,
-            issortie=True
+            issortie=True,
+            source=s
         )
         regl.bonsortie.set(livraisons)
         
@@ -4756,6 +4760,7 @@ def reglebonsachat(request):
     mode=json.loads(request.POST.get('mode'))
     npiece=json.loads(request.POST.get('npiece'))
     bank=json.loads(request.POST.get('bank'))
+    source=json.loads(request.POST.get('source'))
     date=request.POST.get('date')
     # date=timezone.now().date()
     echeance=json.loads(request.POST.get('echeance'))
@@ -4806,7 +4811,7 @@ def reglebonsachat(request):
             isfarah=isfarah,
         )
     print('>> date suppp', date)
-    for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+    for m, mod, np, ech, bk, s in zip(mantant, mode, npiece, echeance, bank, source):
         regl=PaymentSupplier.objects.create(
             supplier_id=supplierid,
             amount=m,
@@ -4815,7 +4820,8 @@ def reglebonsachat(request):
             mode=mod,
             npiece=np,
             bank=bk,
-            isfarah=isfarah
+            isfarah=isfarah,
+            source=s
         )
         if moderegl=='bl':
             regl.bons.set(livraisons)
@@ -5400,13 +5406,21 @@ def searchproduct(request):
 
 def filterbldate(request):
     target=request.GET.get('target')
+    searchtype=request.GET.get('searchtype')
     isfarah=target=='f'
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     print(startdate, enddate)
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-bon_no')[:50]
+    print('>> searchtype', searchtype)
+    if searchtype=="waiting":
+        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
+    elif searchtype=="valid":
+        print('>> searchtype is valid')
+        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).order_by('-bon_no')
+    else:
+        bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).order_by('-bon_no')
     # trs=''
     # for i in bons:
     #     trs+=f'''

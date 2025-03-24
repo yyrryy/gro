@@ -423,14 +423,18 @@
       alertify.error('Date')
       return
     }
-    $.get('/products/filterbldate', {startdate:startdate, enddate:enddate},(data)=>{
+    searchtype=$('.searchinputlistbl').attr('searchtype')
+    $.get('/products/filterbldate', {startdate:startdate, enddate:enddate, 'searchtype':searchtype},(data)=>{
       console.log(data)
       $('.listblbody').html(data.trs)
       $('.totalbons').text(data.total)
     })
-    $('.listblholder').on('scroll', handleScrolllistbl);
+    // activate scrolling only if we are in wating mode
+    if (searchtype=='waiting'){
+      $('.listblholder').on('scroll', handleScrolllistbl);
       currentPagelistbl=1
       loadinglistbl = false;
+    }
   })
   $('.searchinputlistbl').on("change", function() {
     // Get the values from all filter input fields
