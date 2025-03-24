@@ -137,7 +137,7 @@ margin: 0;
                   <tr>
                       <td style="padding: 2px 0; font-size: 13px; width: 9%;">REF</td>
                       <td style="padding: 2px 0; font-size: 13px;">Article</td>
-                      <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Barcode</td>
+                      <!-- <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Barcode</td> -->
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Quantité</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 6%;" >Prix unit.</td>
                       <td style="padding: 2px 0; font-size: 13px;width: 3%;" >Remise1</td>
@@ -155,7 +155,7 @@ margin: 0;
                     <input type="hidden" class="achatitemid" value="{{i.id}}">
                     <td class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', '{{i.product.id}}')">{{i.product.ref.upper}}</td>
                     <td class="name">{{i.product.name}}</td>
-                    <td><input class="qtybarcode" style="width:65px;"></td>
+                    <!-- <td><input class="qtybarcode" style="width:65px;"></td> -->
                     <!-- <td>
                       <input style="width:65px;" type="text" value="{{i.devise}}" class="devise">
                     </td> -->
@@ -257,14 +257,14 @@ margin: 0;
       }
       pdcts.push(id)
       localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
+      // <td><input class="qtybarcode" style="width:65px;"></td>
       let tr = `
       <tr class="itemrow">
-        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
         
         
         <td hidden style="padding: 2px 0; font-size: 13px;" class="clientprice"><input class="devise" value="${adddevise.val()}" style="width:65px;"></td>
-        <td><input class="qtybarcode" style="width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notempty" onkeyup="calculatebonachat(event)" name="qty" onkeyup="calculatebonachat(event)" value="${addqty.val()}" style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notempty" onkeyup="calculatebonachat(event)" name="price" onkeyup="calculatebonachat(event)" value="${addprice.val()}" step=0.01 style="height:23px; width:65px;"></td>
         <td style="padding: 2px 0; font-size: 13px;"><input type="number" onkeyup="calculatebonachat(event)" value="${addremise1.val()}" class="calculate remise1" onkeyup="calculatebonachat(event)" name="remise" style="height:23px; width:65px;"></td></td>
@@ -326,6 +326,7 @@ margin: 0;
       return
     }
     var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = addname.attr('data').split('§');
+    console.log('>> data>>', addname.attr('data'))
     pdcts=JSON.parse(localStorage.getItem('pdctsinbonachat{{bon.id}}{{target}}')) || []
     
     console.log(id, pdcts, pdcts.includes(id))
@@ -353,6 +354,8 @@ margin: 0;
     let addtotal=(addqty.val()*netp4).toFixed(2)
     realqty=addqty.val()*qtyjeu
     unitprice=addprice.val()/qtyjeu
+    console.log('>> addqty', addqty.val(), qtyjeu, addprice.val(), realqty, unitprice)
+    console.log('realqty', realqty, unitprice)
     item={
       'id':id,
       'ref':ref,
@@ -372,7 +375,7 @@ margin: 0;
     localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
     let tr = `
     <tr class="itemrow">
-      <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineba(event, id)">${ref}</td>
+      <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
       <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
       
       
@@ -528,7 +531,7 @@ margin: 0;
         ajax: {
           type:'get',
           dataType: 'json',
-          url: '/products/searchproduct?target={{target}}',
+          url: '/products/searchproductforbonachat?target={{target}}',
           data: function (params) {
             var query = {
               term: params.term,
@@ -552,10 +555,7 @@ margin: 0;
   productIds.push('{{ i.product.id }}');
   {% endfor %}
   localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(productIds));
-  $(document).ready(function(){
-    $('.supplierbonachat{{bon.id}}').select2('open')
-  })
-
+  
 
 
     $('.resultsholderbonachat{{bon.id}}').on('change', function(){
@@ -564,7 +564,7 @@ margin: 0;
         if ($(this).val()==''){
             return
         }
-        var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice] = $(this).val().split('§');
+        var [ref, name, dp, stock, stockfacture, id, sellprice, remise, netprice, representprice, qtyjeu] = $(this).val().split('§');
         let repswithprice=[]
         let addname=parentdiv.find('input[name="addname"]')
         // let addprice=parentdiv.find('input[name="addprice"]')
@@ -579,7 +579,7 @@ margin: 0;
         })
         // addqty.val('')
         // addremise.val(remise)
-        addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}`)
+        addname.val(`${ref} - ${name}`).attr('data', `${ref}§${name}§${dp}§${stock}§${stockfacture}§${id}§${sellprice}§${remise}§${netprice}§${representprice}§${qtyjeu}`)  
 
 
         // let selected = $(this).find(':selected')
@@ -593,6 +593,13 @@ margin: 0;
           $('.data').addClass('border border-danger')
           return
       }
+      // check if year is current year
+      if ($('.datebonachat{{bon.id}}').val().split('-')[0] != new Date().getFullYear()){
+        $('.datebonachat{{bon.id}}').addClass('border border-danger')
+        alertify.error('Date invalid')
+        return
+      }
+      $('.datebonachat{{bon.id}}').removeClass('border border-danger')
       $('.data').removeClass('border border-danger')
       // check if .itemrow is exist
       if ($('.itemrow').length==0){

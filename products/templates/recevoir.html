@@ -600,11 +600,17 @@
         let parentdiv=$(e.target).parent().parent().parent().parent()
 
         e.preventDefault()
-        if (parentdiv.find('.supplierselect').val()=='' || parentdiv.find('.nbonachat').val()=='' || parentdiv.find('.datebonachat').val()==''|| parentdiv.find('.mode').val()==""|| parentdiv.find('.datefacture').val()==""){
+        if (parentdiv.find('.supplierselect').val()=='' || parentdiv.find('.nbonachat').val()=='' || parentdiv.find('.datefacture').val()==''|| parentdiv.find('.mode').val()==""|| parentdiv.find('.datefacture').val()==""){
             parentdiv.find('.databonachat').css('border', '3px solid red')
             alertify.error('Veuillez remplir tous les champs obligatoires')
             return
         }
+        if ($('.datefacture').val().split('-')[0] != new Date().getFullYear()){
+          $('.datefacture').addClass('border border-danger')
+          alertify.error('Date invalid')
+          return
+        }
+        $('.datefacture').removeClass('border border-danger')
         // empty table
         if (parentdiv.find('.bonachatbody tr').length==0 ){
             parentdiv.find('.data').css('border', '3px solid red')
