@@ -660,7 +660,8 @@ $('.filterfcdate').on('click', function(){
       alertify.error('Date')
       return
     }
-    $.get('/products/filterfcdate', {startdate:startdate, enddate:enddate, 'target':'{{target}}'},(data)=>{
+    waiting=$('.searchinputlistfactures').attr('waiting')
+    $.get('/products/filterfcdate', {startdate:startdate, enddate:enddate, 'target':'{{target}}', 'waiting':waiting},(data)=>{
       console.log(data)
       parentdiv.find('tbody').html(data.trs)
       parentdiv.find('.totalfc').text(data.total)

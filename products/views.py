@@ -6030,10 +6030,13 @@ def filterfcdate(request):
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
     target=request.GET.get('target')
+    # using isvalid directly, when waiting ==1 means we want waiting list
+    isvalid=not request.GET.get('waiting')=='1'
     isfarah=target=='f'
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-facture_no')[:50]
+    print('>> isvalid', isvalid)
+    bons=Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).order_by('-facture_no')[:50]
     
     # trs=''
     # for i in bons:
