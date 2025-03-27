@@ -28,8 +28,8 @@
           <tbody>
             {% for order in echeances %}
           
-              <tr class="ord" orderid="{{order.id}}" {% if order.refused %}style="background:#f37e46"{%endif%}>
-                <td>{{ order.date|date:'d/m/Y' }}</td>
+              <tr class="ord" orderid="{{order.id}}" style="background:{% if order.echance == today %}yellowgreen;{% elif order.echance < today %}#fff0f3{% endif %}">
+                <td>{{ order.date|date:'d/m/Y' }} </td>
                 <td>{{ order.npiece }}</td>
                 <td>{{ order.client.name }}</td>
                 <td>{{ order.mode}}</td>
