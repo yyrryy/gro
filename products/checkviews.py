@@ -3505,4 +3505,19 @@ def echeancesupp(request):
     
     print('>> echeances', echeances)
     banks=Bank.objects.filter(target=target)
-    return render(request, 'listecheancesupp.html', {'echeances':echeances, 'target':target, 'banks':banks})
+    return render(request, 'listecheancesupp.html', {'echeances':echeances, 'target':target, 'banks':banks, "today":today})
+
+def downloadcreditclient(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    today = timezone.now().date()
+    # sold if orgh or farah else soldbs
+    if target=='f':
+        clients=[i for i in Client.objects.filter(clientfarah=True) if i.sold.sold!=0 ]
+    elif target=='o': 
+        clients=[i for i in Client.objects.filter(clientorgh=True) if i.sold().sold!=0 ]
+    else:
+        clients=[i for i in Client.objects.filter(clientsortie=True) if i.soldbs.sold!=0 ]
+    print(">> counts", clients)
+    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
+    

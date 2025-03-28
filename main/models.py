@@ -375,19 +375,41 @@ class Client(models.Model):
     phone2=models.CharField(max_length=200, default=None, null=True)
     diver=models.BooleanField(default=False)
     accesscatalog=models.BooleanField(default=False)
+    class SoldblData:
+        def __init__(self, sold, bons, avances, avoirs, reglements):
+            self.sold = sold
+            self.bons = bons
+            self.avances = avances
+            self.avoirs = avoirs
+            self.reglements = reglements
+
     def sold(self):
-        bons=Bonlivraison.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0
-        avoirs=Avoirclient.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0
-        avancess=Avanceclient.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
-        reglements=PaymentClientbl.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0
-        return round(bons-avancess-avoirs-reglements, 2)
+        bons = round(Bonlivraison.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        avoirs = round(Avoirclient.objects.filter(client=self).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        avances = round(Avanceclient.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+        reglements = round(PaymentClientbl.objects.filter(client=self).aggregate(Sum('amount'))['amount__sum'] or 0, 2)
+
+        sold_value = round(bons - avances - avoirs - reglements, 2)
+        return self.SoldblData(sold_value, bons, avances, avoirs, reglements)
+    class SoldbsData:
+        def __init__(self, sold, bons, avances, avoirs, reglements, remise):
+            self.sold = sold
+            self.bons = bons
+            self.avances = avances
+            self.avoirs = avoirs
+            self.reglements = reglements
+            self.remise = remise
+
+    
     def soldbs(self):
         totalbons=Bonsortie.objects.filter(client_id=self).aggregate(Sum('total')).get('total__sum')or 0
         totalavoirs=Avoirclient.objects.filter(client_id=self).aggregate(Sum('total')).get('total__sum')or 0
         totalavances=Avanceclient.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
         totalreglements=PaymentClientbl.objects.filter(client_id=self).aggregate(Sum('amount')).get('amount__sum')or 0
         remise=Bonsortie.objects.filter(client_id=self).aggregate(Sum('remiseamount')).get('remiseamount__sum')or 0
-        return round(totalbons-totalavoirs-totalavances-totalreglements-remise, 2)
+        sold_value = round(totalbons-totalavoirs-totalavances-totalreglements-remise, 2)
+        return self.SoldbsData(sold_value, totalbons, totalavances, totalavoirs, totalreglements, remise)
+        
     def __str__(self) -> str:
         return self.name+'-'+str(self.city)
 
