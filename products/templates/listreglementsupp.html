@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="border-end p-2 position-relative">
+    <div class="border p-2 position-relative">
         <div class="accordion" id="accordionreglsupp">
             <div class="">
 
@@ -294,120 +294,262 @@
 
     </div>
 
-    <div class="d-flex justify-content-between">
-        <div class="d-flex">
-            <select name="yearsreglbl" class="populateyears" onchange="yeardatareglbl()" style="background: #eaeaea;
-                margin: 0 6px 10px;
-                width: 5em;
-                border-radius: 10px;">
+    
+    <div class="row">
+        <div class="col-8 p-2">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                <select name="yearsreglbl" class="populateyears" onchange="yeardatareglbl()" style="background: #eaeaea;
+                    margin: 0 6px 10px;
+                    width: 5em;
+                    border-radius: 10px;">
 
 
-                </select>
-          <!-- <div class="me-2">
-            Du <br>
-            <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="startdate">
-          </div> -->
-          <!-- <div>
-            Au <br>
-            <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="enddate">
-          </div>
-          <button class="btn btn-sm bg-dark text-white filterreglsuppdate">Filtrer</button> -->
+                    </select>
+            <!-- <div class="me-2">
+                Du <br>
+                <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="startdate">
+            </div> -->
+            <!-- <div>
+                Au <br>
+                <input type="date" value="{{today|date:'Y-m-d'}}" name="" id="" class="enddate">
+            </div>
+            <button class="btn btn-sm bg-dark text-white filterreglsuppdate">Filtrer</button> -->
 
+                </div>
+                <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistreglsupp">
+
+            </div>
+            <div style="height: 70vh; overflow-y: scroll;" >
+            <table class="table table-bordered reglsupptable" style="font-size: 12px;">
+                <thead style="position: static; top: 0; background: gray;">
+                    <th>
+                        Series
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        N°
+                    </th>
+                    <th>
+                        Mantant
+                    </th>
+                    <th>
+                        Date saisie
+                    </th>
+                    <th>
+                        Fournisseur
+                    </th>
+        
+                    <th>
+                        Echeance
+                    </th>
+                    <th>
+                        N° Bons
+                    </th>
+                </thead>
+                <tbody>
+                    {% for i in reglements %}
+                    <tr>
+                            <td>
+                                REGLFOURN#{{i.id}}
+                            </td>
+                            <td>
+                                {{i.mode}}
+                            </td>
+                            <td>
+                                {{i.npiece}}
+                            </td>
+                            <td>
+                                {{i.amount}}
+                            </td>
+                            <td>
+                                {{i.date|date:"d/m/Y"}}
+                            </td>
+                            <td>
+                                {{i.supplier.name}}
+                            </td>
+                            <td>
+                                {{i.echeance|date:"d/m/Y"}}
+                            </td>
+                            <td class="d-flex justify-content-between">
+        
+                                <!-- <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" data-tooltip=" {% for bon in i.bons.all %}{{ bon.nbon }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                                </button> -->
+        
+                                <button class="btn btn-success btn-sm" onclick="updatereglementsupp('{{i.id}}')">✐</button>
+                                {% if not i.ispaid %}
+                                {% if i.mode == 'effet' or i.mode == 'cheque' %}
+                                    <button reglid="{{i.id}}" reglmode="{{i.mode}}" rglnpiece="{{i.npiece}}" onclick="selectregl('{{i.id}}', '{{i.mode}}', '{{i.npiece}}', '{{i.amount}}')" class="btn btn-dark bi bi-arrow-right"></button>
+                                {% endif %}
+                                {% endif %}
+                            </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
         </div>
-        <input style="width:20em" type="text" name="" id="" placeholder="Recherche" class="searchinputlistreglsupp">
-
-    </div>
-    <div style="height: 70vh; overflow-y: scroll;" >
-      <table class="table table-bordered reglsupptable" style="font-size: 12px;">
-          <thead style="position: static; top: 0; background: gray;">
-            <th>
-                Series
-            </th>
-            <th>
-                Type
-            </th>
-              <th>
-                  N°
-              </th>
-              <th>
-                  Mantant
-              </th>
-              <th>
-                  Date saisie
-              </th>
-              <th>
-                  Fournisseur
-              </th>
-
-              <th>
-                  Echeance
-              </th>
-              <th>
-                  N° Bons
-              </th>
-          </thead>
-          <tbody>
-               {% for i in reglements %}
-               <tr>
-                    <td>
-                        REGLFOURN#{{i.id}}
-                    </td>
-                     <td>
-                          {{i.mode}}
-                     </td>
-                     <td>
-                          {{i.npiece}}
-                     </td>
-                     <td>
-                          {{i.amount}}
-                     </td>
-                     <td>
-                          {{i.date|date:"d/m/Y"}}
-                     </td>
-                     <td>
-                          {{i.supplier.name}}
-                     </td>
-                     <td>
-                          {{i.echeance|date:"d/m/Y"}}
-                     </td>
-                     <td class="d-flex justify-content-between">
-
-                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" data-tooltip=" {% for bon in i.bons.all %}{{ bon.nbon }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-                        </button>
-
-                        <button class="btn btn-success btn-sm" onclick="updatereglementsupp('{{i.id}}')">✐</button>
-                     </td>
-               </tr>
-               {% endfor %}
-          </tbody>
-      </table>
+        <div class="col-4">
+            <div class="bg-white p-2 border">
+              <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
+                <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab()">x</button> -->
+                <!-- <div>
+                  Transfer
+                </div> -->
+                <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab()">↻</button> -->
+              </div>
+        
+              <div>
+                date:
+                <input type="date" class="form-control mb-2 dateregl">
+                <input type="text" class="form-control mb-2 nrecu" placeholder="N° reçu">
+                <select class="form-control bank">
+                  <option value="">-- Banque--</option>
+                  {% for i in banks %}
+                  <option value="{{i.id}}">
+                    {{i.name}} ({{i.rib}})
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="mt-3 reglholder" ids="[]" style="height: 60vh; overflow: scroll;">
+        
+                </div>
+                <button class="btn bg-darkblue w-100 text-white" onclick="payreglementsupp()">Transfer</button>
+              </div>
+        
+            </div>
+        </div>
     </div>
     <div class="card-body row">
-      <div class="col-4">
-      </div>
+        
     </div>
 </div>
 
 
 <script>
-    function payreglementsupp(reglid){
-        banktarget=$('.banktarget').val()
-        if (banktarget==''){
-            alertify.error('Bank is required')
-            return
+    function selectregl(reglid, reglmode, reglpiece, reglamount){
+    ids=JSON.parse($('.reglholder').attr('ids'))
+    if (ids.includes(reglid)){
+      alertify.error('Déja ajouté')
+      return
+    }
+    $('.reglholder').attr('ids', JSON.stringify(ids.concat(reglid)))
+    $('.reglholder').append(`
+      <div class="d-flex justify-content-between bg-darkblue text-white p-2 mb-2">
+        <div>
+          ${reglpiece} - ${reglmode} - ${reglamount}
+        </div>
+        <button class="btn bg-danger text-white" onclick="removeregl(event, ${reglid})">X</button>
+      </div>
+    `)
+    
+  }
+  function selectregl(reglid, reglmode, reglpiece, reglamount){
+    ids=JSON.parse($('.reglholder').attr('ids'))
+    if (ids.includes(reglid)){
+      alertify.error('Déja ajouté')
+      return
+    }
+    $('.reglholder').attr('ids', JSON.stringify(ids.concat(reglid)))
+    $('.reglholder').append(`
+      <div class="d-flex justify-content-between bg-darkblue text-white p-2 mb-2">
+        <div>
+          ${reglpiece} - ${reglmode} - ${reglamount}
+        </div>
+        <button class="btn bg-danger text-white" onclick="removeregl(event, ${reglid})">X</button>
+      </div>
+    `)
+    
+  }
+  function removeregl(event, reglid){
+    $(event.target).parent().remove()
+    ids=JSON.parse($('.reglholder').attr('ids'))
+    $('.reglholder').attr('ids', JSON.stringify(ids.filter(id=>id!=reglid)))
+  }
+  function payreglementfc(event, reglid) {
+    console.log(consecutiveClicksfc)
+
+      // User has clicked the element four times consecutively
+      // Add your code to run when there are four consecutive clicks here
+      alertify.confirm('Payer', 'Payer le reglement', function(){
+        $.get('/products/payreglfc', {'reglid': reglid}, (data)=>{
+          $(event.target).parent().parent().css('background', 'yellowgreen')
+          necheance=parseInt($('.echeanceindex').text())
+          if (necheance>0){
+            $('.echeanceindex').text(necheance-1)
+          }
+        })
+        // Reset the count
+
+      }
+        , function(){ alertify.error('Cancel')});
+      // Reset the count
+
+
+  }
+  // transfer
+  function payreglementsupp() {
+    nrecu=$('.nrecu').val()
+    dateregl=$('.dateregl').val()
+    bank=$('.bank').val()
+    ids=JSON.parse($('.reglholder').attr('ids'))
+    if (nrecu==''||bank==''||dateregl==''||ids.length==0){
+      alertify.error('N° reçu, Banque, reglements')
+      return
+
+    }
+    console.log(ids, nrecu, bank)
+        // User has clicked the element four times consecutively
+        // Add your code to run when there are four consecutive clicks here
+    alertify.confirm('Payer', 'Payer le reglement', function(){
+      $.get('/products/payreglsupp', {'ids': JSON.stringify(ids), 'bank':bank, 'nrecu':nrecu, 'dateregl':dateregl}, (data)=>{
+        necheance=parseInt($('.echeanceindexcl').text())
+        if (necheance>0){
+          $('.echeanceindexcl').text(necheance-1)
         }
-        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
-            if (value=='ORGHAD'){
-                $.get('/products/payreglementsupp', {
-                    'reglid':reglid,
-                    'banktarget':banktarget,
-                }, (data)=>{
-                    if (data.success){
-                        updatereglementsupp(reglid)
-                    }
-                })
+        ajaxpage('add', '+ Article', '/products/listreglementsupp?target={{target}}')
+      })
+      // Reset the count
+
+    }
+      , function(){ alertify.error('Cancel')});
+
+
+  }
+    // egl single reglement
+    // function payreglementsupp(reglid){
+    //     banktarget=$('.banktarget').val()
+    //     if (banktarget==''){
+    //         alertify.error('Bank is required')
+    //         return
+    //     }
+    //     alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+    //         if (value=='ORGHAD'){
+    //             $.get('/products/payreglementsupp', {
+    //                 'reglid':reglid,
+    //                 'banktarget':banktarget,
+    //             }, (data)=>{
+    //                 if (data.success){
+    //                     updatereglementsupp(reglid)
+    //                 }
+    //             })
             
-        }
+    //     }
+    //     }, function() { alertify.error('Cancel') });
+    // }
+    function refusedreglsupp(reglid){
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+            console.log('>> value', value)
+            if (value=='ORGHAD'){
+                console.log('>> sending efused')
+                $.get('/products/refusedreglsupp', {'reglid':reglid}, (data)=>{
+                    ajaxpage('add', '+ Article', '/products/listreglementsupp?target={{target}}')
+                })
+            }else{
+                alertify.error('Mot de passe')
+            }
         }, function() { alertify.error('Cancel') });
     }
     populateyears()

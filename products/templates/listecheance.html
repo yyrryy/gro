@@ -189,17 +189,20 @@
 
 
   }
-
-function refusedreglfc(event, reglfcid){
-  $.get('/products/refusedreglfc', {'reglfcid':reglfcid}, (data)=>{
-    $(event.target).parent().parent().css({'background':'#f37e46'})
-  })
-}
-function refusedreglbl(event, reglblid){
-  $.get('/products/refusedreglbl', {'reglblid':reglblid}, (data)=>{
-    $(event.target).parent().parent().css({'background':'#f37e46'})
-  })
-}
+  function refusedreglbl(reglid){
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value', function(evt, value) { 
+            console.log('>> value', value)
+            if (value=='ORGHAD'){
+                console.log('>> sending efused')
+                $.get('/products/refusedreglbl', {'reglid':reglid}, (data)=>{
+                    ajaxpage('add', '+ Article', '/products/listreglementbl?target={{target}}')
+                })
+            }else{
+                alertify.error('Mot de passe')
+            }
+        }, function() { alertify.error('Cancel') });
+    }
+    
 $('.searchinputlistecheance').on("keyup", function() {
     // Get the values from all filter input fields
     var filterValue = $(this).val().toLowerCase();

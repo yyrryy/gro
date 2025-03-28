@@ -2916,6 +2916,7 @@ def listreglementbl(request):
         'reglements':reglements,
         'today':timezone.now().date(),
         'target':target,
+        'banks':Bank.objects.all()
     }
     # if reglements:
     #     ctx['total']=round(PaymentClientbl.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
@@ -3052,7 +3053,8 @@ def listreglementsupp(request):
         'reglements':reglements,
         'target':target,
         'suppliers':Supplier.objects.all(),
-        'today':timezone.now().date()
+        'today':timezone.now().date(),
+        'banks':Bank.objects.all()
     }
     # if reglements:
     #     ctx['total']=round(PaymentSupplier.objects.filter(date__year=thisyear).aggregate(Sum('amount'))['amount__sum'], 2)
@@ -6140,7 +6142,7 @@ def filterreglbldate(request):
     print(bons)
     return JsonResponse({
         'html':render(request, 'reglbllist.html', {'bons':bons}).content.decode('utf-8'),
-        'total':round(bons.aggregate(Sum('amount')).get('amount__sum'), 2),
+        #'total':round(bons.aggregate(Sum('amount')).get('amount__sum'), 2),
 
     })
 
@@ -10818,9 +10820,28 @@ def refusedreglfc(request):
     })
 
 def refusedreglbl(request):
-    reglblid=request.GET.get('reglblid')
-    regl=PaymentClientbl.objects.get(pk=reglblid)
+    reglid=request.GET.get('reglid')
+    regl=PaymentClientbl.objects.get(pk=reglid)
     regl.refused=True
+    regl.ispaid=False
+    regl.save()
+    bank=regl.targetbank
+    bank.total-=regl.amount
+    bank.save()
+    regl.targetbank=None
+    return JsonResponse({
+        'success':True
+    })
+
+def refusedreglsupp(request):
+    reglid=request.GET.get('reglid')
+    regl=PaymentSupplier.objects.get(pk=reglid)
+    regl.refused=True
+    regl.ispaid=False
+    bank=regl.targetbank
+    bank.total+=regl.amount
+    bank.save()
+    regl.targetbank=None
     regl.save()
     return JsonResponse({
         'success':True

@@ -4,21 +4,23 @@
     </strong>
     {% if not reglement.mode == 'espece' %}
             {% if reglement.ispaid %}
-                <div class="alert alert-success">Reglement Payé {% if reglement.nrecu%} N° recu:{{reglement.nrecu}}{%endif%}</div>
+                <div class="alert alert-success">Reglement Payé {% if reglement.nrecu%} N° recu:{{reglement.nrecu}}{%endif%} <br>
+                    <button class="btn btn-danger" onclick="refusedreglsupp('{{reglement.id}}')">Impyé</button>
+                </div>
             {% else %}
             
             <button class="btn btn-danger bi bi-trash" onclick="deletereglementsupplier('{{reglement.id}}')"></button>
             {% if reglement.echeance <= today %}
             <div>
-                <select class="banktarget">
+                <!-- <select class="banktarget">
                     <option value="">Selectionner une banque</option>
                     {% for i in banks %}
                             <option value="{{i.id}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
                     <button class="btn btn-info" onclick="payreglementsupp('{{reglement.id}}')">Payé</button>
-
-                </div>
+-->
+                </div> 
                 {% endif %}
                 {% endif %}
                 {% else %}
