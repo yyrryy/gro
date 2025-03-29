@@ -419,6 +419,7 @@ urlpatterns = [
     path('echeanceclient', checkviews.echeanceclient, name='echeanceclient'),
     path('echeancesupp', checkviews.echeancesupp, name='echeancesupp'),
     path('downloadcreditclient', checkviews.downloadcreditclient, name='downloadcreditclient'),
+    path('downloadallclient', checkviews.downloadallclient, name='downloadallclient'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),
     # path('checkfactureno', checkviews.checkfactureno, name='checkfactureno'),

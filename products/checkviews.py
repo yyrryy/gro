@@ -3342,6 +3342,7 @@ def transfertfromcaisse(request):
     sourceid=request.GET.get('sourceid')
     caisse=Caisse.objects.get(pk=sourceid)
     amount=request.GET.get('amount')
+    date=request.GET.get('date')
     caissetarget=request.GET.get('caissetarget') or None
     banktarget=request.GET.get('banktarget') or None
     if caissetarget:
@@ -3357,7 +3358,9 @@ def transfertfromcaisse(request):
         banktarget.total+=float(amount)
         banktarget.save()
     caisse.save()
-    Transfer.objects.create(caissesource=caisse, caissetarget=caissetarget, amount=amount, banktarget=banktarget)
+    Transfer.objects.create(caissesource=caisse, caissetarget=caissetarget, amount=amount, 
+    banktarget=banktarget,
+    date=date)
     return JsonResponse({
         'success':True
     })
@@ -3366,6 +3369,7 @@ def transfertfrombank(request):
     sourceid=request.GET.get('sourceid')
     bank=Bank.objects.get(pk=sourceid)
     amount=request.GET.get('amount')
+    date=request.GET.get('date')
     caissetarget=request.GET.get('caissetarget') or None
     banktarget=request.GET.get('banktarget') or None
     print('ssorce', bank, 'amount', amount, 'caissetarget', caissetarget, 'banktarget', banktarget, banktarget=='')
@@ -3382,7 +3386,7 @@ def transfertfrombank(request):
         banktarget.total+=float(amount)
         banktarget.save()
     bank.save()
-    Transfer.objects.create(banksource=bank, caissetarget=caissetarget, amount=amount, banktarget=banktarget)
+    Transfer.objects.create(banksource=bank, caissetarget=caissetarget, amount=amount, banktarget=banktarget, date=date)
     return JsonResponse({
         'success':True
     })
@@ -3513,11 +3517,25 @@ def downloadcreditclient(request):
     today = timezone.now().date()
     # sold if orgh or farah else soldbs
     if target=='f':
-        clients=[i for i in Client.objects.filter(clientfarah=True) if i.sold.sold!=0 ]
+        clients=[i for i in Client.objects.filter(clientfarah=True) if i.sold().sold!=0 ]
     elif target=='o': 
         clients=[i for i in Client.objects.filter(clientorgh=True) if i.sold().sold!=0 ]
     else:
-        clients=[i for i in Client.objects.filter(clientsortie=True) if i.soldbs.sold!=0 ]
+        clients=[i for i in Client.objects.filter(clientsortie=True) if i.soldbs().sold!=0 ]
+    print(">> counts", clients)
+    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
+    
+def downloadallclient(request):
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    today = timezone.now().date()
+    # sold if orgh or farah else soldbs
+    if target=='f':
+        clients= Client.objects.filter(clientfarah=True) 
+    elif target=='o': 
+        clients=Client.objects.filter(clientorgh=True) 
+    else:
+        clients=Client.objects.filter(clientsortie=True)
     print(">> counts", clients)
     return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
     

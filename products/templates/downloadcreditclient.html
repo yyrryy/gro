@@ -61,7 +61,7 @@
 
                 </td>
                 <td>
-                    {{i.sold.bons}}
+                    {% if target == 's'%}{{i.soldbs.bons}}{%else%}{{i.sold.bons}}{% endif %}
                 </td>
                 <td>
                     {{i.sold.avoirs}}
@@ -73,10 +73,10 @@
                     {{i.sold.avances}}
                 </td>
                 <td>
-                    {{i.sold.remise}}
+                    {% if target == 's'%}{{i.soldbs.remise}}{%else%}{{i.sold.remise}}{% endif %}
                 </td>
                 <td>
-                    {{i.sold.sold}}
+                    {% if target == 's'%}{{i.soldbs.sold}}{%else%}{{i.sold.sold}}{% endif %}
                 </td>
             </tr>
             {% endfor %}

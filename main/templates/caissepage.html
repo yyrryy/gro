@@ -59,6 +59,10 @@
                                 <div id="transfercaisse{{item.id}}" class="collapse">
                                     <div class="d-flex">
                                         <div class="form-group me-2">
+                                            <label for="name">Date</label>
+                                            <input type="date" class="form-control datefromcaisse{{item.id}}" placeholder="0.00">
+                                        </div>
+                                        <div class="form-group me-2">
                                             <label for="name">Mantant</label>
                                             <input type="number" class="form-control mantantfromcaisse{{item.id}}" placeholder="0.00">
                                         </div>
@@ -155,6 +159,10 @@
                             <div id="transferbank{{item.id}}" class="collapse">
                                 <div class="d-flex">
                                     <div class="form-group me-2">
+                                        <label for="name">Date</label>
+                                        <input type="date" class="form-control datefrombank{{item.id}}" placeholder="0.00">
+                                    </div>
+                                    <div class="form-group me-2">
                                         <label for="name">Mantant</label>
                                         <input type="number" class="form-control mantantfrombank{{item.id}}" placeholder="0.00">
                                     </div>
@@ -205,6 +213,11 @@
     function transfertfromcaisse(id, caissetotal){
         var targetcaisse = $('.targetcaissefromcaisse'+id).val();
         var mantant = $('.mantantfromcaisse'+id).val();
+        var date = $('.datefromcaisse'+id).val();
+        if (date==''){
+            alertify.error('Veuillez saisir une date');
+            return;
+        }
         if (mantant==''||mantant<=0){
             alertify.error('Veuillez saisir un mantant');
             return;
@@ -225,6 +238,7 @@
         }
         $.get('/products/transfertfromcaisse',{
             amount:mantant,
+            date:date,
             caissetarget: targetcaisse,
             banktarget: targetbank,
             sourceid: id
@@ -236,6 +250,11 @@
     
     function transfertfrombank(id, caissetotal){
         var mantant = $('.mantantfrombank'+id).val();
+        var date = $('.datefrombank'+id).val();
+        if (date==''){
+            alertify.error('Veuillez saisir une date');
+            return;
+        }
         if (mantant==''||mantant<=0){
             alertify.error('Veuillez saisir un mantant');
             return;
@@ -257,6 +276,7 @@
         }
         $.get('/products/transfertfrombank',{
             amount:mantant,
+            date:date,
             caissetarget: targetcaisse,
             banktarget: targetbank,
             sourceid: id
