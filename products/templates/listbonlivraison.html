@@ -271,6 +271,7 @@
       $('.searchinputlistbl').attr('waiting', '0')
       $('.searchinputlistbl').attr('searchtype', 'valid')
       $('.listblbody').html(data.html)
+      $('.hidebltotal').html(data.total)
       $('.listblbody').removeClass('blurred')
     })
   }
@@ -333,7 +334,7 @@
     $('.listblholder').on('scroll', handleScrolllistbl);
     $.get('/products/yeardatabl', {year:year}, (data)=>{
       $('.listblbody').html(data.trs)
-      $('.totalbons').text(data.total)
+      $('.hidebltotal').text(data.total)
     })
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
@@ -409,7 +410,7 @@
         $('.listblbody').removeClass('blurred')
 
         $('.listblbody').html(data.html)
-      $('.totalbons').text(data.total)
+      $('.hidebltotal').text(data.total)
       }
     )
   }
@@ -424,10 +425,10 @@
       return
     }
     searchtype=$('.searchinputlistbl').attr('searchtype')
-    $.get('/products/filterbldate', {startdate:startdate, enddate:enddate, 'searchtype':searchtype},(data)=>{
+    $.get('/products/filterbldate', {startdate:startdate, enddate:enddate, 'searchtype':searchtype, 'target':'{{target}}'},(data)=>{
       console.log(data)
       $('.listblbody').html(data.trs)
-      $('.totalbons').text(data.total)
+      $('.hidebltotal').text(data.total)
     })
     // activate scrolling only if we are in wating mode
     if (searchtype=='waiting'){
@@ -459,7 +460,7 @@
         
         $(".listbltable tbody").html('')
         $(".listbltable tbody").html(data.trs)
-        $('.totalbons').text(data.total)
+        $('.hidebltotal').text(data.total)
         });
       $('.listblholder').on('scroll', handleScrolllistbl);
       currentPagelistbl=1

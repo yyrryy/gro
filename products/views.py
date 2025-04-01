@@ -2082,10 +2082,10 @@ def listbonlivraison(request):
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
         bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
-        total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+        total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
     else:
         bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
-        total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year).aggregate(Sum('total')).get('total__sum')
+        total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
         'bons':bons,
@@ -5418,11 +5418,14 @@ def filterbldate(request):
     print('>> searchtype', searchtype)
     if searchtype=="waiting":
         bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum') or 0
     elif searchtype=="valid":
         print('>> searchtype is valid')
         bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).order_by('-bon_no')
+        total=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=True).aggregate(Sum('total')).get('total__sum') or 0
     else:
         bons=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).order_by('-bon_no')
+        total=Bonlivraison.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).aggregate(Sum('total')).get('total__sum') or 0
     # trs=''
     # for i in bons:
     #     trs+=f'''
@@ -5459,10 +5462,9 @@ def filterbldate(request):
     #     '''
     ctx={
         'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
+        'total':total
 
     }
-    if bons:
-        ctx['total']=round(Bonlivraison.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 
 def filterbsdate(request):
@@ -6039,7 +6041,8 @@ def filterfcdate(request):
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     print('>> isvalid', isvalid)
     bons=Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).order_by('-facture_no')[:50]
-    
+    total=round(Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).aggregate(Sum('total')).get('total__sum') or 0, 2)
+    totaltva=round(Facture.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).aggregate(Sum('tva')).get('tva__sum') or 0, 2)
     # trs=''
     # for i in bons:
     #     trs+=f'''
@@ -6072,11 +6075,10 @@ def filterfcdate(request):
     #       </tr>
     #     '''
     ctx={
-        'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8')
+        'trs':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),
+        'total':total,
+        'totaltva':totaltva,
     }
-    if bons:
-        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
-        ctx['totaltva']=round(bons.aggregate(Sum('tva')).get('tva__sum'), 2)
     return JsonResponse(ctx)
     # return JsonResponse({
     #     'html':render(request, 'fclist.html', {'bons':bons}).content.decode('utf-8'),

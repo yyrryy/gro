@@ -2348,7 +2348,7 @@ def getbonvalider(request):
         'valider':1
     }
     if bons:
-        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['total']=round(Bonlivraison.objects.filter(isfarah=isfarah, isvalid=True).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 def getbonachatvalider(request):
     target=request.GET.get('target')
@@ -2372,7 +2372,7 @@ def getfacturevalider(request):
         'total':0,
     }
     if factures:
-        ctx['total']=round(factures.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['total']=round(Facture.objects.filter(isfarah=isfarah, isvalid=True).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 
 def getfactureachatvalider(request):

@@ -361,6 +361,7 @@
     $('.listfcbody').addClass('blurred')
     $.get('/products/getfacturevalider?target={{target}}', (data)=>{
       $('.listfcbody').html(data.html)
+      $('.totalfc').html(data.total)
       $('.listfcbody').removeClass('blurred')
     })
   }
@@ -664,8 +665,8 @@ $('.filterfcdate').on('click', function(){
     $.get('/products/filterfcdate', {startdate:startdate, enddate:enddate, 'target':'{{target}}', 'waiting':waiting},(data)=>{
       console.log(data)
       parentdiv.find('tbody').html(data.trs)
-      parentdiv.find('.totalfc').text(data.total)
-      parentdiv.find('.totalfctva').text(data.totaltva)
+      $('.totalfc').text(data.total)
+      $('.totalfctva').text(data.totaltva)
     })
   })
 $('.searchinputlistfactures').on("change", function() {
