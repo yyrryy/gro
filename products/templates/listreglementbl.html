@@ -346,6 +346,18 @@
                                 <div>
                                     Mantant a payé <strong class="whattopay">0.00</strong>DH
                                 </div>
+                                <button class="btn btn-success col-4" onclick="$('.confirmregl').toggleClass('d-none')">
+                                    Regler situation
+                                </button>
+                                <div class="confirmregl row col-4 d-none">
+                                    Confirmer le reglement?
+                                    <button class="btn btn-success col-6" onclick="reglsituation()">
+                                        Oui
+                                    </button>
+                                    <button class="btn btn-danger col-6" onclick="$('.confirmregl').addClass('d-none')">
+                                        Non
+                                    </button>
+                                </div>
                                 <div class="row">
                                     <small>Date reglement:</small>
                                     <div class="col-4">
@@ -597,6 +609,33 @@
 
 
 <script>
+    function reglsituation(){
+        selectedValues = $("input[name='bonstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        selectedavoirs = $("input[name='avoirstopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        
+        selectedavances = $("input[name='avancestopay']:checked").map(function() {
+            return this.value;
+        }).get()
+        clientid=$('[name="addreglementclientsbl"]').val()
+        date=$('[name="datereglementclientbl"]').val()
+        $.get('/products/reglsituation', {
+            bons:JSON.stringify(selectedValues),
+            avoirs:JSON.stringify(selectedavoirs),
+            avances:JSON.stringify(selectedavances),
+            clientid:clientid,
+            date:date,
+            moderegl:$('.moderegl').val(),
+            target:'{{target}}',
+        }, (data)=>{
+            if (data.success){
+                ajaxpage('add', '+ Article', '/products/listreglementbl?target={{target}}')
+            }
+        })
+    }
     function selectregl(reglid, reglmode, reglpiece, reglamount){
     ids=JSON.parse($('.reglholder').attr('ids'))
     if (ids.includes(reglid)){

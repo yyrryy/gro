@@ -3324,8 +3324,6 @@ def reglebons(request):
         livraisons=Facture.objects.filter(pk__in=bons)
     avoirs=Avoirclient.objects.filter(pk__in=avoirs)
     avances=Avanceclient.objects.filter(pk__in=avances)
-    avoirs.update(inreglement=True)
-    avances.update(inreglement=True)
     totalmantant=sum(mantant)
     totalbons=livraisons.aggregate((Sum('total')))['total__sum'] or 0
     if totalmantant>whattopay:
@@ -3390,6 +3388,9 @@ def reglebons(request):
             regl.save()
         regl.avoirs.set(avoirs)
         regl.avances.set(avances)
+        avoirs.update(inreglement=True)
+        avances.update(inreglement=True)
+        livraisons.update(ispaid=True)
         caisse=Caisse.objects.filter(target=target).first()
         if mod=='espece':
             if caisse:
@@ -4068,17 +4069,17 @@ def relevclient(request):
         bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
         avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True, isavoir=False)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True, isavoir=False, amount__gt=0)
     elif target=="s":
         bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
         avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, isavoir=False)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, isavoir=False, amount__gt=0)
     else:
         bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
         avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True, ispaid=False)
         avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True, isavoir=False)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True, isavoir=False, amount__gt=0)
         #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
@@ -11609,4 +11610,51 @@ def vv(request):
         i.save()
     return JsonResponse({
         'rr':True
+    })
+
+def reglsituation(request):
+    bons=json.loads(request.GET.get('bons'))
+    avoirs=json.loads(request.GET.get('avoirs'))
+    avances=json.loads(request.GET.get('avances'))
+    clientid=request.GET.get('clientid')
+    target=request.GET.get('target')
+    print('>> target', target)
+    moderegl=request.GET.get('moderegl')
+    date=request.GET.get('date')
+    if moderegl=='bl':
+        if target=='s':
+            livraisons=Bonsortie.objects.filter(pk__in=bons)
+        else:
+            livraisons=Bonlivraison.objects.filter(pk__in=bons)
+    else:
+        livraisons=Facture.objects.filter(pk__in=bons)
+    avoirs=Avoirclient.objects.filter(pk__in=avoirs)
+    avances=Avanceclient.objects.filter(pk__in=avances)
+    regl=PaymentClientbl.objects.create(
+        client_id=clientid,
+        amount=0,
+        #today
+        # date=timezone.now().date(),
+        date=date,
+        mode="Rsituation",
+        isfarah=target=='f',
+        isorgh=target=='o',
+        issortie=target=='s'
+    )
+    if moderegl=='bl':
+        if target=='s':
+            regl.bonsortie.set(livraisons)
+        else:
+            regl.bons.set(livraisons)
+    else:
+        regl.factures.set(livraisons)
+        regl.usedinfacture=True
+        regl.save()
+    regl.avoirs.set(avoirs)
+    regl.avances.set(avances)
+    avoirs.update(inreglement=True)
+    avances.update(inreglement=True)
+    livraisons.update(ispaid=True)
+    return JsonResponse({
+        'success':True
     })
