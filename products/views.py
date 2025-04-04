@@ -1464,17 +1464,23 @@ def supplierinfo(request, id):
     return render(request, 'supplierinfo.html', ctx)
 
 def clientinfo(request, id):
-    target=request.GET.get('targegt')
+    target=request.GET.get('target')
     isfarah=target=='f'
     client=Client.objects.get(pk=id)
+    if target=='s':
+        bons=Bonsortie.objects.filter(client=client, total__gt=0)
+    else:
+        bons=Bonlivraison.objects.filter(isfarah=isfarah, client=client, total__gt=0)
     ctx={
         'target':target,
         'client':client,
         'totalavoirs':Avoirclient.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
         'totalpayments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
         'totaltr':Bonlivraison.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
-        'bons':Bonlivraison.objects.filter(isfarah=isfarah, client=client, total__gt=0),
-        'payments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client)
+        'bons':bons,
+        'payments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client),
+        'avoirs':Avoirclient.objects.filter(client=client),
+        'title':f'Compte client: {client.name}'
     }
     return render(request, 'clientinfo.html', ctx)
 

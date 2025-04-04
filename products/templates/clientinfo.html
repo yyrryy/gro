@@ -1,14 +1,78 @@
 {% load global_tags %}
 <div class="row">
+    
     <div class="col-3">
         <div class="bg-white p-2">
+            <button class="bi bi-arrow-left w-100" onclick="ajaxpage('ff', 'j', '/products/clientspage?target={{target}}')">List clients</button>
+            
             <table class="table table-bordered">
+                <tr>
+                    <td>
+                        Client
+                    </td>
+                    <td>
+                        {{client.name}}
+                        
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         Sold Client
                     </td>
                     <td>
-                        {{client.sold|floatformat:2|intspace}}
+                        {% if target == 's' %}
+                        {{client.soldbs.sold|floatformat:2|intspace}}
+                        {% else %}
+                        {{client.sold.sold|floatformat:2|intspace}}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total bons
+                    </td>
+                    <td>
+                        {% if target == 's' %}
+                        {{client.soldbs.bons|floatformat:2|intspace}}
+                        {% else %}
+                        {{client.sold.bons|floatformat:2|intspace}}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total Avoirs
+                    </td>
+                    <td>
+                        {{client.sold.avoirs|floatformat:2|intspace}}
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total reglement
+                    </td>
+                    <td>
+                        {{client.sold.reglements|floatformat:2|intspace}}
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total avances
+                    </td>
+                    <td>
+                        {{client.sold.avances|floatformat:2|intspace}}
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Total remise
+                    </td>
+                    <td>
+                        {{client.soldbs.remise|floatformat:2|intspace}}
+                        
                     </td>
                 </tr>
                 <!-- <tr>
