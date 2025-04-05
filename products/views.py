@@ -1762,7 +1762,7 @@ def getclientdata(request):
     client=Client.objects.get(pk=id)
     return JsonResponse({
         'html':render(request, 'clientmodaldata.html', {'client':client, 'target':target}).content.decode('utf-8'),
-        'sold':client.sold()
+        'sold':client.sold().sold
     })
 
     # return JsonResponse({
@@ -4129,21 +4129,22 @@ def relevclientnr(request):
     print('>> target', target)
     if target=="f":
         print('>>> here in farah', clientid, )
-        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True, ispaid=False)
-        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True, isavoir=False)
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True, ispaid=False)
+        
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True, ispaid=False, inreglement=False)
+        avances=[]
+        reglementsbl=[]
     elif target=="s":
         bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, ispaid=False)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True, ispaid=False)
-        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, inreglement=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True, ispaid=False, inreglement=False)
+        avances=[]
         reglementsbl=[]
         #reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True, isavoir=False, inreglement=False)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
-        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True, ispaid=False)
-        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
-        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True, isavoir=False)
+        bons=Bonlivraison.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False, ispaid=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True, ispaid=False, inreglement=False)
+        avances=[]
+        reglementsbl=[]
         #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
     # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)

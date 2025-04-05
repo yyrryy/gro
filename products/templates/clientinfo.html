@@ -218,8 +218,20 @@
             </div>
         </div>
         </div>
-        </div>
-<div class="row col-md-9">
+    </div>
+    <div class="row col-md-9">
+        <div>
+            <button class="btn border btnselect btn-dark" style="
+            border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); $('.tables').addClass('d-none'); $('.bons').removeClass('d-none')">Bons</button>
+            <button class="btn border btnselect btn-dark active" style="
+            border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Factures</button>
+            <button class="btn border btnselect btn-dark" style="
+            border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonvalider()">Avoirs</button>
+            <button class="btn border btnselect btn-dark" style="
+            border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getcanceledbons()">Reglement</button>
+            <button class="btn border btnselect btn-dark" style="
+            border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getcanceledbons()">Avances</button>
+          </div>
         <!-- <br>
         <button type="button" class="btn btn-success addoneproduct" data-toggle="modal" data-target="#exampleModal">
             Ajouter+
