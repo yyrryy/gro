@@ -1776,14 +1776,14 @@ def getclientbonsforfacture(request):
     target=request.POST.get('target')
     print('>> target', target)
     if target=='s':
-        bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('date')
+        bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('bon_no')
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     elif target=='f':
-        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=True).order_by('date')[:50]
-        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=True).order_by('bon_no')
+        total=round(bons.aggregate(Sum('total')).get('total__sum')or 0,  2)
     else:
-        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=False).order_by('date')[:50]
-        total=round(Bonlivraison.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
+        bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=False).order_by('bon_no')
+        total=round(bons.aggregate(Sum('total')).get('total__sum')or 0,  2)
     trs=''
     for i in bons:
         # old code, if reglement is paid it's checked from here

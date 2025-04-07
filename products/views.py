@@ -4244,7 +4244,7 @@ def sendrelevclientfc(request):
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     if target=='f':
         avoirs=Avoirclient.objects.filter(client=client, date__range=[startdate, enddate])
-        reglementsfc=PaymentClientfc.objects.filter(client=client, date__range=[startdate, enddate])
+        reglementsfc=PaymentClientbl.objects.filter(client=client, date__range=[startdate, enddate])
 
         bons=Facture.objects.filter(client=client, date__range=[startdate, enddate], isfarah=True)
     else:
@@ -10924,23 +10924,43 @@ def relevsuppprint(request):
         })
 
 def relevfcprint(request):
+    target=request.GET.get('target')
+    
     clientid=request.GET.get('clientid')
     client=Client.objects.get(pk=clientid)
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=True, date__range=[startdate, enddate])
-    reglementsfc=PaymentClientfc.objects.filter(client_id=clientid, date__range=[startdate, enddate])
-
-    bons=Facture.objects.filter(client_id=clientid, date__range=[startdate, enddate])
+    if target=="f":
+        print('>>> here in farah', clientid, )
+        bons=Facture.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=True)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isfarah=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isfarah=True)
+    elif target=="s":
+        bons=Bonsortie.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], issortie=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], issortie=True)
+    else:
+        bons=Facture.objects.filter(client_id=clientid,  date__range=[startdate, enddate], isfarah=False)
+        avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate], isorgh=True)
+        avances=Avanceclient.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate], isorgh=True)
+        #bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0, isfarah=isfarah)
+    # totalcredit=round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
+    # totaldebit=round(bons.aggregate(Sum('total'))['total__sum'], 2)
+    # sold=round(totaldebit-totalcredit, 2)
 
     # chain all the data based on dates
     # first get all dates
+    print('>> bons, target', bons, target)
     releve = chain(*[
-    ((bon, 'Facture') for bon in bons),
+    ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
-    ((reglementfc, 'PaymentClientfc') for reglementfc in reglementsfc),
+    ((avance, 'avanceclient') for avance in avances),
+    ((reglementbl, 'PaymentClientbl') for reglementbl in reglementsbl),
     ])
 
     # Sort the items by date

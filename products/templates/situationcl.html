@@ -265,7 +265,7 @@
           alertify.error('ERRO')
           return
         }
-        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/relevfcprint?clientid='+clientid+'&datefrom='+datefrom+'&dateto='+dateto, '', 'width=900,height=900');
+        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/bons/bprint/12455t/relevfcprint?target={{target}}&clientid='+clientid+'&datefrom='+datefrom+'&dateto='+dateto, '', 'width=900,height=900');
 
           myWindow.focus();
         setTimeout(function() {
