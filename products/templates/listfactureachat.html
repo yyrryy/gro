@@ -648,7 +648,7 @@ $('.searchinputlistfactures').on("change", function() {
 
     }
     else{
-    $.get('/products/searchforlistfc', {'term':filterValue.trim(), 'year':year, 'startdate':$('.startdatelistfc').val(), 'enddate':$('.enddatelistfc').val()}, (data)=>{
+    $.get('/products/searchforlistfcachat', {'term':filterValue.trim(), 'year':year, 'startdate':$('.startdatelistfc').val(), 'enddate':$('.enddatelistfc').val()}, (data)=>{
       $(".facturestable tbody").html('')
       $(".facturestable tbody").html(data.trs)
       $('.totalfc').text(data.total)

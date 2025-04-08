@@ -8448,6 +8448,52 @@ def searchforlistfc(request):
 
     })
 
+def searchforlistfcachat(request):
+    term=request.GET.get('term')
+    waiting=request.GET.get('waiting')== '1'
+    target=request.GET.get('target')
+    searchedterm=request.GET.get('term')
+    startdate=request.GET.get('startdate') or '0'
+    enddate=request.GET.get('enddate') or '0'
+    print('>>', startdate, enddate)
+    year=request.GET.get('year')
+    isfarah=target=='f'
+
+    # Split the term into individual words separated by '*'
+    search_terms = term.split('+')
+
+    # Create a list of Q objects for each search term and combine them with &
+    q_objects = Q()
+    for term in search_terms:
+        print('>>>>>> term', term)
+        q_objects &= (
+            Q(supplier__name__iregex=term)|
+            Q(supplier__city__iregex=term)|
+            Q(facture_no__iregex=term)|
+            Q(bon__nbon__iregex=term)|
+            Q(supplier__code__iregex=term)|
+            Q(total__iregex=term)
+        )
+
+    print('>>>> search list fc, startdate and enddate are 0')
+    bons=Factureachat.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no')[:50]
+    total=round(Factureachat.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        
+    # if year=='0':
+    #     bons=Facture.objects.filter(q_objects).filter(date__year=thisyear).order_by('-facture_no')[:50]
+    #     total=round(Facture.objects.filter(q_objects).filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
+    # else:
+    #     bons=Facture.objects.filter(q_objects).filter(date__year=year).order_by('-facture_no')[:50]
+    #     total=round(Facture.objects.filter(q_objects).filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
+
+    return JsonResponse({
+        'trs':render(request, 'fcachatlist.html', {'bons':bons}).content.decode('utf-8'),
+        'total':total,
+
+    })
+
+
+
 def createnewclientaccount(request):
     clientid=request.POST.get('clientid')
     client= Client.objects.get(pk=clientid)
