@@ -4119,11 +4119,11 @@ def relevclient(request):
 
 
 def relevclientnr(request):
-    clientid=request.POST.get('clientid')
-    target=request.POST.get('target')
+    clientid=request.GET.get('clientid')
+    target=request.GET.get('target')
     client=Client.objects.get(pk=clientid)
-    startdate=request.POST.get('datefrom')
-    enddate=request.POST.get('dateto')
+    startdate=request.GET.get('datefrom')
+    enddate=request.GET.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     print('>> target', target)
@@ -4164,17 +4164,25 @@ def relevclientnr(request):
     sorted_releve = sorted(releve, key=lambda item: item[0].date)
 
 
-    return JsonResponse({
-        'html':render(request, 'relevecl.html', {
+    return render(request, 'releveclprint.html', {
             'releve':[sorted_releve[i:i+32] for i in range(0, len(sorted_releve), 32)],
             'client':client,
-
+            'title':"Situation client non reglé",
             'startdate':startdate,
             'enddate':enddate,
 
-        }).content.decode('utf-8'),
-        #'soldfc':client.soldfacture,
-    })
+        })
+    # return JsonResponse({
+    #     'html':render(request, 'releveclprint.html', {
+    #         'releve':[sorted_releve[i:i+32] for i in range(0, len(sorted_releve), 32)],
+    #         'client':client,
+
+    #         'startdate':startdate,
+    #         'enddate':enddate,
+
+    #     }).content.decode('utf-8'),
+    #     #'soldfc':client.soldfacture,
+    # })
 
 
 
@@ -10885,7 +10893,7 @@ def relevblprint(request):
     return render(request, 'releveclprint.html', {
             'releve':[sorted_releve[i:i+36] for i in range(0, len(sorted_releve), 36)],
             'client':client,
-
+            'title':"Situation client",
             'startdate':startdate,
             'enddate':enddate,
 

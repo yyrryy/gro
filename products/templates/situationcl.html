@@ -155,24 +155,37 @@
           alertify.error('ERRO')
           return
         }
-        $('.loader').removeClass('d-none')
-        $.ajax({
-            url: '/products/relevclientnr',
-            type: 'POST',
-            data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                'clientid': clientid,
-                'datefrom': datefrom,
-                'dateto': dateto,
-                'target':'{{target}}'
-            },
-            success: function(data){
-                $('.loader').addClass('d-none')
-                $('.releveclblholder').html(data.html)
-                $('.soldfcinrelvbl').text('Sold Facture: '+(data.soldfc).toFixed(2))
-                // dateInput.value = currentDate;
-            }
-        })
+        var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/relevclientnr?target={{target}}&clientid='+clientid+'&datefrom='+datefrom+'&dateto='+dateto, '', 'width=900,height=900');
+
+          myWindow.focus();
+          setTimeout(function() {
+          try {
+            myWindow.print();
+            console.log('Print command issued.');
+            myWindow.close();
+            console.log('New window closed.');
+          } catch (e) {
+            console.error('Failed to print and close the window:', e);
+          }
+        }, 1000);
+
+        // $.ajax({
+        //     url: '/products/relevclientnr',
+        //     type: 'POST',
+        //     data: {
+        //         csrfmiddlewaretoken: '{{ csrf_token }}',
+        //         'clientid': clientid,
+        //         'datefrom': datefrom,
+        //         'dateto': dateto,
+        //         'target':'{{target}}'
+        //     },
+        //     success: function(data){
+        //         $('.loader').addClass('d-none')
+        //         $('.releveclblholder').html(data.html)
+        //         $('.soldfcinrelvbl').text('Sold Facture: '+(data.soldfc).toFixed(2))
+        //         // dateInput.value = currentDate;
+        //     }
+        // })
     }
     
     
