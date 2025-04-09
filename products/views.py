@@ -1193,7 +1193,7 @@ def addbonlivraison(request):
         date=datebon,
         modlvrsn=transport,
         bon_no=receipt_no,
-        note=note,
+        notebon=note,
         isfarah=isfarah,
         isorgh=isorgh,
     )
@@ -2705,7 +2705,7 @@ def updatebonlivraison(request):
     
     livraison.modlvrsn=transport
     livraison.client=client
-    livraison.note=note
+    livraison.notebon=note
     # livraison.salseman_id=request.POST.get('repid')
     livraison.total=totalbon
     livraison.date=datebon

@@ -536,7 +536,10 @@ class Bonlivraison(models.Model):
     isdelivered=models.BooleanField(default=False)
     # true when its paid
     ispaid=models.BooleanField(default=False)
+    # this will hold bon sortie numbers
     note=models.TextField(default=None, null=True, blank=True)
+    # this will hold notes related only to bon
+    notebon=models.TextField(default=None, null=True, blank=True)
     #statud if regl == r0
     statusreg=models.CharField(max_length=50, null=True, default='n1', blank=True)
     #statud if factur == f1
