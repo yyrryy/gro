@@ -5329,7 +5329,7 @@ def searchproductbonsortie(request):
     # get url pams
     term=request.GET.get('term').lower().strip()
     products=Produit.objects.filter(Q(ref__startswith=term) |Q(farahref__startswith=term))
-
+    print('term>>', term)
     results=[]
     for i in products:
         ref=i.farahref if term.startswith('fr-') else i.ref

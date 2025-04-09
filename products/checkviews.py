@@ -449,7 +449,7 @@ def validatebonsortie(request):
         livraison_data = {
             'total': item_total,
             'qty': i.qty,
-            
+            'remise':i.remise,
             'name': i.name,
             'product': product,
             'price': i.price,

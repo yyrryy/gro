@@ -36,11 +36,11 @@
 </head>
 <body>
 
-<div id="printfc{{facture.id}}" style="position:relative;">
+<div id="printfc{{facture.id}}" class="px-2" style="position:relative;">
   {% for i in orderitems %}
   {% if forloop.counter == orderitems|length %}
   <!-- last iteration -->
-  <div class="postion-relative px-5 facture{{facture.id}}holder p-3" style="min-height: 29.7cm;width: 21cm; border:1px solid;">
+  <div class="postion-relative facture{{facture.id}}holder p-3" style="min-height: 29.7cm;width: 21cm; border:1px solid;">
 
 
     <!-- facture header -->
@@ -115,7 +115,7 @@
                   <td style="white-space: nowrap;padding-left:3px">
                       {% for v in i %}
                         {% if names %}
-                        {{v.product.name.upper|slice:"50"}}
+                        {{v.product.name.upper|slice:"30"}}
                         {% else %}
                         {{v.product.category.name.upper}}
                         {% endif %}
@@ -244,7 +244,7 @@
     {% endif %}
   </div>
   {% else %}
-  <div class="postion-relative px-5 facture{{facture.id}}holder p-3" style="min-height: 29.7cm;width: 21cm; border:1px solid;">
+  <div class="postion-relative facture{{facture.id}}holder p-3" style="min-height: 29.7cm;width: 21cm; border:1px solid;">
 
 
     <!-- facture header -->
@@ -315,7 +315,7 @@
             <td style="white-space: nowrap; padding-left:3px">
               {% for v in i %}
                 {% if names %}
-                {{v.product.name.upper|slice:"50"}}
+                {{v.product.name.upper|slice:"30"}}
                 {% else %}
                 {{v.product.category.name.upper}}
                 {% endif %}
