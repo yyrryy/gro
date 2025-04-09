@@ -499,7 +499,7 @@ def viewoneproduct(request, id):
         stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
     #stockout=Livraisonitem.objects.filter(product=product, isfacture=False).order_by('-id')
     # stockoutfc=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).order_by('-id')
-    avoirs=Stockin.objects.filter(product=product, isavoir=True)
+    avoirs=Stockin.objects.filter(product=product, isavoir=True, isfarah=target=='f', isorgh=target=='o')
     qtyin=stockin.aggregate(Sum('quantity'))['quantity__sum'] or 0
     qtyavoir=avoirs.aggregate(Sum('quantity'))['quantity__sum'] or 0
     releve = chain(*[
@@ -2716,11 +2716,12 @@ def updatebonlivraison(request):
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
         if target=='f':
-            print('>>> deleting old bon items')
+            print('>>> deleting old bon items in farah')
             product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
             
             
         else:
+            print('>>> deleting old bon items in orgh')
             product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
             # st=Stockin.objects.filter(isfarah=False, product=product).last()
             # st.qtyofprice=st.qtyofprice+int(i.qty)

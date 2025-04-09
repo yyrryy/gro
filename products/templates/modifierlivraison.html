@@ -24,7 +24,7 @@ margin: 0;
 <div class="d-flex text-white rounded h3 text-center" style="background: #1a6a9b;">
   <button class="bi bi-arrow-left" onclick="ajaxpage('listbl', 'list bon livraison', '/products/listbonlivraison?target={{target}}')"></button>
   <div>
-    {{title}}
+    {{title}} {{target}}
   </div>
 </div>
 {% if livraison.ispaid %}
