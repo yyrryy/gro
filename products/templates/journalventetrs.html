@@ -4,7 +4,7 @@
         {{i.bon.date|date:"d/m/Y"}}
     </td>
     <td>
-        {{i.bon.bon_no}}
+        {{i.bon.bon_no}} {%if i.isfarah%}(FR){% else %}(OR){%endif%}
     </td>
     <td>
         {{i.product.ref.upper}}
