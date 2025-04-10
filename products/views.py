@@ -1470,16 +1470,18 @@ def clientinfo(request, id):
     if target=='s':
         bons=Bonsortie.objects.filter(client=client, total__gt=0)
     else:
-        bons=Bonlivraison.objects.filter(isfarah=isfarah, client=client, total__gt=0)
+        bons=Bonlivraison.objects.filter(client=client, total__gt=0)
     ctx={
         'target':target,
         'client':client,
-        'totalavoirs':Avoirclient.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
-        'totalpayments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'totaltr':Bonlivraison.objects.filter(isfarah=isfarah, client=client).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalavoirs':Avoirclient.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalpayments':PaymentClientbl.objects.filter(client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
+        'totaltr':Bonlivraison.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
         'bons':bons,
-        'payments':PaymentClientbl.objects.filter(isfarah=isfarah, client=client),
+        'payments':PaymentClientbl.objects.filter(client=client),
         'avoirs':Avoirclient.objects.filter(client=client),
+        'avances':Avanceclient.objects.filter(client=client),
+        'factures':Facture.objects.filter(client=client),
         'title':f'Compte client: {client.name}'
     }
     return render(request, 'clientinfo.html', ctx)
