@@ -1482,6 +1482,8 @@ def clientinfo(request, id):
         'avoirs':Avoirclient.objects.filter(client=client),
         'avances':Avanceclient.objects.filter(client=client),
         'factures':Facture.objects.filter(client=client),
+        'devis':Devi.objects.filter(client=client),
+        'commandes':Command.objects.filter(client=client),
         'title':f'Compte client: {client.name}'
     }
     return render(request, 'clientinfo.html', ctx)
@@ -9031,7 +9033,8 @@ def searchforlistclient(request):
         clients=Client.objects.all()[:50]
         return JsonResponse({
             'trs':render(request, 'clienttrs.html', {
-            'clients':clients
+            'clients':clients,
+            'target':target
             }).content.decode('utf-8')
         })
     regex_search_term = term.replace('+', '*')
