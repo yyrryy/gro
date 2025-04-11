@@ -1452,14 +1452,23 @@ def addfacture(request):
 
 def supplierinfo(request, id):
     supplier=Supplier.objects.get(pk=id)
+    target=request.GET.get('target')
+    isfarah=target=='f'
+    avances=Avancesupplier.objects.filter(supplier=supplier, isfarah=isfarah)
     ctx={
+        'target':target,
         'title':f'Info fournisseur {supplier.name.upper}',
         'supplier':supplier,
-        'totalavoirs':Avoirsupplier.objects.filter(supplier=supplier).aggregate(Sum('total'))['total__sum'] or 0,
-        'totalpayments':PaymentSupplier.objects.filter(supplier=supplier).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'totaltr':Itemsbysupplier.objects.filter(supplier=supplier).aggregate(Sum('total'))['total__sum'] or 0,
-        'bons':Itemsbysupplier.objects.filter(supplier=supplier),
-        'payments':PaymentSupplier.objects.filter(supplier=supplier)
+        'totalavoirs':Avoirsupplier.objects.filter(supplier=supplier, isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalpayments':PaymentSupplier.objects.filter(supplier=supplier, isfarah=isfarah).aggregate(Sum('amount'))['amount__sum'] or 0,
+        'totaltr':Itemsbysupplier.objects.filter(supplier=supplier, isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0,
+        'bons':Itemsbysupplier.objects.filter(supplier=supplier, isfarah=isfarah),
+        'payments':PaymentSupplier.objects.filter(supplier=supplier, isfarah=isfarah),
+        'factures':Factureachat.objects.filter(supplier=supplier, isfarah=isfarah),
+        'avances':avances,
+        'totalavances':avances.aggregate(Sum('amount'))['amount__sum'] or 0,
+        'devis':Devisupplier.objects.filter(supplier=supplier, isfarah=isfarah),
+        'commandes':Commandsupplier.objects.filter(supplier=supplier, isfarah=isfarah),
     }
     return render(request, 'supplierinfo.html', ctx)
 

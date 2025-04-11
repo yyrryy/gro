@@ -127,7 +127,7 @@
                             </button>
                         </td>
                         <!-- onclick="ajaxpage('supp{{i.id}}', 'Fournisseur: {{i.name}}', '/products/supplier/{{i.id}}')" -->
-                        <td >{% if i.image %}<img src="{{i.image.url}}" style="width: 20%;" alt="">{% endif %} {{i.name}}</td>
+                        <td onclick="ajaxpage('supp{{i.id}}', 'Fournisseur: {{i.name}}', '/products/supplier/{{i.id}}?target={{target}}')">{% if i.image %}<img src="{{i.image.url}}" style="width: 20%;" alt="" >{% endif %} {{i.name}}</td>
                         <td>{{i.code}}</td>
                         <td>{{i.city}}</td>
                         <td>{{i.phone}}</td>
