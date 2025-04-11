@@ -19,7 +19,9 @@
         <button class="bi bi-arrow-left w-100" onclick="ajaxpage('ff', 'j', '/products/supplierspage?target={{target}}')">List fourniosseurs</button>
             
         <div>
+          {% if supplier.image %}
             <img src="{{supplier.image.url}}" width="100%" height="200px" alt="supplier image" class="rounded">
+          {% endif %}
             <table class="table table-bordered">
                 <tr>
                     <td>Fournisseur</td>
