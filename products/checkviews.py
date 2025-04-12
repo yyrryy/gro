@@ -445,7 +445,7 @@ def validatebonsortie(request):
     for i in items:
         product = i.product
         item_total = float(i.total)
-        
+        print(">> remise", i.remise)
         livraison_data = {
             'total': item_total,
             'qty': i.qty,
@@ -507,7 +507,8 @@ def validatebonsortie(request):
     # Create Bonlivraison for farah items
     if farahitems:
         create_bonlivraison('FR-BL', totalfarah, farahitems, is_farah=True)
-    
+    print('>> orghitems', orghitems)
+    print('>> farahitems', farahitems)
     # Create Bonlivraison for orgh items
     if orghitems:
         create_bonlivraison('BL', totalorgh, orghitems, is_farah=False)
