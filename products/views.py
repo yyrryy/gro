@@ -8006,7 +8006,7 @@ def searchforlistbl(request):
             total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, iscanceled=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     return JsonResponse({
-        'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
+        'trs':render(request, 'bllist.html', {'bons':bons, 'notloading':True, 'target':target}).content.decode('utf-8'),
         'total':total
     })
 
