@@ -2931,6 +2931,7 @@ def validerbulk(request):
                     'qty': item.qty,
                     'bonsortie':i,
                     'name': item.name,
+                    'remise': item.remise,
                     'product': product,
                     'price': item.price,
                     'client': item.client,
