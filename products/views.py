@@ -1480,6 +1480,7 @@ def clientinfo(request, id):
         bons=Bonsortie.objects.filter(client=client, total__gt=0)
     else:
         bons=Bonlivraison.objects.filter(client=client, total__gt=0)
+    print('>> bons', bons.count())
     ctx={
         'target':target,
         'client':client,
@@ -1493,6 +1494,7 @@ def clientinfo(request, id):
         'factures':Facture.objects.filter(client=client),
         'devis':Devi.objects.filter(client=client),
         'commandes':Command.objects.filter(client=client),
+        'nbrbons':bons.count(),
         'title':f'Compte client: {client.name}'
     }
     return render(request, 'clientinfo.html', ctx)
@@ -10930,6 +10932,8 @@ def relevblprint(request):
     clientid=request.GET.get('clientid')
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
+    target=request.GET.get('target')
+    isfarah=target=='f'
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
     # print(clientid, startdate, enddate)
@@ -10937,7 +10941,7 @@ def relevblprint(request):
     #     'rr':'rr'
     #     })
     client=Client.objects.get(pk=clientid)
-    avoirs=Avoirclient.objects.filter(client_id=clientid, avoirfacture=False, date__range=[startdate, enddate])
+    avoirs=Avoirclient.objects.filter(client_id=clientid, date__range=[startdate, enddate])
     reglementsbl=PaymentClientbl.objects.filter(client_id=clientid, date__range=[startdate, enddate])
     bons=Bonlivraison.objects.filter(client_id=clientid, date__range=[startdate, enddate], total__gt=0)
 

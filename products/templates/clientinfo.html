@@ -3,7 +3,6 @@
     
     <div class="col-3">
         <div class="bg-white p-2">
-          supplierspage?target=f
             <button class="bi bi-arrow-left w-100" onclick="ajaxpage('ff', 'j', '/products/clientspage?target={{target}}')">List clients</button>
             
             <table class="table table-bordered">
@@ -222,6 +221,20 @@
         </div>
     </div>
     <div class="row col-md-9">
+      <div class="d-flex justify-content-between">
+        <div>
+          <input type="date" id="startDate">
+          <input type="date" id="endDate">
+          <button class="btn btn-dark" id="filterBtn">Filter</button>
+        </div>
+        <input style="width: 20em;
+        background: #80808038;
+        border-radius: 11px;
+        margin-bottom: 9px;
+      " 
+      searchtype="waiting"
+      type="text" name="" id="" placeholder="Recherche" class="searchinput" onkeyup="searchtable(event)" >
+      </div>
         <div>
             <button class="btn border btnselect btn-dark active" style="
             border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); $('.tables').addClass('d-none'); $('.bons').removeClass('d-none')">Bons</button>
@@ -246,12 +259,13 @@
         <!-- bons -->
         
         <div class="bons tables">
-            <div class="bg-white shadow rounded p-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4>Bon</h4>
-                    <strong>
-                        {{nbrbons}}
-                    </strong>
+          <div class="bg-white shadow rounded p-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <h4>Bon</h4>
+              <strong>
+                  {{nbrbons}}
+              </strong>
+                   
                 </div>
                 <div style="height: 70vh; overflow: scroll;" class="listblholder">
                     <table class="table table-bordered table-hover table-striped listbltable" style="font-size: 12px;" id="addbonlivraisonle">
@@ -284,7 +298,7 @@
                           <tr class="ord bl-row" mode="waiting" orderid="{{order.code}}" ondblclick="ajaxpage('bonl{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/bonlivraisondetails/{{order.id}}?target={{target}}&mode=waiting')" style="background:{% if order.isdelivered %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%}" >
                             
                             <td >{{ order.bon_no }}</td>
-                            <td >{{ order.date|date:'d/m/Y' }}</td>
+                            <td class="date">{{ order.date|date:'d/m/Y' }}</td>
                             <td >{{ order.client.name }}</td>
                             <td >{{ order.client.code }}</td>
                             <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}</td>
@@ -405,31 +419,33 @@
                         {{nbrpayments}}
                     </strong>
                 </div>
-                <table style="font-size: 12px;" class="table table-bordered p-2">
-                    <thead class="bg-darkblue text-white">
-                        <tr>
-                            <th>Date</th>
-                            <th>Mode</th>
-                            <th>Montant</th>
-                            <th>Echeance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for bon in payments %}
-                        <tr>
-                            <td>{{bon.date|date:'d/m/Y'}}</td>
-                            <td>{{bon.mode}}</td>
-                            <td>{{bon.amount|floatformat:2|intspace}}</td>
-                            <td>
-                                {% if bon.mode == 'espece' %}
-                                --
-                                {% else %}
-                                {{bon.echance|date:'d/m/Y'}}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                </table>
+                <div class="listfcholder" style="height:70vh;overflow: scroll;">
+                  <table style="font-size: 12px;" class="table table-bordered p-2">
+                      <thead class="bg-darkblue text-white">
+                          <tr>
+                              <th>Date</th>
+                              <th>Mode</th>
+                              <th>Montant</th>
+                              <th>Echeance</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for bon in payments %}
+                          <tr>
+                              <td class="date">{{bon.date|date:'d/m/Y'}}</td>
+                              <td>{{bon.mode}}</td>
+                              <td>{{bon.amount|floatformat:2|intspace}}</td>
+                              <td>
+                                  {% if bon.mode == 'espece' %}
+                                  --
+                                  {% else %}
+                                  {{bon.echance|date:'d/m/Y'}}
+                                  {% endif %}
+                              </td>
+                          </tr>
+                          {% endfor %}
+                  </table>
+                </div>
                 <!--  -->
             </div>
         </div>
@@ -443,31 +459,33 @@
                         {{nbrpayments}}
                     </strong>
                 </div>
-                <table style="font-size: 12px;" class="table table-bordered p-2">
-                    <thead class="bg-darkblue text-white">
-                        <tr>
-                            <th>Date</th>
-                            <th>Mode</th>
-                            <th>Montant</th>
-                            <th>Echeance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for bon in avances %}
-                        <tr>
-                            <td>{{bon.date|date:'d/m/Y'}}</td>
-                            <td>{{bon.mode}}</td>
-                            <td>{{bon.amount|floatformat:2|intspace}}</td>
-                            <td>
-                                {% if bon.mode == 'espece' %}
-                                --
-                                {% else %}
-                                {{bon.echance|date:'d/m/Y'}}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                </table>
+                <div class="listfcholder" style="height:70vh;overflow: scroll;">
+                  <table style="font-size: 12px;" class="table table-bordered p-2">
+                      <thead class="bg-darkblue text-white">
+                          <tr>
+                              <th>Date</th>
+                              <th>Mode</th>
+                              <th>Montant</th>
+                              <th>Echeance</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for bon in avances %}
+                          <tr>
+                              <td>{{bon.date|date:'d/m/Y'}}</td>
+                              <td>{{bon.mode}}</td>
+                              <td>{{bon.amount|floatformat:2|intspace}}</td>
+                              <td>
+                                  {% if bon.mode == 'espece' %}
+                                  --
+                                  {% else %}
+                                  {{bon.echance|date:'d/m/Y'}}
+                                  {% endif %}
+                              </td>
+                          </tr>
+                          {% endfor %}
+                  </table>
+                </div>
                 <!--  -->
             </div>
         </div>
@@ -480,26 +498,28 @@
                         {{navoirs}}
                     </strong>
                 </div>
-                <table style="font-size: 12px;" class="table table-bordered">
-                    <thead class="bg-darkblue text-white">
-                      <th>Date</th>
-                        <th>N°</th>
-                        <th>Total</th>
-                        <th></th>
-                    </thead>
-                    <tbody>
-                        {% for i in avoirs %}
-                        <tr>
-                          <td>{{i.date|date:'d/m/Y'}}</td>
-                            <td>{{i.no}}</td>
-                            <td>{{i.total|floatformat:2|intspace}}</td>
-                            <!-- <td>
-                                {{i.items}}
-                            </td> -->
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="listfcholder" style="height:70vh;overflow: scroll;">
+                  <table style="font-size: 12px;" class="table table-bordered">
+                      <thead class="bg-darkblue text-white">
+                        <th>Date</th>
+                          <th>N°</th>
+                          <th>Total</th>
+                          <th></th>
+                      </thead>
+                      <tbody>
+                          {% for i in avoirs %}
+                          <tr>
+                            <td class="date">{{i.date|date:'d/m/Y'}}</td>
+                              <td>{{i.no}}</td>
+                              <td>{{i.total|floatformat:2|intspace}}</td>
+                              <!-- <td>
+                                  {{i.items}}
+                              </td> -->
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
             </div>
         </div>
 
@@ -546,7 +566,7 @@
                           <tr class="ord fc-row" orderid="{{order.code}}" ondblclick="ajaxpage('facture{{order.id}}', 'Facture {{order.facture_no}}', '/products/facturedetails/{{order.id}}?target={{target}}')" mode="waiting"
                           >
                             <td>{{ order.facture_no }}</td>
-                            <td>{{ order.date|date:'d/m/Y' }}</td>
+                            <td class="date">{{ order.date|date:'d/m/Y' }}</td>
                             <td>{{ order.total|floatformat:2|intspace}}</td>
                             <td>{{ order.ht|floatformat:2|intspace}}</td>
                             <td>{{ order.thistva|floatformat:2|intspace}}</td>
@@ -697,7 +717,7 @@
                           {% for order in devis %}
                             <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/devidetails?id={{order.id}}&&target={{target}}')" style="background:" >
                               <td >{{ order.bon_no }}</td>
-                              <td >{{ order.date|date:'d/m/Y' }}</td>
+                              <td class="date">{{ order.date|date:'d/m/Y' }}</td>
                               <td >{{ order.client.name }}</td>
                               <td >{{ order.client.code }}</td>
                               <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}
@@ -772,7 +792,7 @@
                             <td>Transport</td>
                           </tr>
                         </tfoot> -->
-                      </table>
+                    </table>
                 </div>
                 <!--  -->
             </div>
@@ -814,7 +834,7 @@
                           {% for order in commandes %}
                             <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/boncommanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
                               <td >{{ order.bon_no }}</td>
-                              <td >{{ order.date|date:'d/m/Y' }}</td>
+                              <td class="date">{{ order.date|date:'d/m/Y' }}</td>
                               <td >{{ order.client.name }}</td>
                               <td >{{ order.client.code }}</td>
                               <td style="color: blue;">{{ order.total|floatformat:'2'|intspace}}
@@ -897,6 +917,60 @@
 
 </div>
 <script>
+  function searchtable(event) {
+    const input = $(event.target);
+    const filter = input.val().toLowerCase();
+    // may includemultiple terms separated by a + sign
+    const terms = filter.split('+').map(term => term.trim()).filter(term => term !== '');
+    const rows = $('.tables:not(.d-none) tbody tr');
+    // Show all rows initially
+    // If no filter, show all rows
+    if (terms.length === 0) {
+      return;
+    }
+    // Filter rows based on all terms
+    rows.each(function () {
+      const row = $(this);
+      const text = row.text().toLowerCase();
+      let showRow = true;
+      for (const term of terms) {
+        if (!text.includes(term)) {
+          showRow = false;
+          break;
+        }
+      }
+      if (showRow) {
+        row.show();
+      } else {
+        row.hide();
+      }
+    });
+    
+  }
+  function parseDate(str) {
+    // Expecting str format: "dd/mm/yyyy"
+    const parts = str.split('/');
+    return new Date(parts[2], parts[1] - 1, parts[0]); // year, month (0-based), day
+  }
+
+  $('#filterBtn').on('click', function () {
+    const startVal = $('#startDate').val();
+    const endVal = $('#endDate').val();
+
+    // Convert from yyyy-mm-dd to Date
+    const start = startVal ? new Date(startVal) : null;
+    const end = endVal ? new Date(endVal) : null;
+    $('.tables:not(.d-none) tbody tr').each(function () {
+      const dateText = $(this).find('.date').text().trim();
+      const rowDate = parseDate(dateText);
+
+      if (start && rowDate < start || end && rowDate > end) {
+        $(this).hide();
+      } else {
+        $(this).show();
+      }
+    });
+  });
     function allowcatalog(clientcode){
         $.get('/products/allowcatalog', {'clientcode':clientcode}, (data)=>{
             updatetab('client{{client.id}}', '/products/client/{{client.id}}')

@@ -28,6 +28,7 @@
 
         <button class="btn btn-info w-100 mt-2" onclick="genererrelvecl(event)">Relevé</button>
         <button class="btn btn-dark w-100 mt-2" onclick="genererrelveclnr(event)">Relevé Non reglé</button>
+        <button class="btn btn-dark w-100 mt-2" onclick="printrelveclnr(event)">Imprimer Relevé Non reglé</button>
         <!-- <button class="btn btn-success w-100 mt-2 printrelvebl" onclick="printsituationbl('releveclblholder')">Imprimer</button> -->
         <button class="btn btn-success w-100 mt-2 printrelvebl" onclick="printsituationbl('clientid', 'startdate', 'enddate')">Imprimer</button>
         <button class="btn btn-primary w-100 mt-2 printrelvebl" onclick="$('.relvlogo').toggleClass('invisible');localStorage.getItem('showenteterelv') === 'true'?localStorage.setItem('showenteterelv','false'):localStorage.setItem('showenteterelv','true')">Entette</button>
@@ -140,12 +141,12 @@
             success: function(data){
                 $('.loader').addClass('d-none')
                 $('.releveclblholder').html(data.html)
-                $('.soldfcinrelvbl').text('Sold Facture: '+(data.soldfc).toFixed(2))
+                // $('.soldfcinrelvbl').text('Sold Facture: '+(data.soldfc).toFixed(2))
                 // dateInput.value = currentDate;
             }
         })
     }
-    function genererrelveclnr(event){
+    function printrelveclnr(event){
         parentdiv=$(event.target).parent()
         console.log(parentdiv)
         clientid=parentdiv.find('select[name="clientsituationselect"]').val()
@@ -187,6 +188,36 @@
         //     }
         // })
     }
+    
+    function genererrelveclnr(event){
+        parentdiv=$(event.target).parent()
+        console.log(parentdiv)
+        clientid=parentdiv.find('select[name="clientsituationselect"]').val()
+        datefrom=parentdiv.find('input[name="situationcldatefrom"]').val()
+        dateto=parentdiv.find('input[name="situationcldateto"]').val()
+        if (clientid==null || datefrom=='' || dateto==''){
+          alertify.error('ERRO')
+          return
+        }
+        $.ajax({
+            url: '/products/relevclientnr',
+            type: 'GET',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                'clientid': clientid,
+                'datefrom': datefrom,
+                'dateto': dateto,
+                'target':'{{target}}'
+            },
+            success: function(data){
+                $('.loader').addClass('d-none')
+                $('.releveclblholder').html(data)
+                // dateInput.value = currentDate;
+            }
+        })
+    
+        
+      }
     
     
     $(function(){
