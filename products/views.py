@@ -1480,7 +1480,6 @@ def clientinfo(request, id):
         bons=Bonsortie.objects.filter(client=client, total__gt=0)
     else:
         bons=Bonlivraison.objects.filter(client=client, total__gt=0)
-    print('>> bons', bons.count())
     ctx={
         'target':target,
         'client':client,
@@ -10388,7 +10387,7 @@ def updatenotebl(request):
     note=request.GET.get('note')
     blid=request.GET.get('blid')
     bon=Bonlivraison.objects.get(pk=blid)
-    bon.note=note
+    bon.notebon=note
     bon.save()
     return JsonResponse({
         'success':True
