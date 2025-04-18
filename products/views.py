@@ -9662,6 +9662,8 @@ def filterjvdate(request):
     #     </tr>
     #     '''
     #items = [item for queryset in bons for item in queryset]
+    total=round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2)
+    totalqty=round(bons.aggregate(Sum('qty')).get('qty__sum') or 0, 2)
     ctx={
         'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
     }
