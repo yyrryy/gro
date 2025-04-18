@@ -9563,67 +9563,7 @@ def filterjvdate(request):
     print('>> productid, dateto, datefrom', productid, startdate, enddate, target)
     # startdate = datetime.strptime(startdate, '%Y-%m-%d') or None
     # enddate = datetime.strptime(enddate, '%Y-%m-%d') or None
-    if target=="s":
-        if productid==None:
-            print('>> produuct is none')
-            if enddate==None:
-                bons=Sortieitem.objects.order_by('-date')
-            else:
-                bons=Sortieitem.objects.filter(date__range=[startdate, enddate]).order_by('-date')
-        else:
-            if enddate==None:
-                bons=Sortieitem.objects.filter(product_id=productid).order_by('-date')
-                print('>> produuct is not none', bons)
-            else:
-                bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
-        ctx={
-            'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
-        }
-        
-        
-        if bons:
-            ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
-            ctx['totalqty']=round(bons.aggregate(Sum('qty')).get('qty__sum'), 2)
-        return JsonResponse(ctx)
-    else:
-        if productid==None:
-            print('>> produuct is none')
-            if enddate==None:
-                bons=Bonlivraison.objects.filter(isfarah=target=="f").order_by('-date')
-                bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
-            else:
-                bons=Livraisonitem.objects.filter(isfarah=target=="f", date__range=[startdate, enddate]).order_by('-date')
-                bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
-        else:
-            print('>> produuct is not none')
-            bons=Bonlivraison.objects.filter(isfarah=target=="f", product_id=productid,  date__range=[startdate, enddate]).order_by('-date')
-            bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
-
-    # if target=='f':
-    #     if productid==None:
-    #         print('>> produuct is none')
-    #         if enddate==None:
-    #             bons=Livraisonitem.objects.filter(isfarah=True, isfacture=False).order_by('-date')
-    #         else:
-    #             bons=Livraisonitem.objects.filter(isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
-    #     else:
-    #         print('>> produuct is not none')
-    #         bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
-
-    # elif target=='o':
-    #     if productid==None:
-    #         print('>> produuct is none')
-    #         if enddate==None:
-    #             bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False).order_by('-date')
-    #         else:
-    #             bons=Livraisonitem.objects.filter(isfarah=False, isfacture=False, date__range=[startdate, enddate]).order_by('-date')
-    #     else:
-    #         print('>> produuct is not none')
-    #         if enddate==None:
-    #             bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False).order_by('-date')
-    #         else:
-    #             bons=Livraisonitem.objects.filter(product_id=productid, isfarah=False, date__range=[startdate, enddate]).order_by('-date')
-    # else:
+    # if target=="s":
     #     if productid==None:
     #         print('>> produuct is none')
     #         if enddate==None:
@@ -9636,9 +9576,69 @@ def filterjvdate(request):
     #             print('>> produuct is not none', bons)
     #         else:
     #             bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+    #     ctx={
+    #         'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
+    #     }
+        
+        
+    #     if bons:
+    #         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+    #         ctx['totalqty']=round(bons.aggregate(Sum('qty')).get('qty__sum'), 2)
+    #     return JsonResponse(ctx)
+    # else:
+    #     if productid==None:
+    #         print('>> produuct is none')
+    #         if enddate==None:
+    #             bons=Bonlivraison.objects.filter(isfarah=target=="f").order_by('-date')
+    #             bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
+    #         else:
+    #             bons=Livraisonitem.objects.filter(isfarah=target=="f", date__range=[startdate, enddate]).order_by('-date')
+    #             bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
+    #     else:
+    #         print('>> produuct is not none')
+    #         bons=Bonlivraison.objects.filter(isfarah=target=="f", product_id=productid,  date__range=[startdate, enddate]).order_by('-date')
+    #         bons=[Livraisonitem.objects.filter(bon=i).order_by('-date') for i in bons]
 
-    #     #bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
-    # #elif target=='o':
+    if target=='f':
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(isfarah=True).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(isfarah=True, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, date__range=[startdate, enddate]).order_by('-date')
+
+    elif target=='o':
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(isfarah=False).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(isfarah=False, date__range=[startdate, enddate]).order_by('-date')
+        else:
+            print('>> produuct is not none')
+            if enddate==None:
+                bons=Livraisonitem.objects.filter(product_id=productid).order_by('-date')
+            else:
+                bons=Livraisonitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+    else:
+        if productid==None:
+            print('>> produuct is none')
+            if enddate==None:
+                bons=Sortieitem.objects.order_by('-date')
+            else:
+                bons=Sortieitem.objects.filter(date__range=[startdate, enddate]).order_by('-date')
+        else:
+            if enddate==None:
+                bons=Sortieitem.objects.filter(product_id=productid).order_by('-date')
+                print('>> produuct is not none', bons)
+            else:
+                bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+
+        #bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+    #elif target=='o':
     
     # trs=''
     # for i in bons:
@@ -9661,16 +9661,15 @@ def filterjvdate(request):
     #         </td>
     #     </tr>
     #     '''
-    items = [item for queryset in bons for item in queryset]
+    #items = [item for queryset in bons for item in queryset]
     ctx={
-        'trs':render(request, 'journalventetrs.html', {'bons':items, 'target':target}).content.decode('utf-8')
+        'trs':render(request, 'journalventetrs.html', {'bons':bons, 'target':target}).content.decode('utf-8')
     }
-    
     if bons:
-        ctx['total']=round(sum(item.total for item in items))
-        ctx['totalqty']=sum(item.qty for item in items)
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['totalqty']=round(bons.aggregate(Sum('qty')).get('qty__sum'), 2)
     return JsonResponse(ctx)
-
+    
 def filterjvfcdate(request):
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
