@@ -9603,20 +9603,20 @@ def filterjvdate(request):
         if productid==None:
             print('>> produuct is none')
             if enddate==None:
-                bons=Livraisonitem.objects.filter(isfarah=True).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=True).order_by('-date')
             else:
-                bons=Livraisonitem.objects.filter(isfarah=True, date__range=[startdate, enddate]).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=True, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
-            bons=Livraisonitem.objects.filter(product_id=productid, isfarah=True, date__range=[startdate, enddate]).order_by('-date')
+            bons=Livraisonitem.objects.filter(product_id=productid, bon__isfarah=True, date__range=[startdate, enddate]).order_by('-date')
 
     elif target=='o':
         if productid==None:
             print('>> produuct is none')
             if enddate==None:
-                bons=Livraisonitem.objects.filter(isfarah=False).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=False).order_by('-date')
             else:
-                bons=Livraisonitem.objects.filter(isfarah=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=False, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
             if enddate==None:
@@ -9718,29 +9718,29 @@ def filterjachdate(request):
         if productid==None:
             print('>> produuct is none')
             if enddate==None:
-                bons=Stockin.objects.filter(isfarah=True, isavoir=False).order_by('-date')
+                bons=Stockin.objects.filter(bon__isfarah=True, isavoir=False).order_by('-date')
             else:
-                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Stockin.objects.filter(product_id=productid, bon__isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
             if enddate==None:
-                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False).order_by('-date')
+                bons=Stockin.objects.filter(product_id=productid, bon__isfarah=True, isavoir=False).order_by('-date')
             else:
-                bons=Stockin.objects.filter(product_id=productid, isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Stockin.objects.filter(product_id=productid, bon__isfarah=True, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
 
     elif target=='o':
         if productid==None:
             print('>> produuct is none')
             if enddate==None:
-                bons=Stockin.objects.filter(isfarah=False, isavoir=False).order_by('-date')
+                bons=Stockin.objects.filter(bon__isfarah=False, isavoir=False).order_by('-date')
             else:
-                bons=Stockin.objects.filter(isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Stockin.objects.filter(bon__isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
         else:
             print('>> produuct is not none')
             if enddate==None:
-                bons=Stockin.objects.filter(product_id=productid, isfarah=False, isavoir=False).order_by('-date')
+                bons=Stockin.objects.filter(product_id=productid, bon__isfarah=False, isavoir=False).order_by('-date')
             else:
-                bons=Stockin.objects.filter(product_id=productid, isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
+                bons=Stockin.objects.filter(product_id=productid, bon__isfarah=False, isavoir=False, date__range=[startdate, enddate]).order_by('-date')
     else:
         bons=Sortieitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
     
