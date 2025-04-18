@@ -9620,9 +9620,9 @@ def filterjvdate(request):
         else:
             print('>> produuct is not none  in orgh')
             if enddate==None:
-                bons=Livraisonitem.objects.filter(product_id=productid).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=False, product_id=productid).order_by('-date')
             else:
-                bons=Livraisonitem.objects.filter(product_id=productid, date__range=[startdate, enddate]).order_by('-date')
+                bons=Livraisonitem.objects.filter(bon__isfarah=False,  product_id=productid, date__range=[startdate, enddate]).order_by('-date')
     else:
         if productid==None:
             print('>> produuct is none')
