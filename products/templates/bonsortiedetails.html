@@ -17,6 +17,18 @@
       Payé
     </button>
     {% endif %} -->
+    {% if request.user.is_superuser %}
+    {% if order.generated %}
+    <div>Bon validé deja</div>
+    {%endif%}
+    {% if order.ispaid %}
+    <div>Bon reglé deja</div>
+    {%endif%}
+    
+    <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
+      Modifier
+    </button>
+    {% endif %}
     {% if not order.generated and not order.ispaid %}
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
       Modifier
