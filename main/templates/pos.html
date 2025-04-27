@@ -19,7 +19,69 @@
       <div class="btn p-2 text-center">
         Point de vente
       </div>
-      
+      <div class="dropdown show">
+        <a class="btn border dropdown-toggle bg-dark text-white" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Menu
+        </a>
+  
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <div class="bg-darkblue" style="height: 90vh; overflow-y: scroll;">
+            <nav class="account-nav__list mt-2">
+              
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
+                <a  href="#">+ Bon de sortie</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">
+                <a  href="#">List bons sorties</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addclientstab', 'CLIENTS', '/products/clientspage?target=s')">
+                <a  href="#">List Clients</a>
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementbl', 'REGL BL', '/products/listreglementbl?target=s')">
+                <a  href="#">Reglement clients</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target=s')">
+                <a  href="#">Avoirs</a>
+        
+              </li>
+              
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementbl', 'REGL BL', '/products/listavances?target=s')">
+                <a  href="#">Avances</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('situationcl', 'Sit.CLBL', '/products/situationcl?target=s')">
+                <a  href="#">Situation Client</a>
+        
+              </li>
+              
+        
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/stock?target=s')">
+                <a  href="#">Stock</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/journalvente?target=s')">
+                <a  href="#">Journa ventes</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/carlogospage?target=s')">
+                <a  href="#">Voitures</a>
+        
+              </li>
+              <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/caissepage?target=s')">
+                <a  href="#">Gestion Finance</a>
+        
+              </li>
+              
+              <!-- stock -->
+              
+        
+            </nav>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- <button class="btn border">Clients</button>
     <div class="dropdown show">
@@ -86,70 +148,16 @@
 </div>
 
 <div class="d-flex">
-  <div class="sidebarholder p-0 position-relative" style="width: 13%;">
+  <!-- <div class="sidebarholder p-0 position-relative" style="width: 13%;">
     <div class="d-flex">
         <img src="" alt="" style="width: 100%; z-index: 9999">
   
   
   
     </div>
-    <div class="bg-darkblue" style="height: 90vh; overflow-y: scroll;">
-      <nav class="account-nav__list mt-2">
-        
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
-          <a  href="#">+ Bon de sortie</a>
+    
   
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">
-          <a  href="#">List bons sorties</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addclientstab', 'CLIENTS', '/products/clientspage?target=s')">
-          <a  href="#">List Clients</a>
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementbl', 'REGL BL', '/products/listreglementbl?target=s')">
-          <a  href="#">Reglement clients</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+bon livraison', '/products/listavoirclient?target=s')">
-          <a  href="#">Avoirs</a>
-  
-        </li>
-        
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addlistreglementbl', 'REGL BL', '/products/listavances?target=s')">
-          <a  href="#">Avances</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('situationcl', 'Sit.CLBL', '/products/situationcl?target=s')">
-          <a  href="#">Situation Client</a>
-  
-        </li>
-        
-  
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/stock?target=s')">
-          <a  href="#">Stock</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/journalvente?target=s')">
-          <a  href="#">Journa ventes</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/carlogospage?target=s')">
-          <a  href="#">Voitures</a>
-  
-        </li>
-        <li class="account-nav__item tab-link" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/caissepage?target=s')">
-          <a  href="#">Gestion Finance</a>
-  
-        </li>
-        
-        <!-- stock -->
-        
-  
-      </nav>
-    </div>
-  
-  </div>
+  </div> -->
   <div id="maintab" class="w-100" style="height: 90vh; overflow-y: scroll;">
     
   

@@ -11,6 +11,7 @@
             <th>Remise2</th>
             <th>Remise3</th>
             <th>Remise4</th>
+            <th>Rest Quantité</th>
         </tr>
     </thead>
     <tbody>
@@ -26,6 +27,7 @@
             <td>{{ i.remise2 }}</td>
             <td>{{ i.remise3 }}</td>
             <td>{{ i.remise4 }}</td>
+            <td idachat="{{i.id}}">{{ i.qtyofprice }}</td>
         </tr>
         {% endfor %}
     </tbody>

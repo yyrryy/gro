@@ -28,11 +28,12 @@
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
       Modifier
     </button>
-    {% endif %}
+    {% else %}
     {% if not order.generated and not order.ispaid %}
     <button class="btn w-100 bg-orange text-white mt-2" onclick="ajaxpage('modifierlivraison{{order.id}}', 'Modifier {{order.bon_no}}', '/products/modifierbonsortie?id={{order.id}}')">
       Modifier
     </button>
+    {% endif %}
     {% endif %}
 
     <!-- <button class="btn btn-sm bg-darkblue text-white w-100 mt-2" onclick="hidetettebl()">

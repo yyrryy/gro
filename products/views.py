@@ -11731,11 +11731,11 @@ def getqtyprice(request):
     if target=='s':
         term=request.GET.get('term')
         if (term.startswith('fr-')):
-            histyory=Stockin.objects.filter(product_id=id, isfarah=True, isavoir=False).order_by('-date')[:20]
+            histyory=Stockin.objects.filter(product_id=id, isfarah=True, isavoir=False, qtyofprice__gt=0).order_by('date')
         else:
-            histyory=Stockin.objects.filter(product_id=id, isfarah=False, isavoir=False).order_by('-date')[:20]
+            histyory=Stockin.objects.filter(product_id=id, isfarah=False, isavoir=False, qtyofprice__gt=0).order_by('date')
     else:
-        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False).order_by('-date')[:20]
+        histyory=Stockin.objects.filter(product_id=id, isfarah=isfarah, isavoir=False, qtyofprice__gt=0).order_by('date')
     return render(request, 'qtyprice.html', {'history':histyory})
 
 

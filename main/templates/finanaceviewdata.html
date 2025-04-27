@@ -65,21 +65,36 @@
                 <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Date</th>
+                                <th>Date echeance</th>
+                                <th>N°</th>
                                 <th>Montant</th>
+                                <th>client</th>
                                 <th>Raison</th>
+                                <th>N° recu</th>
+                                <th>date recu</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in ins %}
                             <tr>
                                 <td>{{i.date|date:'d/m/Y'}}</td>
+                                <td>{{i.mode}} - {{i.npiece}}</td>
                                 <td>{{i.amount}}</td>
+                                <td>
+                                    {{i.client.name}}
+                                </td>
                                 <td>
                                     {%if i.banksource%} {{i.banksource.name}}{%endif%} 
                                     {%if i.caissesource%} {{i.caissesource.name}}{%endif%} 
-                                    {{i.client.name}}
+                                    
                                     ({{i.type}})
+                                </td>
+                                
+                                <td>
+                                    {{i.nrecu}}
+                                </td>
+                                <td>
+                                    {{i.dateregl|date:'d/m/Y'}}
                                 </td>
                             </tr>
                             {% endfor %}
