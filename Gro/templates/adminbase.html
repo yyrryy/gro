@@ -1237,11 +1237,28 @@ a .uil {
           $('.addscreenhtml').html(data)
         })
       }
-      function getitemsforlistbl(event){
+      // function filtersearch(event){
+      //   var $el = $('.productsbrand' + $(event.target).attr('id')).fadeIn(450);
+      //   $('.itemsforlistblresult > tr').not($el).hide();
+      //   //$btns.removeClass('active');
+      //   //$(this).addClass('active');
+      // }
+      function filtercategories(event){
+        console.log($('.productscategory' + $(event.target).attr('id')))
+        if ($(event.target).attr('id')=='cat0'){
+          $('.itemsforlistblresult > tr').show();
+          return
+        }
+        var $el = $('.productscategory' + $(event.target).attr('id')).fadeIn(450);
+        $('.itemsforlistblresult > tr').not($el).hide();
+        //$btns.removeClass('active');
+        //$(this).addClass('active');
+      }
+      function getitemsforlistbl(event, target){
     let term=$('.searchitemsforlistbl').val()
     if (term.length>=2){
       $('.itemsforlistblresult').html('<tr><td>searching....</td></tr>')
-      $.get('/products/getitemsforlistbl?target=o', {'term':term}, (data)=>{
+      $.get('/products/getitemsforlistbl?target='+target, {'term':term}, (data)=>{
         console.log(data)
         $('.brands').html('')
         $('.categoriesfilter').html('')
@@ -1250,9 +1267,12 @@ a .uil {
             <img class="tag-badge tag-badge--hot" id='${i.id}' onclick="filtersearch(event)" src='${i.image}'>
           `)
         }
+        $('.categoriesfilter').append(`
+            <button class="btn btn-dark w-100 mb-2" id='cat0' onclick="filtercategories(event)" style="font-size:15px;">Tous</button><br>
+          `)
         for (i of data.categories){
           $('.categoriesfilter').append(`
-            <div class="tag-badge tag-badge--hot" id='cat${i.id}' onclick="filtercategories(event)" style="font-size:15px;">${i.name}</div>
+            <button class="btn btn-dark w-100 mb-2" id='cat${i.id}' onclick="filtercategories(event)" style="font-size:15px;">${i.name}</button><br>
           `)
         }
         $('.itemsforlistblresult').html(data.trs)

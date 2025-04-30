@@ -22,12 +22,12 @@
             <td>
                 ({% if i.isfarah %}FR {% else %}OR{%endif%})
             </td>
-            <td>{{ i.price }}</td>
+            <td class="price">{{ i.price }}</td>
             <td>{{ i.remise1 }}</td>
             <td>{{ i.remise2 }}</td>
             <td>{{ i.remise3 }}</td>
             <td>{{ i.remise4 }}</td>
-            <td idachat="{{i.id}}">{{ i.qtyofprice }}</td>
+            <td class="qtyofprice qtyprices" idachat="{{i.id}}">{{ i.qtyofprice }}</td>
         </tr>
         {% endfor %}
     </tbody>

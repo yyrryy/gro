@@ -40,8 +40,7 @@
                     <small>Bon N°: {{bon.bon_no}}
                     </small>
                     <!-- <button type="button" name="button" class="btn bg-darkblue text-white" onclick="refreshselectclient(event)">↻</button> -->
-
-                    <select {% if not request.user.is_superuser %}disabled{%endif%}  name="client" id="" style="width:100%;" class="select2 clientselectbl form-select notemptylivraison select2client">
+                    <select {% if bon.isvalid and not request.user.is_superuser %}disabled{%endif%}  name="client" id="" style="width:100%;" class="select2 clientselectbl form-select notemptylivraison select2client">
                       <option value="{{bon.client.id}}">{{bon.client.name}}</option>  
                       <!-- <option value="">---</option>
                         {% for i in clients %}

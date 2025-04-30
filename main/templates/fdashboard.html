@@ -202,13 +202,13 @@
       margin-bottom: 9px;
       " type="text" placeholder="Cherche Article" class="searchitemsforlistbl"
       onfocus="$('.itemssearchresultslistbl').removeClass('d-none')"
-      onchange="getitemsforlistbl(event)">
+      onchange="getitemsforlistbl(event, '{{target}}')">
       <div style="
       position: absolute;
       right:0;
       height: 80vh;
-      width: 70vw;
-      overflow-y: scroll;
+      width: 90vw;
+      overflow-x: scroll;
       z-index: 99;
       background: white;
       padding: 10px;
@@ -219,23 +219,28 @@
   
           </div>
         </div>
-        <table class="table table-bordered">
-          <thead>
-            <tr class="text-center bg-darkblue text-white">
-              <td style="width:30%;">IMAGE</td>
-              <td>REF.</td>
-              <td>ARTICLE</td>
-              <td>STOCK Farah</td>
-              <td>STOCK Orgh</td>
-              <!-- <td>PR. Vent</td> -->
-              <td>Marque</td>
-              
-            </tr>
-          </thead>
-          <tbody class="itemsforlistblresult">
-  
-          </tbody>
-        </table>
+        <div class="row">
+          <div class="col-3 categoriesfilter"></div>
+          <div class="col-9">
+            <table class="table table-bordered">
+              <thead>
+                <tr class="text-center bg-darkblue text-white">
+                  <td style="width:30%;">IMAGE</td>
+                  <td>REF.</td>
+                  <td>ARTICLE</td>
+                  <td>STOCK Farah</td>
+                  <td>STOCK Orgh</td>
+                  <!-- <td>PR. Vent</td> -->
+                  <td>Marque</td>
+                  
+                </tr>
+              </thead>
+              <tbody class="itemsforlistblresult">
+      
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     

@@ -222,13 +222,7 @@
   </div>
 
   <script>
-    $('[name="addqty"]').on('change', ()=>{
-      qty=$('[name="addqty"]')
-      
-      $('.qtyofprice').forEach(element => {
-        
-      });
-    })
+    
     $('.select2').select2()
     function paymentbon(){
       let total = parseFloat($('.totalbonsortie').text())
@@ -457,7 +451,36 @@
         //   );
         //   return
         // }
-
+        qtyprices=$('.qtyprices')
+      prices=0
+      qties=0
+      qty=parseFloat(addqty.val())
+      for (let i = 0; i < qtyprices.length; i++) {
+        
+        let current = $(qtyprices[i]); // get the jQuery object
+        oldqtyprice=current.text()
+        price=current.parent().find('.price')
+        let currentQty = parseFloat(current.text()); // if it's an input use .val(), if span/div use .text()
+        if (qty <= 0) {
+          console.log('Reached 0 or below, stopping.');
+          break; // stop the loop if qty is zero or less
+        }
+        if (qty>=currentQty){
+          prices+=currentQty*parseFloat(price.text())
+          qties+=currentQty
+          current.text(0)
+        }else{
+          newqtyprice=Math.abs(qty-currentQty)
+          //diff=oldqtyprice-newqtyprice
+          prices+=qty*parseFloat(price.text())
+          qties+=qty
+          current.text(newqtyprice)
+        }
+        qty= qty-currentQty; // decrease qty
+          console.log('After item', i, 'qty is now:', qty);
+          
+      }
+      coutmoyen=prices/qties
         pdcts.push(distid)
         localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
@@ -478,6 +501,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
+            <input type="hidden" name="coutmoyen" value="${coutmoyen}">
 
         </tr>
         `
@@ -494,7 +518,8 @@
           'dp': dp,
           'stock': stockfarah,
           'clientprice': priceclient,
-          'netprice': netprice
+          'netprice': netprice,
+          'coutmoyen': coutmoyen
         }
         bonachatbody.prepend(tr)
         // delete selected option
@@ -732,6 +757,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${item.netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
             <input type="hidden" name="productid" value="${item.id}">
+            <input type="hidden" name="coutmoyen" value="${item.coutmoyen}">
 
         </tr>
         `
@@ -869,6 +895,7 @@
               let total = tr.find('.total').text()
               let clientprice= tr.find('.clientprice').text()
               let productid = tr.find('input[name="productid"]').val()
+              let coutmoyen = tr.find('input[name="coutmoyen"]').val()
               let product = {
                 'farah':tr.attr('farah'),
                 'qty': qty,
@@ -878,6 +905,7 @@
                 'remise': remise,
                 'total': total,
                 'productid': productid,
+                'coutmoyen': coutmoyen,
                 'clientprice':clientprice
               }
               products.push(product)
