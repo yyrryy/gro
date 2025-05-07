@@ -4226,7 +4226,7 @@ def relevsupplier(request):
     else:
         # orgh
         avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate], ispaid=False)
-        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False)
+        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False, isfarah=False)
         avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=False, date__range=[startdate, enddate])
         if isrelevefacture:
             bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)

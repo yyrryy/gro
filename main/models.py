@@ -813,9 +813,7 @@ class Livraisonitem(models.Model):
     date=models.DateField(default=None, null=True, blank=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
-    def __str__(self) -> str:
-        return f'{self.bon.bon_no} - {self.product.ref}'
-
+    
 
 class Avoirclient(models.Model):
     iscaceled=models.BooleanField(default=False)
@@ -1254,9 +1252,7 @@ class Sortieitem(models.Model):
     isfacture=models.BooleanField(default=False)
     isavoir=models.BooleanField(default=False)
     date=models.DateField(default=None, null=True, blank=True)
-    def __str__(self) -> str:
-        return f'{self.bon.bon_no} - {self.product.ref}'
-
+    
 class Factureachat(models.Model):
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     iscaceled=models.BooleanField(default=False)
