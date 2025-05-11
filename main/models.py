@@ -1243,6 +1243,10 @@ class Sortieitem(models.Model):
     name=models.CharField(max_length=9000, null=True, default=None)
     qty=models.FloatField(default=0.00)
     coutmoyen=models.FloatField(default=0.00, null=True, blank=True)
+    achatids=models.TextField(default=None, null=True, blank=True)
+    remainqties=models.TextField(default=None, null=True, blank=True)
+    oldqties=models.TextField(default=None, null=True, blank=True)
+    
     # this total represents the revenue of this product
     price=models.FloatField(default=0.00)
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)

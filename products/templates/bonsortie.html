@@ -454,10 +454,14 @@
         qtyprices=$('.qtyprices')
       prices=0
       qties=0
+      achatids=[]
+      // what remains from eaach achat
+      remainqties=[]
       qty=parseFloat(addqty.val())
       for (let i = 0; i < qtyprices.length; i++) {
         
         let current = $(qtyprices[i]); // get the jQuery object
+        achatids.push(current.attr('achatid'))
         oldqtyprice=current.text()
         price=current.parent().find('.price')
         let currentQty = parseFloat(current.text()); // if it's an input use .val(), if span/div use .text()
@@ -469,12 +473,14 @@
           prices+=currentQty*parseFloat(price.text())
           qties+=currentQty
           current.text(0)
+          remainqties.push(0)
         }else{
           newqtyprice=Math.abs(qty-currentQty)
           //diff=oldqtyprice-newqtyprice
           prices+=qty*parseFloat(price.text())
           qties+=qty
           current.text(newqtyprice)
+          remainqties.push(newqtyprice)
         }
         qty= qty-currentQty; // decrease qty
           console.log('After item', i, 'qty is now:', qty);
@@ -501,7 +507,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
-            <input type="hidden" name="coutmoyen" value="${coutmoyen}">
+            <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}">
 
         </tr>
         `
@@ -519,7 +525,9 @@
           'stock': stockfarah,
           'clientprice': priceclient,
           'netprice': netprice,
-          'coutmoyen': coutmoyen
+          'coutmoyen': coutmoyen,
+          'achatids': achatids,
+          'remainqties': remainqties
         }
         bonachatbody.prepend(tr)
         // delete selected option
@@ -757,7 +765,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${item.netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${item.total}</td>
             <input type="hidden" name="productid" value="${item.id}">
-            <input type="hidden" name="coutmoyen" value="${item.coutmoyen}">
+            <input type="hidden" name="coutmoyen" value="${item.coutmoyen}" achatids="${item.achatids}" remainqties="${item.remainqties}">
 
         </tr>
         `
@@ -895,6 +903,8 @@
               let total = tr.find('.total').text()
               let clientprice= tr.find('.clientprice').text()
               let productid = tr.find('input[name="productid"]').val()
+              let achatids= tr.find('input[name="productid"]').attre('achatids')
+              let remainqties= tr.find('input[name="productid"]').attre('remainqties')
               let coutmoyen = tr.find('input[name="coutmoyen"]').val()
               let product = {
                 'farah':tr.attr('farah'),
@@ -906,7 +916,9 @@
                 'total': total,
                 'productid': productid,
                 'coutmoyen': coutmoyen,
-                'clientprice':clientprice
+                'clientprice':clientprice,
+                'achatids':achatids,
+                'remainqties':remainqties
               }
               products.push(product)
           })
