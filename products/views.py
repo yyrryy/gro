@@ -2776,11 +2776,11 @@ def updatebonlivraison(request):
             oldqties=oldqties,
             coutmoyen=i['coutmoyen'],
         )
-        if achatids:
-            stockins=Stockin.objects.filter(pk__in=achatids)
-            for s, r in zip(stockins, remainqties):
-                s.qtyofprice=r
-                s.save()
+        # if achatids:
+        #     stockins=Stockin.objects.filter(pk__in=achatids)
+        #     for s, r in zip(stockins, remainqties):
+        #         s.qtyofprice=r
+        #         s.save()
 
     return JsonResponse({
         'success':True

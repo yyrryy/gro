@@ -2619,11 +2619,12 @@ def updatebonsortie(request):
                 coutmoyen=i['coutmoyen'],
             )
             print('>> achatids', achatids)
-            if not 'None' in achatids:
-                stockins=Stockin.objects.filter(pk__in=achatids)
-                for s, r in zip(stockins, remainqties):
-                    s.qtyofprice=r
-                    s.save()
+
+            # if not 'None' in achatids:
+            #     for i, r in zip(achatids, remainqties):
+            #         s=Stockin.objects.filter(pk=1)
+            #         s.qtyofprice=r
+            #         s.save()
             # update stock accordinly
             if farah:
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
