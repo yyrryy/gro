@@ -171,6 +171,7 @@ margin: 0;
                   <td class="netprice">{{i.product.prixnet}}</td>
                   <td class="total">{{i.total}}</td>
                   <input type="hidden" name="productid" value="{{i.product.id}}">
+                  <input type="hidden" name="coutmoyen" value="{{i.coutmoyen}}" achatids="{{i.achatids}}" remainqties="{{i.remainqties}}" oldqties="{{i.oldqties}}">
 
             {% endfor %}
             </tbody>
@@ -267,7 +268,44 @@ margin: 0;
       return
     }
     console.log(addqty.val(), stock)
-
+    qtyprices=$('.qtyprices')
+            prices=0
+            qties=0
+            achatids=[]
+            // what remains from eaach achat
+            remainqties=[]
+            oldqties=[]
+            qty=parseFloat(addqty.val())
+            for (let i = 0; i < qtyprices.length; i++) {
+              
+              let current = $(qtyprices[i]); // get the jQuery object
+              oldqtyprice=current.text()
+              price=current.parent().find('.price')
+              let currentQty = parseFloat(current.text()); // if it's an input use .val(), if span/div use .text()
+              if (qty <= 0) {
+                console.log('Reached 0 or below, stopping.');
+                break; // stop the loop if qty is zero or less
+              }
+              achatids.push(current.attr('achatid'))
+              oldqties.push(currentQty)
+              if (qty>=currentQty){
+                prices+=currentQty*parseFloat(price.text())
+                qties+=currentQty
+                current.text(0)
+                remainqties.push(0)
+              }else{
+                newqtyprice=Math.abs(qty-currentQty)
+                //diff=oldqtyprice-newqtyprice
+                prices+=qty*parseFloat(price.text())
+                qties+=qty
+                current.text(newqtyprice)
+                remainqties.push(newqtyprice)
+              }
+              qty= qty-currentQty; // decrease qty
+                console.log('After item', i, 'qty is now:', qty);
+                
+            }
+            coutmoyen=prices/qties
     if (parseInt(addqty.val())>parseInt(stock)){
       console.log('qty', addqty.val(), 'stock', stock, 'qty > stock', addqty>stock)
 
@@ -303,6 +341,7 @@ margin: 0;
               <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
               <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
               <input type="hidden" name="productid" value="${id}">
+              <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}" oldqties="${oldqties}">
 
           </tr>
           `
@@ -349,6 +388,7 @@ margin: 0;
         <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
         <input type="hidden" name="productid" value="${id}">
+        <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}" oldqties="${oldqties}">
 
     </tr>
     `

@@ -788,6 +788,10 @@ class Outfacture(models.Model):
     isorgh=models.BooleanField(default=False)
     livraison=models.ForeignKey('Livraisonitem', on_delete=models.SET_NULL, default=None, null=True)
 class Livraisonitem(models.Model):
+    coutmoyen=models.FloatField(default=0.00, null=True, blank=True)
+    achatids=models.TextField(default=None, null=True, blank=True)
+    remainqties=models.TextField(default=None, null=True, blank=True)
+    oldqties=models.TextField(default=None, null=True, blank=True)
     pricesofout=models.TextField(default=None, blank=True, null=True)
     qtyofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonlivraison, on_delete=models.CASCADE, default=None, null=True)

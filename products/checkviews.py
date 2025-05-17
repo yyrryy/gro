@@ -13,6 +13,7 @@ import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
 import base64
+import ast
 from django.contrib.auth.decorators import login_required, user_passes_test
 def isadmin(user):
     return user.groups.filter(name='admin').exists()
@@ -177,12 +178,19 @@ def addbonsortie(request):
             farah=i['farah']=='1'
             product=Produit.objects.get(pk=i['productid'])
             #create sortie items
+            achatids=i['achatids'].split(',')
+            remainqties=i['remainqties'].split(',')
+            oldqties=i['oldqties'].split(',')
             sortitem=Sortieitem.objects.create(
                 bon=order,
                 remise=i['remise'],
                 name=i['name'],
                 ref=i['ref'],
                 product=product,
+                achatids=achatids,
+                remainqties=remainqties,
+                oldqties=oldqties,
+                coutmoyen=i['coutmoyen'],
                 qty=i['qty'],
                 price=i['price'],
                 total=i['total'],
@@ -190,7 +198,11 @@ def addbonsortie(request):
                 date=datebon,
                 isfarah=farah,
             )
-        
+            
+            stockins=Stockin.objects.filter(pk__in=achatids)
+            for s, r in zip(stockins, remainqties):
+                s.qtyofprice=r
+                s.save()
             # update stock accordinly
             if farah:
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
@@ -2561,6 +2573,13 @@ def updatebonsortie(request):
         else:
             product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
         product.save()
+        # achatids = ast.literal_eval(i.achatids)
+        # oldqties = ast.literal_eval(i.oldqties)
+        # if achatids:
+        #     stockins=Stockin.objects.filter(pk__in=achatids)
+        #     for s, o in zip(stockins, oldqties):
+        #         s.qtyofprice=o
+        #         s.save()
         #print('>> qtyofprice, qties', json.loads(i.pricesofout), json.loads(i.qtyofout))
         # prices and qties of prices
         # for pr, qty in zip(json.loads(i.pricesofout), json.loads(i.qtyofout)):
@@ -2574,6 +2593,14 @@ def updatebonsortie(request):
             farah=i['farah']=='1'
             product=Produit.objects.get(pk=i['productid'])
             #create sortie items
+            if '[' in i['achatids']:   
+                achatids=ast.literal_eval(i['achatids'])
+                remainqties=ast.literal_eval(i['remainqties'])
+                oldqties=ast.literal_eval(i['oldqties'])
+            else:
+                achatids=[i['achatids']]
+                remainqties=[i['remainqties']]
+                oldqties=[i['oldqties']]
             sortitem=Sortieitem.objects.create(
                 bon=bon,
                 remise=i['remise'],
@@ -2586,8 +2613,16 @@ def updatebonsortie(request):
                 client_id=clientid,
                 date=datebon,
                 isfarah=farah,
+                achatids=achatids,
+                remainqties=remainqties,
+                oldqties=oldqties,
+                coutmoyen=i['coutmoyen'],
             )
-        
+            if achatids:
+                stockins=Stockin.objects.filter(pk__in=achatids)
+                for s, r in zip(stockins, remainqties):
+                    s.qtyofprice=r
+                    s.save()
             # update stock accordinly
             if farah:
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
@@ -3541,3 +3576,18 @@ def downloadallclient(request):
     print(">> counts", clients)
     return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
     
+def removelineinbonsortie(request):
+    id=request.GET.get('sortieitemid')
+    item=Sortieitem.objects.get(pk=id)
+    print('>>', item.achatids)
+    achatids = ast.literal_eval(item.achatids)
+    oldqties = ast.literal_eval(item.oldqties)
+    if achatids:
+        stockins=Stockin.objects.filter(pk__in=achatids)
+        print('>> stockins', stockins)
+        for s, o in zip(stockins, oldqties):
+            s.qtyofprice=o
+            s.save()
+    return JsonResponse({
+        'success':True
+    })

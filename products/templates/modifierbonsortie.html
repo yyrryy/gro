@@ -163,14 +163,19 @@
               <tbody class="bonsortiebody">
                 {% for i in items %}
                 <tr class="itemrow" productid={{i.product.id}} farah={%if i.isfarah%}1{%else%}0{%endif%}>
-                  <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, {{i.product.id}})">{{i.ref}}</td>
+                  <td style="padding: 2px 0; font-size: 13px;" class="ref">{{i.ref}}</td>
+                  <!-- if remove need to work it should remove the sortieitem -->
+                  <!-- <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, '{{i.product.id}}', '{{i.id}}')">{{i.ref}}</td> -->
                   <td style="padding: 2px 0; font-size: 13px;" class="name text-start">{{i.name}}</td>
-                  <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td>
+                  <!-- <td style="padding: 2px 0; font-size: 13px;"><input type="number" readonly class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td> -->
+                  <td style="padding: 2px 0; font-size: 13px;"><input type="number" readonly class="calculate qty notemptylivraison" onkeyup="calculate(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td>
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event);" name="price" value="{{i.price}}" step=0.01 style="height:23px; width:100%;"></td>
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="{{i.remise}}" class="calculate remise" onkeyup="calculate(event);" name="remise" style="height:23px; width:100%;"></td>
                   <td style="padding: 2px 0; font-size: 13px;" class="netprice">{{i.netprice}}</td>
                   <td style="padding: 2px 0; font-size: 13px;" class="total">{{i.total}}</td>
                   <input type="hidden" name="productid" value="{{i.product.id}}">
+                  <input type="hidden" name="productid" value="{{i.product.id}}">
+                  <input type="hidden" name="coutmoyen" value="{{i.coutmoyen}}" achatids="{{i.achatids}}" remainqties="{{i.remainqties}}" oldqties="{{i.oldqties}}">
                 </tr>
                 {% endfor %}
               </tbody>
@@ -295,7 +300,7 @@
 
     })
     
-    function removelinebl(event, id) {
+    function removelinebl(event, id, sortieitemid) {
           let parentdiv=$(event.target).parent().parent().parent().parent().parent().parent()
           clicksinbl++;
 
@@ -305,17 +310,29 @@
               alertify.confirm('Supprimer', 'Supprimer la ligne', function(){
                 console.log('delete'),
                 // remove element
+                // $.get('/products/removelineinbonsortie', {
+                //   'sortieitemid':sortieitemid
+                // })
                 $(event.target).parent().remove()
                 // remove id from localstorage
-
                 // pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie'))
                 // pdcts.splice(pdcts.indexOf(id.toString()), 1)
                 // localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
                 // update total
                 let totalbon = parseFloat(parentdiv.find('.totalbonsortie').text())
-                let totalrow = parseFloat($(event.target).parent().find('.total').text())
-                let totalbonvalue = (totalbon-totalrow).toFixed(2)
-                parentdiv.find('.totalbonsortie').html(totalbonvalue)
+                let totalrow = $('.total')
+                sum=0
+                totalrow.each(function() {
+                  sum += parseFloat($(this).text());
+                });
+                //let totalbonvalue = (totalbon-totalrow).toFixed(2)
+                parentdiv.find('.totalbonsortie').html(sum)
+                // empty everything to start calculating again
+                $('.producthistory').html('')
+                $('[name="addname"]').attr('data', '')
+                // resete select2
+                $('.resultsholderbonsortie').val('').trigger('change')
+
                 // Reset the count
                 clicksinbl = 0;
                 removeinlocalstorage('bonsortie', id)
@@ -327,7 +344,7 @@
           }
       }
 
-  function addrowbonsortie(event){
+      function addrowbonsortie(event){
         let target=$(event.target)
         farah=target.attr('farah')
         parentdiv=target.parent().parent().parent().parent()
@@ -343,33 +360,161 @@
         let addremise=parentdiv.find('[name="addremise"]')
         let priceclient=parentdiv.find('.addclientprice ').text()
         //|| addremise.val()==''
-        if (addqty.val()=='' || addprice.val()=='' || addqty.val()==0 || addprice.val()==0){
+        if (addqty.val()=='' || addprice.val()=='' || addqty.val()==0 || addprice.val()==0 || addname.attr('data')==''){
           alertify.error('Veuillez remplir tous les champs')
           return
         }
+        // if (addqty.val()<0 || addqty.val()>max){
+        //   alertify.error('Qty invalid')
+          
+        // }
         var [ref, name, dp, stockfarah, stockfacturefarah, stockorgh, stockfactureorgh, id, sellprice, remise, netprice, representprice] = addname.attr('data').split('§');
         //console.log(ref, name, dp, stock, id, sellprice, remise, netprice, representprice)
         pdcts=JSON.parse(localStorage.getItem('pdctsinbonsortie')) || []
         console.log(id, pdcts, pdcts.includes(id))
         // distinguished id will be an id to store in ids local
         distid=farah=='1'?'f'+id:'o'+id
-        if (pdcts.includes(distid)){
-          parentdiv.find('.addstock').val('')
-          parentdiv.find('.addstockfacture').val('')
-          addqty.val('')
-          addname.val('')
-          addremise.val('')
-          addprice.val('')
-          $('.addstock').text('')
-          $('.addstockfacture').text('')
-          alertify.error('Ce produit est deja dans le bon')
-          $('.resultsholderbonsortie').select2('open')
+        // if (pdcts.includes(distid)){
+        //   parentdiv.find('.addstock').val('')
+        //   parentdiv.find('.addstockfacture').val('')
+        //   addqty.val('')
+        //   addname.val('')
+        //   addremise.val('')
+        //   addprice.val('')
+        //   $('.addstock').text('')
+        //   $('.addstockfacture').text('')
+        //   alertify.error('Ce produit est deja dans le bon')
+        //   $('.resultsholderbonsortie').select2('open')
 
-          return
+        //   return
+        // }
+
+        // here is the case if qty is greater than stock
+        //console.log(addqty.val(), stock)
+        
+        // if (parseInt(addqty.val())>parseInt(stock)){
+        //   console.log('qty', addqty.val(), 'stock', stock, 'qty > stock', addqty>stock)
+
+        //   alertify.confirm('Quantité superieur au stock', 'Voulez vous continuer ?', function(){
+        //     if (addqty.val()=='' || addprice.val()=='' || addremise.val()==''){
+        //       alertify.error('Veuillez remplir tous les champs')
+        //       return
+        //     }
+
+        //     if (pdcts.includes(id)){
+        //       parentdiv.find('.addstock').val('')
+        //       parentdiv.find('.addstockfacture').val('')
+        //       addqty.val('')
+        //       addname.val('')
+        //       addremise.val('')
+        //       addprice.val('')
+        //       alertify.error('Ce produit est deja dans le bon')
+        //       $('.resultsholderbonsortie').select2('open')
+        //       return
+        //     }
+        //     pdcts.push(id)
+        //     localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
+        //     afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
+        //     let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
+        //     console.log(net)
+        //     let addtotal=(parseFloat(addqty.val())*parseFloat(net)).toFixed(2)
+        //     // ${stock<=0? "text-danger":"" }
+        //     let tr = `
+        //     <tr class="itemrow" id=${id} farah=>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${ref}</td>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
+        //         <td style="paddingpx 0; font-size: 13px;" class="dp">${dp}</td>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="stock">${stock}</td>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
+        //         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" readonly onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
+        //         <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
+        //         <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="remise" style="height:23px; width:100%;"></td>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
+        //         <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
+        //         <input type="hidden" name="productid" value="${id}">
+
+        //     </tr>
+        //     `
+        //     item={
+        //       'id': id,
+        //       'qty': addqty.val(),
+        //       'price': addprice.val(),
+        //       'remise': addremise.val(),
+        //       'total': addtotal,
+        //       'name': name,
+        //       'ref': ref,
+        //       'dp': dp,
+        //       'stock': stock,
+        //       'clientprice': priceclient,
+        //       'netprice': netprice
+        //     }
+        //     // prepare item to be saved in localstorage
+            
+        //     bonachatbody.prepend(tr)
+        //     // delete selected option
+        //     parentdiv.find('.addstock').val('')
+        //     parentdiv.find('.addstockfacture').val('')
+        //     addqty.val('')
+        //     addname.val('')
+        //     addremise.val('')
+        //     addprice.val('')
+        //     var totalSum = 0;
+        //     parentdiv.find('.total').each(function() {
+        //       totalSum += parseFloat($(this).text());
+        //     });
+            
+        //     console.log('saving items')
+        //     savetolocalstorage(item, totalSum, 'bonsortie')
+        //     parentdiv.find('.totalbon').text(totalSum.toFixed(2))
+        //     parentdiv.find('.resultsholderbonsortie').select2('open')
+        //   }, function(){
+        //     alertify.error('Cancel')
+        //     parentdiv.find('.resultsholderbonsortie').select2('open')
+
+        //   }
+        //   );
+        //   return
+        // }
+        qtyprices=$('.qtyprices')
+      prices=0
+      qties=0
+      achatids=[]
+      // what remains from eaach achat
+      remainqties=[]
+      oldqties=[]
+      qty=parseFloat(addqty.val())
+      for (let i = 0; i < qtyprices.length; i++) {
+        
+        let current = $(qtyprices[i]); // get the jQuery object
+        oldqtyprice=current.text()
+        price=current.parent().find('.price')
+        let currentQty = parseFloat(current.text()); // if it's an input use .val(), if span/div use .text()
+        if (qty <= 0) {
+          console.log('Reached 0 or below, stopping.');
+          break; // stop the loop if qty is zero or less
         }
-
-        pdcts.push(distid)
-        localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
+        achatids.push(current.attr('achatid'))
+        oldqties.push(currentQty)
+        if (qty>=currentQty){
+          prices+=currentQty*parseFloat(price.text())
+          qties+=currentQty
+          current.text(0)
+          remainqties.push(0)
+        }else{
+          newqtyprice=Math.abs(qty-currentQty)
+          //diff=oldqtyprice-newqtyprice
+          prices+=qty*parseFloat(price.text())
+          qties+=qty
+          current.text(newqtyprice)
+          remainqties.push(newqtyprice)
+        }
+        qty= qty-currentQty; // decrease qty
+          console.log('After item', i, 'qty is now:', qty);
+          
+      }
+      coutmoyen=prices/qties
+        //pdcts.push(distid)
+        //localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
         afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
         console.log(afterremise)
         let net=(parseFloat(addprice.val())-(parseFloat(addprice.val())*parseFloat(addremise.val())/100))
@@ -380,20 +525,21 @@
         <tr class="itemrow" productid=${id} farah=${farah}>
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${farah=='1'?'(FR)':'(OR)'} ${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event)" name="qty" max=${max} value="${addqty.val()}" style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event)" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event)" name="remise" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" readonly onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="netprice"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
+            <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}" oldqties="${oldqties}">
 
         </tr>
         `
         item={
           'farah':farah,
-          'max':max,
           'id': id,
           'qty': addqty.val(),
+          'max':max,
           'price': addprice.val(),
           'remise': addremise.val(),
           'total': addtotal,
@@ -402,7 +548,11 @@
           'dp': dp,
           'stock': stockfarah,
           'clientprice': priceclient,
-          'netprice': netprice
+          'netprice': netprice,
+          'coutmoyen': coutmoyen,
+          'achatids': achatids,
+          'remainqties': remainqties,
+          'oldqties': oldqties
         }
         bonachatbody.prepend(tr)
         // delete selected option
@@ -411,7 +561,7 @@
         addremise.val('')
         addprice.val('')
         parentdiv.find('.addstock').val('')
-          parentdiv.find('.addstockfacture').val('')
+        parentdiv.find('.addstockfacture').val('')
         totals=parentdiv.find('.total')
         totalbon=parentdiv.find('.totalbon')
         var totalSum = 0;
@@ -419,7 +569,7 @@
             totalSum += parseFloat($(this).text());
         });
         
-        savetolocalstorage(item, totalSum, 'updatebonsortie')
+        savetolocalstorage(item, totalSum, 'bonsortie')
         totalbon.text(totalSum.toFixed(2))
         // $('.resultsholderbonsortie').val('').trigger('change')
         $('.resultsholderbonsortie').select2('open')
@@ -672,7 +822,8 @@
       $('.resultsholderbonsortie').on('change', function(){
           console.log('>cc>', $(this).val())
           parentdiv=$(this).parent().parent()
-          if ($(this).val()==''){
+          console.log('>>', $(this).val())
+          if ($(this).val()==''|| $(this).val()==null){
               return
           }
 
@@ -711,7 +862,7 @@
             function(data){
               $('.producthistory').html(data)
           })
-          $('.addstock').text('Stock farah: '+stocktotalfarah)
+          // $('.addstock').text('Stock farah: '+stocktotalfarah)
           $('.addstockfacture').text('Stock orgh: '+stocktotalorgh)
           // we are getting ere list of reps that have price
           
@@ -729,7 +880,8 @@
               success: function(data){
                 console.log(data)
                 parentdiv.find('.addclientprice').html((`${data.price} (${data.remise}%)`))
-                $('.addbyuprice').html(`pr. achat farah: ${data.frbuyprice}(${data.frremise}%) <br> pr. achat orgh: ${data.orbuyprice}(${data.orremise}%)`)
+                // $('.addbyuprice').html(`pr. achat farah: ${data.frbuyprice}(${data.frremise}%) <br> pr. achat orgh: ${data.orbuyprice}(${data.orremise}%)`)
+                $('.addbyuprice').html(`pr. achat orgh: ${data.orbuyprice}(${data.orremise}%)`)
               }
             })
 
@@ -776,6 +928,10 @@
               let price = tr.find('.price').val()
               let remise = tr.find('.remise').val()
               let total = tr.find('.total').text()
+              let achatids= tr.find('input[name="coutmoyen"]').attr('achatids')
+              let remainqties= tr.find('input[name="coutmoyen"]').attr('remainqties')
+              let oldqties= tr.find('input[name="coutmoyen"]').attr('oldqties')
+              let coutmoyen = tr.find('input[name="coutmoyen"]').val()
               //let clientprice= tr.find('.clientprice').text()
               let productid = tr.find('input[name="productid"]').val()
               let product = {
@@ -788,6 +944,10 @@
                 'total': total,
                 'productid': productid,
                 //'clientprice':clientprice
+                'coutmoyen': coutmoyen,
+                'achatids':achatids,
+                'remainqties':remainqties,
+                'oldqties':oldqties
               }
               products.push(product)
           })

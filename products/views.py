@@ -26,6 +26,8 @@ from collections import defaultdict
 import calendar
 from django.db.models.functions import TruncDay
 import uuid
+import ast
+
 today = timezone.now().date()
 thisyear=timezone.now().year
 
@@ -1220,53 +1222,15 @@ def addbonlivraison(request):
             product=Produit.objects.get(pk=i['productid'])
             pricesofout=[]
             qtyofout=[]
+            achatids=i['achatids'].split(',')
+            remainqties=i['remainqties'].split(',')
+            oldqties=i['oldqties'].split(',')
             if isfarah:
                 print('>>> we are in farah')
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
-                # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
-                # thisqty=int(i['qty'])
-                # for pr in prices:
-                #     print('>> qty', thisqty, pr.product.ref)
-                #     if not thisqty<=0:
-                #         print('>> qty is not 0')
-                #         if pr.qtyofprice<=thisqty:
-                #             thisqty=thisqty-int(pr.qtyofprice)
-                #             qtyofout.insert(0, pr.qtyofprice)
-                #             pr.qtyofprice=0
-                #             pricesofout.insert(0, pr.id)
-                #         else:
-                #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                #             qtyofout.insert(0, thisqty)
-                #             thisqty=0
-                #             pricesofout.insert(0, pr.id)
-                #         pr.save()
-                #     else:
-                #         print('>> qty', thisqty, pr.product.ref, 'breaking')
-                #         break
-
-
             else:
                 thisqty=float(i['qty'])
-                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
-                # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product, isavoir=False)
-                # for pr in prices:
-                #     if not thisqty<=0:
-                #         print('>> qty is not 0')
-                #         if pr.qtyofprice<=thisqty:
-                #             thisqty=thisqty-int(pr.qtyofprice)
-                #             qtyofout.insert(0, pr.qtyofprice)
-                #             pr.qtyofprice=0
-                #             pricesofout.insert(0, pr.id)
-                #         else:
-                #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
-                #             qtyofout.insert(0, thisqty)
-                #             thisqty=0
-                #             pricesofout.insert(0, pr.id)
-                #         pr.save()
-                #     else:
-                #         print('>> breaking')
-                #         break
-                    
+                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])      
             product.save()
             Livraisonitem.objects.create(
                 qtyofout=qtyofout,
@@ -1281,7 +1245,11 @@ def addbonlivraison(request):
                 total=i['total'],
                 client_id=clientid,
                 date=datebon,
-                isfarah=isfarah
+                isfarah=isfarah,
+                achatids=achatids,
+                remainqties=remainqties,
+                oldqties=oldqties,
+                coutmoyen=i['coutmoyen'],
             )
     #order.pricesofout=pricesofout
     order.save()
@@ -2229,9 +2197,11 @@ def listavoirclient(request):
     target=request.GET.get('target')
     isfarah=target=='f'
     if target=='s':
-        bons= Avoirclient.objects.filter(date__year=thisyear, issortie=True).order_by('-id')[:50]
+        bons= Avoirclient.objects.filter(date__year=thisyear, issortie=True).order_by('-id')
+    elif target=='o':
+        bons= Avoirclient.objects.filter(date__year=thisyear, isorgh=True).order_by('-id')
     else:
-        bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-id')[:50]
+        bons= Avoirclient.objects.filter(date__year=thisyear, isfarah=isfarah).order_by('-id')
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Avoir Client',
@@ -2762,53 +2732,15 @@ def updatebonlivraison(request):
         product=Produit.objects.get(pk=i['productid'])
         pricesofout=[]
         qtyofout=[]
+        achatids=ast.literal_eval(i['achatids'])
+        remainqties=ast.literal_eval(i['remainqties'])
+        oldqties=ast.literal_eval(i['oldqties'])
         if target=='f':
             product.stocktotalfarah=float(product.stocktotalfarah)-qty
-            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=True, product=product, isavoir=False).order_by('id')
-            # thisqty=int(i['qty'])
-            # for pr in prices:
-            #     print('>> qty', thisqty, pr.product.ref)
-            #     if not thisqty<=0:
-            #         print('>> qty is not 0')
-            #         if pr.qtyofprice<=thisqty:
-            #             thisqty=thisqty-int(pr.qtyofprice)
-            #             qtyofout.append(pr.qtyofprice)
-            #             pr.qtyofprice=0
-            #             pricesofout.insert(0, pr.id)
-            #         else:
-            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
-            #             qtyofout.append(thisqty)
-            #             thisqty=0
-            #             pricesofout.insert(0, pr.id)
-            #         pr.save()
-            #     else:
-            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
-            #         break
-        
+            
         else:
             product.stocktotalorgh=float(product.stocktotalorgh)-qty
-            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=False, product=product).order_by('id')
-
-            # thisqty=int(i['qty'])
-            # for pr in prices:
-            #     print('>> qty', thisqty, pr.product.ref)
-            #     if not thisqty<=0:
-            #         print('>> qty is not 0')
-            #         if pr.qtyofprice<=thisqty:
-            #             thisqty=thisqty-int(pr.qtyofprice)
-            #             qtyofout.append(pr.qtyofprice)
-            #             pr.qtyofprice=0
-            #             pricesofout.insert(0, pr.id)
-            #         else:
-            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
-            #             qtyofout.append(thisqty)
-            #             thisqty=0
-            #             pricesofout.insert(0, pr.id)
-            #         pr.save()
-            #     else:
-            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
-            #         break
-        
+            
         product.save()
         # if i.get('bonitemid', None):
         #     st=Livraisonitem.objects.filter(pk=i['bonitemid']).first()
@@ -2838,8 +2770,17 @@ def updatebonlivraison(request):
             total=i['total'],
             date=datebon,
             isfarah=target=='f',
-            client=client
+            client=client,
+            achatids=achatids,
+            remainqties=remainqties,
+            oldqties=oldqties,
+            coutmoyen=i['coutmoyen'],
         )
+        if achatids:
+            stockins=Stockin.objects.filter(pk__in=achatids)
+            for s, r in zip(stockins, remainqties):
+                s.qtyofprice=r
+                s.save()
 
     return JsonResponse({
         'success':True
@@ -3775,7 +3716,15 @@ def addavoirclient(request):
             product=Produit.objects.get(pk=i['productid'])
             # if isfacture:
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
+            
             if isfarah:
+                ins = Stockin.objects.filter(
+                    qtyofprice__gt=0,
+                    product=product,
+                    isfarah=True
+                ).exclude(
+                    qtyofprice=F('quantity')
+                )
                 product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
                 #prices=Stockin.objects.filter(product=product, isfarah=True)
                 bonid=i['bonid']

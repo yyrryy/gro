@@ -453,7 +453,44 @@
         }
 
         // here is the case if qty is greater than stock
-        
+        qtyprices=$('.qtyprices')
+            prices=0
+            qties=0
+            achatids=[]
+            // what remains from eaach achat
+            remainqties=[]
+            oldqties=[]
+            qty=parseFloat(addqty.val())
+            for (let i = 0; i < qtyprices.length; i++) {
+              
+              let current = $(qtyprices[i]); // get the jQuery object
+              oldqtyprice=current.text()
+              price=current.parent().find('.price')
+              let currentQty = parseFloat(current.text()); // if it's an input use .val(), if span/div use .text()
+              if (qty <= 0) {
+                console.log('Reached 0 or below, stopping.');
+                break; // stop the loop if qty is zero or less
+              }
+              achatids.push(current.attr('achatid'))
+              oldqties.push(currentQty)
+              if (qty>=currentQty){
+                prices+=currentQty*parseFloat(price.text())
+                qties+=currentQty
+                current.text(0)
+                remainqties.push(0)
+              }else{
+                newqtyprice=Math.abs(qty-currentQty)
+                //diff=oldqtyprice-newqtyprice
+                prices+=qty*parseFloat(price.text())
+                qties+=qty
+                current.text(newqtyprice)
+                remainqties.push(newqtyprice)
+              }
+              qty= qty-currentQty; // decrease qty
+                console.log('After item', i, 'qty is now:', qty);
+                
+            }
+            coutmoyen=prices/qties
         if (parseInt(addqty.val())>parseInt(stock)){
           console.log('qty', addqty.val(), 'stock', stock, 'qty > stock', addqty>stock)
 
@@ -474,6 +511,8 @@
               $('.resultsholderbonlivraison').select2('open')
               return
             }
+            
+            
             pdcts.push(id)
             localStorage.setItem('pdctsinbonlivraison{{target}}', JSON.stringify(pdcts))
             afterremise=parseFloat(addprice.val())*parseFloat(addremise.val())/100
@@ -493,6 +532,8 @@
                 <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
                 <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
                 <input type="hidden" name="productid" value="${id}">
+                <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}" oldqties="${oldqties}">
+
 
             </tr>
             `
@@ -507,7 +548,11 @@
               'dp': dp,
               'stock': stock,
               'clientprice': priceclient,
-              'netprice': netprice
+              'netprice': netprice,
+              'coutmoyen': coutmoyen,
+              'achatids': achatids,
+              'remainqties': remainqties,
+              'oldqties': oldqties
             }
             // prepare item to be saved in localstorage
             
@@ -555,6 +600,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${netprice}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
+            <input type="hidden" name="coutmoyen" value="${coutmoyen}" achatids="${achatids}" remainqties="${remainqties}" oldqties="${oldqties}">
 
         </tr>
         `
@@ -569,7 +615,11 @@
           'dp': dp,
           'stock': stock,
           'clientprice': priceclient,
-          'netprice': netprice
+          'netprice': netprice,
+          'coutmoyen': coutmoyen,
+          'achatids': achatids,
+          'remainqties': remainqties,
+          'oldqties': oldqties
         }
         bonachatbody.prepend(tr)
         // delete selected option
@@ -915,6 +965,10 @@
               let remise = tr.find('.remise').val()
               let total = tr.find('.total').text()
               let clientprice= tr.find('.clientprice').text()
+              let achatids= tr.find('input[name="coutmoyen"]').attr('achatids')
+              let remainqties= tr.find('input[name="coutmoyen"]').attr('remainqties')
+              let oldqties= tr.find('input[name="coutmoyen"]').attr('oldqties')
+              let coutmoyen = tr.find('input[name="coutmoyen"]').val()
               let productid = tr.find('input[name="productid"]').val()
               let product = {
                   'qty': qty,
@@ -924,7 +978,11 @@
                   'remise': remise,
                   'total': total,
                   'productid': productid,
-                  'clientprice':clientprice
+                  'clientprice':clientprice,
+                  'coutmoyen': coutmoyen,
+                  'achatids':achatids,
+                  'remainqties':remainqties,
+                  'oldqties':oldqties
               }
               products.push(product)
           })
