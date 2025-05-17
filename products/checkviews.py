@@ -2618,7 +2618,8 @@ def updatebonsortie(request):
                 oldqties=oldqties,
                 coutmoyen=i['coutmoyen'],
             )
-            if achatids:
+            print('>> achatids', achatids)
+            if not 'None' in achatids:
                 stockins=Stockin.objects.filter(pk__in=achatids)
                 for s, r in zip(stockins, remainqties):
                     s.qtyofprice=r
