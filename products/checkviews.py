@@ -3584,7 +3584,7 @@ def removelineinbonsortie(request):
     print('>>', item.achatids)
     achatids = ast.literal_eval(item.achatids)
     oldqties = ast.literal_eval(item.oldqties)
-    if achatids:
+    #if achatids:
         # stockins=Stockin.objects.filter(pk__in=achatids)
         # print('>> stockins', stockins)
         # for s, o in zip(stockins, oldqties):
