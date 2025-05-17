@@ -163,9 +163,9 @@
               <tbody class="bonsortiebody">
                 {% for i in items %}
                 <tr class="itemrow" productid={{i.product.id}} farah={%if i.isfarah%}1{%else%}0{%endif%}>
-                  <td style="padding: 2px 0; font-size: 13px;" class="ref">{{i.ref}}</td>
+                  <!-- <td style="padding: 2px 0; font-size: 13px;" class="ref">{{i.ref}}</td> -->
                   <!-- if remove need to work it should remove the sortieitem -->
-                  <!-- <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, '{{i.product.id}}', '{{i.id}}')">{{i.ref}}</td> -->
+                  <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, '{{i.product.id}}', '{{i.id}}')">{{i.ref}}</td>
                   <td style="padding: 2px 0; font-size: 13px;" class="name text-start">{{i.name}}</td>
                   <!-- <td style="padding: 2px 0; font-size: 13px;"><input type="number" readonly class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td> -->
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" readonly class="calculate qty notemptylivraison" onkeyup="calculate(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td>
