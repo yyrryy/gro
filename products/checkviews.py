@@ -199,10 +199,10 @@ def addbonsortie(request):
                 isfarah=farah,
             )
             
-            stockins=Stockin.objects.filter(pk__in=achatids)
-            for s, r in zip(stockins, remainqties):
-                s.qtyofprice=r
-                s.save()
+            # stockins=Stockin.objects.filter(pk__in=achatids)
+            # for s, r in zip(stockins, remainqties):
+            #     s.qtyofprice=r
+            #     s.save()
             # update stock accordinly
             if farah:
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
@@ -3585,11 +3585,11 @@ def removelineinbonsortie(request):
     achatids = ast.literal_eval(item.achatids)
     oldqties = ast.literal_eval(item.oldqties)
     if achatids:
-        stockins=Stockin.objects.filter(pk__in=achatids)
-        print('>> stockins', stockins)
-        for s, o in zip(stockins, oldqties):
-            s.qtyofprice=o
-            s.save()
+        # stockins=Stockin.objects.filter(pk__in=achatids)
+        # print('>> stockins', stockins)
+        # for s, o in zip(stockins, oldqties):
+        #     s.qtyofprice=o
+        #     s.save()
     return JsonResponse({
         'success':True
     })
