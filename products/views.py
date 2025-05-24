@@ -2732,9 +2732,9 @@ def updatebonlivraison(request):
         product=Produit.objects.get(pk=i['productid'])
         pricesofout=[]
         qtyofout=[]
-        achatids=ast.literal_eval(i['achatids'])
-        remainqties=ast.literal_eval(i['remainqties'])
-        oldqties=ast.literal_eval(i['oldqties'])
+        # achatids=ast.literal_eval(i['achatids'])
+        # remainqties=ast.literal_eval(i['remainqties'])
+        # oldqties=ast.literal_eval(i['oldqties'])
         if target=='f':
             product.stocktotalfarah=float(product.stocktotalfarah)-qty
             
@@ -2771,9 +2771,9 @@ def updatebonlivraison(request):
             date=datebon,
             isfarah=target=='f',
             client=client,
-            achatids=achatids,
-            remainqties=remainqties,
-            oldqties=oldqties,
+            # achatids=achatids,
+            # remainqties=remainqties,
+            # oldqties=oldqties,
             coutmoyen=i['coutmoyen'],
         )
         # if achatids:
