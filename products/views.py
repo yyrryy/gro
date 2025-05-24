@@ -2774,7 +2774,7 @@ def updatebonlivraison(request):
             # achatids=achatids,
             # remainqties=remainqties,
             # oldqties=oldqties,
-            coutmoyen=i['coutmoyen'],
+            # coutmoyen=i['coutmoyen'],
         )
         # if achatids:
         #     stockins=Stockin.objects.filter(pk__in=achatids)
