@@ -3593,3 +3593,22 @@ def removelineinbonsortie(request):
     return JsonResponse({
         'success':True
     })
+
+def updatefactureachatnumber(request):
+    id=request.GET.get('id')
+    facture_no=request.GET.get('facture_no')
+    facture=Factureachat.objects.get(pk=id)
+    facture.facture_no=facture_no
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })
+def updatefactureachatdate(request):
+    id=request.GET.get('id')
+    date=request.GET.get('date')
+    facture=Factureachat.objects.get(pk=id)
+    facture.date=date
+    facture.save()
+    return JsonResponse({
+        'success':True
+    })

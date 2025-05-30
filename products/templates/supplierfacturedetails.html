@@ -35,8 +35,22 @@
   </button>
   {% endif %} -->
 </div>
+
 <div class="d-flex justify-content-between">
   <div id="printfc{{facture.id}}" style="position:relative;">
+    <div class="row">
+      <div class="col-5">
+        <input type="text" class="ms-2 updatefactureachatnumber form-control" value="{{facture.facture_no}}">
+        
+        <button class="btn btn-dark w-100" onclick="updatefactureachatnumber()">Modifier Numero</button>
+      </div>
+      <div class="col-5">
+        <input type="date" class="ms-2 updatefactureachatdate form-control" value="{{facture.date|date:'Y-m-d'}}">
+        
+        <button class="btn btn-dark w-100" onclick="updatefactureachatdate()">Modifier date</button>
+      </div>
+      
+    </div>
     {% for i in orderitems %}
     {% if forloop.counter == orderitems|length %}
     <!-- last iteration -->
@@ -455,6 +469,24 @@
 
 
 <script>
+  function updatefactureachatnumber(request){
+    facture_no=$('.updatefactureachatnumber').val()
+    $.get('/products/updatefactureachatnumber', {
+      'id':'{{facture.id}}',
+      'facture_no':facture_no
+    }, (data)=>{
+      ajaxpage('facture{{facture.id}}', 'r', '/products/supplierfacturedetails/{{facture.id}}?target={{target}}')
+    })
+  }
+  function updatefactureachatdate(request){
+    date=$('.updatefactureachatdate').val()
+    $.get('/products/updatefactureachatdate', {
+      'id':'{{facture.id}}',
+      'date':date
+    }, (data)=>{
+      ajaxpage('facture{{facture.id}}', 'r', '/products/supplierfacturedetails/{{facture.id}}?target={{target}}')
+    })
+  }
   $('.updaterepfacture{{facture.id}}').on('change', function(){
     console.log(">>>>>>>>up")
     rep=$(this).val()

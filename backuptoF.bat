@@ -26,5 +26,4 @@ echo Copying backup to external SSD drive %EXTERNAL_SSD_DRIVE%...
 copy "%BACKUP_FILE%" %EXTERNAL_SSD_DRIVE%
 copy "%BACKUP_FILE%" %EXTERNAL2%
 echo Copy completed.
-pause
 endlocal
