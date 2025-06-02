@@ -51,7 +51,7 @@
       {{title}}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="forceupdatetab('addlistreglementbl', '/products/listreglementbl')">↻</button>
-  </div>
+</div>
 <!-- addsupplier modal -->
 <div class="modal fade" id="editsuppmodal" tabindex="-1" aria-labelledby="editsuppmodalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1294,6 +1294,7 @@
         clientid=$('[name="addreglementclientsbl"]').val()
         mode=$('.mode').val()
         $('.loadingscreen').removeClass('d-none')
+        console.log('>>sending getbonsclient')
         $.post('/products/getclientbons', {
             moderegl:$('.moderegl').val(),
             clientid:clientid,
