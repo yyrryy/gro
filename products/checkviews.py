@@ -1790,6 +1790,7 @@ def getclientbonsforfacture(request):
     print('>> target', target)
     if target=='s':
         bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('bon_no')
+        print('>> client', bons, clientid)
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
     elif target=='f':
         bons=Bonlivraison.objects.filter(client_id=clientid, isfacture=False, isfarah=True).order_by('bon_no')
