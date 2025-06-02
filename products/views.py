@@ -3055,10 +3055,10 @@ def getclientbons(request):
         bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')
         print('>> in reglezmznt', bons)
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
-        for i in bons:
-            trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+        # for i in bons:
+        #     trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
         return JsonResponse({
-            'bons':trs,
+            'bons':render(request, 'clintbonsinreglement.html', {'bons':bons}).content.decode('utf-8'),
             'avoirs':render(request, 'avoirsbl.html', {'avoirs':avoir}).content.decode('utf-8'),
             'avances':render(request, 'avancesbl.html', {'avances':avance}).content.decode('utf-8'),
             # 'total':total,
