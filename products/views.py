@@ -3053,6 +3053,7 @@ def getclientbons(request):
         avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False, ispaid=False).order_by('date')
         avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
         bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')
+        print('>> in reglezmznt', bons)
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
         for i in bons:
             trs+=f'<tr class="blreglrow" clientid="{clientid}"><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.bon_no}</td><td>{i.total}</td> <td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
