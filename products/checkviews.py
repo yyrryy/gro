@@ -1787,7 +1787,7 @@ def supplierlistcommand(request):
 def getclientbonsforfacture(request):
     clientid=request.POST.get('clientid')
     target=request.POST.get('target')
-    print('>> target', target)
+    print('>> target in reglemznt', target)
     if target=='s':
         bons=Bonsortie.objects.filter(client_id=clientid, isfacture=False).order_by('bon_no')
         print('>> client', bons, clientid)
