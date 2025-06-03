@@ -1295,28 +1295,57 @@
         mode=$('.mode').val()
         $('.loadingscreen').removeClass('d-none')
         console.log('>>sending getbonsclient')
+        // $.get('/products/getclientbons', {
+        //     'moderegl':$('.moderegl').val(),
+        //     'clientid':clientid,
+        //     'datefrom':datefrom,
+        //     'dateend':dateend,
+        //     'target':'{{target}}',
+        //     'mode':$('.mode').val(),
+        //     'csrfmiddlewaretoken': '{{ csrf_token }}'
+        //     }, function(data){
+        //         console.log(data)
+        //         $('.loadingscreen').addClass('d-none')
+        //         $('.reglementclientbonholder').html(data.bons)
+        //         $('.avoirstable').html(data.avoirs)
+        //         $('.avancestable').html(data.avances)
+        //         $('.totalbonsbl').text(data.total)
+        //         $('.totalbons').text(data.totalbons)
+        //         $('.totalavoirs').text(data.totalavoirs)
+        //         $('.totalavances').text(data.totalavances)
+        //         $('.soldblregl').text((data.soldbl).toFixed(2))
+        //         // $('.select2').select2()
+        //     // populate bons multiselect
+        // })
+
         $.get('/products/getclientbons', {
-            'moderegl':$('.moderegl').val(),
-            'clientid':clientid,
-            'datefrom':datefrom,
-            'dateend':dateend,
-            'target':'{{target}}',
-            'mode':$('.mode').val(),
-            'csrfmiddlewaretoken': '{{ csrf_token }}'
-            }, function(data){
-                console.log(data)
-                $('.loadingscreen').addClass('d-none')
-                $('.reglementclientbonholder').html(data.bons)
-                $('.avoirstable').html(data.avoirs)
-                $('.avancestable').html(data.avances)
-                $('.totalbonsbl').text(data.total)
-                $('.totalbons').text(data.totalbons)
-                $('.totalavoirs').text(data.totalavoirs)
-                $('.totalavances').text(data.totalavances)
-                $('.soldblregl').text((data.soldbl).toFixed(2))
-                // $('.select2').select2()
-            // populate bons multiselect
+            'moderegl': $('.moderegl').val(),
+            'clientid': clientid,
+            'datefrom': datefrom,
+            'dateend': dateend,
+            'target': 's',
+            'mode': $('.mode').val(),
+            'csrfmiddlewaretoken': 'uPWR8DvkdtFBhoN4jW5Dma1Zyn1g6BU8cSh0fu44pAWAoIHbH0arVH5ynK7RN08N'
         })
+        .done(function(data) {
+            console.log('Success:', data);
+            $('.loadingscreen').addClass('d-none');
+            $('.reglementclientbonholder').html(data.bons);
+            $('.avoirstable').html(data.avoirs);
+            $('.avancestable').html(data.avances);
+            $('.totalbonsbl').text(data.total);
+            $('.totalbons').text(data.totalbons);
+            $('.totalavoirs').text(data.totalavoirs);
+            $('.totalavances').text(data.totalavances);
+            $('.soldblregl').text((data.soldbl).toFixed(2));
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Error fetching bons:', textStatus, errorThrown);
+            console.log('Response Text:', jqXHR.responseText);
+        })
+        .always(function() {
+            console.log('Request finished');
+        });
         // enable the divholder of the multiselects
         // get client bons
         //populate bons multiselect
