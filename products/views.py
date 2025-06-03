@@ -3052,7 +3052,7 @@ def getclientbons(request):
     if target=='s':
         avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False, ispaid=False).order_by('date')
         avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
-        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')
+        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')[:50]
         print('>> in reglezmznt', bons)
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
         # for i in bons:
