@@ -3041,18 +3041,18 @@ def listreglementfc(request):
 
 
 def getclientbons(request):
-    clientid=request.POST.get('clientid')
-    target=request.POST.get('target')
-    moderegl=request.POST.get('moderegl')
-    datefrom=request.POST.get('datefrom')
-    dateend=request.POST.get('dateend')
+    clientid=request.GET.get('clientid')
+    target=request.GET.get('target')
+    moderegl=request.GET.get('moderegl')
+    datefrom=request.GET.get('datefrom')
+    dateend=request.GET.get('dateend')
     print('>> target', target)
     trs=''
     isfarah=target=='f'
     if target=='s':
         avoir=Avoirclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False, ispaid=False).order_by('date')
         avance=Avanceclient.objects.filter(client_id=clientid, date__range=[datefrom, dateend], issortie=True, inreglement=False).order_by('date')
-        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')[:50]
+        bons=Bonsortie.objects.filter(client_id=clientid, ispaid=False, date__range=[datefrom, dateend]).order_by('date')
         print('>> in reglezmznt', bons)
         total=round(Bonsortie.objects.filter(client_id=clientid).aggregate(Sum('total')).get('total__sum')or 0,  2)
         # for i in bons:

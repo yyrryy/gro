@@ -1295,7 +1295,7 @@
         mode=$('.mode').val()
         $('.loadingscreen').removeClass('d-none')
         console.log('>>sending getbonsclient')
-        $.post('/products/getclientbons', {
+        $.get('/products/getclientbons', {
             moderegl:$('.moderegl').val(),
             clientid:clientid,
             datefrom:datefrom,
