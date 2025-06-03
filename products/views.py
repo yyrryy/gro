@@ -3065,7 +3065,7 @@ def getclientbons(request):
             'totalavoirs':round(avoir.aggregate(Sum('total')).get('total__sum') or 0, 2),
             'totalavances':round(avance.aggregate(Sum('amount')).get('amount__sum') or 0, 2),
             # 'total':total,
-            'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2),
+            #'soldbl':round(Client.objects.get(pk=clientid).soldbl, 2),
             'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
             
         })
