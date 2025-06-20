@@ -24,6 +24,17 @@
       <strong>Mode: {{i.mode}}</strong> <br>
     </div>
     {% endfor %}
+    <hr>
+    {% for i in avances %}
+    <div class="border p-2 bg-dark text-white">
+      <div>Avance de bon</div>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+    </div>
+    {% endfor %}
     {% for i in reglementsfc %}
     <div class="alert alert-danger">
       Reglement facture de bon: REG#{{i.id}} <br>

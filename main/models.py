@@ -476,6 +476,7 @@ class Avanceclient(models.Model):
     isfarah=models.BooleanField(default=False)
     isorgh=models.BooleanField(default=False)
     issortie=models.BooleanField(default=False)
+    bonofavance=models.CharField(max_length=900, default=None, null=True)
     # avance selected in an rglement
     inreglement=models.BooleanField(default=False)
     targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)

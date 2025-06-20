@@ -138,6 +138,7 @@
                         <select name="addreglementclientsbl" id="" class="form-select addreglementclientsbl select2client" style="width:100%;" onchange="getbons()">
 
                         </select>
+                        <input type="text" class="form-control bonofavance" placeholder="N° bon">
                         
                     </div>
 
@@ -310,6 +311,10 @@
             <th onclick="sorttable(event)">
                 Note
             </th>
+
+            <th onclick="sorttable(event)">
+                N° bon
+            </th>
             
             <th onclick="sorttable(event)">
                 Status
@@ -353,6 +358,9 @@
                    <td>
                     {{i.note.upper}}
                </td>
+               <td>
+                    {{i.bonofavance.upper}}
+                </td>
                    <td>
                     {% if i.inreglement %}
                     <div class="" style="text-align: center; background: rgb(179, 255, 0);">
@@ -360,6 +368,7 @@
                     </div>
                     {% else %}
                     <button class="btn bi bi-trash" onclick="deleteavanceclient(event, '{{i.id}}')"></button>
+                    <button class="btn bi bi-eye" onclick="showavanceclient(event, '{{i.id}}')"></button>
                     {% endif %}
                    </td>
                      
@@ -425,6 +434,18 @@
                } }
                , function() { alertify.error('Cancel') });
         
+    }
+    function showavanceclient(event, avanceid){
+        $('.updateavances').removeClass('d-none')
+        
+        $.get('/products/showavanceclient', {
+            'target':'{{target}}', 
+            'avanceid':avanceid
+            }, function(data){
+                console.log(data)
+                $('.reglebldata').html(data)
+                
+        })
     }
     
   // load more bl in regle not woking
@@ -997,9 +1018,10 @@
         echeance=parentdiv.find('[name="echeance"]').map(function() {
             return this.value;
         }).get();
-        
+        bonofavance=$('.bonofavance').val()
         $.get('/products/addavanceclient', {
             clientid:clientid,
+            bonofavance:bonofavance,
             target:'{{target}}',
             mantant:JSON.stringify(mantant),
             mode:JSON.stringify(mode),

@@ -1861,13 +1861,13 @@ def bonlivraisondetails(request, id):
     reglements=PaymentClientbl.objects.filter(bons__in=[order])
     facture=order.facture
     reglementsfc=PaymentClientbl.objects.filter(factures__in=[facture])
-
+    avances=Avanceclient.objects.filter(bonofavance=order.bon_no)
     orderitems=list(orderitems)
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
-    print('>> reglement', reglements)
     ctx={
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
+        'avances':avances,
         'orderitems':orderitems,
         'reglements':reglements,
         'reglementsfc':reglementsfc,
@@ -2907,6 +2907,7 @@ def listavances(request):
 
 def addavanceclient(request):
     clientid=request.GET.get('clientid')
+    bonofavance=request.GET.get('bonofavance')
     client=Client.objects.get(pk=clientid)
     
     target=request.GET.get('target')
@@ -2935,7 +2936,8 @@ def addavanceclient(request):
             npiece=np,
             isfarah=target=='f',
             isorgh=target=='o',
-            issortie=target=='s'
+            issortie=target=='s',
+            bonofavance=bonofavance
         )
         caisse=Caisse.objects.filter(target=target).first()
         if mod=='espece':
@@ -11746,3 +11748,8 @@ def reglsituation(request):
     return JsonResponse({
         'success':True
     })
+def showavanceclient(request):
+    avanceid=request.GET.get('avanceid')
+    target=request.GET.get('target')
+    avance=Avanceclient.objects.get(pk=avanceid)
+    return render(request, 'showavanceclient.html', {'avanceid':avanceid, 'target':target, 'avance':avance})
