@@ -1155,7 +1155,7 @@ a .uil {
         date=$('.regldate').val()
         if (date==''){
           alertify.error('Date')
-          error
+          return
         }
         $.get('/products/updatereglebons', {
           'reglementid':id,
@@ -1166,6 +1166,37 @@ a .uil {
           'echeance':echeance,
           'bank':bank
         })
+      }
+
+      function updateavanceclient(event, id){
+        console.log('>>updateavance')
+        mantant=$('[name="mantant"]').val()
+        note=$('[name="note"]').val()
+        bonofavance=$('[name="bonofavance"]').val()
+        npiece=$('[name="npiece"]').val()
+        mode=$('[name="mode"]').val()
+        echeance=$('[name="echeance"]').val()
+        bank=$('[name="bank"]').val()
+        date=$('.regldate').val()
+        console.log('>>updateavance2')
+        if (date==''){
+          alertify.error('Date')
+          return
+        }
+        console.log('>>updateavance3', id)
+        
+        $.get('/products/updateavanceclient', {
+          'avanceid':id,
+          'mantant':mantant,
+          'mode':mode,
+          'npiece':npiece,
+          'date':date,
+          'echeance':echeance,
+          'bank':bank,
+          'note':note,
+          'bonofavance':bonofavance,
+        })
+        console.log('>>updateavance4')
       }
       
       function updatereglsupp(id){

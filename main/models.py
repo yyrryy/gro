@@ -635,6 +635,7 @@ class Notesrepresentant(models.Model):
 
 
 class PaymentClientbl(models.Model):
+    code=models.CharField(max_length=100, default=None, null=True, blank=True)
     dateregl = models.DateTimeField(default=None, null=True, blank=True)
     client=models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True, blank=True)
     date = models.DateTimeField(default=None)

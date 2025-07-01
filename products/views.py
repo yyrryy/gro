@@ -5635,6 +5635,35 @@ def updatereglebons(request):
     # thisclient.soldbl=round(float(thisclient.soldbl)-float(reglement.amount)+float(mantant), 2)
     # substract the old total from client soldbl
 
+def updateavanceclient(request):
+    avanceid=request.GET.get('avanceid')
+    mantant=request.GET.get('mantant')
+    mode=request.GET.get('mode')
+    bank=request.GET.get('bank')
+    note=request.GET.get('note')
+    bonofavance=request.GET.get('bonofavance')
+    npiece=request.GET.get('npiece')
+    date=datetime.strptime(request.GET.get('date'), '%Y-%m-%d')
+    echeance=request.GET.get('echeance')
+    echeance=datetime.strptime(echeance, '%Y-%m-%d') if echeance!='' else None
+    # newbons=json.loads(request.POST.get('bons'))
+    avance=Avanceclient.objects.get(pk=avanceid)
+    
+    avance.date=date
+    avance.amount=mantant
+    avance.mode=mode
+    avance.bank=bank
+    avance.npiece=npiece
+    avance.bonofavance=bonofavance
+    avance.note=note
+    avance.echeance=echeance
+
+    print('>>> bank', bank)
+    #avance.bons.set(livraisons)
+    avance.save()
+    return JsonResponse({
+        'success':True
+    })
 
 def updatereglesupp(request):
     reglementid=request.GET.get('reglementid')
