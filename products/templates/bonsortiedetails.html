@@ -60,6 +60,16 @@
       <strong>Mode: {{i.mode}}</strong> <br>
     </div>
     {% endfor %}
+    {% for i in avances %}
+    <div class="border p-2 bg-dark text-white">
+      <div>Avance de bon</div>
+      <strong>Mantant: {{i.amount}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+      <strong>N° piece: {{i.npiece}}</strong> <br>
+      <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
+      <strong>Mode: {{i.mode}}</strong> <br>
+    </div>
+    {% endfor %}
     {% if not order.generated %}
     <button class="btn w-100 btn-success" style="margin-top: 15em;" onclick="validatebonsortie(event, '{{order.id}}')">
       Valider Bon sortie (prix bon sortie)

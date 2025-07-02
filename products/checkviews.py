@@ -766,13 +766,15 @@ def bonsortiedetails(request, id):
     orderitems=[orderitems[i:i+34] for i in range(0, len(orderitems), 34)]
     reglements=PaymentClientbl.objects.filter(bonsortie__in=[order])
     cars=Carlogos.objects.all()
+    avances=Avanceclient.objects.filter(bonofavance=order.bon_no)
     ctx={
         'reglements':reglements,
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
         'orderitems':orderitems,
         'bonsortie':True,
-        'cars':cars
+        'cars':cars,
+        'avances':avances,
     }
     return render(request, 'bonsortiedetails.html', ctx)
 
