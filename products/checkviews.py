@@ -2531,11 +2531,13 @@ def getlastbuyprice(request):
 def modifierbonsortie(request):
     id=request.GET.get('id')
     bon=Bonsortie.objects.get(pk=id)
+    avances=Avanceclient.objects.filter(bonofavance=bon.bon_no).exists()
     items=Sortieitem.objects.filter(bon=bon)
     ctx={
         'title':'Modifier '+bon.bon_no,
         'items':items,
         'bon':bon,
+        'avances':avances,
         'cars':Carlogos.objects.all().order_by('id'),
         # 'products':Produit.objects.all(),
         # 'clients':Client.objects.all(),

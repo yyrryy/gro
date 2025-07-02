@@ -199,6 +199,7 @@
           <div class="col-2">
             <!-- <strong>Payment</strong> -->
             <!-- bordered box with title peyment, it will have input for the given amount and a div ta calculate the remaining amount -->
+            {% if not avances %}
             <div class="bg-white rounded p-2">
               <div class="">
                 <div>
@@ -229,7 +230,7 @@
               </div>
 
 
-          </div>
+          </div>{% endif %}
       </div>
 
   </div>
