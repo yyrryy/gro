@@ -17,6 +17,7 @@
     {% for i in reglements %}
     <div class="alert alert-danger">
       Reglement de bon: REG#{{i.id}} <br>
+      <strong>date: {{i.date|date:'d/m/y'}}</strong> <br>
       <strong>Mantant: {{i.amount}}</strong> <br>
       <strong>Mode: {{i.mode}}</strong> <br>
       <strong>N° piece: {{i.npiece}}</strong> <br>
@@ -25,6 +26,7 @@
       <hr>
       Avance de reglement: <br>
       {% for avance in i.avances.all %}
+      <strong>date: {{i.date|date:'d/m/y'}}</strong> <br>
       <strong>Mantant: {{avance.amount}}</strong> <br>
       <strong>Mode: {{avance.mode}}</strong> <br>
       <strong>N° piece: {{avance.npiece}}</strong> <br>
@@ -44,6 +46,7 @@
     {% for i in avances %}
     <div class="border p-2 bg-dark text-white">
       <div>Avance de bon</div>
+      <strong>date: {{i.date|date:'d/m/y'}}</strong> <br>
       <strong>Mantant: {{i.amount}}</strong> <br>
       <strong>Mode: {{i.mode}}</strong> <br>
       <strong>N° piece: {{i.npiece}}</strong> <br>
