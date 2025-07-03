@@ -54,10 +54,25 @@
     <div class="alert alert-danger">
       Reglement de bon: REG#{{i.id}} <br>
       <strong>Mantant: {{i.amount}}</strong> <br>
-      <strong>Mode: {{i.mode}}</strong> <br>
       <strong>N° piece: {{i.npiece}}</strong> <br>
       <strong>echeance: {{i.echance|date:'d/m/y'}}</strong> <br>
       <strong>Mode: {{i.mode}}</strong> <br>
+      <hr>
+      Avance de reglement: <br>
+      {% for avance in i.avances.all %}
+      <strong>Mantant: {{avance.amount}}</strong> <br>
+      <strong>Mode: {{avance.mode}}</strong> <br>
+      <strong>N° piece: {{avance.npiece}}</strong> <br>
+      <strong>echeance: {{avance.echance|date:'d/m/y'}}</strong> <br>
+      {% endfor %}
+      <hr>
+      Avoir de reglement: <br>
+      {% for avoir in i.avoires.all %}
+      <strong>Total: {{avoir.total}}</strong> <br>
+      <strong>date: {{avoir.date|date:'d/m/Y'}}</strong> <br>
+      <strong>N° piece: {{avoir.no}}</strong> <br>
+      
+      {% endfor %}
     </div>
     {% endfor %}
     {% for i in avances %}
