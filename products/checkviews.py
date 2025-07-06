@@ -3617,3 +3617,14 @@ def updatefactureachatdate(request):
     return JsonResponse({
         'success':True
     })
+
+    
+def inventaire(request):
+    target=request.GET.get('target')
+    products=Produit.objects.all()
+    destination="Orgh" if target=='o' else "Farah"
+    return render(request, 'inventaire.html', {
+        'target':target,
+        'products':products,
+        'title': f'Inventaire {destination}'
+    })

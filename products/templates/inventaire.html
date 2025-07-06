@@ -4,7 +4,7 @@
   <link href="/static/css/minified.css" rel="stylesheet" />
   <script src="/static/js/chart.js"></script>
   <script src="/static/js/xlsx.full.min.js"></script>
-
+  <title>{{title}}</title>
 </head>
 <style media="screen">
   .blurred{
@@ -17,37 +17,39 @@
 </style>
 <body style="background: white; font-family: monospace;">
   <div class="p-2 container">
-
-
-      <!-- mini tables (header) -->
-      <div class="d-flex">
-        <input type="file" class="form-control excelfile">
-        <button class="btn-success btn-sm" onclick="excelpdcts(event)
-        ">Importer</button>
-
-      </div>
-      <div class="position-relative">
-        <div class="loadingscreen w-100 h-100 d-none" style="position: absolute;top: 0;background: #12121285;">
-          <div class="spinner-border text-light" role="status">
-          </div>
-        </div>
-        <div class="mt-5 entries">
-
-        </div>
-        <div class="row">
-          <div class="mt-5 difftracker p-2 border rounded col-7">
-
-          </div>
-          <div class="mt-5 referrors p-2 text-danger col-5">
-
-
-          </div>
-        </div>
-
-
-
-
-      </div>
+    <div class="bg-darkblue p-2 rounded text-white text-center">{{title}}</div>
+    <div class="mt-2" style="height: 90vh; overflow: scroll;">
+      <table class="table table-bordered table-hover">
+        <thead style="position: sticky; top: 0; background: black; color: white;">
+          <tr>
+            <td>Ref</td>
+            <td>Designation</td>
+            <td>Stock system</td>
+            <td>Stock reel</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in products %}
+          <tr>
+            <td>
+              {{i.ref}}
+            </td>
+            <td>
+              {{i.name}}
+            </td>
+            <td>
+              {% if target == 'o' %}{{i.stocktotalorgh}}{% else %}{{i.stocktotalfarah}}{% endif %}
+            </td>
+            <td class="d-flex align-items-center p-2 justify-content-center">
+              <input type="number" class="" placeholder="stock raal" style="
+              height: 2em;">
+              <button class="btn bi bi-check btn-primary"></button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
   </div>
   <script>
