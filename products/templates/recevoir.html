@@ -310,7 +310,7 @@
     localStorage.setItem('pdctsinbonachat{{target}}', JSON.stringify(pdcts))
     let tr = `
     <tr class="itemrow">
-      <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removeline(event, id, 'bonachat{{target}}')">${ref}</td>
+      <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removeline(event, id, 'bonachat{{target}}')">${ref}</td>
       <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
       <td style="paddingpx 0; font-size: 13px;">${dp}</td>
       <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
@@ -496,7 +496,7 @@
       localStorage.setItem('pdctsinbonachat{{target}}', JSON.stringify(pdcts))
       let tr = `
       <tr class="itemrow">
-        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removeline(event, id, 'bonachat{{target}}')">${ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removeline(event, id, 'bonachat{{target}}')">${ref}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
         <td style="paddingpx 0; font-size: 13px;">${dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${stock}</td>
@@ -725,7 +725,7 @@
     //         let bonachatbody = $('.bonachatbody')
     //         let tr = `
     //         <tr>
-    //             <td class="ref">${ref}</td>
+    //             <td class="ref text-uppercase">${ref}</td>
     //             <td class="name">${name}</td>
     //             <td>${dp}</td>
     //             <td>${stock}</td>
@@ -776,7 +776,7 @@
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
         $('.bonachatbody').prepend(`<tr class="itemrow">
-        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removeline(event, id, 'bonachat{{target}}')">${item.ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removeline(event, id, 'bonachat{{target}}')">${item.ref}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
         <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
         <td style="padding: 2px 0; font-size: 13px;">${item.stock}</td>

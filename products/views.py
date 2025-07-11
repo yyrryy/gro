@@ -4347,7 +4347,7 @@ def listboncommnd(request):
 def bonachatdetails(request, id):
     target=request.GET.get('target')
     bon=Itemsbysupplier.objects.get(pk=id)
-    items=Stockin.objects.filter(nbon=bon)
+    items=Stockin.objects.filter(nbon=bon).order_by('-id')
     payments=PaymentSupplier.objects.filter(bons__in=[bon])
     #orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
 
@@ -4709,12 +4709,12 @@ def getsuppbons(request):
     if mode=="bl":
         bons=Itemsbysupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend], isfacture=False)
         for i in bons:
-            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{i.total}" onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.nbon}</td><td>{i.supplier.name}</td><td>{round(i.total, 2)}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total="{round(i.total, 2)}" onchange="checkreglementbox(event)"></td></tr>'
 
     else:
         bons=Factureachat.objects.filter(isfarah=isfarah, supplier_id=supplierid, ispaid=False, date__range=[datestart, dateend])
         for i in bons:
-            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{i.total}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={i.total} onchange="checkreglementbox(event)"></td></tr>'
+            trs+=f'<tr><td>{i.date.strftime("%d/%m/%Y")}</td><td>{i.facture_no}</td><td>{round(i.total, 2)}</td><td><input type="checkbox" value="{i.id}" name="bonstopay" total={round(i.total, 2)} onchange="checkreglementbox(event)"></td></tr>'
     print('isfarah', isfarah)
     avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, inreglement=False, ispaid=False, date__range=[datestart, dateend])
     print('avoirs', avoirs)
@@ -4764,37 +4764,37 @@ def reglebonsachat(request):
     avances.update(inreglement=True)
     totalmantant=sum(mantant)
     totalbons=livraisons.aggregate(Sum('total'))['total__sum'] or 0
-    if whattopay<totalmantant:
-        livraisons.update(ispaid=True)
-        if moderegl=='facture':
-            for livraison in livraisons:
-                # Update 'ispaid' for related ManyToManyField (bons)
-                print('>> bons of facture', livraison.bons.all())
-                livraison.bons.all().update(ispaid=True)
-        print('>> rel is ,ore than pay', totalmantant, whattopay)
-        diff=round(totalmantant-whattopay, 2)
-        print('>>>>>>< deiff', diff)
-        # create avance supp
-        Avancesupplier.objects.create(
-            supplier_id=supplierid,
-            amount=diff,
-            date=date,
-            isfarah=isfarah,
-        )
-    if whattopay==totalmantant:
-        livraisons.update(ispaid=True)
-        if moderegl=='facture':
-            print('facture is paid', livraisons.values())
-            for livraison in livraisons:
-                # Update 'ispaid' for related ManyToManyField (bons)
-                livraison.bons.all().update(ispaid=True)
-    if whattopay>totalmantant:
-        Avancesupplier.objects.create(
-            supplier_id=supplierid,
-            amount=totalmantant,
-            date=date,
-            isfarah=isfarah,
-        )
+    # if whattopay<totalmantant:
+    #     livraisons.update(ispaid=True)
+    #     if moderegl=='facture':
+    #         for livraison in livraisons:
+    #             # Update 'ispaid' for related ManyToManyField (bons)
+    #             print('>> bons of facture', livraison.bons.all())
+    #             livraison.bons.all().update(ispaid=True)
+    #     print('>> rel is ,ore than pay', totalmantant, whattopay)
+    #     diff=round(totalmantant-whattopay, 2)
+    #     print('>>>>>>< deiff', diff)
+    #     # create avance supp
+    #     Avancesupplier.objects.create(
+    #         supplier_id=supplierid,
+    #         amount=diff,
+    #         date=date,
+    #         isfarah=isfarah,
+    #     )
+    #if whattopay==totalmantant:
+    livraisons.update(ispaid=True)
+    if moderegl=='facture':
+        print('facture is paid', livraisons.values())
+        for livraison in livraisons:
+            # Update 'ispaid' for related ManyToManyField (bons)
+            livraison.bons.all().update(ispaid=True)
+    # if whattopay>totalmantant:
+    #     Avancesupplier.objects.create(
+    #         supplier_id=supplierid,
+    #         amount=totalmantant,
+    #         date=date,
+    #         isfarah=isfarah,
+    #     )
     print('>> date suppp', date)
     for m, mod, np, ech, bk, s in zip(mantant, mode, npiece, echeance, bank, source):
         regl=PaymentSupplier.objects.create(
