@@ -4347,7 +4347,7 @@ def listboncommnd(request):
 def bonachatdetails(request, id):
     target=request.GET.get('target')
     bon=Itemsbysupplier.objects.get(pk=id)
-    items=Stockin.objects.filter(nbon=bon).order_by('-id')
+    items=Stockin.objects.filter(nbon=bon)
     payments=PaymentSupplier.objects.filter(bons__in=[bon])
     #orderitems=[items[i:i+36] for i in range(0, len(items), 36)]
 

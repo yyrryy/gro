@@ -328,7 +328,7 @@
       </tr>
       `
       
-      bonachatbody.prepend(tr)
+      bonachatbody.append(tr)
       // delete selected option
       addqty.val('')
       addname.val('')
@@ -514,7 +514,7 @@
         </tr>
         `
         
-        bonachatbody.prepend(tr)
+        bonachatbody.append(tr)
         // delete selected option
         addqty.val('')
         addname.val('')
@@ -592,7 +592,7 @@
     //         <input type="hidden" name="productidbonachat" value="${id}">
     //     </tr>
     //     `
-    //     bonachatbody.prepend(tr)
+    //     bonachatbody.append(tr)
     //     // delect selected option
     // })
 
@@ -743,7 +743,7 @@
     //             <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
     //         </tr>
     //         `
-    //         bonachatbody.prepend(tr)
+    //         bonachatbody.append(tr)
     //         // delect selected option
     //         selectElement.remove(selectElement.selectedIndex);
     //     }
@@ -775,7 +775,7 @@
       pdcts=JSON.parse(localStorage.getItem('bonachat{{target}}')) || []
       for (let i=0; i<pdcts.length; i++){
         item=pdcts[i]
-        $('.bonachatbody').prepend(`<tr class="itemrow">
+        $('.bonachatbody').append(`<tr class="itemrow">
         <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removeline(event, id, 'bonachat{{target}}')">${item.ref}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
         <td style="paddingpx 0; font-size: 13px;">${item.dp}</td>
