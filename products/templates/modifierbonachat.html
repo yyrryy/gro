@@ -153,7 +153,7 @@ margin: 0;
                 {% for i in items %}
                 <tr class="itemrow">
                     <input type="hidden" class="achatitemid" value="{{i.id}}">
-                    <td class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', '{{i.product.id}}')">{{i.product.ref.upper}}</td>
+                    <td class="ref text-uppercase" onclick="removelineupdateachat(event, '{{bon.id}}', '{{i.product.id}}')">{{i.product.ref.upper}}</td>
                     <td class="name">{{i.product.name}}</td>
                     <!-- <td><input class="qtybarcode" style="width:65px;"></td> -->
                     <!-- <td>
@@ -260,7 +260,7 @@ margin: 0;
       // <td><input class="qtybarcode" style="width:65px;"></td>
       let tr = `
       <tr class="itemrow">
-        <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
+        <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
         <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
         
         
@@ -277,7 +277,7 @@ margin: 0;
         </tr>
         `
         
-        bonachatbody.prepend(tr)
+        bonachatbody.append(tr)
         // delete selected option
         addqty.val('')
         addname.val('')
@@ -375,7 +375,7 @@ margin: 0;
     localStorage.setItem('pdctsinbonachat{{bon.id}}{{target}}', JSON.stringify(pdcts))
     let tr = `
     <tr class="itemrow">
-      <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
+      <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
       <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
       
       
@@ -392,7 +392,7 @@ margin: 0;
       </tr>
       `
       
-      bonachatbody.prepend(tr)
+      bonachatbody.append(tr)
       // delete selected option
       addqty.val('')
       addname.val('')
@@ -487,7 +487,7 @@ margin: 0;
       let addtotal=(parseFloat(addqty.val()==''?0:addqty.val())*parseFloat(addprice.val()==''?0:addprice.val())).toFixed(2) || 0
       let tr = `
       <tr class="itemrow ${stock<=0? "text-danger":"" }">: 2
-          <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
+          <td style="padding: 2px 0; font-size: 13px;" class="ref text-uppercase" onclick="removelineupdateachat(event, '{{bon.id}}', ${id})">${ref}</td>
           <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
           
           
@@ -501,7 +501,7 @@ margin: 0;
       </tr>
       `
 
-      bonachatbody.prepend(tr)
+      bonachatbody.append(tr)
       // delete selected option
       addqty.val('')
       addname.val('')
@@ -722,7 +722,7 @@ margin: 0;
     //         let bonachatbody = $('.bonachatbody')
     //         let tr = `
     //         <tr>
-    //             <td class="ref">${ref}</td>
+    //             <td class="ref text-uppercase">${ref}</td>
     //             <td class="name">${name}</td>
     //             <td>${dp}</td>
     //             <td>${stock}</td>
@@ -740,7 +740,7 @@ margin: 0;
     //             <td><button class="btn btn-danger btn-sm" onclick="removefrombon(this)">X</button></td>
     //         </tr>
     //         `
-    //         bonachatbody.prepend(tr)
+    //         bonachatbody.append(tr)
     //         // delect selected option
     //         selectElement.remove(selectElement.selectedIndex);
     //     }
