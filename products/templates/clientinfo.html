@@ -374,7 +374,7 @@
                           <td style="width: 12%;"></td>
                           <td style="width: 5%;"></td>
                           <td style="width: 5%; background: yellowgreen;" class="totalbons" onclick="$('.hidebltotal').toggleClass('fade')">
-                            <div class="hidebltotal">{{total|floatformat:'2'|intspace}}</div>
+                            {{totalbons|floatformat:'2'|intspace}}
                           </td>
                           <td style="width: 5%;"></td>
                           <td style="width: 5%;"></td>
@@ -960,6 +960,7 @@
     // Convert from yyyy-mm-dd to Date
     const start = startVal ? new Date(startVal) : null;
     const end = endVal ? new Date(endVal) : null;
+    total=0
     $('.tables:not(.d-none) tbody tr').each(function () {
       const dateText = $(this).find('.date').text().trim();
       const rowDate = parseDate(dateText);
@@ -968,8 +969,11 @@
         $(this).hide();
       } else {
         $(this).show();
+        console.log($(this).find('td'))
+        total += parseFloat($( $(this).find('td')[4] ).text());
       }
     });
+    $('.totalbons').text(total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " "));
   });
     function allowcatalog(clientcode){
         $.get('/products/allowcatalog', {'clientcode':clientcode}, (data)=>{

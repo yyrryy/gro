@@ -3562,12 +3562,15 @@ def downloadcreditclient(request):
     # sold if orgh or farah else soldbs
     if target=='f':
         clients=[i for i in Client.objects.filter(clientfarah=True) if i.sold().sold!=0 ]
+        totalbons=(round(Bonlivraison.objects.filter(isfarah=True, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
     elif target=='o': 
         clients=[i for i in Client.objects.filter(clientorgh=True) if i.sold().sold!=0 ]
+        totalbons=sum(round(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
     else:
         clients=[i for i in Client.objects.filter(clientsortie=True) if i.soldbs().sold!=0 ]
-    print(">> counts", clients)
-    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
+        totalbons=(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0 for i in clients)
+    print(">> counts", clients, totalbons)
+    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today, 'totalbons':totalbons})
     
 def downloadallclient(request):
     target=request.GET.get('target')
@@ -3575,13 +3578,15 @@ def downloadallclient(request):
     today = timezone.now().date()
     # sold if orgh or farah else soldbs
     if target=='f':
-        clients= Client.objects.filter(clientfarah=True) 
+        clients= Client.objects.filter(clientfarah=True)
+        totalbons=sum(round(Bonlivraison.objects.filter(isfarah=True, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
     elif target=='o': 
-        clients=Client.objects.filter(clientorgh=True) 
+        clients=Client.objects.filter(clientorgh=True)
+        totalbons=sum(round(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
     else:
         clients=Client.objects.filter(clientsortie=True)
-    print(">> counts", clients)
-    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today})
+    print('>> clients', clients, totalbons)
+    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today, 'totalbons':totalbons})
     
 def removelineinbonsortie(request):
     id=request.GET.get('sortieitemid')

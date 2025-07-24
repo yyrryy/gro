@@ -1453,7 +1453,7 @@ def clientinfo(request, id):
         'client':client,
         'totalavoirs':Avoirclient.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
         'totalpayments':PaymentClientbl.objects.filter(client=client).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'totaltr':Bonlivraison.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalbons':Bonlivraison.objects.filter(client=client).aggregate(Sum('total'))['total__sum'] or 0,
         'bons':bons,
         'payments':PaymentClientbl.objects.filter(client=client),
         'avoirs':Avoirclient.objects.filter(client=client),
