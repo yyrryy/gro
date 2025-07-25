@@ -111,7 +111,7 @@
       </tr>
     </tbody>
   </table> -->
-  <div style="height: 70vh; overflow: scroll;" class="listachatholder">
+  <div style="height: 65vh; overflow: scroll;" class="listachatholder">
     <table class="listachattable table table-bordered table-hover table-striped achattable" style="font-size: 12px;" id="addbonlivraisonle">
       <thead style="position: sticky; top: 0; background: gray;">
         <tr>
@@ -185,15 +185,36 @@
       </tfoot> -->
     </table>
   </div>
-  <div ></div>
+  <button class="btn btn-success w-100 loadmorebtn" wanted="nonvalid" onclick="loadbonachat(event)">Plus</button>
 </div>
 
 
 
 
+
 <script>
+  page=1;
+  hasmore=true
+  function loadbonachat(even){
+    // what we want, valid or not valid bons
+    wanted=$(event.taget).attr('wanted')
+    if (!hasmore){return}
+
+    $('.listbachatbody').addClass('blurred')
+    $.get('/products/loadbonachat?target={{target}}',{
+      'page':page,
+      'wanted':wanted
+    }, (data)=>{
+      page+=1
+      $('.listbachatbody').removeClass('blurred')
+      $('.listbachatbody').append(data.html)
+      hasmore=data.has_more
+
+    })
+  }
   function getbonachatvalider(){
     $('.listbachatbody').addClass('blurred')
+    $('.loadmorebtn').attr('wanted', 'valid')
     $.get('/products/getbonachatvalider?target={{target}}', (data)=>{
       $('.listbachatbody').html(data.html)
       $('.listbachatbody').removeClass('blurred')

@@ -11782,3 +11782,23 @@ def showavanceclient(request):
     target=request.GET.get('target')
     avance=Avanceclient.objects.get(pk=avanceid)
     return render(request, 'showavanceclient.html', {'avanceid':avanceid, 'target':target, 'avance':avance})
+
+def loadbonachat(request):
+    target=request.GET.get('target')
+    page = int(request.GET.get('page', 1))
+
+    per_page = 50  # Adjust as needed
+
+    start = (page - 1) * per_page
+    end = page * per_page
+    wantvalid=request.GET.get('wanted')=='valid'
+    if target=='f':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True, isvalid=wantvalid).order_by('-id')[start:end]
+    elif target=='o':
+        bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=False, isvalid=wantvalid).order_by('-id')[start:end]
+    return JsonResponse({
+        'html':render(request, 'bonachattrs.html', {'bons':bons}).content.decode('utf-8'),
+        'has_more': len(bons) == per_page
+        
+    })
+    
