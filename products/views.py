@@ -11791,6 +11791,7 @@ def loadbonachat(request):
 
     start = (page - 1) * per_page
     end = page * per_page
+    print('>> start , end', start , end)
     wantvalid=request.GET.get('wanted')=='valid'
     if target=='f':
         bons=Itemsbysupplier.objects.filter(date__year=thisyear, isfarah=True, isvalid=wantvalid).order_by('-id')[start:end]

@@ -154,7 +154,17 @@
 
           </tr>
         {% endfor %}
+        
       </tbody>
+      <tr style="background: yellowgreen;position: sticky; bottom: 0;">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="total">{{total}}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
       <!-- <thead style="position: sticky; bottom: 0; background: white;">
         <tr>
           <td style="width: 8%;"></td>
@@ -193,7 +203,7 @@
 
 
 <script>
-  page=1;
+  page=2;
   hasmore=true
   function loadbonachat(even){
     // what we want, valid or not valid bons
@@ -216,7 +226,9 @@
     $('.listbachatbody').addClass('blurred')
     $('.loadmorebtn').attr('wanted', 'valid')
     $.get('/products/getbonachatvalider?target={{target}}', (data)=>{
+      console.log(data)
       $('.listbachatbody').html(data.html)
+      $('.total').html(data.total)
       $('.listbachatbody').removeClass('blurred')
     })
   }
@@ -226,7 +238,7 @@
     if (year==''){return}
     currentPagelistbl=1
     loadinglistbl = false;
-    $('.listachatholder').on('scroll', handleScrolllistachat)
+    //$('.listachatholder').on('scroll', handleScrolllistachat)
 
     $.get('/products/yeardatabachat?target={{target}}', {year:year}, (data)=>{
       $(".listachattable tbody").html(data.trs)
@@ -261,7 +273,7 @@
       $(".listachattable tbody").html(data.trs)
       $('.totalbbonachat').text(data.total)
       });
-      $('.listachatholder').on('scroll', handleScrolllistachat)
+      //$('.listachatholder').on('scroll', handleScrolllistachat)
 
     currentPagelistbl=1
     loadinglistbl = false;
@@ -287,7 +299,7 @@
           if (!data.has_more) {
 
               // Remove the scroll event listener when there are no more records
-              $('.listachatholder').on('scroll', handleScrolllistachat)
+              //$('.listachatholder').on('scroll', handleScrolllistachat)
 
           }
         })
@@ -315,7 +327,7 @@
     };
 
     // Attach the scroll event listener
-    $('.listachatholder').on('scroll', handleScrolllistachat)
+    //$('.listachatholder').on('scroll', handleScrolllistachat)
 
 
 

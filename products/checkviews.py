@@ -2280,7 +2280,7 @@ def getbonachattovalidate(request):
             'bons':trs,
             'totalbons':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2),
         })
-    bons=Itemsbysupplier.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah, isfacture=True).order_by('date')
+    bons=Itemsbysupplier.objects.filter(isvalid=False, ispaid=True, date__range=[datefrom, dateend], isfarah=isfarah).order_by('date')
     for i in bons:
         facture_info = f'facture={i.facture.facture_no}' if i.facture else ""
         print('>>', facture_info)
@@ -2326,11 +2326,12 @@ def validatebonachat(request):
     else:
         livraisons=Itemsbysupplier.objects.filter(pk__in=bons)
         for livraison in livraisons:
-            print("make facture valid", livraison.facture.facture_no)
-            # Update 'ispaid' for related ManyToManyField (bons)
-            livraison.facture.ispaid=True
-            livraison.facture.isvalid=True
-            livraison.facture.save()
+            if livraison.facture:
+                print("make facture valid", livraison.facture.facture_no)
+                # Update 'ispaid' for related ManyToManyField (bons)
+                livraison.facture.ispaid=True
+                livraison.facture.isvalid=True
+                livraison.facture.save()
     livraisons.update(isvalid=True)
     return JsonResponse({
         'success':True
@@ -2372,7 +2373,7 @@ def getbonachatvalider(request):
     bons = Itemsbysupplier.objects.filter(isfarah=isfarah, isvalid=True).order_by('-nbon')[:50]
     print('>> bons', bons)
     ctx={
-        'html':render(request, 'bonachatlist.html', {'bons':bons, 'target':target, "mode": 'valid'}).content.decode('utf-8'),
+        'html':render(request, 'bonachattrs.html', {'bons':bons, 'target':target, "mode": 'valid'}).content.decode('utf-8'),
         'total':0,
     }
     if bons:
