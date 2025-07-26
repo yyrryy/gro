@@ -6102,12 +6102,15 @@ def filterfcdate(request):
 def filterachatdate(request):
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
+    isvalid=request.GET.get('wanted')=='valid'
+    isfarah=request.GET.get('target')=='f'
+    print('>>', startdate, enddate, isvalid, isfarah)
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    bons=Itemsbysupplier.objects.filter(date__range=[startdate, enddate])
+    bons=Itemsbysupplier.objects.filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid)
     return JsonResponse({
-        'html':render(request, 'achatlist.html', {'bons':bons}).content.decode('utf-8'),
-        'total':round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        'html':render(request, 'bonachattrs.html', {'bons':bons}).content.decode('utf-8'),
+        'total':round(bons.aggregate(Sum('total')).get('total__sum') or 0, 2)
     })
 
 def updateclientpassword(request):
@@ -7889,6 +7892,7 @@ def searchforlistachat(request):
     isfarah=target=="f"
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
+    isvalid=request.GET.get('wanted')=='valid'
     search_terms = term.split('+')
     print(search_terms)
 
@@ -7903,11 +7907,12 @@ def searchforlistachat(request):
         )
     print(term, startdate, enddate)
     if startdate=='0' and enddate=='0':
-        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah).order_by('-date')
-        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=isvalid).order_by('-date')
+        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, isvalid=isvalid).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
     else:
-        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-date')
-        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).order_by('-date')
+        total=round(Itemsbysupplier.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=isvalid).order_by('-date').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    print('>> bons', bons)
     # trs=''
     # for order in bons:
     #     trs+=f'''
@@ -7931,7 +7936,7 @@ def searchforlistachat(request):
     #         '''
 
     return JsonResponse({
-        'trs':render(request, 'bonachatrs.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
+        'trs':render(request, 'bonachattrs.html', {'bons':bons, 'target':target}).content.decode('utf-8'),
         'total':total
     })
 
@@ -7956,7 +7961,6 @@ def searchforlistbl(request):
                 Q(client__region__iregex=i)|
                 Q(client__city__iregex=i)|
                 Q(client__code__iregex=i)|
-                Q(total__iregex=i)|
                 Q(bonsortie__bon_no__iregex=i)|
                 Q(facture__facture_no__iregex=i)|
                 Q(statusreg__iregex=i)|
@@ -8451,10 +8455,9 @@ def searchforlistfcachat(request):
     searchedterm=request.GET.get('term')
     startdate=request.GET.get('startdate') or '0'
     enddate=request.GET.get('enddate') or '0'
-    print('>>', startdate, enddate)
     year=request.GET.get('year')
     isfarah=target=='f'
-
+    isvalid=request.GET.get('wanted')=='valid'
     # Split the term into individual words separated by '*'
     search_terms = term.split('+')
 
@@ -8470,7 +8473,6 @@ def searchforlistfcachat(request):
             Q(supplier__code__iregex=term)|
             Q(total__iregex=term)
         )
-
     print('>>>> search list fc, startdate and enddate are 0')
     bons=Factureachat.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no')[:50]
     total=round(Factureachat.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah, isvalid=False).order_by('-facture_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
