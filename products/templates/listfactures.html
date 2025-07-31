@@ -37,7 +37,7 @@
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <!-- <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="deletetab('addlistfactures')">x</button> -->
     <div>
-      <!-- <button class="btn border btnselect btn-dark" style=" 
+      <!-- <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active')">Tous</button>-->
       <button class="btn border btnselect btn-dark active" style="
       border-radius: 11px;" onclick="ajaxpage('addlistbonlivraison', 'tt', '/products/listfactures?target={{target}}')">En attend</button>
@@ -81,14 +81,14 @@
                     </div>
                 </div>
 
-                
+
 
                     <div class="d-flex justify-content-between mt-3">
                         <div>
                             <small>Bons:</small> <strong class="totalcheckedbl">0.00</strong><br>
                         </div>
-                        
-                        
+
+
                     </div>
 
                     <div class="mb-2 mt-2 listaddreglblholder" style="max-height: 150px; overflow-y: scroll;">
@@ -115,7 +115,7 @@
                             </thead>
                             <tbody class="reglementclientbonholder">
                             </tbody>
-                            
+
 
                         </table>
                         <!-- <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
@@ -175,7 +175,7 @@
           <div>
             <button class="btn btn-sm bg-dark text-white filterfcdate">Filtrer</button>
             <button class="btn btn-success bi bi-download" onclick="exportfc(event)">
-          
+
             </button>
           </div>
 
@@ -189,13 +189,13 @@
 
 
         </select>
-        
+
       </div>
       <!-- <div style="color: red; cursor: pointer; padding: 7px; border-radius: 12px; height: 2.5em; width: 4em;" title="BON 3 MOIS" class="bg-white text-center" onclick="getnotpaidfc(event)">
         {{depasserfc}}
 
       </div> -->
-      
+
 
     </div>
     <div class="d-flex">
@@ -263,8 +263,14 @@
                 {{order.note}}
               </td>
               <td>
-                
-                <div class="accordion" id="accordionrr{{order.id}}">
+                {% for i in order.reglements %}
+                      -Mode: {{ i.mode }} {{ i.npiece }}<br>
+                      <!-- -N° piece: {{ i.npiece }} <br>
+                      -Mantant {{ i.amount }} <br>
+                      -Echeance: {{ i.echance|date:'d/m/Y' }} <br> -->
+                  {% endfor %}
+
+                <!-- <div class="accordion" id="accordionrr{{order.id}}">
 
                   <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsrr{{order.id}}" aria-expanded="true" aria-controls="collapsrr{{order.id}}">
 
@@ -272,16 +278,11 @@
                   </button>
 
                   <div id="collapsrr{{order.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionrr{{order.id}}">
-                      {% for i in order.reglements %}
-                      -Momde: {{ i.mode }} <br>
-                      -N° piece: {{ i.npiece }} <br>
-                      -Mantant {{ i.amount }} <br>
-                      -Echeance: {{ i.echance|date:'d/m/Y' }} <br>
-                      {% endfor %}
+
 
 
                   </div>
-                </div>
+                </div> -->
               </td>
                 <td>
                   {% if order.bon %}
@@ -482,7 +483,7 @@
         // populate facture multiselect
     })
 
-    
+
   function makefacturecompta(event, factureid){
     tr=$(event.target).parent().parent()
     $.get('/products/comptable', {
@@ -620,12 +621,12 @@
         selectedValues = parentdiv.find("input[name='bonstopay']:checked").map(function() {
             return this.value;
         }).get()
-        
+
         clientid=$('[name="clientoffacture"]').val()
-        
+
         date=$(".dateoffacture").val()
 
-       
+
         if (selectedValues.length==0 || clientid==null){
           alertify.error('Champs vide')
           return
@@ -643,7 +644,7 @@
           }else{
             alertify.error(data.error)
             $(this).removeClass('disabled')
-            
+
           }
         })
     })

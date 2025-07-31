@@ -30,8 +30,13 @@
     {{order.note}}
   </td>
   <td>
-                
-    <div class="accordion" id="accordionrr{{order.id}}">
+    {% for i in order.reglements %}
+        -Mode: {{ i.mode }} <br>
+        <!-- -N° piece: {{ i.npiece }} <br>
+        -Mantant {{ i.amount }} <br>
+        -Echeance: {{ i.echance|date:'d/m/Y' }} <br> -->
+    {% endfor %}  
+    <!-- <div class="accordion" id="accordionrr{{order.id}}">
 
       <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapsrr{{order.id}}" aria-expanded="true" aria-controls="collapsrr{{order.id}}">
 
@@ -48,7 +53,7 @@
 
 
       </div>
-    </div>
+    </div> -->
   </td>
     <td>
       {% if order.bon %}
