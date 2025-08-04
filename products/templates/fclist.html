@@ -4,7 +4,7 @@
 >
   <td>{{ order.facture_no }}</td>
   <td>{{ order.date|date:'d/m/Y' }}</td>
-  <td>{{ order.total|floatformat:2|intspace}}</td>
+  <td style="color: blue; font-size: 15px;">{{ order.total|floatformat:2|intspace}}</td>
   <td>{{ order.ht|floatformat:2|intspace}}</td>
   <td>{{ order.thistva|floatformat:2|intspace}}</td>
   <td>{{ order.client.name }}</td>

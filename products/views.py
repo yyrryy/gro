@@ -11805,3 +11805,14 @@ def loadbonachat(request):
         
     })
     
+def getfacturepaidtype(request):
+    isfarah=request.GET.get('target')=='f'
+    mode=request.GET.get('mode')
+    factures=Facture.objects.filter(
+        isfarah=isfarah,
+        fcreglements__mode=mode
+    )
+    return JsonResponse({
+        'html':render(request, 'fclist.html', {'bons':factures}).content.decode('utf-8'),
+        'total':round(factures.aggregate(Sum('total')).get('total__sum') or 0, 2)
+    })
