@@ -11808,10 +11808,24 @@ def loadbonachat(request):
 def getfacturepaidtype(request):
     isfarah=request.GET.get('target')=='f'
     mode=request.GET.get('mode')
-    factures=Facture.objects.filter(
-        isfarah=isfarah,
-        fcreglements__mode=mode
-    )
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+
+    isvalid=request.GET.get('wanted')=='valid'
+    print('ss', isfarah, mode, isvalid, startdate, enddate)
+    if startdate=='' or enddate=='':
+        factures=Facture.objects.filter(
+            isfarah=isfarah,
+            isvalid=isvalid,
+            fcreglements__mode=mode,
+        )
+    else:
+        factures=Facture.objects.filter(
+            isfarah=isfarah,
+            isvalid=isvalid,
+            fcreglements__mode=mode,
+            date__range=[startdate, enddate]
+        )
     return JsonResponse({
         'html':render(request, 'fclist.html', {'bons':factures}).content.decode('utf-8'),
         'total':round(factures.aggregate(Sum('total')).get('total__sum') or 0, 2)

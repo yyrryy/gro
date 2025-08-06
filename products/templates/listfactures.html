@@ -365,11 +365,17 @@
   loadinglistfc = false;
   function getfacturepaidtype(event){
     mode=$(event.target).val()
+    wanted=$(event.target).attr('wanted')
     if (mode==''){
       return
     }
     $('.listfcbody').addClass('blurred')
-    $.get('/products/getfacturepaidtype?target={{target}}&mode='+mode, (data)=>{
+    $.get('/products/getfacturepaidtype?target={{target}}' ,{
+      'mode':mode,
+      'wanted':wanted,
+      'startdate':$('.startdatelistfc').val(),
+      'enddate':$('.enddatelistfc').val(),
+    }, (data)=>{
       $('.listfcbody').html(data.html)
       $('.totalfc').html(data.total)
       $('.listfcbody').removeClass('blurred')
@@ -377,7 +383,7 @@
   }
   function getfacturevalider(){
     $('.searchinputlistfactures').attr('waiting', '0')
-    $('facturepaidtype').attr('wanted', 'valid')
+    $('.facturepaidtype').attr('wanted', 'valid')
     $('.listfcbody').addClass('blurred')
     $.get('/products/getfacturevalider?target={{target}}', (data)=>{
       $('.listfcbody').html(data.html)
