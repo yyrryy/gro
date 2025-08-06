@@ -11812,20 +11812,18 @@ def getfacturepaidtype(request):
     enddate=request.GET.get('enddate')
 
     isvalid=request.GET.get('wanted')=='valid'
-    print('ss', isfarah, mode, isvalid, startdate, enddate)
-    if startdate=='' or enddate=='':
-        factures=Facture.objects.filter(
-            isfarah=isfarah,
-            isvalid=isvalid,
-            fcreglements__mode=mode,
-        )
+    filters = {
+        'isfarah': isfarah,
+        'isvalid': isvalid,
+    }
+
+    if startdate and enddate:
+        filters['date__range'] = [startdate, enddate]
+    if mode=='nonpaye':
+        filters['ispaid']=False
     else:
-        factures=Facture.objects.filter(
-            isfarah=isfarah,
-            isvalid=isvalid,
-            fcreglements__mode=mode,
-            date__range=[startdate, enddate]
-        )
+        filters['fcreglements__mode']=mode
+    factures = Facture.objects.filter(**filters)
     return JsonResponse({
         'html':render(request, 'fclist.html', {'bons':factures}).content.decode('utf-8'),
         'total':round(factures.aggregate(Sum('total')).get('total__sum') or 0, 2)
