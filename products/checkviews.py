@@ -80,11 +80,13 @@ def ste1(request):
 @login_required(login_url='main:home')
 def ste2(request):
     return render(request, 'odashboard.html', {'target':'o'})
-@user_passes_test(isadmin, login_url='main:home')
+#@user_passes_test(isadmin, login_url='main:home')
 @login_required(login_url='main:home')
 def pointdevente(request):
     return render(request, 'pos.html', {'target':'s'})
 
+#@user_passes_test(isadmin, login_url='main:home')
+@login_required(login_url='main:home')
 def bonsortie(request):
     # get the last order_no
     # if there is no order_no then set it to this format 'ym0001'
@@ -114,7 +116,8 @@ def bonsortie(request):
         # 'commercials':Represent.objects.all(),
     })
 
-
+#@user_passes_test(isadmin, login_url='main:home')
+@login_required(login_url='main:home')
 def addbonsortie(request):
 
     #current_time = datetime.now().strftime('%H:%M:%S')

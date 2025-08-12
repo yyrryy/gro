@@ -10,7 +10,7 @@ from django.db.models import Count, F, Sum, Q, BooleanField, Case, When, Value
 from django.db.models.functions import Cast
 from django.contrib.sessions.models import Session
 from functools import wraps
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 import json
 from django.contrib.auth.models import Group
 from django.db import transaction
@@ -1131,7 +1131,7 @@ def addsupply(request):
         #'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
     })
 
-
+@login_required(login_url='main:home')
 def addbonlivraison(request):
     # mantant=request.POST.get('mantant')
     # mode=request.POST.get('mode')
@@ -11821,6 +11821,8 @@ def getfacturepaidtype(request):
         filters['date__range'] = [startdate, enddate]
     if mode=='nonpaye':
         filters['ispaid']=False
+    elif mode=='paye':
+        filters['ispaid']=True
     else:
         filters['fcreglements__mode']=mode
     factures = Facture.objects.filter(**filters)
