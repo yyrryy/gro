@@ -10997,7 +10997,9 @@ def relevsuppprint(request):
     reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
 
     bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
-
+    totaldebit = round(bons.aggregate(Sum('total'))['total__sum'], 2)
+    totalcredit = round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
+    totalsold=totaldebit-totalcredit
     releve = chain(*[
     ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
@@ -11011,10 +11013,11 @@ def relevsuppprint(request):
     return render(request, 'relevesuppprint.html', {
             'releve':[sorted_releve[i:i+30] for i in range(0, len(sorted_releve), 30)],
             'supplier':supplier,
-
+            'totaldebit':totaldebit,
+            'totalcredit':totalcredit,
             'startdate':startdate,
             'enddate':enddate,
-
+            'totalsold':totalsold
         })
 
 def relevfcprint(request):
