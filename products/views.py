@@ -10987,16 +10987,32 @@ def relevblprint(request):
 
 def relevsuppprint(request):
     supplierid=request.GET.get('supplierid')
+    isrelevefacture=request.GET.get('facture')=='1'
+    target=request.GET.get('target')
     print('>>>', supplierid)
     supplier=Supplier.objects.get(pk=supplierid)
     startdate=request.GET.get('datefrom')
     enddate=request.GET.get('dateto')
     startdate = datetime.strptime(startdate, '%Y-%m-%d')
     enddate = datetime.strptime(enddate, '%Y-%m-%d')
-    avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
-    reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
-
-    bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate])
+    if target=="f":
+        avoirs=Avoirsupplier.objects.filter(isfarah=True, supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate], ispaid=False)
+        reglementsbl=PaymentSupplier.objects.filter(isfarah=True, supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False)
+        avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=True, date__range=[startdate, enddate])
+        if isrelevefacture:
+            bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=True)
+            print('>>>>>>>>>>>< infacture relve farah', bons)
+        else:
+            bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=True)
+    else:
+        # orgh
+        avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate], ispaid=False)
+        reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isavoir=False, isfarah=False)
+        avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=False, date__range=[startdate, enddate])
+        if isrelevefacture:
+            bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
+        else:
+            bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
     totaldebit = round(bons.aggregate(Sum('total'))['total__sum'], 2)
     totalcredit = round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
     totalsold=totaldebit-totalcredit
