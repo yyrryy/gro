@@ -11015,7 +11015,7 @@ def relevsuppprint(request):
             bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
     totaldebit = round(bons.aggregate(Sum('total'))['total__sum'], 2)
     totalcredit = round(avoirs.aggregate(Sum('total'))['total__sum'], 2)+round(reglementsbl.aggregate(Sum('amount'))['amount__sum'], 2)
-    totalsold=totaldebit-totalcredit
+    totalsold=round(totaldebit-totalcredit, 2)
     releve = chain(*[
     ((bon, 'Bonlivraison') for bon in bons),
     ((avoir, 'Avoirclient') for avoir in avoirs),
