@@ -10871,7 +10871,8 @@ def factureprint(request, id):
     ht=order.total/1.2
     tva=ht*0.2
     if hasespece:
-        dr=round(PaymentClientbl.objects.filter(factures__in=[order], mode='espece')[0].amount*.25/100, 2)
+        #dr=round(PaymentClientbl.objects.filter(factures__in=[order], mode='espece')[0].amount*.25/100, 2)
+        dr=round(order.total*.25/100, 2)
         netapy=order.total+dr
     ctx={
         'isfarah':isfarah,
