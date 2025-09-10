@@ -3117,11 +3117,11 @@ def replaceproduct(request):
     stockin=Stockin.objects.filter(product=oldproduct)
     stockin.update(product=newproduct)
     # replace old in bon achat
-    avoirsupp=Returnedsupplier.filter(product=oldproduct)
+    avoirsupp=Returnedsupplier.objects.filter(product=oldproduct)
     avoirsupp.update(product=newproduct)
     # replace old in bon avoir supp
-    oldproduct.replacedby=newproduct
-    oldproduct.save()
+    #oldproduct.replacedby=newproduct
+    oldproduct.delete()
     newproduct.save()
     return JsonResponse({
         'success':True

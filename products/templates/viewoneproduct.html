@@ -302,7 +302,7 @@
                             <strong>Le reference correct:</strong>
                             <select class="form-control ref refreplace"></select>
 
-                            <!-- <button class="w-100" onclick="replaceproduct()">Remplacer</button> -->
+                            <button class="w-100" onclick="replaceproduct()">Remplacer</button>
                          </div>
                         {% endif %}
                         <!-- <div class="damagedpdctsholder">
@@ -882,15 +882,23 @@
       }
       
     function replaceproduct(){
-        productid=$('.refreplace').val()
+        productid=$('.refreplace').val().split('§')[5]
         if (productid==null){
             alertify.error('No product selected')
             return
         }
         alertify.prompt( 'Confirmer', 'Mot de pass', '****', function(evt, value) { 
           if (value=='ORGHAD'){
-            $.get('/products/replaceproduct', {'replacewith':productid, 'producttoreplace':'{{product.id}}'}, (data)=>{
-                ajaxpage('addpdct2', 'Produit zzg', '/products/viewoneproduct/'+productid+'?target={{target}}')
+            $.get('/products/replaceproduct', {'replacewith':productid, 'producttoreplace':'{{product.id}}', 'target':'{{target}}'}, (data)=>{
+                // close the current window
+                if (data.success){
+                  alertify.success('Produit remplacé')
+                    window.close()
+                }else{
+                    alertify.error(data.message)
+                }
+
+                //ajaxpage('addpdct2', 'Produit zzg', '/products/viewoneproduct/'+productid+'?target={{target}}')
             })
           }else{
             alertify.error('Mot de passe')
