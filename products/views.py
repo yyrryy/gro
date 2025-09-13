@@ -8080,7 +8080,7 @@ def searchforlistbs(request):
         print(">> here 1²",startdate, enddate)
         bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
         total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-
+    print(">> bons", bons)
     return JsonResponse({
         'trs':render(request, 'bslist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
