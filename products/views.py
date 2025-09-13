@@ -11771,6 +11771,13 @@ def reglsituation(request):
         livraisons=Facture.objects.filter(pk__in=bons)
     avoirs=Avoirclient.objects.filter(pk__in=avoirs)
     avances=Avanceclient.objects.filter(pk__in=avances)
+    totals=round(avoirs.aggregate(Sum('total')).get('total__sum') or 0, 2)+round(avances.aggregate(Sum('amount')).get('amount__sum') or 0, 2)
+    totalbons=round(livraisons.aggregate(Sum('total')).get('total__sum') or 0, 2)
+    if not totals==totalbons:
+        return JsonResponse({
+            'success':False,
+            'message':'Le total des avoirs et avances doit etre egale au total des bons/factures'
+        })
     regl=PaymentClientbl.objects.create(
         client_id=clientid,
         amount=0,

@@ -346,6 +346,17 @@
                                 <div>
                                     Mantant a payé <strong class="whattopay">0.00</strong>DH
                                 </div>
+                                
+                                <div class="row">
+                                    <small>Date reglement:</small>
+                                    <div class="col-4">
+                                        <input type="date" name="" id="" value="{{today|date:'Y-m-d'}}" class="form-control mb-2 datereglement">
+                                    </div>
+
+                                </div>
+                                <button class="btn text-white w-100 submitaddreglemntclientbtn disabled" style="background: #00538c;">
+                                    Valider
+                                </button>
                                 <button class="btn btn-success col-4" onclick="$('.confirmregl').toggleClass('d-none')">
                                     Regler situation
                                 </button>
@@ -358,16 +369,6 @@
                                         Non
                                     </button>
                                 </div>
-                                <div class="row">
-                                    <small>Date reglement:</small>
-                                    <div class="col-4">
-                                        <input type="date" name="" id="" value="{{today|date:'Y-m-d'}}" class="form-control mb-2 datereglement">
-                                    </div>
-
-                                </div>
-                                <button class="btn text-white w-100 submitaddreglemntclientbtn disabled" style="background: #00538c;">
-                                    Valider
-                                </button>
                                 <!-- <div class="mb-2">
                                     <small>Facture</small>
                                     <select name="addreglementbons disabled" id="" class="select2 form-select " multiple="multiple">
@@ -633,6 +634,8 @@
         }, (data)=>{
             if (data.success){
                 ajaxpage('add', '+ Article', '/products/listreglementbl?target={{target}}')
+            }else{
+                alertify.error(data.message)
             }
         })
     }
@@ -996,7 +999,7 @@
         console.log('err')
         currentPageblregl=1
         loadingblregl = false;
-        $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
+        //$('.listaddreglblholder').on('scroll', handleScrollreglblcl)
         let clientid=$('[name="addreglementclientsbl"]').val()
         console.log(clientid)
         $.post(
@@ -1277,7 +1280,7 @@
         mode=$('.mode').val()
         datefrom=$('.datefrom').val()
         dateend=$('.dateend').val()
-        //$('.listaddreglblholder').on('scroll', handleScrollreglblcl)
+        $('.listaddreglblholder').on('scroll', handleScrollreglblcl)
         if (clientid==null || datefrom=="" || dateend==""){
             console.log('err3')
             console.log('err3')
