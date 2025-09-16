@@ -4530,8 +4530,8 @@ def updatebonachat(request):
                     product.frremise2=0 if i['remise2']=="" else i['remise2']
                     product.frremise3=0 if i['remise3']=="" else i['remise3']
                     product.frremise4=0 if i['remise4']=="" else i['remise4']
-                    product.frsellprice=0 if i['price']=="" else i['price']
-                    product.frremisesell=0 if i['remise1']=="" else i['remise1']
+                    #product.frsellprice=0 if i['price']=="" else i['price']
+                    #product.frremisesell=0 if i['remise1']=="" else i['remise1']
                     product.frnetbuyprice=netprice
                     product.froriginsupp=supplier
             else:
@@ -4559,8 +4559,8 @@ def updatebonachat(request):
                     product.remise2=0 if i['remise2']=="" else i['remise2']
                     product.remise3=0 if i['remise3']=="" else i['remise3']
                     product.remise4=0 if i['remise4']=="" else i['remise4']
-                    product.sellprice=0 if i['price']=="" else i['price']
-                    product.remisesell=0 if i['remise1']=="" else i['remise1']
+                    #product.sellprice=0 if i['price']=="" else i['price']
+                    #product.remisesell=0 if i['remise1']=="" else i['remise1']
                     product.netbuyprice=netprice
                     product.originsupp=supplier
 
@@ -4678,8 +4678,8 @@ def updatefactureachat(request):
                 product.frremise2=0 if i['remise2']=="" else i['remise2']
                 product.frremise3=0 if i['remise3']=="" else i['remise3']
                 product.frremise4=0 if i['remise4']=="" else i['remise4']
-                product.frsellprice=0 if i['price']=="" else i['price']
-                product.frremisesell=0 if i['remise1']=="" else i['remise1']
+                #product.frsellprice=0 if i['price']=="" else i['price']
+                #product.frremisesell=0 if i['remise1']=="" else i['remise1']
                 product.frnetbuyprice=netprice
             else:
                 product.buyprice=0 if i['price']=="" else i['price']
@@ -4687,8 +4687,8 @@ def updatefactureachat(request):
                 product.remise2=0 if i['remise2']=="" else i['remise2']
                 product.remise3=0 if i['remise3']=="" else i['remise3']
                 product.remise4=0 if i['remise4']=="" else i['remise4']
-                product.sellprice=0 if i['price']=="" else i['price']
-                product.remisesell=0 if i['remise1']=="" else i['remise1']
+                #product.sellprice=0 if i['price']=="" else i['price']
+                #product.remisesell=0 if i['remise1']=="" else i['remise1']
                 product.netbuyprice=netprice
             product.save()
 
