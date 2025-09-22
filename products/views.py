@@ -11856,3 +11856,12 @@ def getfacturepaidtype(request):
         'html':render(request, 'fclist.html', {'bons':factures}).content.decode('utf-8'),
         'total':round(factures.aggregate(Sum('total')).get('total__sum') or 0, 2)
     })
+def setinventair(request):
+    id=request.GET.get('id')
+    qty=request.GET.get('qty')
+    product=Produit.objects.get(pk=id)
+    product.stockinventaire=qty
+    product.save()
+    return JsonResponse({
+        'success':True
+    })

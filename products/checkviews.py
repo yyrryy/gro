@@ -15,6 +15,7 @@ from io import BytesIO
 import base64
 import ast
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models.functions import Coalesce, Cast
 def isadmin(user):
     return user.groups.filter(name='admin').exists()
 
@@ -3627,13 +3628,21 @@ def updatefactureachatdate(request):
         'success':True
     })
 
-    
+
 def inventaire(request):
-    target=request.GET.get('target')
-    products=Produit.objects.all()
-    destination="Orgh" if target=='o' else "Farah"
+    target = request.GET.get('target')
+    stock_field = 'stocktotalfarah' if target == 'f' else 'stocktotalorgh'
+    items = Produit.objects.annotate(
+        diff=(
+            Coalesce(F('stockinventaire'), Value(0.0)) -
+            Cast(Coalesce(F(stock_field), Value(0)), FloatField())
+        )
+    ).filter(diff__gt=0)
+    products = Produit.objects.order_by('-ref')
+    destination = "Orgh" if target == 'o' else "Farah"
     return render(request, 'inventaire.html', {
-        'target':target,
-        'products':products,
+        'target': target,
+        'products': products,
+        'items': items,
         'title': f'Inventaire {destination}'
     })
