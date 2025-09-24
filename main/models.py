@@ -1237,6 +1237,8 @@ class Bonsortie(models.Model):
     def save(self, *args, **kwargs):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)
+    def hasavance(self):
+        return Avanceclient.objects.filter(bonofavance=self.bon_no).exists()
     def __str__(self) -> str:
         return self.bon_no
 # lines in bon sorie

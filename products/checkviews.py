@@ -2561,7 +2561,7 @@ def updatebonsortie(request):
     # orderno
     #transport=request.POST.get('transport')
     note=request.POST.get('note')
-    payment=request.POST.get('payment')
+    payment=request.POST.get('payment', 0)
     print('>>>>>>', products, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')

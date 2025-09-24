@@ -17,8 +17,14 @@
       Encaissé
     </div>
     
-
+    {% elif order.hasavance %}
+    <div class="" style="text-align: center; background: rgb(255, 196, 0);">
+      Avance
+    </div>
     {% else %}
+    <div class="" style="text-align: center; background: yellow;">
+      En attend
+    </div>
 
       <div class="" style="text-align: center; background: yellow;">
         En attend
