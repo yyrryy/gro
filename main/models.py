@@ -256,15 +256,15 @@ class Supplier(models.Model):
     note=models.TextField(default=None, null=True)
     def soldfarah(self):
         bons=Itemsbysupplier.objects.filter(supplier=self, isfarah=True).aggregate(Sum('total'))['total__sum'] or 0
-        avoirs=Avoirsupplier.objects.filter(supplier=self, isfarah=True).aggregate(Sum('total'))['total__sum'] or 0
+        avoirs=Avoirsupplier.objects.filter(supplier=self, isfarah=True, ispaid=False).aggregate(Sum('total'))['total__sum'] or 0
         avancess=Avancesupplier.objects.filter(supplier=self, isfarah=True).aggregate(Sum('amount'))['amount__sum'] or 0
-        reglements=PaymentSupplier.objects.filter(supplier=self, isfarah=True).aggregate(Sum('amount'))['amount__sum'] or 0
+        reglements=PaymentSupplier.objects.filter(supplier=self, isfarah=True,isavoir=False).aggregate(Sum('amount'))['amount__sum'] or 0
         return round(bons-avancess-avoirs-reglements, 2)
     def soldorgh(self):
         bons=Itemsbysupplier.objects.filter(supplier=self, isfarah=False).aggregate(Sum('total'))['total__sum'] or 0
-        avoirs=Avoirsupplier.objects.filter(supplier=self, isfarah=False).aggregate(Sum('total'))['total__sum'] or 0
+        avoirs=Avoirsupplier.objects.filter(supplier=self, isfarah=False, ispaid=False).aggregate(Sum('total'))['total__sum'] or 0
         avancess=Avancesupplier.objects.filter(supplier=self, isfarah=False).aggregate(Sum('amount'))['amount__sum'] or 0
-        reglements=PaymentSupplier.objects.filter(supplier=self, isfarah=False).aggregate(Sum('amount'))['amount__sum'] or 0
+        reglements=PaymentSupplier.objects.filter(supplier=self, isfarah=False,isavoir=False).aggregate(Sum('amount'))['amount__sum'] or 0
         return round(bons-avancess-avoirs-reglements, 2)
     def __str__(self) -> str:
         return self.name
