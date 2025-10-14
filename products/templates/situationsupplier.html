@@ -24,6 +24,11 @@
         
     </div>
 
+    <div>
+      <button class="btn btn-success w-100 mt-2 genererrelvesuppliernonregle">Generer BL non reglé</button>
+      <button class="btn btn-success w-100 mt-2 genererrelvefcsuppliernonregle">Generer FC non reglé</button>
+    </div>
+
     <div class="col-9 relevesuppholder" id="relevesuppholder">
         <div class="d-flex flex-column align-items-center justify-content-center loader position-fixed d-none"
         style="height: 100%;background:#171717bc ; width: 100%; z-index: 9999;"
@@ -226,4 +231,68 @@
             }
         })
     })
+    $('.genererrelvesuppliernonregle').on('click', function(){
+        parentdiv=$(this).parent()
+        console.log(parentdiv)
+        // check notempty
+        supplierid=parentdiv.find('select[name="suppliersituationselect"]').val()
+        datefrom=parentdiv.find('input[name="situationsuppdatefrom"]').val()
+        dateto=parentdiv.find('input[name="situationsuppdateto"]').val()
+        var isAnyEmpty = parentdiv.find('.notempty').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;
+        if (supplierid==null || datefrom=='' || dateto==''){
+            alertify.error('Remplir les champs')
+            return
+        }
+        $.ajax({
+            url: '/products/relevsuppliernonregle',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                'supplierid': supplierid,
+                'datefrom': datefrom,
+                'dateto': dateto,
+                "target": "{{target}}"
+            },
+            success: function(data){
+                $('.loader').addClass('d-none')
+                $('.relevesuppholder').html(data.html)
+                // this used to reset date to today
+                //dateInput.value = currentDate;
+                //datetoInput.value = currentDate;
+            }
+        })
+    })
+    $('.genererrelvefcsuppliernonregle').on('click', function(){
+        parentdiv=$(this).parent()
+        console.log(parentdiv)
+        // check notempty
+        supplierid=parentdiv.find('select[name="suppliersituationselect"]').val()
+        datefrom=parentdiv.find('input[name="situationsuppdatefrom"]').val()
+        dateto=parentdiv.find('input[name="situationsuppdateto"]').val()
+        var isAnyEmpty = parentdiv.find('.notempty').filter(function() { return $(this).val() == '' || $(this).val()==0; }).length > 0;
+        if (supplierid==null || datefrom=='' || dateto==''){
+            alertify.error('Remplir les champs')
+            return
+        }
+        $.ajax({
+            url: '/products/relevsuppliernonregle',
+            type: 'POST',
+            data: {
+              'target':'{{target}}',
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+              'supplierid': supplierid,
+              'facture': '1',
+              'datefrom': datefrom,
+              'dateto': dateto,
+            },
+            success: function(data){
+                $('.loader').addClass('d-none')
+                $('.relevesuppholder').html(data.html)
+                // this used to reset date to today
+                //dateInput.value = currentDate;
+                //datetoInput.value = currentDate;
+            }
+        })
+    })
+
 </script>

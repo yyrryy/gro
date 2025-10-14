@@ -117,6 +117,7 @@ urlpatterns = [
     path('listavoirclient', views.listavoirclient, name='listavoirclient'),
     path('listavoirsupplier', views.listavoirsupplier, name='listavoirsupplier'),
     path('relevsupplier', views.relevsupplier, name='relevsupplier'),
+    path('relevsuppliernonregle', views.relevsuppliernonregle, name='relevsuppliernonregle'),
     path('filterreglbldate', views.filterreglbldate, name='filterreglbldate'),
     path('filterreglfcdate', views.filterreglfcdate, name='filterreglfcdate'),
     path('sortupbl', views.sortupbl, name='sortupbl'),

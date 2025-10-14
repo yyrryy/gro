@@ -295,6 +295,7 @@
                 <div style="height: 70vh; overflow: scroll;" class="listachatholder">
                     <table style="font-size: 12px;" class="table table-bordered">
                         <thead class="bg-darkblue text-white">
+                            <th>N°</th>
                             <th>Date</th>
                             <th>Total</th>
                             <th></th>
@@ -302,6 +303,7 @@
                         <tbody>
                             {% for i in avoirs %}
                             <tr>
+                                <td>{{i.no}} {%if i.ispaid%}(R){%endif%}</td>
                                 <td>{{i.date|date:'d/m/Y'}}</td>
                                 <td>{{i.total|floatformat:2}}</td>
                                 <!-- <td>

@@ -1423,6 +1423,7 @@ def supplierinfo(request, id):
     target=request.GET.get('target')
     isfarah=target=='f'
     avances=Avancesupplier.objects.filter(supplier=supplier, isfarah=isfarah)
+    print('>> ssssss')
     ctx={
         'target':target,
         'title':f'Info fournisseur {supplier.name.upper}',
@@ -1436,6 +1437,7 @@ def supplierinfo(request, id):
         'avances':avances,
         'totalavances':avances.aggregate(Sum('amount'))['amount__sum'] or 0,
         'devis':Devisupplier.objects.filter(supplier=supplier, isfarah=isfarah),
+        'avoirs':Avoirsupplier.objects.filter(supplier=supplier, isfarah=isfarah),
         'commandes':Commandsupplier.objects.filter(supplier=supplier, isfarah=isfarah),
     }
     return render(request, 'supplierinfo.html', ctx)
@@ -4185,6 +4187,60 @@ def relevsupplier(request):
         else:
             bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
         print('rr', supplierid)
+    # chain all the data based on dates
+    # first get all dates
+    releve = chain(*[
+    ((bon, 'factureachat') for bon in bons) if isrelevefacture else ((bon, 'Itemsbysupplier') for bon in bons),
+    ((avoir, 'Avoirsupplier') for avoir in avoirs),
+    ((avance, 'avancesupplier') for avance in avances),
+    ((reglementbl, 'Paymentsupplier') for reglementbl in reglementsbl),
+    ])
+
+    # Sort the items by date
+    sorted_releve = sorted(releve, key=lambda item: item[0].date)
+
+
+    return JsonResponse({
+        'html':render(request, 'relevesupp.html', {
+            'releve':sorted_releve,
+            'supplier':supplier,
+            'startdate':startdate,
+            'enddate':enddate,
+
+        }).content.decode('utf-8')
+    })
+
+def relevsuppliernonregle(request):
+    supplierid=request.POST.get('supplierid')
+    target=request.POST.get('target')
+    isfarah=target=='f'
+    isrelevefacture=request.POST.get('facture')=='1'
+    print('>> isfacture releve', request.POST.get('facture'))
+    supplier=Supplier.objects.get(pk=supplierid)
+    startdate=request.POST.get('datefrom')
+    enddate=request.POST.get('dateto')
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    print('>> is facture', isrelevefacture)
+    avoirs=Avoirsupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
+    reglementsbl=PaymentSupplier.objects.filter(isfarah=isfarah, supplier_id=supplierid, date__range=[startdate, enddate])
+    avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=isfarah, date__range=[startdate, enddate])
+    if isrelevefacture:
+        bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=isfarah, ispaid=False)
+        print('>>>>>>>>>>>< infacture relve farah', bons)
+    else:
+        bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=isfarah, ispaid=False)
+    #     print('rr', supplierid)
+    # else:
+    #     # orgh
+    #     avoirs=Avoirsupplier.objects.filter(supplier_id=supplierid, avoirfacture=False, date__range=[startdate, enddate])
+    #     reglementsbl=PaymentSupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
+    #     avances=Avancesupplier.objects.filter(supplier_id=supplierid, isfarah=False, date__range=[startdate, enddate])
+    #     if isrelevefacture:
+    #         bons=Factureachat.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
+    #     else:
+    #         bons=Itemsbysupplier.objects.filter(supplier_id=supplierid, date__range=[startdate, enddate], isfarah=False)
+    #     print('rr', supplierid)
     # chain all the data based on dates
     # first get all dates
     releve = chain(*[
