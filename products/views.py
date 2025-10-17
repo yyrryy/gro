@@ -2890,11 +2890,11 @@ def listreglementbl(request):
 def listavances(request):
     target=request.GET.get('target')
     if target=="f":
-        avances=Avanceclient.objects.filter(isfarah=True).order_by('-id')[:50]
+        avances=Avanceclient.objects.filter(isfarah=True).order_by('-id')
     elif target=="o":
-        avances=Avanceclient.objects.filter(isorgh=True).order_by('-id')[:50]
+        avances=Avanceclient.objects.filter(isorgh=True).order_by('-id')
     else:
-        avances=Avanceclient.objects.filter(issortie=True).order_by('-id')[:50]
+        avances=Avanceclient.objects.filter(issortie=True).order_by('-id')
     print('lenreg', len(avances))
     ctx={
         'title':'List des avances CL BL',
@@ -4215,7 +4215,6 @@ def relevsuppliernonregle(request):
     target=request.POST.get('target')
     isfarah=target=='f'
     isrelevefacture=request.POST.get('facture')=='1'
-    print('>> isfacture releve', request.POST.get('facture'))
     supplier=Supplier.objects.get(pk=supplierid)
     startdate=request.POST.get('datefrom')
     enddate=request.POST.get('dateto')
