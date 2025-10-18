@@ -102,9 +102,9 @@
               <td style="">Ref</td>
               <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
-              <td style="width: 7%;">P.U</td>
+              <td style="width: 7%;">P.U TTC</td>
               <td style="width: 5%;">Rem</td>
-              <td style="width: 13%;">Mantant</td>
+              <td style="width: 13%;">Mantant TTC</td>
             </tr>
           </thead>
           <tbody>
@@ -161,14 +161,23 @@
           <small>
             page: {{forloop.counter}}/{{orderitems|length}}
           </small>
-          <div class="text-center d-flex justify-content-between" style="background: #aeaeae8c;
-          font-size: 13px; width:14em;">
-            <div>Total</div>
-            <div style="font-size: 16px; margin-right: 13px;">
-              <strong>
-                {{order.total|floatformat:2|intspace}}
-              </strong>
-            </div>
+          <div class="text-center d-flex justify-content-between" style="
+          font-size: 13px; width: 50%;">
+          <table class="table">
+            <tr>
+              <td>Total HT</td>
+              <td>{{order.totalht|floatformat:2|intspace}}</td>
+            </tr>
+            <tr>
+              <td>TVA</td>
+              <td>{{order.tva|floatformat:2|intspace}}</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>{{order.total|floatformat:2|intspace}}</td>
+            </tr>
+          </table>
+            
           </div>
           
           
@@ -241,9 +250,9 @@
               <td style="">Ref</td>
               <td style="width:53%;">Designation</td>
               <td style="width: 5%;">Qté</td>
-              <td style="width: 7%;">P.U</td>
+              <td style="width: 7%;">P.U TTC</td>
               <td style="width: 5%;">Rem</td>
-              <td style="width: 13%;">Mantant</td>
+              <td style="width: 13%;">Mantant TTC</td>
             </tr>
           </thead>
           <tbody>
