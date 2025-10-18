@@ -7,6 +7,9 @@
     <button class="btn w-100 btn-primary mb-2" onclick="printlivraison('{{order.id}}', '{{target}}')">
       Imprimer
     </button>
+    <button class="btn w-100 btn-primary mb-2" onclick="printlivraisonht('{{order.id}}', '{{target}}')">
+      Imprimer HT
+    </button>
     <button 
     class="btn w-100 bg-orange text-white mt-2" 
     {% if order.isvalid or order.ispaid %}disabled{% endif %}

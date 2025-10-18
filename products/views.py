@@ -10840,6 +10840,23 @@ def bonlivraisonprint(request, id):
     }
     return render(request, 'bonlivraisonprint.html', ctx)
 
+def bonlivraisonprintht(request, id):
+    isfarah=request.GET.get('target')=='f'
+    print('<>> target', request.GET.get('target'))
+    order=Bonlivraison.objects.get(pk=id)
+    orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
+    reglements=PaymentClientbl.objects.filter(bons__in=[order])
+    orderitems=list(orderitems)
+    orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
+    ctx={
+        'isfarah':isfarah,
+        'title':f'Bon de livraison {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+    }
+    return render(request, 'bonlivraisonprintht.html', ctx)
+
+
 
 def printdevi(request):
     isfarah=request.GET.get('target')=='f'

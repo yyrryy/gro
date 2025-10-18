@@ -556,6 +556,10 @@ class Bonlivraison(models.Model):
         super().save(*args, **kwargs)
     def __str__(self) -> str:
         return self.bon_no
+    def totalht(self):
+        return round(self.total/1.2, 2)
+    def tva(self):
+        return round((self.total/1.2)*.2, 2)
 
 class Facture(models.Model):
     isvalid=models.BooleanField(default=False)
@@ -820,7 +824,10 @@ class Livraisonitem(models.Model):
     clientprice=models.FloatField(default=0.00)
     date=models.DateField(default=None, null=True, blank=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
-
+    def priceht(self):
+        return round(self.price/1.2, 2)
+    def totalht(self):
+        return round(self.total/1.2, 2)
     
 
 class Avoirclient(models.Model):
