@@ -77,8 +77,15 @@ WSGI_APPLICATION = 'Gro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-usepg = os.getenv('pgdb')=='true'
-if usepg:
+usesqlite = os.getenv('pgdb')=='true'
+if usesqlite:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -89,13 +96,7 @@ if usepg:
             'PORT': '5432',              # Default PostgreSQL port
         }
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+    
 
 
 # Password validation
