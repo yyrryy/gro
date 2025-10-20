@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from os.path import join
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'Gro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [(join(BASE_DIR, 'Gro/templates')),],
+        'DIRS': [(os.path.join(BASE_DIR, 'Gro/templates')),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,16 +77,25 @@ WSGI_APPLICATION = 'Gro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'orghdata',        # Replace with your database name
-        'USER': 'postgres',     # Replace with your database user
-        'PASSWORD': 'gadwad123', # Replace with your database password
-        'HOST': 'localhost',         # Or your database server address
-        'PORT': '5432',              # Default PostgreSQL port
+usepg = os.getenv('pgdb')=='true'
+if usepg:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'orghdata',        # Replace with your database name
+            'USER': 'postgres',     # Replace with your database user
+            'PASSWORD': 'gadwad123', # Replace with your database password
+            'HOST': 'localhost',         # Or your database server address
+            'PORT': '5432',              # Default PostgreSQL port
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
@@ -108,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 STATICFILES_DIRS = [
-    join(BASE_DIR, "Gro/static"),
+    os.path.join(BASE_DIR, "Gro/static"),
 ]
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -126,11 +135,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = join(BASE_DIR, 'media_root/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
