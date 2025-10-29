@@ -2578,11 +2578,12 @@ def updatebonsortie(request):
     for i in items:
         product=i.product
         # stock
-        if i.isfarah:
-            product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
-        else:
-            product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
-        product.save()
+        if not bon.generated:
+            if i.isfarah:
+                product.stocktotalfarah=float(product.stocktotalfarah)+float(i.qty)
+            else:
+                product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
+            product.save()
         # achatids = ast.literal_eval(i.achatids)
         # oldqties = ast.literal_eval(i.oldqties)
         # if achatids:
