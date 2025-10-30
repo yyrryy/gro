@@ -6955,9 +6955,9 @@ def updatebonavoir(request):
     items=Stockin.objects.filter(avoir=avoir)
     for i in items:
         product=Produit.objects.get(pk=i.product_id)
-        if isfarah:
+        if tqrget == 'f':
             product.stocktotalfarah=float(product.stocktotalfarah)-float(i.quantity)
-        else:
+        elif target == 'o':
             product.stocktotalorgh=float(product.stocktotalorgh)-float(i.quantity)
         # if avoir.avoirfacture:
         #     product.stockfacture=int(product.stockfacture)-int(i.qty)
