@@ -6899,7 +6899,7 @@ def updatebonavoir(request):
     totalbon=request.POST.get('totalbon')
     newmode=request.POST.get('mode')
     isfacture=True if newmode=='facture' else False
-    print("isfacture", isfacture)
+    print("target", target)
     thisclient=avoir.client
     # regle stock
     # # regle soldclient
@@ -6984,9 +6984,9 @@ def updatebonavoir(request):
     with transaction.atomic():
         for i in json.loads(request.POST.get('products')):
             product=Produit.objects.get(pk=i['productid'])
-            if isfarah:
+            if target == 'f':
                 product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
-            else:
+            elif target == 'o':
                 product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
             # if isfacture:
             #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
@@ -11936,4 +11936,28 @@ def setinventair(request):
     product.save()
     return JsonResponse({
         'success':True
+    })
+
+def zz(request):
+    products=Produit.objects.all()
+    data=[]
+    for i in products:
+        inorgh=Stockin.objects.filter(product=i, isorgh=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        outorgh=Livraisonitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0 + Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
+        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        sortiefarah=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
+        outfarah=Livraisonitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortiefarah
+        data.append({
+            'ref':i.ref,
+            'entreeOrgh':inorgh,
+            'sortiOrgh':outorgh,
+            'netorgh':inorgh - outorgh,
+            'stockorghSYSTEM':i.stocktotalorgh,
+            'entreeFarah':infarah,
+            'sortiFarah':outfarah,
+            'netfarah':infarah - outfarah,
+            'stockfarahSYSTEM':i.stocktotalfarah,
+        })
+    return JsonResponse({
+        "data":data
     })

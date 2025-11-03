@@ -77,8 +77,9 @@ WSGI_APPLICATION = 'Gro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-usesqlite = os.getenv('pgdb')=='true'
-if usesqlite:
+in1337 = os.getenv('HOME')=='/home/aaliali'
+print('in1337', os.getenv('HOME'), os.getenv('HOME')=='/home/aaliali')
+if in1337:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
