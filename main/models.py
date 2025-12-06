@@ -60,7 +60,12 @@ class Incaisse(models.Model):
 
 class Produit(models.Model):
     # stockinventqire used to know how much qty in bon inventaire #RFF3
-    stockinventaire=models.FloatField(default=None, null=True, blank=True)
+    #inventaire in is what needs to be added by inventaire
+    #inventaire out is what needs to be out by inventaire
+    inventaireinfarah=models.FloatField(default=None, null=True, blank=True)
+    inventaireoutfarah=models.FloatField(default=None, null=True, blank=True)
+    inventaireinorgh=models.FloatField(default=None, null=True, blank=True)
+    inventaireoutorgh=models.FloatField(default=None, null=True, blank=True)
     # negative stock
     replacedby=models.ForeignKey("Produit", on_delete=models.SET_NULL, default=None, null=True, blank=True)
     isnegativeinfr=models.BooleanField(default=False)

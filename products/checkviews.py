@@ -3632,6 +3632,27 @@ def updatefactureachatdate(request):
 
 def inventaire(request):
     target = request.GET.get('target')
+    isfarah=target=='f'
+    stock_field = 'stocktotalfarah' if target == 'f' else 'stocktotalorgh'
+    inventaire_field = 'stockinventairefarah' if target == 'f' else 'stockinventaireorgh'
+    if isfarah:
+        itemstosortie=Produit.objects.filter(inventaireoutfarah__gt=0)
+        itemstoenter=Produit.objects.filter(inventaireinarah__gt=0)
+    else:
+        itemstosortie=Produit.objects.filter(inventaireoutorgh__gt=0)
+        itemstoenter=Produit.objects.filter(inventaireinorgh__gt=0)
+    print('>> items to sortie', itemstosortie)
+    print('>> items to entre', itemstoenter)
+    destination = "Orgh" if target == 'o' else "Farah"
+    return render(request, 'inventaire.html', {
+        'target': target,
+        'itemstoenter': itemstoenter,
+        'itemstosortie': itemstosortie,
+        'title': f'Inventaire {destination}'
+    })
+
+def getinventairedata(request):
+    target = request.GET.get('target')
     stock_field = 'stocktotalfarah' if target == 'f' else 'stocktotalorgh'
     items = Produit.objects.annotate(
         diff=(
@@ -3639,11 +3660,6 @@ def inventaire(request):
             Cast(Coalesce(F(stock_field), Value(0)), FloatField())
         )
     ).filter(diff__gt=0)
-    products = Produit.objects.order_by('-ref')
-    destination = "Orgh" if target == 'o' else "Farah"
-    return render(request, 'inventaire.html', {
-        'target': target,
-        'products': products,
-        'items': items,
-        'title': f'Inventaire {destination}'
+    return JsonResponse({
+        'html': render(request, 'inventairedata.html', {'items': items, 'target': target}).content.decode('utf-8')
     })

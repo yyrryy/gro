@@ -693,6 +693,23 @@
           console.log(data)
           console.log(products)
           $('.loadingscreen').removeClass('d-none')
+          console.log({
+                'mantant':JSON.stringify(mantant),
+                'mode':JSON.stringify(mode),
+                'npiece':JSON.stringify(npiece),
+                'echeance':JSON.stringify(echeance),
+                'bank':JSON.stringify(bank),
+                'target': '{{target}}',
+                'totalbon': totalbon,
+                'clientid': clientid,
+                'repid':repid,
+                'transport':transport,
+                'datebon': datebon,
+                // 'mode': mode,
+                'orderno': orderno,
+                'products': JSON.stringify(products),
+                'csrfmiddlewaretoken': '{{csrf_token}}'
+              })
           $.ajax({
               url: "{% url 'products:addavoirclient' %}",
               type: 'POST',

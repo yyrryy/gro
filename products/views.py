@@ -3703,139 +3703,87 @@ def addavoirclient(request):
         except:
             receipt_no = f"SO-AV{year}/1"
     print(receipt_no, clientid, repid, totalbon, datebon)
-    try:
 
-        avoir=Avoirclient.objects.create(
-            no=receipt_no,
-            client_id=clientid,
-            representant_id=repid,
-            total=totalbon,
-            date=datebon,
-            # avoirfacture=isfacture,
+    avoir=Avoirclient.objects.create(
+        no=receipt_no,
+        client_id=clientid,
+        representant_id=repid,
+        total=totalbon,
+        date=datebon,
+        # avoirfacture=isfacture,
+        isfarah=isfarah,
+        isorgh=isorgh,
+        issortie=issortie
+    )
+
+    for i in json.loads(products):
+        product=Produit.objects.get(pk=i['productid'])
+        # if isfacture:
+        #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
+        
+        if isfarah:
+            ins = Stockin.objects.filter(
+                qtyofprice__gt=0,
+                product=product,
+                isfarah=True
+            ).exclude(
+                qtyofprice=F('quantity')
+            )
+            product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
+            #prices=Stockin.objects.filter(product=product, isfarah=True)
+            
+        if isorgh:
+            product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
+            
+        product.save()
+        Stockin.objects.create(
+            isavoir=True,
+            avoir=avoir,
+            product=product,
+            quantity=i['qty'],
+            remise1=0 if i['remise']=="" else i['remise'],
+            price=0 if i['price']=="" else i['price'],
+            total=i['total'],
             isfarah=isfarah,
             isorgh=isorgh,
-            issortie=issortie
+            issortie=issortie,
+            date=datebon,
+            qtyofprice=i['qty']
         )
-
-        for i in json.loads(products):
-            product=Produit.objects.get(pk=i['productid'])
-            # if isfacture:
-            #     product.stockfacture=int(product.stockfacture)+int(i['qty'])
-            
-            if isfarah:
-                ins = Stockin.objects.filter(
-                    qtyofprice__gt=0,
-                    product=product,
-                    isfarah=True
-                ).exclude(
-                    qtyofprice=F('quantity')
+    totalamount=sum([i for i in mantant if i is not None])
+    if totalamount>0:
+        print('totalamount', totalamount)
+        if float(totalamount)==float(totalbon):
+            avoir.ispaid=True
+        else:
+            diff=round(float(totalbon)-float(totalamount), 2)
+            avoir.rest=diff
+        avoir.save()
+        for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
+            if m is not None:
+                regl=PaymentClientbl.objects.create(
+                    client_id=clientid,
+                    amount=m,
+                    #today
+                    date=timezone.now().date(),
+                    echance=ech,
+                    bank=bk,
+                    mode=mod,
+                    npiece=np,
+                    isfarah=target=='f',
+                    isorgh=target=='o',
+                    issortie=target=='s',
+                    isavoir=True
                 )
-                product.stocktotalfarah=float(product.stocktotalfarah)+float(i['qty'])
-                #prices=Stockin.objects.filter(product=product, isfarah=True)
-                bonid=i['bonid']
-                #if bonid:
-                bon=Bonlivraison.objects.get(pk=bonid)
-                #prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
-                ## finish this prices
-                thisqty=int(i['qty'])
-                
-                # for price in prices:
-                #     print('>> id of qty', price.id)
-                #     if not thisqty==0:
-                #         needs=price.quantity-price.qtyofprice
-                #         price.qtyofprice+=needs
-                #         if needs>thisqty:
-                #             price.qtyofprice=thisqty
-                #             thisqty=0
-                #         else:
-                #             thisqty-=needs
-                #         price.save()
-
-                # # if prices.exists():
-                #     thisqty=int(i['qty'])
-                #     for p in prices:
-                #         if thisqty==0:
-                #             break
-                #         if p.qtyofprice<p:
-                #             p.quantity+=thisqty
-            if isorgh:
-                product.stocktotalorgh=float(product.stocktotalorgh)+float(i['qty'])
-                bonid=i['bonid']
-                #if bonid:
-                bon=Bonlivraison.objects.get(pk=bonid)
-                # prices=Stockin.objects.filter(pk__in=json.loads(bon.pricesofout))
-                # print('>>> prices', prices)
-                # ## finish this prices
-                # thisqty=int(i['qty'])
-                
-                # for price in prices:
-                #     print('>> id of qty', price.id)
-                #     if not thisqty==0:
-                #         needs=price.quantity-price.qtyofprice
-                #         price.qtyofprice+=needs
-                #         if needs>thisqty:
-                #             price.qtyofprice=thisqty
-                #             thisqty=0
-                #         else:
-                #             thisqty-=needs
-                #         price.save()
-            product.save()
-            Stockin.objects.create(
-                isavoir=True,
-                avoir=avoir,
-                product=product,
-                quantity=i['qty'],
-                remise1=0 if i['remise']=="" else i['remise'],
-                price=0 if i['price']=="" else i['price'],
-                total=i['total'],
-                isfarah=isfarah,
-                isorgh=isorgh,
-                issortie=issortie,
-                date=datebon,
-                qtyofprice=i['qty']
-            )
-        # client.soldtotal=round(float(client.soldtotal)-float(totalbon), 2)
-        # client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
-        # client.save()
-        totalamount=sum([i for i in mantant if i is not None])
-        if totalamount>0:
-            print('totalamount', totalamount)
-            if float(totalamount)==float(totalbon):
-                avoir.ispaid=True
-            else:
-                diff=round(float(totalbon)-float(totalamount), 2)
-                avoir.rest=diff
-            avoir.save()
-            for m, mod, np, ech, bk in zip(mantant, mode, npiece, echeance, bank):
-                if m is not None:
-                    regl=PaymentClientbl.objects.create(
-                        client_id=clientid,
-                        amount=m,
-                        #today
-                        date=timezone.now().date(),
-                        echance=ech,
-                        bank=bk,
-                        mode=mod,
-                        npiece=np,
-                        isfarah=target=='f',
-                        isorgh=target=='o',
-                        issortie=target=='s',
-                        isavoir=True
-                    )
-                    regl.avoirs.set([avoir])
-                    caisse=Caisse.objects.filter(target=target).first()
-                    if mod=='espece':
-                        if caisse:
-                            caisse.total-=m
-                            regl.targetcaisse=caisse
-                            regl.save()
-                            caisse.save()
-    except Exception as e:
-        print('>>error av cl:', e)
-        return JsonResponse({
-            'success':False,
-            'eorro':e
-        })
+                regl.avoirs.set([avoir])
+                caisse=Caisse.objects.filter(target=target).first()
+                if mod=='espece':
+                    if caisse:
+                        caisse.total-=m
+                        regl.targetcaisse=caisse
+                        regl.save()
+                        caisse.save()
+    
 
     # increment it
     return JsonResponse({
@@ -11928,11 +11876,28 @@ def getfacturepaidtype(request):
         'html':render(request, 'fclist.html', {'bons':factures}).content.decode('utf-8'),
         'total':round(factures.aggregate(Sum('total')).get('total__sum') or 0, 2)
     })
-def setinventair(request):
+def setinventairin(request):
     id=request.GET.get('id')
     qty=request.GET.get('qty')
+    target=request.GET.get('target')
     product=Produit.objects.get(pk=id)
-    product.stockinventaire=qty
+    if target=='f':
+        product.inventaireinfarah=qty
+    else:
+        product.inventaireinorgh=qty
+    product.save()
+    return JsonResponse({
+        'success':True
+    })
+def setinventairout(request):
+    id=request.GET.get('id')
+    qty=request.GET.get('qty')
+    target=request.GET.get('target')
+    product=Produit.objects.get(pk=id)
+    if target=='f':
+        product.inventaireoutfarah=qty
+    else:
+        product.inventaireoutorgh=qty
     product.save()
     return JsonResponse({
         'success':True
