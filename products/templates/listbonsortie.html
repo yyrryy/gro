@@ -46,6 +46,13 @@
 <div class="bg-white shadow rounded">
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <div>
+      <button class="btn border btnselect btn-dark active" style="
+      border-radius: 11px;" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">En attend</button>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortievalider()">Validé</button>
+      
+    </div>
+    <div>
       {{title}}
     </div>
     <button class="btn bg-orange" style="border:1px solid var(--orange);" onclick="ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}')">↻</button>
@@ -260,6 +267,17 @@
 
 
 <script>
+  function getbonsortievalider(){
+    $('.listblbody').addClass('blurred')
+    $.get('/products/getbonsortievalider?target={{target}}', (data)=>{
+      $('.searchinputlistbl').attr('waiting', '0')
+      $('.searchinputlistbl').attr('searchtype', 'valid')
+      $('.listblbody').html(data.html)
+      $('.hidebltotal').html(data.total)
+      $('.listblbody').removeClass('blurred')
+    })
+  }
+  
   function viewbonsortie(id){
     wd=window.open('/products/viewbonsortie?id='+id, '', 'width=900,height=900');
     wd.focus();
