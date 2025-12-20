@@ -5,7 +5,7 @@
 </div> -->
 <div class="exportpdctsholder position-absolute rounded shadow bg-white d-flex p-2 justify-content-between" style="z-index: 9999; top: -10vh; left: 13%; width: 80vw; height: 10vh; transition: top .7s ease;" >
   <div class="d-flex">
-    <select name="exportcategory">
+    <select name="exportcategory" class="form-control col-6">
       <option value="0">
         Tous
       </option>
@@ -20,9 +20,9 @@
       <button class="btn btn-success" onclick="exportcategory()">
         Copie Exc.
       </button>
-      <button class="btn btn-success" onclick="exportinventaire()">
+      <!-- <button class="btn btn-success" onclick="exportinventaire()">
         INVANTAIRE
-      </button>
+      </button> -->
 
     </div>
   </div>
@@ -45,12 +45,12 @@
 
     <div class="d-flex justify-content-between" style="width: 12em;">
       <button class="btn btn-info btn-sm" style="height: 15px;" onclick="$('.productstable tbody span.stockfacture').toggleClass('invisible')"></button>
-    <!-- <button class="btn btn-danger btn-sm" style="height: 15px;" onclick="showdeactivated()"></button>
+    <!-- <button class="btn btn-danger btn-sm" style="height: 15px;" onclick="showdeactivated()"></button> -->
     <button class="btn bi bi-download text-white" onclick="$('.exportpdctsholder').css('top', '10vh')"
     style="width: 2.7em;
     background: #df691a;
     height: 21px;
-    border-radius: 11px;"></button> -->
+    border-radius: 11px;"></button>
   </div>
   <!-- <button class="btn btn-sm bi bi-plus btn-success" onclick="ajaxpage('add', '+ Article', '/products/addproductspage')"></button> -->
   <!-- <div class="d-flex" > -->
@@ -231,7 +231,7 @@
   }
   function exportcategory(){
     let categoryid = $('select[name="exportcategory"]').val();
-    let url = '/products/exportproducts?categoryid=' + categoryid;
+    let url = '/products/exportproducts?target={{target}}&categoryid=' + categoryid;
 
     // Create a hidden iframe to trigger the file download
     var iframe = $('<iframe>', {

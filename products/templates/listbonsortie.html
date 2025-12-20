@@ -126,7 +126,7 @@
   border-radius: 11px;"></button> -->
 
   </div>
-  <div style="height: 70vh; overflow: scroll;" class="listblholder">
+  <div style="height: 60vh; overflow: scroll;" class="listblholder">
     <table class="table table-bordered table-hover table-striped listbltable" style="font-size: 12px;" id="addbonlivraisonle">
       <thead style="position: sticky; top: 0;">
         <tr style="background: #676767; color: white;">
@@ -267,9 +267,12 @@
 
 
 <script>
+  currentPagelistbl=1
   function getbonsortievalider(){
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonsortievalider?target={{target}}', (data)=>{
+      currentPagelistbl=1
+      $('.listblholder').on('scroll', handleScrolllistbl);
       $('.searchinputlistbl').attr('waiting', '0')
       $('.searchinputlistbl').attr('searchtype', 'valid')
       $('.listblbody').html(data.html)
@@ -429,7 +432,8 @@
   }
   function loadMoreRecordslistbl (year, startdate, enddate, term)  {
     loadinglistbl = true;
-    $.get(`/products/loadlistbs/?target={{target}}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}`, (data)=>{
+    searchtype=$('.searchinputlistbl').attr('searchtype')
+    $.get(`/products/loadlistbs/?target={{target}}&page=${currentPagelistbl}&year=${year}&startdate=${startdate}&enddate=${enddate}&term=${term}&searchtype=${searchtype}`, (data)=>{
 
       const tbody = $('.listbltable tbody');
       tbody.append(data.trs);
@@ -530,6 +534,7 @@
     }
     else{
       let year=$('select[name="yearsbl"]').val()?$('select[name="yearsbl"]').val():0
+      searchtype=$('.searchinputlistbl').attr('searchtype')
       console.log(year)
       // Split the filter value into individual terms based on the '&' sign
       // var filterTerms = filterValue.split('+').map(function(term) {
@@ -537,7 +542,7 @@
       // });
       let startdate=$('.startdatefilterbl').val()==""?0:$('.startdatefilterbl').val()
       let enddate=$('.enddatefilterbl').val()==""?0:$('.enddatefilterbl').val()
-      $.get('/products/searchforlistbs', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate}, (data)=>{
+      $.get('/products/searchforlistbs', {'term':filterValue.trim(), 'startdate':startdate, 'enddate':enddate, 'searchtype':searchtype}, (data)=>{
         console.log('eee')
         $(".listbltable tbody").html('')
         $(".listbltable tbody").html(data.trs)

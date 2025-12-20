@@ -7670,8 +7670,9 @@ def loadlistbl(request):
 
 def loadlistbs(request):
     page = int(request.GET.get('page', 1))
-    target =request.GET.get('target')
-    isfarah=target=='f'
+    # if search type changed to valid, means the button valid clicked and wz wnt only valid bons
+    searchtype =request.GET.get('searchtype')
+    isgenerated=searchtype=='valid'
     all=request.GET.get('all')=='1'
     valid=request.GET.get('valid')=='1'
     year =request.GET.get('year')
@@ -7731,16 +7732,10 @@ def loadlistbs(request):
                 )
         print(startdate, enddate)
         if startdate=='0' and enddate=='0':
-            if all:
-                bons=Bonsortie.objects.exclude(isvalid=True).filter(date__year=thisyear).filter(q_objects).order_by('-bon_no')[start:end]
-            if valid:
-                bons=Bonsortie.objects.filter(isvalid=True, date__year=thisyear).filter(q_objects).order_by('-bon_no')[start:end]
+            bons=Bonsortie.objects.filter(generated=isgenerated, date__year=thisyear).filter(q_objects).order_by('-bon_no')[start:end]
             #total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         else:
-            if all:
-                bons=Bonsortie.objects.exclude(isvalid=True).filter(date__range=[startdate, enddate]).filter(q_objects).order_by('-bon_no')[start:end]
-            if valid:
-                bons=Bonsortie.objects.filter(isvalid=True, date__range=[startdate, enddate]).filter(q_objects).order_by('-bon_no')[start:end]
+            bons=Bonsortie.objects.filter(generated=isgenerated, date__range=[startdate, enddate]).filter(q_objects).order_by('-bon_no')[start:end]
             # bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
             # total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         # for i in bons:
@@ -7791,24 +7786,24 @@ def loadlistbs(request):
             # '''
         print('>>>load bl term')
         return JsonResponse({
-            'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+            'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
     if startdate != '0' and enddate != '0':
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
-        bons=Bonsortie.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
-        total=round(Bonsortie.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(date__range=[startdate, enddate], generated=isgenerated).order_by('-bon_no')[start:end]
+        total=round(Bonsortie.objects.filter(date__range=[startdate, enddate], generated=isgenerated).aggregate(Sum('total'))['total__sum'] or 0, 2)
         print('>>>load bl date f')
         return JsonResponse({
-            'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+            'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
-    bons= Bonsortie.objects.filter(date__year=year).order_by('-bon_no')[start:end]
-    total=round(Bonsortie.objects.filter(date__year=year).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    bons= Bonsortie.objects.filter(date__year=year, generated=isgenerated).order_by('-bon_no')[start:end]
+    total=round(Bonsortie.objects.filter(date__year=year, generated=isgenerated).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     return JsonResponse({
-        'trs':render(request, 'bslist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
+        'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
         'has_more': len(bons) == per_page
     })
 
@@ -8001,6 +7996,9 @@ def searchforlistbl(request):
 
 def searchforlistbs(request):
     term=request.GET.get('term')
+    searchtype=request.GET.get('searchtype')
+    # if searchtype == valid, means we want only the generated bs
+    isgenerated=searchtype=='valid'
     target=request.GET.get('target')
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
@@ -8077,12 +8075,12 @@ def searchforlistbs(request):
             )
     print(">> here 1",startdate, enddate)
     if startdate=='0' and enddate=='0':
-        bons=Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[:50]
-        total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__year=thisyear, generated=isgenerated).order_by('-bon_no')[:50]
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear, generated=isgenerated).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
     else:
         print(">> here 1²",startdate, enddate)
-        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
-        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate], generated=isgenerated).order_by('-bon_no')[:50]
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate], generated=isgenerated).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
     return JsonResponse({
         'trs':render(request, 'bslist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
@@ -8847,6 +8845,7 @@ def loadclients(request):
 
 def exportproducts(request):
     categoryid=request.GET.get('categoryid')
+    isfarah=request.GET.get('target')=='f'
     if categoryid=='0':
         products=Produit.objects.all()
         filename='Produit_tous'+today.strftime('%d/%m/%y')+'.xlsx'
@@ -8863,15 +8862,19 @@ def exportproducts(request):
     ws = wb.active
 
     # Write column headers
-    ws.append(['ref', 'name', 'category', 'buyprice', 'sellprice', 'remise', 'prixnet', 'stocktotal', 'stockfacture', 'mark', 'diametre', 'block', 'equivalent', 'refeq1', 'refeq2'])
+    ws.append(['ref', 'name', 'category', 'buyprice', 'sellprice', 'remise', 'prixnet', 'stocktotal', 'mark', 'diametre', 'block', 'equivalent', 'refeq1', 'refeq2'])
 
     # Write product data
     for product in products:
+        if isfarah:
+            stock=product.stocktotalfarah
+        else:
+            stock=product.stocktotalorgh
         ws.append([
             product.ref, product.name,
             product.category.name if product.category else '',  # Extract category name
             product.buyprice, product.sellprice,
-            product.remise, product.prixnet, product.stocktotal, product.stockfacture, product.mark.name if product.mark else '',
+            product.remise1, product.prixnet, stock, product.mark.name if product.mark else '',
             product.diametre, product.block, product.equivalent, product.refeq1, product.refeq2
         ])
 

@@ -744,7 +744,7 @@ def achatsection(request):
     return render(request, 'achatsection.html', ctx)
 
 def listbonsortie(request):
-    bons=Bonsortie.objects.all().order_by('-bon_no')[:50]
+    bons=Bonsortie.objects.filter(generated=False).order_by('-bon_no')[:50]
     ctx={
         'title':'List des bons de sortie',
         'bons':bons
