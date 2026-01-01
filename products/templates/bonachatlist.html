@@ -1,4 +1,4 @@
-{{% load global_tags %}
+{% load global_tags %}
 {% for order in bons %}
   <tr class="ord {% if loadmore %}achat-row{% endif %}" orderid="{{order.id}}" ondblclick="ajaxpage('bonachat{{order.id}}', 'Bon achat {{order.nbon}}', '/products/bonachatdetails/{{order.id}}?target={{target}}')">
     <td>{{ order.nbon }}</td>

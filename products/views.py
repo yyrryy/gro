@@ -8645,34 +8645,9 @@ def yeardatabachat(request):
     # get all bls of that year
     bons=Itemsbysupplier.objects.filter(date__year=year).order_by('-id')[:50]
     print('>> bons in', year, bons)
-    trs=''
-    for order in bons:
-        trs+=f'''
-        <tr class="ord achat-row" orderid="{order.id}" ondblclick="ajaxpage('bonachat{order.id}', 'Bon achat {order.nbon}', '/products/bonachatdetails/{order.id}')">
-            <td>{ order.nbon }</td>
-            <td>{ order.date.strftime("%d/%m/%Y") }</td>
-            <td>{ order.supplier.name }</td>
-            <td>{ order.total}</td>
-            <td>{ order.tva}</td>
-            <td>{"Facture"if order.isfacture else "Bl"}</td>
-            <td>{ round(order.supplier.rest, 2) }</td>
-            <td class="d-flex">
-                <div>{"R0"if order.ispaid else "N1"}</div>
-
-              <div style="width:15px; height:15px; border-radius:50%; background:{"green"if order.ispaid else "red"};" ></div>
-
-
-
-            </td>
-            <td>
-              <button class="btn bi bi-download" onclick="printbonachat('{order.id}')"></button>
-            </td>
-
-          </tr>
-        '''
     return JsonResponse({
-        'trs':trs,
-        'total':round(Bonlivraison.objects.filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        'trs':render(request, 'bonachatlist.html', {'bons':bons}).content.decode('utf-8'),
+        'total':round(Itemsbysupplier.objects.filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
     })
 
 def yeardatabc(request):
