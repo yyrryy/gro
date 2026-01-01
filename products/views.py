@@ -8643,6 +8643,7 @@ def yeardatabs(request):
     target=request.GET.get('target')
     # get all bls of that year
     bls=Bonsortie.objects.filter(date__year=year).order_by('-id')[:50]
+    print('>> bons ', bls)
     # trs=''
     # for i in bls:
     #     trs+=f'''
