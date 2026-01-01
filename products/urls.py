@@ -164,6 +164,7 @@ urlpatterns = [
     path('createnewrepaccount', views.createnewrepaccount, name='createnewrepaccount'),
     path('createnewclientaccount', views.createnewclientaccount, name='createnewclientaccount'),
     path('yeardatabl', views.yeardatabl, name='yeardatabl'),
+    path('yeardatabs', views.yeardatabs, name='yeardatabs'),
     path('loadreglbl/', views.loadreglbl, name='loadreglbl'),
     path('loadclients/', views.loadclients, name='loadclients'),
     path('exportproducts', views.exportproducts, name='exportproducts'),

@@ -88,7 +88,7 @@
       
     </div>
     <div class="d-flex">
-      <select name="yearsbl" onchange="yeardatabl()" class="populateyears">
+      <select name="yearsbl" onchange="yeardatabs()" class="populateyears">
 
       </select>
       <button class="btn btn-success" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
@@ -419,13 +419,13 @@
   // date=new Date()
   // year=date.getFullYear()
   // $('select[name="yearsbl"]').append('<option value="'+year+'">'+year+'</option>')
-  function yeardatabl(){
+  function yeardatabs(){
     let year=$('select[name="yearsbl"]').val()
     if (year==''){return}
     currentPagelistbl=1
     loadinglistbl = false;
     $('.listblholder').on('scroll', handleScrolllistbl);
-    $.get('/products/yeardatabl', {year:year}, (data)=>{
+    $.get('/products/yeardatabs', {year:year}, (data)=>{
       $('.listblbody').html(data.trs)
       $('.totalbons').text(data.total)
     })
