@@ -8075,12 +8075,16 @@ def searchforlistbs(request):
             )
     print(">> here 1",startdate, enddate)
     if startdate=='0' and enddate=='0':
-        bons=Bonsortie.objects.filter(q_objects).filter(date__year=thisyear, generated=isgenerated).order_by('-bon_no')[:50]
-        total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear, generated=isgenerated).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no')[:50]
+        # generated=isgenerated
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        # generated=isgenerated
     else:
         print(">> here 1²",startdate, enddate)
-        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate], generated=isgenerated).order_by('-bon_no')[:50]
-        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate], generated=isgenerated).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
+        # generated=isgenerated
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        # generated=isgenerated
     return JsonResponse({
         'trs':render(request, 'bslist.html', {'bons':bons, 'notloading':True}).content.decode('utf-8'),
         'total':total
