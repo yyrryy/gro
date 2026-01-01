@@ -8644,41 +8644,6 @@ def yeardatabs(request):
     # get all bls of that year
     bls=Bonsortie.objects.filter(date__year=year).order_by('-id')[:50]
     print('>> bons ', bls)
-    # trs=''
-    # for i in bls:
-    #     trs+=f'''
-    #     <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" year={year} orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/bonlivraisondetails/{i.id}')">
-    #         <td>{ i.bon_no }</td>
-    #         <td>{ i.date.strftime("%d/%m/%Y")}</td>
-    #         <td>{ i.client.name }</td>
-    #         <td>{ i.client.code }</td>
-    #         <td>{ i.total}</td>
-    #         <td>{ i.client.region}</td>
-    #         <td>{ i.client.city}</td>
-    #         <td>{ i.client.soldbl}</td>
-    #         <td>{ i.salseman }</td>
-    #         <td class="d-flex justify-content-between">
-    #           <div>
-    #           {'R0' if i.ispaid else 'N1' }
-
-    #           </div>
-    #           <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-    #         </td>
-    #         <td class="text-danger">
-    #         {'OUI' if i.isfacture else 'NON'}
-
-    #         </td>
-
-    #         <td>
-    #           {i.commande.order_no if i.commande else '--'}
-    #         </td>
-    #         <td>
-    #           {i.modlvrsn}
-    #         </td>
-    #       </tr>
-    #     '''
-    
     return JsonResponse({
         'trs':render(request, 'bslist.html', {'bons':bls}).content.decode('utf-8'),
         'total':round(Bonlivraison.objects.filter(date__year=year).aggregate(Sum('total'))['total__sum'] or 0, 2)
