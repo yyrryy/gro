@@ -4436,7 +4436,7 @@ def updatebonachat(request):
     for i in items:
         product=i.product
         print('removing from total')
-        if isfarah:
+        if bon.isfarah:
             product.stocktotalfarah=float(product.stocktotalfarah)-float(i.quantity)
         else:
             product.stocktotalorgh=float(product.stocktotalorgh)-float(i.quantity)
@@ -4500,8 +4500,8 @@ def updatebonachat(request):
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
                 qtyofprice=qty,
-                isfarah=target=='f',
-                isorgh=target=='o',
+                isfarah=bon.isfarah,
+                isorgh=bon.isorgh,
                 net=netwithremise1
             )
             
@@ -4509,7 +4509,7 @@ def updatebonachat(request):
             # totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
             # print(totalprices, totalqty)
             #product.coutmoyen=round(totalprices/totalqty, 2)
-            if isfarah:
+            if bon.isfarah:
                 # if product.stocktotalfarah>0:
                 #     print('>> has stock')
                 #     totalqtys=int(product.stocktotalfarah)+int(i['qty'])
