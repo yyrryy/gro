@@ -594,11 +594,11 @@ margin: 0;
           return
       }
       // check if year is current year
-      if ($('.datebonachat{{bon.id}}').val().split('-')[0] != new Date().getFullYear()){
-        $('.datebonachat{{bon.id}}').addClass('border border-danger')
-        alertify.error('Date invalid')
-        return
-      }
+      // if ($('.datebonachat{{bon.id}}').val().split('-')[0] != new Date().getFullYear()){
+      //   $('.datebonachat{{bon.id}}').addClass('border border-danger')
+      //   alertify.error('Date invalid')
+      //   return
+      // }
       $('.datebonachat{{bon.id}}').removeClass('border border-danger')
       $('.data').removeClass('border border-danger')
       // check if .itemrow is exist
