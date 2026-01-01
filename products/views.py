@@ -8635,7 +8635,9 @@ def yeardatabl(request):
     })
 
 def yeardatabachat(request):
+    this_year=datetime.now().year
     year=request.GET.get('year') or this_year
+    print('year>>>', year)
     # get all bls of that year
     bons=Itemsbysupplier.objects.filter(date__year=year).order_by('-id')[:50]
     trs=''
