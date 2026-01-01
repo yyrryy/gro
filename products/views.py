@@ -8644,6 +8644,7 @@ def yeardatabachat(request):
     print('year>>>', year) 
     # get all bls of that year
     bons=Itemsbysupplier.objects.filter(date__year=year).order_by('-id')[:50]
+    print('>> bons in', year, bons)
     trs=''
     for order in bons:
         trs+=f'''
