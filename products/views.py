@@ -2071,11 +2071,11 @@ def listbonlivraison(request):
     # get only the last 100 orders of the current year
     # only check one target as bon livraison is only for farah or orgh, pos has bonsortie
     if target=='f':
-        bons= Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
-        total=Bonlivraison.objects.filter(isfarah=True, date__year=timezone.now().year, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
+        bons= Bonlivraison.objects.filter(isfarah=True, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isfarah=True, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
     else:
-        bons= Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
-        total=Bonlivraison.objects.filter(isfarah=False, date__year=timezone.now().year, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
+        bons= Bonlivraison.objects.filter(isfarah=False, isvalid=False, iscanceled=False).order_by('-bon_no')[:50]
+        total=Bonlivraison.objects.filter(isfarah=False, isvalid=False, iscanceled=False).aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Bons de livraison',
         'bons':bons,
@@ -4436,7 +4436,7 @@ def updatebonachat(request):
     for i in items:
         product=i.product
         print('removing from total')
-        if isfarah:
+        if bon.isfarah:
             product.stocktotalfarah=float(product.stocktotalfarah)-float(i.quantity)
         else:
             product.stocktotalorgh=float(product.stocktotalorgh)-float(i.quantity)
@@ -4500,8 +4500,8 @@ def updatebonachat(request):
                 price=0 if i['price']=="" else i['price'],
                 total=0 if i['total']=="" else i['total'],
                 qtyofprice=qty,
-                isfarah=target=='f',
-                isorgh=target=='o',
+                isfarah=bon.isfarah,
+                isorgh=bon.isorgh,
                 net=netwithremise1
             )
             
@@ -4509,7 +4509,7 @@ def updatebonachat(request):
             # totalqty=Stockin.objects.filter(product=product).aggregate(Sum('quantity'))['quantity__sum'] or 0
             # print(totalprices, totalqty)
             #product.coutmoyen=round(totalprices/totalqty, 2)
-            if isfarah:
+            if bon.isfarah:
                 # if product.stocktotalfarah>0:
                 #     print('>> has stock')
                 #     totalqtys=int(product.stocktotalfarah)+int(i['qty'])
@@ -7546,7 +7546,7 @@ def loadlistbl(request):
                 )
         print(startdate, enddate)
         if startdate=='0' and enddate=='0':
-            bons=Bonlivraison.objects.filter(date__year=thisyear, isfarah=isfarah, isvalid=isvalid).filter(q_objects).order_by('-bon_no')[start:end]
+            bons=Bonlivraison.objects.filter(isfarah=isfarah, isvalid=isvalid).filter(q_objects).order_by('-bon_no')[start:end]
             
             #total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=thisyear, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         else:
@@ -7617,9 +7617,9 @@ def loadlistbl(request):
             'trs':render(request, 'bllist.html', {'bons':bons, 'target':target, 'isfarah':isfarah}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
-    bons= Bonlivraison.objects.filter(isvalid=isvalid, date__year=year, isfarah=isfarah).order_by('-bon_no')[start:end]
+    bons= Bonlivraison.objects.filter(isvalid=isvalid, isfarah=isfarah).order_by('-bon_no')[start:end]
     
-    total=round(Bonlivraison.objects.filter(date__year=year, isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    total=round(Bonlivraison.objects.filter(isfarah=isfarah).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     # for i in bons:
     #     trs+=f'''
@@ -7976,9 +7976,7 @@ def searchforlistbl(request):
         else:
             bons=Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, iscanceled=True).order_by('-bon_no')[:50]
             total=round(Bonlivraison.objects.filter(q_objects).filter(date__year=year, isfarah=isfarah, iscanceled=True).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-            
     else:
-        print('>> hhere2')
         if searchtype=='waiting':
             bons=Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).order_by('-bon_no')[:50]
             total=round(Bonlivraison.objects.filter(q_objects).filter(date__range=[startdate, enddate], isfarah=isfarah, isvalid=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
