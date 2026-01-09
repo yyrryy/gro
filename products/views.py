@@ -2235,33 +2235,30 @@ def listfactures(request):
     year=timezone.now().strftime("%y")
     # get only the last 100 orders of the current year
     if target=='f':
-        bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).order_by('-facture_no')[:50]
-        total=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).aggregate(Sum('total')).get('total__sum') or 0
-        lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=True).last().date if bons else timezone.now().date()
+        bons= Facture.objects.filter(isvalid=False, isfarah=True).order_by('-facture_no')[:50]
+        total=Facture.objects.filter(isvalid=False, isfarah=True).aggregate(Sum('total')).get('total__sum') or 0
+        lastdatefacture=Facture.objects.filter(isvalid=False, isfarah=True).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(
-            facture_no__startswith=f'FR-FC{year}'
-        ).last()
+            facture_no__startswith=f'FR-FC').last()
         # latest_receipt = Bonsortie.objects.filter(
         #     facture_no__startswith=f'FR-BL{year}'
         # ).order_by("-bon_no").first()
         if latest_receipt:
             latest_receipt_no = int(latest_receipt.facture_no[-9:])
-            receipt_no = f"FR-FC{year}{latest_receipt_no + 1:09}"
+            receipt_no = f"{latest_receipt.facture_no[:7]}{latest_receipt_no + 1:09}"
         else:
             receipt_no = f"FR-FC{year}000000001"
     else:
-        bons= Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).order_by('-facture_no')[:50]
-        total=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).aggregate(Sum('total')).get('total__sum') or 0
-        lastdatefacture=Facture.objects.filter(isvalid=False, date__year=timezone.now().year, isfarah=False).last().date if bons else timezone.now().date()
-        latest_receipt = Facture.objects.filter(
-            facture_no__startswith=f'FC{year}'
-        ).last()
+        bons= Facture.objects.filter(isvalid=False, isfarah=False).order_by('-facture_no')[:50]
+        total=Facture.objects.filter(isvalid=False, isfarah=False).aggregate(Sum('total')).get('total__sum') or 0
+        lastdatefacture=Facture.objects.filter(isvalid=False, isfarah=False).last().date if bons else timezone.now().date()
+        latest_receipt = Facture.objects.filter(facture_no__startswith=f'FC').last()
         # latest_receipt = Bonsortie.objects.filter(
         #     facture_no__startswith=f'FR-BL{year}'
         # ).order_by("-bon_no").first()
         if latest_receipt:
             latest_receipt_no = int(latest_receipt.facture_no[-9:])
-            receipt_no = f"FC{year}{latest_receipt_no + 1:09}"
+            receipt_no = f"{latest_receipt.facture_no[:4]}{latest_receipt_no + 1:09}"
         else:
             receipt_no = f"FC{year}000000001"
     ctx={

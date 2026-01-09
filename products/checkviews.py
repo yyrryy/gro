@@ -1848,6 +1848,7 @@ def facturemultiple(request):
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d')
     clientid=request.GET.get('clientid')
+    facture_no=request.GET.get('facture_no')
     target=request.GET.get('target')
     client=Client.objects.get(pk=clientid)
     bons=json.loads(request.GET.get('bons'))
@@ -1904,7 +1905,7 @@ def facturemultiple(request):
     #     facture=facture
     # else:
     facture=Facture.objects.create(
-        facture_no=receipt_no,
+        facture_no=facture_no,
         client_id=clientid,
         isfarah=isfarah,
         date=date

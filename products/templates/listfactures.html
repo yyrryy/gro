@@ -133,7 +133,7 @@
                       </div>
                       <div>
                         <small>N° facture:</small><br>
-                        <input readonly value="{{receipt_no}}" type="text" class="facture_no form-control">
+                        <input value="{{receipt_no}}" type="text" class="facture_no form-control">
                       </div>
                     </div>
                     <button class="btn text-white w-100 facturemultiple" style="background: #00538c;">
@@ -658,6 +658,7 @@
         clientid=$('[name="clientoffacture"]').val()
 
         date=$(".dateoffacture").val()
+        facture_no=$(".facture_no").val()
 
 
         if (selectedValues.length==0 || clientid==null){
@@ -669,6 +670,7 @@
         console.log(clientid, date, selectedValues)
         $.get('/products/facturemultiple?target={{target}}', {
           'clientid':clientid,
+          'facture_no':facture_no,
           'bons':JSON.stringify(selectedValues),
           'date':date
         }, (data)=>{
