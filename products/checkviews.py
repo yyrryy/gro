@@ -2574,6 +2574,7 @@ def updatebonsortie(request):
     bon.car=car
     bon.note=note
     bon.remise=remise
+    
     items=Sortieitem.objects.filter(bon=bon)
     #initiate stock and price history
     for i in items:
@@ -2585,19 +2586,6 @@ def updatebonsortie(request):
             else:
                 product.stocktotalorgh=float(product.stocktotalorgh)+float(i.qty)
             product.save()
-        # achatids = ast.literal_eval(i.achatids)
-        # oldqties = ast.literal_eval(i.oldqties)
-        # if achatids:
-        #     stockins=Stockin.objects.filter(pk__in=achatids)
-        #     for s, o in zip(stockins, oldqties):
-        #         s.qtyofprice=o
-        #         s.save()
-        #print('>> qtyofprice, qties', json.loads(i.pricesofout), json.loads(i.qtyofout))
-        # prices and qties of prices
-        # for pr, qty in zip(json.loads(i.pricesofout), json.loads(i.qtyofout)):
-        #     st=Stockin.objects.get(pk=pr)
-        #     st.qtyofprice+=qty
-        #     st.save()
         i.delete()
 
     with transaction.atomic():
@@ -2630,110 +2618,12 @@ def updatebonsortie(request):
                 oldqties=oldqties,
                 coutmoyen=i['coutmoyen'],
             )
-            print('>> achatids', achatids)
-
-            # if not 'None' in achatids:
-            #     for i, r in zip(achatids, remainqties):
-            #         s=Stockin.objects.filter(pk=1)
-            #         s.qtyofprice=r
-            #         s.save()
-            # update stock accordinly
-            if farah:
-                product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
-                # negative=json.loads(product.frnegative)
-                # sorties=json.loads(product.frsorties)
-                # if float(product.stocktotalfarah)-float(i['qty'])<0:
-                #     product.isnegativeinfr=True
-                #     negative.append(float(i['qty'])-float(product.stocktotalfarah))
-                #     sorties.append(sortitem.id)
-                # product.frnegative=negative
-                # product.frsorties=sorties
-            else:
-                product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
-                # negative=json.loads(product.negative)
-                # sorties=json.loads(product.sorties)
-                # negative=json.loads(product.negative)
-                # sorties=json.loads(product.sorties)
-                # if float(product.stocktotalorgh)-float(i['qty'])<0:
-                #     product.isnegative=True
-                #     negative.append(float(i['qty'])-float(product.stocktotalfarah))
-                #     sorties.append(sortitem.id)
-                # product.negative=negative
-                # product.sorties=sorties
+            if not bon.generated:
+                if farah:
+                    product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
+                else:
+                    product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
             product.save()
-            
-            # update prices accordinly
-            # pri lli7diffo' d mnchk addifo4n 4kola pri
-            # pricesofout=[]
-            # qtyofout=[]
-            # prices=Stockin.objects.filter(qtyofprice__gt=0, isfarah=farah, product=product, isavoir=False).order_by('id')
-            # thisqty=int(i['qty'])
-            # print('>>> qty', thisqty)
-            # for pr in prices:
-            #     print('>> qty', thisqty, pr.product.ref, pr.qtyofprice, pr.price)
-            #     if not thisqty<=0:
-            #         print('>> qty is not 0')
-            #         if pr.qtyofprice<=thisqty:
-            #             thisqty=thisqty-int(pr.qtyofprice)
-            #             qtyofout.append(pr.qtyofprice)
-            #             pr.qtyofprice=0
-            #             pricesofout.append(pr.id)
-            #         else:
-            #             pr.qtyofprice=int(pr.qtyofprice)-thisqty
-            #             qtyofout.append(thisqty)
-            #             thisqty=0
-            #             pricesofout.append(pr.id)
-            #         pr.save()
-            #     else:
-            #         print('>> qty', thisqty, pr.product.ref, 'breaking')
-            #         break
-            # sortitem.pricesofout=pricesofout
-            # sortitem.qtyofout=qtyofout
-            # sortitem.save()
-    # if float(payment)>0:
-    #     PaymentClientbl.objects.create(
-    #         client_id=clientid,
-    #         amount=payment,
-    #         date=date.today(),
-    #         mode='espece',
-    #         npiece=f'Paiement de bon de sortie {bon.bon_no}',
-    #         issortie=True
-    #     )
-    # if float(payment)<float(totalbon):
-    #     if remise:
-    #         bon.ispaid=True
-    #         bon.remiseamount=round(float(totalbon)-float(payment), 2)
-    #     else:
-    #         bon.rest=round(float(totalbon)-float(payment), 2)
-    #         Avanceclient.objects.create(
-    #             client_id=clientid,
-    #             amount=payment,
-    #             #today
-    #             date=timezone.now().date(),
-    #             npiece=f'Avance de bon de sortie {bon.bon_no}',
-    #             issortie=True
-    #         )
-    # if float(payment)==float(totalbon):
-    #     bon.ispaid=True
-    #     PaymentClientbl.objects.create(
-    #         client_id=clientid,
-    #         amount=payment,
-    #         date=date.today(),
-    #         mode='espece',
-    #         npiece=f'Paiement de bon de sortie {bon.bon_no}',
-    #         issortie=True
-    #     )
-    # payment = PaymentClientbl.objects.annotate(
-    #     bonsortie_count=Count('bonsortie')
-    # ).filter(
-    #     bonsortie_count=1,  # Ensure it has exactly one Bonsortie
-    #     bonsortie__id=4    # Ensure the Bonsortie has ID 4
-    # ).first()
-    # bonsortie=payment.bonsortie.all()
-    # bonsortie.update(ispaid=False)
-    # bonsortie.update(remise=False)
-    # bonsortie.update(paidamount=0.0)
-    # bonsortie.update(remiseamount=0.0)
     if float(payment)>0:
         if remise:
             print('>> Remise')
@@ -2745,7 +2635,6 @@ def updatebonsortie(request):
             amount=payment,
             date=date.today(),
             mode='espece',
-            #npiece=f'Paiement de bon de sortie {bon.bon_no}',
             npiece=f'espece',
             issortie=True
         )
