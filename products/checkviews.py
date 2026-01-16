@@ -2623,7 +2623,7 @@ def updatebonsortie(request):
                     product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
                 else:
                     product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])
-            product.save()
+                product.save()
     if float(payment)>0:
         if remise:
             print('>> Remise')
