@@ -626,13 +626,13 @@
                             </tr>
                         </thead>
                         <tbody class="pdctsinbody{{product.id}}">
-                          <!-- <tr>
+                          <tr>
                             <td>01/01/2024</td>
                             <td>inventaire 2023</td>
                             <td>stock inital</td>
                             <td>{%if isfarah%}{{product.frstockinitial}}{%else%}{{product.stockinitial}}{%endif%}</td>
                             <td>{%if isfarah%}{{product.frpriceinitial|floatformat:2}}{%else%}{{product.priceinitial|floatformat:2}}{%endif%}</td>
-                          </tr> -->
+                          </tr>
                           {% for entry in product.stockin_set.all %}
                           {% endfor %}
                           <!-- 
