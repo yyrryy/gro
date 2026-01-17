@@ -11899,7 +11899,7 @@ def zz(request):
     data=[]
     for i in products:
         print("==>", i.ref)
-        inorgh=Stockin.objects.filter(product=i, isorgh=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        inorgh=Stockin.objects.filter(product=i, isorgh=True).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.stockinitial
 
         sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
@@ -11907,7 +11907,9 @@ def zz(request):
 
         outorgh=Livraisonitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh + avsupporgh
 
-        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        netorgh = inorgh - outorgh
+
+        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0 + frstockinitial
 
         sortiefarah=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
 
@@ -11915,17 +11917,32 @@ def zz(request):
 
         outfarah=Livraisonitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortiefarah + avsuppfarah
 
-        data.append({
-            'ref':i.ref,
-            'entreeOrgh':inorgh,
-            'sortiOrgh':outorgh,
-            'netorgh':inorgh - outorgh,
-            'stockorghSYSTEM':i.stocktotalorgh,
-            'entreeFarah':infarah,
-            'sortiFarah':outfarah,
-            'netfarah':infarah - outfarah,
-            'stockfarahSYSTEM':i.stocktotalfarah,
-        })
+        netfarah = infarah - outfarah
+        if (netorgh != i.stocktotalorgh):
+            data.append({
+                'ref':i.ref,
+                'entreeOrgh':inorgh,
+                'sortiOrgh':outorgh,
+                'netorgh':netorgh,
+                'stockorghSYSTEM':i.stocktotalorgh,
+                'ERROR';'ERROR'
+                # 'entreeFarah':infarah,
+                # 'sortiFarah':outfarah,
+                # 'netfarah':netfarah,
+                # 'stockfarahSYSTEM':i.stocktotalfarah,
+            })
+        else:
+            data.append({
+                'ref':i.ref,
+                'entreeOrgh':inorgh,
+                'sortiOrgh':outorgh,
+                'netorgh':netorgh,
+                'stockorghSYSTEM':i.stocktotalorgh,
+                # 'entreeFarah':infarah,
+                # 'sortiFarah':outfarah,
+                # 'netfarah':netfarah,
+                # 'stockfarahSYSTEM':i.stocktotalfarah,
+            })
     return JsonResponse({
         "data":data
     })
