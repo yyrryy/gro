@@ -11898,6 +11898,7 @@ def zz(request):
     products=Produit.objects.all()
     data=[]
     for i in products:
+        print("==>", i.ref)
         inorgh=Stockin.objects.filter(product=i, isorgh=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
 
         sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
@@ -11913,7 +11914,7 @@ def zz(request):
         avsuppfarah=Returnedsupplier.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
 
         outfarah=Livraisonitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortiefarah + avsuppfarah
-        
+
         data.append({
             'ref':i.ref,
             'entreeOrgh':inorgh,
