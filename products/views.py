@@ -11899,7 +11899,7 @@ def zz(request):
     data=[]
     for i in products:
         print("==>", i.ref)
-        inorgh=Stockin.objects.filter(product=i, isfarah=False, isavoir=False).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        inorgh=Stockin.objects.filter(product=i, isfarah=False, isavoir=False).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.stockinitial
 
         sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
@@ -11909,7 +11909,7 @@ def zz(request):
 
         netorgh = inorgh - outorgh
 
-        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.frstockinitial
 
         sortiefarah=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
 
