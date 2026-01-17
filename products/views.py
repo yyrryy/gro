@@ -11901,11 +11901,11 @@ def zz(request):
         print("==>", i.ref)
         inorgh=Stockin.objects.filter(product=i, isfarah=False, isavoir=False).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.stockinitial
 
-        sortieorgh = Sortieitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0
+        sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
         avsupporgh=Returnedsupplier.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
-        outorgh=Livraisonitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh + avsupporgh
+        outorgh=Livraisonitem.objects.filter(product=i, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh + avsupporgh
 
         netorgh = inorgh - outorgh
 
@@ -11931,18 +11931,18 @@ def zz(request):
                 # 'netfarah':netfarah,
                 # 'stockfarahSYSTEM':i.stocktotalfarah,
             })
-        else:
-            data.append({
-                'ref':i.ref,
-                'entreeOrgh':inorgh,
-                'sortiOrgh':outorgh,
-                'netorgh':netorgh,
-                'stockorghSYSTEM':i.stocktotalorgh,
-                # 'entreeFarah':infarah,
-                # 'sortiFarah':outfarah,
-                # 'netfarah':netfarah,
-                # 'stockfarahSYSTEM':i.stocktotalfarah,
-            })
+        # else:
+        #     data.append({
+        #         'ref':i.ref,
+        #         'entreeOrgh':inorgh,
+        #         'sortiOrgh':outorgh,
+        #         'netorgh':netorgh,
+        #         'stockorghSYSTEM':i.stocktotalorgh,
+        #         # 'entreeFarah':infarah,
+        #         # 'sortiFarah':outfarah,
+        #         # 'netfarah':netfarah,
+        #         # 'stockfarahSYSTEM':i.stocktotalfarah,
+        #     })
     return JsonResponse({
         "data":data
     })
