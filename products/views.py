@@ -2217,7 +2217,7 @@ def listavoirclient(request):
 def listavoirsupplier(request):
     print('>>>>>>',)
     target=request.GET.get('target')
-    bons= Avoirsupplier.objects.filter(date__year=thisyear, isfarah=target=="f").order_by('-id')
+    bons= Avoirsupplier.objects.filter(isfarah=target=="f").order_by('-id')
     total=bons.aggregate(Sum('total')).get('total__sum')
     ctx={
         'title':'Avoir Achat',
