@@ -11925,7 +11925,7 @@ def zz(request):
                 'sortiOrgh':outorgh,
                 'netorgh':netorgh,
                 'stockorghSYSTEM':i.stocktotalorgh,
-                'ERROR';'ERROR'
+                'ERROR':'ERROR'
                 # 'entreeFarah':infarah,
                 # 'sortiFarah':outfarah,
                 # 'netfarah':netfarah,
