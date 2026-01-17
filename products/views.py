@@ -11899,11 +11899,21 @@ def zz(request):
     data=[]
     for i in products:
         inorgh=Stockin.objects.filter(product=i, isorgh=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+
         sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
-        outorgh=Livraisonitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh
+
+        avsupporgh=Returnedsupplier.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
+
+        outorgh=Livraisonitem.objects.filter(product=i, isorgh=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh + avsupporgh
+
         infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0
+
         sortiefarah=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
-        outfarah=Livraisonitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortiefarah
+
+        avsuppfarah=Returnedsupplier.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
+
+        outfarah=Livraisonitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0 + sortiefarah + avsuppfarah
+        
         data.append({
             'ref':i.ref,
             'entreeOrgh':inorgh,
