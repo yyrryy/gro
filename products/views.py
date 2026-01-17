@@ -11909,7 +11909,7 @@ def zz(request):
 
         netorgh = inorgh - outorgh
 
-        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0 + frstockinitial
+        infarah=Stockin.objects.filter(product=i, isfarah=True).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.frstockinitial
 
         sortiefarah=Sortieitem.objects.filter(product=i, isfarah=True).aggregate(Sum('qty'))['qty__sum'] or 0
 
