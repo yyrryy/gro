@@ -11903,12 +11903,14 @@ def zz(request):
     data=[]
     for i in products:
         print("==>", i.ref)
-        inorgh=Stockin.objects.filter(product=i, isfarah=False, isavoir=False).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.stockinitial
+        #achat + avoir
+        inorgh=Stockin.objects.filter(product=i, isfarah=False, issortie=False).aggregate(Sum('quantity'))['quantity__sum'] or 0 + i.stockinitial
 
         sortieorgh = Sortieitem.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
-
+        # avoir fourniss
         avsupporgh=Returnedsupplier.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
+        # bon livraison
         outorgh=Livraisonitem.objects.filter(product=i, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0 + avsupporgh
 
         netorgh = inorgh - outorgh
