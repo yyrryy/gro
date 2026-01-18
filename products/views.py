@@ -477,12 +477,12 @@ def viewoneproduct(request, id):
     isfarah=target=='f'
     product=Produit.objects.get(pk=id)
     stockin=Stockin.objects.filter(product=product, isfarah=isfarah, isavoir=False)
-    if isfarah:
-        if product.frstockinitial:
-            stockin+=product.frstockinitial
-    else:
-        if product.stockinitial:
-            stockin+=product.stockinitial
+    # if isfarah:
+    #     if product.frstockinitial:
+    #         stockin+=product.frstockinitial
+    # else:
+    #     if product.stockinitial:
+    #         stockin+=product.stockinitial
     outbl=Livraisonitem.objects.filter(product=product, isfacture=False, isfarah=isfarah).aggregate(Sum('qty'))['qty__sum'] or 0
     #outfacture=Outfacture.objects.filter(product=product).exclude(facture__bon__isnull=True).aggregate(Sum('qty'))['qty__sum'] or 0
     if target=='f':
