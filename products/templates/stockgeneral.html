@@ -15,9 +15,17 @@
             <tr>
                 <th>REF</th>
                 <th>Designation</th>
+                <th>mark</th>
+                <th>stock initial</th>
+                <th>qte achat</th>
+                <th>avoir achat</th>
+                <th>qty ventes</th>
+                <th>avoir client</th>
                 <th>Stock</th>
-                <th>cout moyen</th>
-                <th>Total</th>
+                <th>Prix achat moyen HT</th>
+                <th>Prix achat moyen tva</th>
+                <th>stock * Prix achat moyen HT</th>
+                <th>stock * Prix achat moyen TTC</th>
             </tr>
         </thead>
         <tbody>
@@ -26,9 +34,18 @@
                     <td>{{product.ref.upper}}</td>
                     <td>{{product.name.upper}}</td>
                     <!-- <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td> -->
-                    <td>{{product.stock}}</td>
-                    <td>{{product.coutmoyen}}</td>
-                    <td>{{product.totalstock}}</td>
+                    <td>{{product.mark.name}}</td>
+                    <td>{% if target == "f" %}{{product.frstockinitial}}{%else%} {{product.stockinitial}} {%endif%}</td>
+                    <td>{{product.qtyacht}}</td>
+                    <td>{{product.avoirachat}}</td>
+                    <td>{{product.qtyventes}}</td>
+                    <td>{{product.avoirventes}}</td>
+                    <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{product.coutmoyenorgh}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
+                    
                 </tr>
             {% endfor %}
         </tbody>

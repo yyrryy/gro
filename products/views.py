@@ -11899,6 +11899,7 @@ def setinventairout(request):
     })
 
 def zz(request):
+    reglestock = reauest.GET.get('reglestock')=='1'
     products=Produit.objects.all()
     data=[]
     for i in products:
@@ -11925,6 +11926,9 @@ def zz(request):
 
         netfarah = infarah - outfarah
         if (netorgh != i.stocktotalorgh):
+            if reglestock:
+                i.stocktotalorgh = netorgh
+                i.save()
             data.append({
                 'ref':i.ref,
                 'entreeOrgh':inorgh,
