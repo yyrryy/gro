@@ -11909,7 +11909,7 @@ def zz(request):
 
         avsupporgh=Returnedsupplier.objects.filter(product=i, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
 
-        outorgh=Livraisonitem.objects.filter(product=i, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0 + sortieorgh + avsupporgh
+        outorgh=Livraisonitem.objects.filter(product=i, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0 + avsupporgh
 
         netorgh = inorgh - outorgh
 
