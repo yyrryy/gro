@@ -3027,126 +3027,127 @@ def stockgeneral(request):
         data=[]
         totalgeneral=0
         products=Produit.objects.filter(stocktotalfarah__gt=0)
-        for i in products:
+        # for i in products:
             
             
-            stock_needed = i.stocktotalfarah
-            test_qs = (
-                Stockin.objects.filter(isavoir=False, product=i, isfarah=True)  # Exclude isavoir=True and filter by product_id
-                .annotate(
-                    running_total=Window(
-                        expression=Sum('quantity'), 
-                        order_by=F('date').desc()  # Order by date (newest first)
-                    )
-                )
-                .annotate(
-                    prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())  # Calculate the previous total
-                )
-                .annotate(
-                    taken_quantity=Case(
-                        # Take the entire quantity if running_total is less than or equal to stock_needed
-                        When(running_total__lte=stock_needed, then=F('quantity')),
+        #     stock_needed = i.stocktotalfarah
+        #     test_qs = (
+        #         Stockin.objects.filter(isavoir=False, product=i, isfarah=True)  # Exclude isavoir=True and filter by product_id
+        #         .annotate(
+        #             running_total=Window(
+        #                 expression=Sum('quantity'), 
+        #                 order_by=F('date').desc()  # Order by date (newest first)
+        #             )
+        #         )
+        #         .annotate(
+        #             prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())  # Calculate the previous total
+        #         )
+        #         .annotate(
+        #             taken_quantity=Case(
+        #                 # Take the entire quantity if running_total is less than or equal to stock_needed
+        #                 When(running_total__lte=stock_needed, then=F('quantity')),
 
-                        # Otherwise, take the remaining quantity from the current stockin
-                        When(
-                            Q(prev_total__lt=stock_needed) & Q(running_total__gte=stock_needed),
-                            then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
-                        ),
+        #                 # Otherwise, take the remaining quantity from the current stockin
+        #                 When(
+        #                     Q(prev_total__lt=stock_needed) & Q(running_total__gte=stock_needed),
+        #                     then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
+        #                 ),
 
-                        default=Value(0),
-                        output_field=FloatField()
-                    )
-                )
-                .filter(taken_quantity__gt=0)  # Only keep rows where we need some quantity
-                .values('id', 'quantity', 'taken_quantity', 'price', 'running_total', 'prev_total', 'net')  # Retrieve only necessary fields
-            )
+        #                 default=Value(0),
+        #                 output_field=FloatField()
+        #             )
+        #         )
+        #         .filter(taken_quantity__gt=0)  # Only keep rows where we need some quantity
+        #         .values('id', 'quantity', 'taken_quantity', 'price', 'running_total', 'prev_total', 'net')  # Retrieve only necessary fields
+        #     )
     
-            # Output the results
-            print("Stockin results:", list(test_qs))
+        #     # Output the results
+        #     print("Stockin results:", list(test_qs))
 
-            print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
-            qties=0
-            prices=0
-            for entry in test_qs:
-                qties+=entry['taken_quantity']
-                prices+=entry['taken_quantity']*entry['net']
-            coutmoyen=round(prices/qties, 2)
-            i.coutmoyen=coutmoyen
-            totalstock=i.stocktotalfarah*coutmoyen
-            totalgeneral+=totalstock
-            data.append({
-                'ref':i.ref,
-                'name':i.name,
-                'stock':i.stocktotalfarah,
-                'coutmoyen':coutmoyen,
-                'totalstock':totalstock
-            })
+        #     print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
+        #     qties=0
+        #     prices=0
+        #     for entry in test_qs:
+        #         qties+=entry['taken_quantity']
+        #         prices+=entry['taken_quantity']*entry['net']
+        #     coutmoyen=round(prices/qties, 2)
+        #     i.coutmoyen=coutmoyen
+        #     totalstock=i.stocktotalfarah*coutmoyen
+        #     totalgeneral+=totalstock
+        #     data.append({
+        #         'ref':i.ref,
+        #         'name':i.name,
+        #         'stock':i.stocktotalfarah,
+        #         'coutmoyen':coutmoyen,
+        #         'totalstock':totalstock
+        #     })
 
     else:
         print('>> working here orgh')
         products=Produit.objects.filter(stocktotalorgh__gt=0)
         data=[]
         totalgeneral=0
-        for i in products:
-            stock_needed = i.stocktotalorgh  # The quantity of stock needed
-            print('>> stock needed', stock_needed, i.ref)
-            test_qs = (
-                Stockin.objects.filter(isavoir=False, product=i, isfarah=False)  # Exclude isavoir=True and filter by product_id
-                .annotate(
-                    running_total=Window(
-                        expression=Sum('quantity'), 
-                        order_by=F('date').desc()  # Order by date (newest first)
-                    )
-                )
-                .annotate(
-                    prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())  # Calculate the previous total
-                )
-                .annotate(
-                    taken_quantity=Case(
-                        # Take the entire quantity if running_total is less than or equal to stock_needed
-                        When(running_total__lte=stock_needed, then=F('quantity')),
+        # for i in products:
+        #     stock_needed = i.stocktotalorgh  # The quantity of stock needed
+        #     print('>> stock needed', stock_needed, i.ref)
+        #     test_qs = (
+        #         Stockin.objects.filter(isavoir=False, product=i, isfarah=False)  # Exclude isavoir=True and filter by product_id
+        #         .annotate(
+        #             running_total=Window(
+        #                 expression=Sum('quantity'), 
+        #                 order_by=F('date').desc()  # Order by date (newest first)
+        #             )
+        #         )
+        #         .annotate(
+        #             prev_total=ExpressionWrapper(F('running_total') - F('quantity'), output_field=FloatField())  # Calculate the previous total
+        #         )
+        #         .annotate(
+        #             taken_quantity=Case(
+        #                 # Take the entire quantity if running_total is less than or equal to stock_needed
+        #                 When(running_total__lte=stock_needed, then=F('quantity')),
 
-                        # Otherwise, take the remaining quantity from the current stockin
-                        When(
-                            Q(prev_total__lt=stock_needed) & Q(running_total__gte=stock_needed),
-                            then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
-                        ),
+        #                 # Otherwise, take the remaining quantity from the current stockin
+        #                 When(
+        #                     Q(prev_total__lt=stock_needed) & Q(running_total__gte=stock_needed),
+        #                     then=ExpressionWrapper(Value(stock_needed) - F('prev_total'), output_field=FloatField())
+        #                 ),
 
-                        default=Value(0),
-                        output_field=FloatField()
-                    )
-                )
-                .filter(taken_quantity__gt=0)  # Only keep rows where we need some quantity
-                .values('id', 'quantity', 'taken_quantity', 'price', 'running_total', 'prev_total', 'net')  # Retrieve only necessary fields
-            )
+        #                 default=Value(0),
+        #                 output_field=FloatField()
+        #             )
+        #         )
+        #         .filter(taken_quantity__gt=0)  # Only keep rows where we need some quantity
+        #         .values('id', 'quantity', 'taken_quantity', 'price', 'running_total', 'prev_total', 'net')  # Retrieve only necessary fields
+        #     )
     
-            # Output the results
-            # print("Stockin results:", list(test_qs))
+        #     # Output the results
+        #     # print("Stockin results:", list(test_qs))
 
-            # print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
-            qties=0
-            prices=0
-            for entry in test_qs:
-                qties+=entry['taken_quantity']
-                prices+=entry['taken_quantity']*entry['net']
-            coutmoyen=0
-            try:
-                coutmoyen=round(prices/qties, 2)
-            except Exception as e:
-                print('>> error, ref', e, i.ref)
-                errorref+=' '+i.ref
-            i.coutmoyen=coutmoyen
-            totalstock=round(i.stocktotalorgh*coutmoyen, 2)
-            totalgeneral+=totalstock
-            data.append({
-                'ref':i.ref,
-                'name':i.name,
-                'stock':i.stocktotalorgh,
-                'coutmoyen':coutmoyen,
-                'totalstock':totalstock
-            })
+        #     # print('>> st', Stockin.objects.filter(isavoir=False, product=i, isfarah=False))
+        #     qties=0
+        #     prices=0
+        #     for entry in test_qs:
+        #         qties+=entry['taken_quantity']
+        #         prices+=entry['taken_quantity']*entry['net']
+        #     coutmoyen=0
+        #     try:
+        #         coutmoyen=round(prices/qties, 2)
+        #     except Exception as e:
+        #         print('>> error, ref', e, i.ref)
+        #         errorref+=' '+i.ref
+        #     i.coutmoyen=coutmoyen
+        #     totalstock=round(i.stocktotalorgh*coutmoyen, 2)
+        #     totalgeneral+=totalstock
+        #     data.append({
+        #         'ref':i.ref,
+        #         'name':i.name,
+        #         'stock':i.stocktotalorgh,
+        #         'coutmoyen':coutmoyen,
+        #         'totalstock':totalstock
+        #     })
     
-    return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
+    return render(request, 'stockgeneral.html', {'products':products, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
+    # return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
 
 def commandepdctorgh(request):
     pdctid=request.GET.get('pdctid')
