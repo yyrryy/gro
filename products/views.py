@@ -11899,7 +11899,7 @@ def setinventairout(request):
     })
 
 def zz(request):
-    reglestock = reauest.GET.get('reglestock')=='1'
+    reglestock = request.GET.get('reglestock')=='1'
     products=Produit.objects.all()
     data=[]
     for i in products:
