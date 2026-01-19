@@ -41,32 +41,32 @@
                     <td>{{product.qtyventes}}</td>
                     <td>{{product.avoirventes}}</td>
                     <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{product.coutmoyenorgh()[0]}} {%endif%}</td>
                     {% with cm=product.coutmoyenorgh %}
-                        <td>
-                            {% if target == "f" %}
-                                {{ product.coutmoyenfarahtva }}
-                            {% else %}
-                                {{ cm.coutttc }}
-                            {% endif %}
-                        </td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{ cm.cout}} {%endif%}</td>
+                    <td>
+                        {% if target == "f" %}
+                            {{ product.coutmoyenfarahtva }}
+                        {% else %}
+                            {{ cm.coutttc }}
+                        {% endif %}
+                    </td>
 
-                        <td>
-                            {% if target == "f" %}
-                                {{ product.coutmoyenfarahtva }}
-                            {% else %}
-                                {{ cm.coutstock }}
-                            {% endif %}
-                        </td>
+                    <td>
+                        {% if target == "f" %}
+                            {{ product.coutmoyenfarahtva }}
+                        {% else %}
+                            {{ cm.coutstock }}
+                        {% endif %}
+                    </td>
 
-                        <td>
-                            {% if target == "f" %}
-                                {{ product.coutmoyenfarahtva }}
-                            {% else %}
-                                {{ cm.coutstockttc }}
-                            {% endif %}
-                        </td>
-                    {% endwith %}
+                    <td>
+                        {% if target == "f" %}
+                            {{ product.coutmoyenfarahtva }}
+                        {% else %}
+                            {{ cm.coutstockttc }}
+                        {% endif %}
+                    </td>
+                {% endwith %}
 
                     
                 </tr>
