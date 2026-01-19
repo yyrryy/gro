@@ -273,9 +273,9 @@ class Produit(models.Model):
             total_qty += take_qty
             remaining -= take_qty
         cout = round(total_cost / total_qty, 2) if total_qty else 0
-        coutttc=cout/1.2
-        coutstock=cout*self.stocktotalorgh
-        coutstockttc=coutttc*self.stocktotalorgh
+        coutttc=round(cout/1.2, 2)
+        coutstock=round(cout*self.stocktotalorgh, 2)
+        coutstockttc=round(coutttc*self.stocktotalorgh, 2)
         return {
             "cout": cout,
             "coutttc": coutttc,
