@@ -42,9 +42,32 @@
                     <td>{{product.avoirventes}}</td>
                     <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td>
                     <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{product.coutmoyenorgh()[0]}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh()[1]}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh()[2]}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh()[3]}} {%endif%}</td>
+                    {% with cm=product.coutmoyenorgh %}
+                        <td>
+                            {% if target == "f" %}
+                                {{ product.coutmoyenfarahtva }}
+                            {% else %}
+                                {{ cm.coutttc }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if target == "f" %}
+                                {{ product.coutmoyenfarahtva }}
+                            {% else %}
+                                {{ cm.coutstock }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if target == "f" %}
+                                {{ product.coutmoyenfarahtva }}
+                            {% else %}
+                                {{ cm.coutstockttc }}
+                            {% endif %}
+                        </td>
+                    {% endwith %}
+
                     
                 </tr>
             {% endfor %}

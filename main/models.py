@@ -276,7 +276,12 @@ class Produit(models.Model):
         coutttc=cout/1.2
         coutstock=cout*self.stocktotalorgh
         coutstockttc=coutttc*self.stocktotalorgh
-        return [cout, coutttc, coutstock, coutstockttc]
+        return {
+            "cout": cout,
+            "coutttc": coutttc,
+            "coutstock": coutstock,
+            "coutstockttc": coutstockttc,
+        }
 # cupppon codes table
 
 
