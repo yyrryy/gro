@@ -233,11 +233,14 @@ class Produit(models.Model):
         achats=Stockin.objects.filter(product=self, isavoir=False, isfarah=False).aggregate(Sum('quantity'))['quantity__sum']
         return achats
     def avoirachat(self):
-        return Returnedsupplier.objects.filter(product=self, isfarah=False).aggregate(Sum('qty'))['qty__sum']
+        return Returnedsupplier.objects.filter(product=self, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
     def qtyventes(self):
         return Livraisonitem.objects.filter(product=self, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum']
     def avoirventes(self):
-        return Stockin.objects.filter(isavoir=True, isorgh=True).aggregate(Sum('quantity'))['quantity__sum']
+            return Stockin.objects.filter(
+                avoir__isnull=False,
+                isorgh=True
+            ).aggregate(Sum('quantity'))['quantity__sum']
     def coutmoyenorgh(self):
         return 5555
 # cupppon codes table
