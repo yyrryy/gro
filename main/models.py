@@ -242,7 +242,38 @@ class Produit(models.Model):
                 isorgh=True
             ).aggregate(Sum('quantity'))['quantity__sum']
     def coutmoyenorgh(self):
-        return 5555
+        stock = self.stocktotalorgh
+        if stock <= 0:
+            return 0
+        entries = (
+            Stockin.objects
+            .filter(
+                product=self,
+                isorgh=True,
+                issortie=False,
+                isavoir=False
+            )
+            .order_by('-date', '-id')
+        )
+        remaining = stock
+        total_cost = 0.0
+        total_qty = 0.0
+
+        for entry in entries:
+            if remaining <= 0:
+                break
+
+            available_qty = entry.quantity - entry.soldqty
+            if available_qty <= 0:
+                continue
+
+            take_qty = min(available_qty, remaining)
+
+            total_cost += take_qty * entry.price
+            total_qty += take_qty
+            remaining -= take_qty
+
+        return round(total_cost / total_qty, 2) if total_qty else 0
 # cupppon codes table
 
 
