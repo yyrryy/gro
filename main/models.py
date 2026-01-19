@@ -269,11 +269,14 @@ class Produit(models.Model):
 
             take_qty = min(available_qty, remaining)
 
-            total_cost += take_qty * entry.price
+            total_cost += take_qty * entry.net
             total_qty += take_qty
             remaining -= take_qty
-
-        return round(total_cost / total_qty, 2) if total_qty else 0
+        cout = round(total_cost / total_qty, 2) if total_qty else 0
+        coutttc=cout/1.2
+        coutstock=cout*self.stocktotalorgh
+        coutstockttc=coutttc*self.stocktotalorgh
+        return [cout, coutttc, coutstock, coutstockttc]
 # cupppon codes table
 
 

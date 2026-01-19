@@ -41,10 +41,10 @@
                     <td>{{product.qtyventes}}</td>
                     <td>{{product.avoirventes}}</td>
                     <td>{% if target == "f" %}{{product.stocktotalfarah}}{%else%} {{product.stocktotalorgh}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{product.coutmoyenorgh}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
-                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorghtva}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarah}}{%else%} {{product.coutmoyenorgh[0]}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh[1]}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh[2]}} {%endif%}</td>
+                    <td>{% if target == "f" %}{{product.coutmoyenfarahtva}}{%else%} {{product.coutmoyenorgh[3]}} {%endif%}</td>
                     
                 </tr>
             {% endfor %}
