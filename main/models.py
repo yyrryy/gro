@@ -230,12 +230,12 @@ class Produit(models.Model):
     # model=models.CharField(max_length=25, default=None)
     # mark=models.CharField(max_length=25, default=None)
     def qtyachat(self):
-        achats=Stockin.objects.filter(product=self, isavoir=False, isfarah=False).aggregate(Sum('quantity'))['quantity__sum']
+        achats=Stockin.objects.filter(product=self, isavoir=False, isfarah=False).aggregate(Sum('quantity'))['quantity__sum'] or 0
         return achats
     def avoirachat(self):
         return Returnedsupplier.objects.filter(product=self, isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
     def qtyventes(self):
-        return Livraisonitem.objects.filter(product=self, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum']
+        return Livraisonitem.objects.filter(product=self, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum'] or 0
     def avoirventes(self):
             return Stockin.objects.filter(
                 avoir__isnull=False,
