@@ -8652,10 +8652,11 @@ def yeardatabs(request):
 
 def yeardatabachat(request):
     this_year=datetime.now().year
-    year=request.GET.get('year') or this_year
+    year=request.GET.get('year')
+    target=request.GET.get('target')
     print('year>>>', year) 
     # get all bls of that year
-    bons=Itemsbysupplier.objects.filter(date__year=year).order_by('-id')[:50]
+    bons=Itemsbysupplier.objects.filter(date__year=year, isfarah=target=='f').order_by('-id')[:50]
     print('>> bons in', year, bons)
     return JsonResponse({
         'trs':render(request, 'bonachatlist.html', {'bons':bons}).content.decode('utf-8'),
