@@ -230,7 +230,7 @@ class Produit(models.Model):
     # model=models.CharField(max_length=25, default=None)
     # mark=models.CharField(max_length=25, default=None)
     def qtyachat(self):
-        achats=Stockin.ibjects.filter(product=self, isavoir=False, isfarah=False).aggregate(Sum('quantity'))['quantity__sum']
+        achats=Stockin.objects.filter(product=self, isavoir=False, isfarah=False).aggregate(Sum('quantity'))['quantity__sum']
         return achats
     def avoirachat(self):
         return Returnedsupplier.objects.filter(product=self, isfarah=False).aggregate(Sum('qty'))['qty__sum']
@@ -238,6 +238,8 @@ class Produit(models.Model):
         return Livraisonitem.objects.filter(product=self, bon__isorgh=True).aggregate(Sum('qty'))['qty__sum']
     def avoirventes(self):
         return Stockin.objects.filter(isavoir=True, isorgh=True).aggregate(Sum('quantity'))['quantity__sum']
+    def coutmoyenorgh(self):
+        return 5555
 # cupppon codes table
 
 
