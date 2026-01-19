@@ -235,7 +235,7 @@ class Produit(models.Model):
     def avoirachat(self):
         return Returnedsupplier.objects.filter(product=self, isfarah=False).aggregate(Sum('qty'))['qty__sum']
     def qtyventes(self):
-        return Livraisonitem.objects.filter(product=self, bon__isorgh=True).aggregate(Sum('qty'))['qty__sum']
+        return Livraisonitem.objects.filter(product=self, bon__isfarah=False).aggregate(Sum('qty'))['qty__sum']
     def avoirventes(self):
         return Stockin.objects.filter(isavoir=True, isorgh=True).aggregate(Sum('quantity'))['quantity__sum']
     def coutmoyenorgh(self):
