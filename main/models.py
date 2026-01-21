@@ -249,7 +249,7 @@ class Produit(models.Model):
             Stockin.objects
             .filter(
                 product=self,
-                isorgh=True,
+                isfarah=False,
                 issortie=False,
                 isavoir=False
             )
@@ -263,7 +263,7 @@ class Produit(models.Model):
             if remaining <= 0:
                 break
 
-            available_qty = entry.quantity - entry.soldqty
+            available_qty = entry.quantity
             if available_qty <= 0:
                 continue
 
