@@ -3146,7 +3146,7 @@ def stockgeneral(request):
         #         'totalstock':totalstock
         #     })
     
-    return render(request, 'stockgeneral.html', {'products':products, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
+    return render(request, 'stockgeneral.html', {'products':products, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref, 'lenproducts':len(products)})
     # return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
 
 def commandepdctorgh(request):
