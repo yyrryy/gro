@@ -3087,6 +3087,14 @@ def stockgeneral(request):
         products=Produit.objects.filter(stocktotalorgh__gt=0)
         data=[]
         totalgeneral=0
+        total_coutstock = 0.0
+        total_coutstockttc = 0.0
+        for i in products:
+            data = i.coutmoyenorgh()
+            total_coutstock += data["coutstock"]
+            total_coutstockttc += data["coutstockttc"]
+            total_coutstock = round(total_coutstock, 2)
+            total_coutstockttc = round(total_coutstockttc, 2)
         # for i in products:
         #     stock_needed = i.stocktotalorgh  # The quantity of stock needed
         #     print('>> stock needed', stock_needed, i.ref)
@@ -3146,7 +3154,7 @@ def stockgeneral(request):
         #         'totalstock':totalstock
         #     })
     
-    return render(request, 'stockgeneral.html', {'products':products, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref, 'lenproducts':len(products)})
+    return render(request, 'stockgeneral.html', {'products':products, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref, 'lenproducts':len(products)}; 'total_coutstock':total_coutstock, 'total_coutstockttc':total_coutstockttc)
     # return render(request, 'stockgeneral.html', {'products':data, 'totalgeneral':totalgeneral, 'target':target, 'errorref':errorref})
 
 def commandepdctorgh(request):
