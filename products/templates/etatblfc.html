@@ -5,20 +5,20 @@
 <body>
 <div class=" d-flex justify-content-between">
 	<div>
-		Du <input type="date" class="monthtostart" style="border-radius:5px; border:1px solid; width: 165px" value="{{monthtostart}}">
-		Du <input type="date" class="monthtoend" style="border-radius:5px; border:1px solid; width: 165px" value="{{monthtoend}}">
-		<select class="rep" name="">
+		<!-- Du <input type="date" class="monthtostart" style="border-radius:5px; border:1px solid; width: 165px" value="{{monthtostart}}">
+		Du <input type="date" class="monthtoend" style="border-radius:5px; border:1px solid; width: 165px" value="{{monthtoend}}"> -->
+		<!-- <select class="rep" name="">
 			{% for i in reps %}
 			<option value="{{i.id}}">{{i.name}}</option>
 			{% endfor %}
 		</select>
-		<input type="text" class="region" placeholder="region">
-		<button class="btn btn-dark" onclick="genereretatbl(event)">Generer</button>
+		<input type="text" class="region" placeholder="region"> -->
+		<!-- <button class="btn btn-dark" onclick="genereretatbl(event)">Generer</button> -->
 	</div>
 	<input class="col-4" placeholder="recherche" onkeyup="searchtableetat(event)">
 	<button class="btn btn-primary" onclick="tabletoexcel()">Excel</button>
 	<button class="btn btn-info bi bi-download" onclick="printetat()"></button>
-	<button class="btn btn-dark" onclick="hidezero()">Zero</button>
+	<!-- <button class="btn btn-dark" onclick="hidezero()">Zero</button> -->
 </div>
 
 <div class="mt-5 printetat p-2 position-relative" id="printetat">
@@ -27,21 +27,29 @@
 	</div>
 	<table class="table table-bordered table-hover" style="font-size: 12px; border-color: black;" id="etattable">
 		<thead class="bg-darkblue text-white" style="position:sticky; top:0;">
-			<td style="width: 15%; white-space: nowrap;">Client</td>
-			<td style="text-align: center; width: 5%;" onclick="$('.clientespece').toggleClass('d-none')">Code</td>
-			<td style="text-align: center; width: 5%">Ville</td>
-			<td style="text-align: center; width: 5%">Region</td>
-			<td style="text-align: center; width: 5%">Repr.</td>
-			<td style="text-align: center; width: 2%"></td>
-			{% for i in months %}
-			<td style="text-align: center" onclick="intsorttable(event)">{{i}}</td>
-			{% endfor %}
-			<td onclick="intsorttable(event)">Situation</td>
+			<td>Client</td>
+			<td>Ville</td>
+			<td>Total bons</td>
+			<td>Total avoirs</td>
+			<td>Total Reglements</td>
+			<td>Total Avances</td>
+			<td>Total Remise</td>
+			<td onclick="intsorttable(event)">Sold</td>
 			<td style="text-align: center; width: 2%">Impr.</td>
 		</thead>
 		<tbody class="etatblfctrs">
-
-
+			{% for i in clients %}
+			<tr>
+				<td>{{i.name}}</td>
+				<td>{{i.city}}</td>
+				<td>{{i.sold.bons}}</td>
+				<td>{{i.sold.avoirs}}</td>
+				<td>{{i.sold.reglements}}</td>
+				<td>{{i.sold.avances}}</td>
+				<td>{{i.sold.remise}}</td>
+				<td>{{i.sold.sold}}</td>
+			</tr>
+			{%endfor%}
 		</tbody>
 
 	</table>
@@ -129,7 +137,7 @@ function genereretatbl(event){
 		monthtoend==''?$('.monthtoend').addClass('border-danger'):$('.monthtostart').addClass('border-danger')
 	}else{
 		$('#etattable tbody').html('Loading ....')
-		$.get(`/products/getetatblfc?monthtostart=${monthtostart}&monthtoend=${monthtoend}&rep=${rep}&region=${region}`, (data)=>{
+		$.get(`/products/getetatblfc?monthtostart=${monthtostart}&monthtoend=${monthtoend}&target={{target}}`, (data)=>{
 			$('#etattable tbody').html(data.trs)
 		})
 	}
