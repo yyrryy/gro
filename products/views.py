@@ -1228,9 +1228,9 @@ def addbonlivraison(request):
             product=Produit.objects.get(pk=i['productid'])
             pricesofout=[]
             qtyofout=[]
-            achatids=i['achatids'].split(',')
-            remainqties=i['remainqties'].split(',')
-            oldqties=i['oldqties'].split(',')
+            # achatids=i['achatids'].split(',')
+            # remainqties=i['remainqties'].split(',')
+            # oldqties=i['oldqties'].split(',')
             if isfarah:
                 print('>>> we are in farah')
                 product.stocktotalfarah=float(product.stocktotalfarah)-float(i['qty'])
@@ -1252,9 +1252,9 @@ def addbonlivraison(request):
                 client_id=clientid,
                 date=datebon,
                 isfarah=isfarah,
-                achatids=achatids,
-                remainqties=remainqties,
-                oldqties=oldqties,
+                # achatids=achatids,
+                # remainqties=remainqties,
+                # oldqties=oldqties,
                 coutmoyen=i['coutmoyen'],
             )
     #order.pricesofout=pricesofout
