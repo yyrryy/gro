@@ -1228,8 +1228,10 @@ def addbonlivraison(request):
             product=Produit.objects.get(pk=i['productid'])
             pricesofout=[]
             qtyofout=[]
-            if i['coutmoyen']:
+            try:
                 coutm = i['coutmoyen']
+            except:
+                coutm = 0
             # achatids=i['achatids'].split(',')
             # remainqties=i['remainqties'].split(',')
             # oldqties=i['oldqties'].split(',')
