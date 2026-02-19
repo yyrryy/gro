@@ -1241,7 +1241,7 @@ def addbonlivraison(request):
             else:
                 thisqty=float(i['qty'])
                 product.stocktotalorgh=float(product.stocktotalorgh)-float(i['qty'])      
-            #product.save()
+            product.save()
             Livraisonitem.objects.create(
                 qtyofout=qtyofout,
                 pricesofout=pricesofout,
