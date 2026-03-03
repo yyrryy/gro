@@ -28,20 +28,21 @@
 	<table class="table table-bordered table-hover" style="font-size: 12px; border-color: black;" id="etattable">
 		<thead class="bg-darkblue text-white" style="position:sticky; top:0;">
 			<td>Client</td>
-			<td>Ville</td>
-			<td>Total bons</td>
-			<td>Total avoirs</td>
-			<td>Total Reglements</td>
-			<td>Total Avances</td>
-			<td>Total Remise</td>
-			<td onclick="intsorttable(event)">Sold</td>
+			<td>ICE</td>
+			<td>Total HT</td>
+			<td>Total TVA</td>
+			<td>Total TTC</td>
+			<td>Total Avoir HT</td>
+			<td>Total Avoir TVA</td>
+			<td>Total Avoir TTC</td>
+			<td onclick="intsorttable(event)">TOTAL NET TTC</td>
 			<td style="text-align: center; width: 2%">Impr.</td>
 		</thead>
 		<tbody class="etatblfctrs">
 			{% for i in clients %}
 			<tr>
 				<td>{{i.name}}</td>
-				<td>{{i.city}}</td>
+				<td>{{i.ice}}</td>
 				<td>{{i.sold.bons}}</td>
 				<td>{{i.sold.avoirs}}</td>
 				<td>{{i.sold.reglements}}</td>

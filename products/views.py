@@ -11811,3 +11811,7 @@ def zz(request):
     return JsonResponse({
         "data":data
     })
+
+def etatgeneralsupplier(request):
+    target = request.GET.get('target')
+    
