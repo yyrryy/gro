@@ -11836,7 +11836,8 @@ def getetatblfc(request):
         totalavoirsht=round(totalavoirs/1.2, 2)
         totalavoirstva = round(totalavoirs-totalavoirsht, 2)
         totalnet = round(totalfactures-totalavoirs, 2)
-        data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
+        if not totalnet == 0:
+            data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
     return JsonResponse({
         "success":True,
         "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8")
