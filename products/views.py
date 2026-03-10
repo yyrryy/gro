@@ -10792,6 +10792,7 @@ def bonlivraisonprint(request, id):
 
 def bonlivraisonprintht(request, id):
     isfarah=request.GET.get('target')=='f'
+    category=request.GET.get('category')=='1'
     print('<>> target', request.GET.get('target'))
     order=Bonlivraison.objects.get(pk=id)
     orderitems=Livraisonitem.objects.filter(bon=order, isfacture=False).order_by('product__name')
@@ -10800,6 +10801,7 @@ def bonlivraisonprintht(request, id):
     orderitems=[orderitems[i:i+38] for i in range(0, len(orderitems), 38)]
     ctx={
         'isfarah':isfarah,
+        'category':category,
         'title':f'Bon de livraison {order.bon_no}',
         'order':order,
         'orderitems':orderitems,
@@ -11811,3 +11813,33 @@ def zz(request):
     return JsonResponse({
         "data":data
     })
+
+def getetatblfc(request):
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    isfarah = request.GET.get("target")=="f"
+    isorgh = request.GET.get("target")=="o"
+    if isorgh:
+        clients = Client.objects.filter(clientorgh=True)
+    if isfarah:
+        clients = Client.objects.filter(clientfarah=True)
+
+    print("==============", start, end)
+    data = []
+    for i in clients:
+        factures = Facture.objects.filter(client=i, date__range=[start, end])
+        avoirs = Avoirclient.objects.filter(client=i, date__range=[start, end])
+        # total factures
+        totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
+        totalfacturesht=round(totalfactures/1.2, 2)
+        totalfacturestva = totalfactures-totalfacturesht
+        totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
+        totalavoirsht=round(totalavoirs/1.2, 2)
+        totalavoirstva = totalavoirs-totalavoirsht
+        totalnet = totalfactures-totalavoirs
+        data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
+    return JsonResponse({
+        "success":True,
+        "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8")
+    })
+

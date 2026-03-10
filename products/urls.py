@@ -325,6 +325,7 @@ urlpatterns = [
     path('setinventairin', views.setinventairin, name='setinventairin'),
     path('setinventairout', views.setinventairout, name='setinventairout'),
     path('zz', views.zz, name='zz'),
+    path('getetatblfc', views.getetatblfc, name='getetatblfc'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),
     # path('makebondelivered', views.makebondelivered, name='makebondelivered'),

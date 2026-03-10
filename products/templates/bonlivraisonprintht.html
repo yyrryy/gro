@@ -118,8 +118,11 @@
               </td>
               <td style="white-space: nowrap; padding:3px">
                   {% for v in i %}
-
+                {% if category %}
                   {{v.product.category.name.upper|slice:'45'}}
+                  {%else%}
+                  {{v.product.name.upper|slice:'45'}}
+                  {%endif%}
                   <br>
                   {% endfor %}
               </td>
@@ -266,8 +269,11 @@
                   </td>
                 <td style="white-space: nowrap; padding:3px">
                   {% for v in i %}
-
+                  {% if category %}
                   {{v.product.category.name.upper|slice:'45'}}
+                  {%else%}
+                  {{v.product.name.upper|slice:'45'}}
+                  {%endif%}
                   <br>
                   {% endfor %}
               </td>
