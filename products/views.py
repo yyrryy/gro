@@ -2263,6 +2263,7 @@ def listfactures(request):
         total=Facture.objects.filter(isvalid=False, isfarah=False).aggregate(Sum('total')).get('total__sum') or 0
         lastdatefacture=Facture.objects.filter(isvalid=False, isfarah=False).last().date if bons else timezone.now().date()
         latest_receipt = Facture.objects.filter(facture_no__startswith=f'FC').last()
+        print("==== last receit", latest_receipt)
         # latest_receipt = Bonsortie.objects.filter(
         #     facture_no__startswith=f'FR-BL{year}'
         # ).order_by("-bon_no").first()
