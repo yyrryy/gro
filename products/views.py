@@ -11844,3 +11844,34 @@ def getetatblfc(request):
         "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8")
     })
 
+def etatsuppliers(request):
+    target=request.GET.get('target')
+    title = "etat Fournisseurs ORGH"
+    return render(request, 'etatsuppliers.html', {'title': title, 'target':target})
+
+def getetatsuppliers(request):
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    isfarah = request.GET.get("target")=="f"
+    isorgh = request.GET.get("target")=="o"
+    suppliers=Supplier.objects.all()
+
+    data = []
+    for i in suppliers:
+        factures = Factureachat.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
+        avoirs = Avoirsupplier.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
+        # total factures
+        totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
+        totalfacturesht=round(totalfactures/1.2, 2)
+        totalfacturestva = round(totalfactures-totalfacturesht, 2)
+        totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
+        totalavoirsht=round(totalavoirs/1.2, 2)
+        totalavoirstva = round(totalavoirs-totalavoirsht, 2)
+        totalnet = round(totalfactures-totalavoirs, 2)
+        if not totalnet == 0:
+            data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
+    return JsonResponse({
+        "success":True,
+        "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8")
+    })
+
