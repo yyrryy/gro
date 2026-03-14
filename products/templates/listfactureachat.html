@@ -164,6 +164,8 @@
           </div>
           <div>
             <button class="btn btn-sm bg-dark text-white filterfcdate">Filtrer</button>
+            <button class="btn btn-success bi bi-download" onclick="exportfcachat(event)">
+            </button>
           </div>
 
         </div>
@@ -323,6 +325,29 @@
 
 
 <script>
+  function exportfcachat(event){
+    startdatelistfc=$('.startdatelistfc').val()
+    enddatelistfc=$('.enddatelistfc').val()
+    let year=$('.populateyears').val()
+    if (startdatelistfc==''||enddatelistfc==''){
+      alertify.error('Date')
+      return
+    }
+    console.log('date', startdatelistfc, enddatelistfc)
+    let url = `/products/exportfcachat?year=${year}&target={{target}}&startdate=${startdatelistfc}&enddate=${enddatelistfc}`;
+
+    // Create a hidden iframe to trigger the file download
+    var iframe = $('<iframe>', {
+        id: 'download-frame',
+        src: url,
+        style: 'display: none;',
+    }).appendTo('body');
+
+    // Remove the iframe after download
+    iframe.on('load', function () {
+        iframe.remove();
+    });
+  }
   function getfactureachatvalider(){
     $('.listfcbody').addClass('blurred')
     $.get('/products/getfactureachatvalider?target={{target}}', (data)=>{

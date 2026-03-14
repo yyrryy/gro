@@ -1347,6 +1347,12 @@ class Factureachat(models.Model):
     isvalid=models.BooleanField(default=False)
     bon=models.ForeignKey(Itemsbysupplier, default=None, null=True, blank=True, on_delete=models.CASCADE, related_name='facturebon')
     supplier=models.ForeignKey(Supplier, default=None, blank=True, on_delete=models.CASCADE, related_name='supplieroffacture')
+    def ht(self):
+        return round(self.total/1.2, 2)
+    def thistva(self):
+        return round((self.total/1.2)*.2, 2)
+    def reglements(self):
+        return PaymentSupplier.objects.filter(factures__in=[self])
 class Outfactureachat(models.Model):
     facture=models.ForeignKey(Factureachat, on_delete=models.CASCADE, default=None)
     total=models.FloatField(default=0.00)

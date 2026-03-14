@@ -2201,6 +2201,51 @@ def exportfc(request):
     wb.save(response)
     return response
 
+def exportfcachat(request):
+    target=request.GET.get('target')
+    year=request.GET.get('year')
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    isfarah=target=='f'
+    # today in d/m/Y
+    today=timezone.now().strftime("%d-%m-%Y")
+    society='FARAH' if target=='f' else 'ORGH'
+    print(">> is farah", target=='f')
+    bons=Factureachat.objects.filter(isfarah=isfarah, date__range=[startdate, enddate])
+    
+    print('bons', bons.count())
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+    # Create a new Excel workbook and add a worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+
+    # Write column headers
+    ws.append(['N° facture', 'Date', 'fournisseur', 'TOTAL TTC', 'HT', 'TVA', 'Mode reglement', 'N° piece', 'Banque'])
+
+    # Write product data
+    for bon in bons:
+        ws.append([
+            bon.facture_no,
+            bon.date.strftime("%d/%m/%Y"),
+            bon.supplier.name if bon.supplier else '--',
+            
+            bon.total,
+            bon.ht(),
+            bon.thistva(),
+            bon.reglements()[0].mode if len(bon.reglements())>0 else '--',
+            bon.reglements()[0].npiece if len(bon.reglements())>0 else '--',
+            bon.reglements()[0].bank if len(bon.reglements())>0 else '--'
+        ])
+
+    response['Content-Disposition'] = f'attachment; filename="facture{society}{today}.xlsx"'
+    # Save the workbook to the response
+    wb.save(response)
+    return response
+
 
 
 
