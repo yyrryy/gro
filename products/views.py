@@ -11893,18 +11893,18 @@ def getetatblfc(request):
         totalnet = round(totalfactures-totalavoirs, 2)
         totalnetttc += float(totalnet)
         if not totalnet == 0:
-            data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet, "totalttc": totalttc, "totaltva": totaltva, "totalht": totalht, "totalavoirttc": totalavoirttc, "totalavoirht": totalavoirht, "totalnetttc": totalnetttc, "totalavoirtva": totalavoirtva})
+            data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet, "totalttc": round(totalttc, 2), "totaltva": round(totaltva, 2), "totalht": round(totalht, 2), "totalavoirttc": round(totalavoirttc, 2), "totalavoirht": round(totalavoirht, 2), "totalnetttc": round(totalnetttc, 2), "totalavoirtva": round(totalavoirtva, 2)})
     print(data)
     return JsonResponse({
         "success":True,
         "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8"),
-        "totalttc": totalttc,
-        "totaltva": totaltva,
-        "totalht": totalht,
-        "totalavoirttc": totalavoirttc,
-        "totalavoirht": totalavoirht,
-        "totalavoirtva": totalavoirtva,
-        "totalnetttc": totalnetttc
+        "totalttc": round(totalttc, 2),
+        "totaltva": round(totaltva, 2),
+        "totalht": round(totalht, 2),
+        "totalavoirttc": round(totalavoirttc, 2),
+        "totalavoirht": round(totalavoirht, 2),
+        "totalavoirtva": round(totalavoirtva, 2),
+        "totalnetttc": round(totalnetttc, 2)
     })
 
 def etatsuppliers(request):
@@ -11945,12 +11945,12 @@ def getetatsuppliers(request):
     return JsonResponse({
         "success":True,
         "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8"),
-        "totalttc": totalttc,
-        "totaltva": totaltva,
-        "totalht": totalht,
-        "totalavoirttc": totalavoirttc,
-        "totalavoirht": totalavoirht,
-        "totalavoirtva": totalavoirtva,
-        "totalnetttc": totalnetttc
+        "totalttc": round(totalttc, 2),
+        "totaltva": round(totaltva, 2),
+        "totalht": round(totalht, 2),
+        "totalavoirttc": round(totalavoirttc, 2),
+        "totalavoirht": round(totalavoirht, 2),
+        "totalavoirtva": round(totalavoirtva, 2),
+        "totalnetttc": round(totalnetttc, 2)
     })
 
