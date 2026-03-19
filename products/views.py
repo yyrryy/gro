@@ -11954,3 +11954,5 @@ def getetatsuppliers(request):
         "totalnetttc": round(totalnetttc, 2)
     })
 
+def qrcodescanner(request):
+    return render(request, 'qrcodescanner.html')

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    p {
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      margin-top: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      background: #111827;
+      color: white;
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+    }
+
+    .label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      word-break: break-word;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>QR Code Scanner</h1>
+    <p>
+      Scan a QR code with your camera directly in the browser. Allow camera access when prompted.
+    </p>
+
+    <div id="reader"></div>
+
+    <div class="actions">
+      <button id="startBtn">Start Scanner</button>
+      <button id="stopBtn" class="secondary" disabled>Stop Scanner</button>
+    </div>
+
+    <div class="result">
+      <div class="label">Scanned Result</div>
+      <div class="value" id="resultText">No QR code detected yet.</div>
+      <div class="status" id="statusText">Scanner is idle.</div>
+    </div>
+  </div>
+
+  <script>
+    let qrScanner = null;
+    let isRunning = false;
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resultText = document.getElementById('resultText');
+    const statusText = document.getElementById('statusText');
+
+    function onScanSuccess(decodedText) {
+      resultText.textContent = decodedText;
+      statusText.textContent = 'QR code detected successfully.';
+    }
+
+    function onScanFailure() {
+      // Ignore frequent scan misses to keep UI clean.
+    }
+
+    async function startScanner() {
+      if (isRunning) return;
+
+      statusText.textContent = 'Starting camera...';
+
+      try {
+        qrScanner = new Html5Qrcode('reader');
+
+        await qrScanner.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
+          onScanSuccess,
+          onScanFailure
+        );
+
+        isRunning = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        statusText.textContent = 'Scanner is running.';
+      } catch (error) {
+        statusText.textContent = 'Could not start scanner. Check camera permissions.';
+        console.error(error);
+      }
+    }
+
+    async function stopScanner() {
+      if (!qrScanner || !isRunning) return;
+
+      try {
+        await qrScanner.stop();
+        await qrScanner.clear();
+        isRunning = false;
+        qrScanner = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusText.textContent = 'Scanner stopped.';
+      } catch (error) {
+        console.error(error);
+        statusText.textContent = 'Error while stopping scanner.';
+      }
+    }
+
+    startBtn.addEventListener('click', startScanner);
+    stopBtn.addEventListener('click', stopScanner);
+  </script>
+</body>
+</html>
