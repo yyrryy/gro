@@ -11879,19 +11879,19 @@ def getetatblfc(request):
         avoirs = Avoirclient.objects.filter(client=i, date__range=[start, end])
         # total factures
         totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
-        totalttc += totalfactures
+        totalttc += float(totalfactures)
         totalfacturesht=round(totalfactures/1.2, 2)
-        totalht += totalfacturesht
+        totalht += float(totalfacturesht)
         totalfacturestva = round(totalfactures-totalfacturesht, 2)
-        totaltva += totalfacturestva
+        totaltva += float(totalfacturestva)
         totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
-        totalavoirttc += totalavoirs
+        totalavoirttc += float(totalavoirs)
         totalavoirsht=round(totalavoirs/1.2, 2)
-        totalavoirht += totalavoirsht
+        totalavoirht += float(totalavoirsht)
         totalavoirstva = round(totalavoirs-totalavoirsht, 2)
-        totalavoirtva += totalavoirstva
+        totalavoirtva += float(totalavoirstva)
         totalnet = round(totalfactures-totalavoirs, 2)
-        totalnetttc += totalnet
+        totalnetttc += float(totalnet)
         if not totalnet == 0:
             data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet, "totalttc": totalttc, "totaltva": totaltva, "totalht": totalht, "totalavoirttc": totalavoirttc, "totalavoirht": totalavoirht, "totalnetttc": totalnetttc, "totalavoirtva": totalavoirtva})
     print(data)
@@ -11926,19 +11926,19 @@ def getetatsuppliers(request):
         avoirs = Avoirsupplier.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
         # total factures
         totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
-        totalttc += totalfactures
+        totalttc += float(totalfactures)
         totalfacturesht=round(totalfactures/1.2, 2)
-        totalht += totalfacturesht
+        totalht += float(totalfacturesht)
         totalfacturestva = round(totalfactures-totalfacturesht, 2)
-        totaltva += totalfacturestva
+        totaltva += float(totalfacturestva)
         totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
-        totalavoirttc += totalavoirs
+        totalavoirttc += float(totalavoirs)
         totalavoirsht=round(totalavoirs/1.2, 2)
-        totalavoirht += totalavoirsht
+        totalavoirht += float(totalavoirsht)
         totalavoirstva = round(totalavoirs-totalavoirsht, 2)
-        totalavoirtva += totalavoirstva
+        totalavoirtva += float(totalavoirstva)
         totalnet = round(totalfactures-totalavoirs, 2)
-        totalnetttc += totalnet
+        totalnetttc += float(totalnet)
 
         if not totalnet == 0:
             data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
