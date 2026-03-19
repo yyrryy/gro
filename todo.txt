@@ -1,5 +1,6 @@
+Modifer devis
+point vente devis
+qrcode 
 users and permissions
 login required each time
-point vente devis
-Modifer devis
 recherch in categoruside when doing serach
