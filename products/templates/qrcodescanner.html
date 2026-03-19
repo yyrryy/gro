@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Code Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode" defer></script>
+  <title>QR Code Scanner Input</title>
   <style>
     * {
       box-sizing: border-box;
@@ -41,11 +40,31 @@
       line-height: 1.5;
     }
 
-    #reader {
-      width: 100%;
-      overflow: hidden;
-      border-radius: 16px;
+    .scanner-box {
       margin-top: 20px;
+      padding: 18px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #f8fafc;
+    }
+
+    .scanner-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .scanner-input:focus {
+      border-color: #111827;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #6b7280;
     }
 
     .actions {
@@ -70,11 +89,6 @@
       color: #111827;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
     .result {
       margin-top: 20px;
       padding: 16px;
@@ -95,6 +109,7 @@
       word-break: break-word;
       font-size: 16px;
       color: #111827;
+      min-height: 24px;
     }
 
     .status {
@@ -106,90 +121,84 @@
 </head>
 <body>
   <div class="card">
-    <h1>QR Code Scanner</h1>
+    <h1>QR Code Scanner Device Input</h1>
     <p>
-      Scan a QR code with your camera directly in the browser. Allow camera access when prompted.
+      This version is for a physical QR code scanner device that behaves like a keyboard. Click the input, then scan a QR code. Most scanners automatically send an Enter key after the scan.
     </p>
 
-    <div id="reader"></div>
+    <div class="scanner-box">
+      <input
+        id="scannerInput"
+        class="scanner-input"
+        type="text"
+        autocomplete="off"
+        autofocus
+        placeholder="Click here and scan with the device"
+      />
+      <div class="hint">
+        Keep this field focused so the scanner can type into it.
+      </div>
+    </div>
 
     <div class="actions">
-      <button id="startBtn">Start Scanner</button>
-      <button id="stopBtn" class="secondary" disabled>Stop Scanner</button>
+      <button id="focusBtn">Focus Input</button>
+      <button id="clearBtn" class="secondary">Clear</button>
     </div>
 
     <div class="result">
       <div class="label">Scanned Result</div>
-      <div class="value" id="resultText">No QR code detected yet.</div>
-      <div class="status" id="statusText">Scanner is idle.</div>
+      <div class="value" id="resultText">No scan received yet.</div>
+      <div class="status" id="statusText">Waiting for scanner input.</div>
     </div>
   </div>
 
   <script>
-    let qrScanner = null;
-    let isRunning = false;
-
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
+    const scannerInput = document.getElementById('scannerInput');
     const resultText = document.getElementById('resultText');
     const statusText = document.getElementById('statusText');
+    const focusBtn = document.getElementById('focusBtn');
+    const clearBtn = document.getElementById('clearBtn');
 
-    function onScanSuccess(decodedText) {
-      resultText.textContent = decodedText;
-      statusText.textContent = 'QR code detected successfully.';
+    function handleScan(value) {
+      const cleaned = value.trim();
+      if (!cleaned) return;
+
+      resultText.textContent = cleaned;
+      statusText.textContent = 'QR code received from scanner device.';
+      scannerInput.value = '';
+      scannerInput.focus();
     }
 
-    function onScanFailure() {
-      // Ignore frequent scan misses to keep UI clean.
-    }
-
-    async function startScanner() {
-      if (isRunning) return;
-
-      statusText.textContent = 'Starting camera...';
-
-      try {
-        qrScanner = new Html5Qrcode('reader');
-
-        await qrScanner.start(
-          { facingMode: 'environment' },
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
-          },
-          onScanSuccess,
-          onScanFailure
-        );
-
-        isRunning = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        statusText.textContent = 'Scanner is running.';
-      } catch (error) {
-        statusText.textContent = 'Could not start scanner. Check camera permissions.';
-        console.error(error);
+    scannerInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        handleScan(scannerInput.value);
       }
-    }
+    });
 
-    async function stopScanner() {
-      if (!qrScanner || !isRunning) return;
+    scannerInput.addEventListener('blur', () => {
+      statusText.textContent = 'Input lost focus. Click Focus Input before scanning again.';
+    });
 
-      try {
-        await qrScanner.stop();
-        await qrScanner.clear();
-        isRunning = false;
-        qrScanner = null;
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        statusText.textContent = 'Scanner stopped.';
-      } catch (error) {
-        console.error(error);
-        statusText.textContent = 'Error while stopping scanner.';
-      }
-    }
+    scannerInput.addEventListener('focus', () => {
+      statusText.textContent = 'Ready to receive scanner input.';
+    });
 
-    startBtn.addEventListener('click', startScanner);
-    stopBtn.addEventListener('click', stopScanner);
+    focusBtn.addEventListener('click', () => {
+      scannerInput.focus();
+      statusText.textContent = 'Input focused. You can scan now.';
+    });
+
+    clearBtn.addEventListener('click', () => {
+      scannerInput.value = '';
+      resultText.textContent = 'No scan received yet.';
+      statusText.textContent = 'Waiting for scanner input.';
+      scannerInput.focus();
+    });
+
+    window.addEventListener('load', () => {
+      scannerInput.focus();
+    });
   </script>
 </body>
 </html>
