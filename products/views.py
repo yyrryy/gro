@@ -2202,6 +2202,52 @@ def exportfc(request):
     return response
 
 
+def exportfcachat(request):
+    target=request.GET.get('target')
+    year=request.GET.get('year')
+    startdate=request.GET.get('startdate')
+    enddate=request.GET.get('enddate')
+    startdate = datetime.strptime(startdate, '%Y-%m-%d')
+    enddate = datetime.strptime(enddate, '%Y-%m-%d')
+    isfarah=target=='f'
+    # today in d/m/Y
+    today=timezone.now().strftime("%d-%m-%Y")
+    society='FARAH' if target=='f' else 'ORGH'
+    print(">> is farah", target=='f')
+    bons=Factureachat.objects.filter(isfarah=isfarah, date__range=[startdate, enddate])
+    
+    print('bons', bons.count())
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+    # Create a new Excel workbook and add a worksheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+
+    # Write column headers
+    ws.append(['N° facture', 'Date', 'fournisseur', 'TOTAL TTC', 'HT', 'TVA', 'Mode reglement', 'N° piece', 'Banque'])
+
+    # Write product data
+    for bon in bons:
+        ws.append([
+            bon.facture_no,
+            bon.date.strftime("%d/%m/%Y"),
+            bon.supplier.name if bon.supplier else '--',
+            
+            bon.total,
+            bon.ht(),
+            bon.thistva(),
+            bon.reglements()[0].mode if len(bon.reglements())>0 else '--',
+            bon.reglements()[0].npiece if len(bon.reglements())>0 else '--',
+            bon.reglements()[0].bank if len(bon.reglements())>0 else '--'
+        ])
+
+    response['Content-Disposition'] = f'attachment; filename="facture{society}{today}.xlsx"'
+    # Save the workbook to the response
+    wb.save(response)
+    return response
+
+
 
 
 
@@ -11874,21 +11920,37 @@ def getetatsuppliers(request):
     suppliers=Supplier.objects.all()
 
     data = []
+    totalttc, totaltva, totalht, totalavoirttc, totalavoirht, totalnetttc, totalavoirtva=0,0,0,0,0,0,0
     for i in suppliers:
         factures = Factureachat.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
         avoirs = Avoirsupplier.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
         # total factures
         totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
+        totalttc += totalfactures
         totalfacturesht=round(totalfactures/1.2, 2)
+        totalht += totalfacturesht
         totalfacturestva = round(totalfactures-totalfacturesht, 2)
+        totaltva += totalfacturestva
         totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
+        totalavoirttc += totalavoirs
         totalavoirsht=round(totalavoirs/1.2, 2)
+        totalavoirht += totalavoirsht
         totalavoirstva = round(totalavoirs-totalavoirsht, 2)
+        totalavoirtva += totalavoirstva
         totalnet = round(totalfactures-totalavoirs, 2)
+        totalnetttc += totalnet
+
         if not totalnet == 0:
             data.append({"name":i.name, "ice": i.ice, "totalfactures": totalfactures, "totalfacturestva": totalfacturestva, "totalfacturesht": totalfacturesht, "totalavoirs": totalavoirs, "totalavoirstva": totalavoirstva, "totalavoirsht": totalavoirsht, 'totalnet':totalnet})
     return JsonResponse({
         "success":True,
-        "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8")
+        "html":render(request, 'etatclientgeneraltrs.html', {'data':data}).content.decode("utf-8"),
+        "totalttc": totalttc,
+        "totaltva": totaltva,
+        "totalht": totalht,
+        "totalavoirttc": totalavoirttc,
+        "totalavoirht": totalavoirht,
+        "totalavoirtva": totalavoirtva,
+        "totalnetttc": totalnetttc
     })
 

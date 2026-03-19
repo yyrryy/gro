@@ -27,7 +27,7 @@
 	</h2>
 	<table class="table table-bordered table-hover" style="font-size: 12px; border-color: black;" id="etattable">
 		<thead class="bg-darkblue text-white" style="position:sticky; top:0;">
-			<td>Client</td>
+			<td>fournisseur</td>
 			<td>ICE</td>
 			<td>Total TTC</td>
 			<td>Total TVA</td>
@@ -41,7 +41,18 @@
 		<tbody class="etatblfctrs">
 			
 		</tbody>
-
+		<thead class="bg-darkblue text-white" style="position:sticky; top:0;">
+			<td></td>
+			<td></td>
+			<td class="totalttc"></td>
+			<td class="totaltva"></td>
+			<td class="totalht">Total HT</td>
+			<td class="totalavoirttc">Total Avoir TTC</td>
+			<td class="totalavoirtva">Total Avoir TVA</td>
+			<td class="totalavoirht">Total Avoir HT</td>
+			<td class="totalnetttc">TOTAL NET TTC</td>
+			<td style="text-align: center; width: 2%"></td>
+		</thead>
 	</table>
 </div>
 <script>
@@ -116,6 +127,13 @@ function printetat(){
 		target: "{{target}}"
 	}, function(data){
 		$('#etattable tbody').html(data.html)
+		$('.totalttc').html(data.totalttc)
+		$('.totaltva').html(data.totaltva)
+		$('.totalht').html(data.totalht)
+		$('.totalavoirttc').html(data.totalavoirttc)
+		$('.totalavoirtva').html(data.totalavoirtva)
+		$('.totalavoirht').html(data.totalavoirht)
+		$('.totalnetttc').html(data.totalnetttc)
 	})
 	}
 }
