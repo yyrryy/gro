@@ -50,7 +50,7 @@
 		transition: all .5s ease">
 		<div class="d-flex justify-content-between">
 			<button class="col-10 btn btn-danger" onclick="$('.tvacalculholder').addClass('d-none')"></button>
-			<select class="tvayears populateyears" onchange="showtva()">
+			<select class="tvayears populateyears disabled" onchange="showtva()">
 			</select>
 		</div>
 		<table class="table table-hover table-bordered" style="border-color:black;font-weight:bold">
@@ -85,7 +85,7 @@
 	<div class="d-flex justify-content-between">
 		<div>
 			<button class="btn btn-primary btn-sm" name="button" onclick="remplacer()">Remplacer <strong class="rowstoreplace">0</strong></button>
-			<select class="years populateyears" name="">
+			<select class="years populateyears disabled" name="">
 			</select>
 			<select class="months" name="">
 				<option value="">--</option>
