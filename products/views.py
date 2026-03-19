@@ -11878,13 +11878,13 @@ def getetatblfc(request):
         factures = Facture.objects.filter(client=i, date__range=[start, end])
         avoirs = Avoirclient.objects.filter(client=i, date__range=[start, end])
         # total factures
-        totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
+        totalfactures = round(factures.aggregate(Sum('total'))['total__sum'] or 0, 2)
         totalttc += float(totalfactures)
         totalfacturesht=round(totalfactures/1.2, 2)
         totalht += float(totalfacturesht)
         totalfacturestva = round(totalfactures-totalfacturesht, 2)
         totaltva += float(totalfacturestva)
-        totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
+        totalavoirs = round(avoirs.aggregate(Sum('total'))['total__sum'] or 0, 2)
         totalavoirttc += float(totalavoirs)
         totalavoirsht=round(totalavoirs/1.2, 2)
         totalavoirht += float(totalavoirsht)
@@ -11925,13 +11925,13 @@ def getetatsuppliers(request):
         factures = Factureachat.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
         avoirs = Avoirsupplier.objects.filter(supplier=i, date__range=[start, end], isfarah=isfarah)
         # total factures
-        totalfactures = factures.aggregate(Sum('total'))['total__sum'] or 0
+        totalfactures = round(factures.aggregate(Sum('total'))['total__sum'] or 0, 2)
         totalttc += float(totalfactures)
         totalfacturesht=round(totalfactures/1.2, 2)
         totalht += float(totalfacturesht)
         totalfacturestva = round(totalfactures-totalfacturesht, 2)
         totaltva += float(totalfacturestva)
-        totalavoirs = avoirs.aggregate(Sum('total'))['total__sum'] or 0
+        totalavoirs = round(avoirs.aggregate(Sum('total'))['total__sum'] or 0, 2)
         totalavoirttc += float(totalavoirs)
         totalavoirsht=round(totalavoirs/1.2, 2)
         totalavoirht += float(totalavoirsht)
