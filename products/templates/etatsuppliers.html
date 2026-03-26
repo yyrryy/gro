@@ -138,19 +138,87 @@ function printetat(){
 	}
 }
 
-function tabletoexcel(){
-	start=$('.start').val()
-	end=$('.end').val()
-	table = document.getElementById('etattable')
-	console.log(table)
+function tabletoexcel() {
+    let start = $('.start').val();
+    let end = $('.end').val();
 
-	console.log('>>excel')
-	var uri = 'data:application/vnd.ms-excel;base64,'
-    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>'
-    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
-    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
-  	var ctx = {worksheet:'Etat_Client_bl_moi'+start+'_'+end, table: table.innerHTML}
-    window.location.href = uri + base64(format(template, ctx))
+    let table = document.getElementById('etattable');
+
+    // Clone table so we don’t modify UI
+    let clone = table.cloneNode(true);
+
+    // 👉 Fix ICE column (2nd column) → force TEXT in Excel
+    let rows = clone.querySelectorAll('tr');
+
+    rows.forEach((row, index) => {
+        let cells = row.querySelectorAll('td');
+
+        if (cells.length > 1) {
+            let iceCell = cells[1];
+
+            if (iceCell && iceCell.innerText.trim() !== '') {
+                // Force Excel text format
+                iceCell.setAttribute(
+                    "style",
+                    "mso-number-format:'\\@'; white-space:nowrap;"
+                );
+
+                // Also prepend ' to be extra safe
+                iceCell.innerText = "'" + iceCell.innerText.trim();
+            }
+        }
+    });
+
+    let uri = 'data:application/vnd.ms-excel;base64,';
+
+    let template = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+        <!--[if gte mso 9]>
+        <xml>
+            <x:ExcelWorkbook>
+                <x:ExcelWorksheets>
+                    <x:ExcelWorksheet>
+                        <x:Name>{worksheet}</x:Name>
+                        <x:WorksheetOptions>
+                            <x:DisplayGridlines/>
+                        </x:WorksheetOptions>
+                    </x:ExcelWorksheet>
+                </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <table border="1">{table}</table>
+    </body>
+    </html>`;
+
+    let base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+    };
+
+    let format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+            return c[p];
+        });
+    };
+
+    let ctx = {
+        worksheet: 'Etat_FOURNISSEURS_' + start + '_' + end,
+        table: clone.innerHTML
+    };
+
+    // 👉 Proper download instead of location.href
+    let link = document.createElement("a");
+    link.href = uri + base64(format(template, ctx));
+    link.download = `Etat_FOURNISSEURS_${start}_${end}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 </script>
 </body>
