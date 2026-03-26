@@ -1,6 +1,8 @@
 Modifer devis
 point vente devis
-qrcode 
+qrcode in bonsortie
+validation bon achat filter has proble,; it adds olso in other table when validation is dropped
+write in categiry and marq in viewproduct
 users and permissions
 login required each time
 recherch in categoruside when doing serach

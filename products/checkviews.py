@@ -3465,17 +3465,30 @@ def downloadcreditclient(request):
     isfarah=target=='f'
     today = timezone.now().date()
     # sold if orgh or farah else soldbs
+    clients=[]
     if target=='f':
         clients=[i for i in Client.objects.filter(clientfarah=True) if i.sold().sold!=0 ]
-        totalbons=(round(Bonlivraison.objects.filter(isfarah=True, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
-    elif target=='o': 
+        # totalbons=(round(Bonlivraison.objects.filter(isfarah=True, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
+    if target=='o': 
         clients=[i for i in Client.objects.filter(clientorgh=True) if i.sold().sold!=0 ]
-        totalbons=sum(round(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
-    else:
+    totalbons=sum(i.sold().bons for i in clients)
+    totalavoirs=sum(i.sold().avoirs for i in clients)
+    totalreglements=sum(i.sold().reglements  for i in clients)
+    totalsolds=sum(i.sold().sold for i in clients)
+    totalavances=sum(round(Avanceclient.objects.filter(client=i).aggregate(Sum('amount'))['amount__sum'] or 0, 2) for i in clients)
+    totalremises = 0
+    if target=='s':
         clients=[i for i in Client.objects.filter(clientsortie=True) if i.soldbs().sold!=0 ]
-        totalbons=(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0 for i in clients)
+        totalbons=sum(i.soldbs().bons for i in clients)
+        totalavoirs=sum(i.soldbs().avoirs for i in clients)
+        totalreglements=sum(i.soldbs().reglements for i in clients)
+        totalsolds=sum(i.soldbs().sold for i in clients)
+        totalremises=sum(i.soldbs().remise for i in clients)
+        totalavances=sum(i.soldbs().avances for i in clients)
+    # totalbons=sum(round(Bonlivraison.objects.filter(isfarah=False, client=i).aggregate(Sum('total'))['total__sum'] or 0, 2) for i in clients)
+    
     print(">> counts", clients, totalbons)
-    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today, 'totalbons':totalbons})
+    return render(request, 'downloadcreditclient.html', {'clients':clients, 'target':target, 'today':today, 'totalbons':totalbons, "totalavoirs":totalavoirs, "totalreglements":totalreglements, "totalsolds":totalsolds, "totalavances":totalavances, "totalremises":totalremises})
     
 def downloadallclient(request):
     target=request.GET.get('target')
