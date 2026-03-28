@@ -540,6 +540,9 @@ class Avanceclient(models.Model):
     inreglement=models.BooleanField(default=False)
     targetcaisse=models.ForeignKey('Caisse', on_delete=models.SET_NULL, default=None, null=True, blank=True)
     targetbank=models.ForeignKey('Bank', on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    def __str__(self) -> str:
+        return f'{self.client.name} - {self.amount}'
+
 
 class Transfer(models.Model):
     date = models.DateTimeField(default=None)
