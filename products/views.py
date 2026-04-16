@@ -5358,7 +5358,7 @@ def searchproductbonsortie(request):
     for i in products:
         ref=i.farahref if term.startswith('fr-') else i.ref
         results.append({
-            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}§{i.coutmoyenfarah()["cout"]}',
+            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}§{i.coutmoyenorgh()["cout"]}',
             'text':f'{ref.upper()} - {i.name.upper()}',
             'stock':i.stocktotalfarah+i.stocktotalorgh,
             'stockfacture':i.stockfacturefarah,
