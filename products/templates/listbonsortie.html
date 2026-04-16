@@ -103,7 +103,10 @@
   <div class="">
     <div class="d-flex justify-content-between">
       <button class="btn border border-danger bi bi-trash" onclick="$('.bonstoprint').val('[]'); $('.checkbon').prop('checked', false);$('.bonstoprint').attr('ids', '[]')"></button>
-      <button class="btn border border-dark bi bi-download" onclick="printbulk()"></button>
+      <div>
+        <button class="btn border border-dark bi bi-download" onclick="printbulk()"></button>
+        <button class="btn bi border border-success validercoutmoyenbulk" onclick="validercoutmoyenbulk()">Valider Cout moyen</button>
+      </div>
       <button class="btn bi border border-success validerbulk" onclick="validerbulk()">Valider</button>
     </div>
     <textarea
@@ -313,6 +316,67 @@
                , function(evt, value) { if (value=='ORGHAD'){
                 $('.validerbulk').addClass('disabled')
                   $.get('/products/validerbulk', { ids: ids }, function(data) {
+                    console.log('Réponse du serveur:', data);
+                    if (data.success) {
+                    alertify.success('Validé');
+                    ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}');
+                    } else {
+                    alertify.error(data.error);
+                    }
+                    }).fail(function() {
+                    alertify.error('Erreur lors de la validation');
+                    });
+
+                
+               }else{
+                alertify.error('Mot de passe')
+               } }
+               , function() { alertify.error('Cancel') });
+        // alertify.prompt('Confirmer', 'Mot de passe', '', function(evt, value) {
+        //     console.log(value);
+        //     if (value === 'ORGHAD') {
+        //         console.log('Validation en cours...');
+        //         $.get('/products/validerbulk', { ids: ids }, function(data) {
+        //             console.log('Réponse du serveur:', data);
+        //             if (data.success) {
+        //                 alertify.success('Validé');
+        //                 ajaxpage('addlistbonsortie', 'tt', '/products/listbonsortie?target={{target}}');
+        //             } else {
+        //                 alertify.error(data.error);
+        //             }
+        //         }).fail(function() {
+        //             alertify.error('Erreur lors de la validation');
+        //         });
+        //     } else {
+        //         console.log('Mot de passe incorrect');
+        //         alertify.error('Mot de passe incorrect');
+        //     }
+        // });
+    
+      } else {
+        alertify.error("Aucune donnée à valider");
+    }
+  }
+
+  function validercoutmoyenbulk() {
+    let oldval, ids;
+    
+    try {
+        oldval = JSON.parse($('.bonstoprint').val() || '[]');
+        ids = JSON.parse($('.bonstoprint').attr('ids') || '[]');
+    } catch (e) {
+        console.error('JSON parsing error:', e);
+        alertify.error('Erreur de données');
+        return;
+    }
+
+    if (oldval.length !== 0) {
+        console.log('ids from validercoutmoyenbulk:', ids);
+        ids = JSON.stringify(ids);
+        alertify.prompt( 'Confirmer', 'Mot de pass', 'Prompt Value'
+               , function(evt, value) { if (value=='ORGHAD'){
+                $('.validercoutmoyenbulk').addClass('disabled')
+                  $.get('/products/validercoutmoyenbulk', { ids: ids }, function(data) {
                     console.log('Réponse du serveur:', data);
                     if (data.success) {
                     alertify.success('Validé');

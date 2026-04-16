@@ -550,15 +550,9 @@ def validatebonsortieproductprice(request):
         prices=Stockin.objects.filter(pk__in=json.loads(i.pricesofout))
         qtyofout=json.loads(i.qtyofout)
         print('>> price hist', prices, i.pricesofout)
-        p=round(i.coutmoyen/0.75, 2)
+        p=round(i.coutmoyen/0.65, 2)
         pbrut=i.price
         print('>>> price before', p, i.price)
-        if prices:
-            allprices=0
-            for pr, qty in zip(prices, qtyofout):
-                allprices+=pr.net*qty
-            p=round(allprices/sum(qtyofout), 2)
-            p=round(p/0.65, 2)
         livraison_data = {
             'pricesofout':i.pricesofout,
             'qtyofout':i.qtyofout,
@@ -2884,6 +2878,111 @@ def validerbulk(request):
                     if not i.bon_no in noteorgh:
                         noteorgh+=i.bon_no+' '
                     totalorgh += item_total
+                    livraison_data['ref']=item.ref.replace('(OR) ', '')
+                    livraison_data['isorgh'] = True
+                    orghitems.append(Livraisonitem(**livraison_data))
+        
+    if len(farahitems)>0:
+        prefix='FR-BL'
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'{prefix}{year}'
+        ).last()
+        
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"{prefix}{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"{prefix}{year}000000001"
+        bon_data = {
+            'total': totalfarah,
+            'date': date.today(),
+            'bon_no': receipt_no,
+            'note': notefarah,
+            'isfarah':True,
+            'client':Client.objects.get(code='CF-1')
+            # make created bon paid if the original bon is paid
+            #'ispaid':bonpaid
+        }
+        new_bon = Bonlivraison.objects.create(**bon_data)
+        #farahitems.update(bon=new_bon)
+        for litem in farahitems:
+            litem.bon=new_bon
+            litem.save()
+    
+    if len(orghitems)>0:
+        prefix='BL'
+        latest_receipt = Bonlivraison.objects.filter(
+            bon_no__startswith=f'{prefix}{year}'
+        ).last()
+        
+        if latest_receipt:
+            latest_receipt_no = int(latest_receipt.bon_no[-9:])
+            receipt_no = f"{prefix}{year}{latest_receipt_no + 1:09}"
+        else:
+            receipt_no = f"{prefix}{year}000000001"
+        bon_data = {
+            'total': totalorgh,
+            'date': date.today(),
+            'bon_no': receipt_no,
+            'note': noteorgh,
+            'isorgh':True,
+            'client':Client.objects.get(code='CO-1')
+            # make created bon paid if the original bon is paid
+            #'ispaid':bonpaid
+        }
+        new_bon = Bonlivraison.objects.create(**bon_data)
+        for litem in orghitems:
+            litem.bon=new_bon
+            litem.save()
+    bons.update(generated=True)
+    return JsonResponse({
+        'success':True
+    })
+
+def validercoutmoyenbulk(request):
+    year = timezone.now().strftime("%y")
+    ids=json.loads(request.GET.get('ids'))
+    print('>>ids', ids)
+    bons = Bonsortie.objects.filter(pk__in=ids)
+    totalfarah, totalorgh = 0, 0
+    farahitems, orghitems = [], []
+    prefix=''
+    notefarah=''
+    noteorgh=''
+    for i in bons:
+        if i.generated:
+            print('bon already generated')
+        else:
+            items = Sortieitem.objects.filter(bon=i)
+            
+            # Prepare Livraisonitems
+            for item in items:
+                product = item.product
+                item_total = float(item.total)
+                price=round(item.coutmoyen/0.65, 2)
+                livraison_data = {
+                    'total': round(round(price-(price*0.25), 2)*item.qty, 2),
+                    'qty': item.qty,
+                    'bonsortie':i,
+                    'name': item.name,
+                    'remise': 25,
+                    'product': product,
+                    'price': price,
+                    'client': item.client,
+                    'date': date.today()
+                }
+
+                if item.isfarah:
+                    if not i.bon_no in notefarah:
+                        notefarah+=i.bon_no+' '
+                    totalfarah += round(round(price-(price*0.25), 2)*item.qty, 2)
+                    livraison_data['ref']=item.ref.replace('(FR) ', '')
+                    livraison_data['isfarah'] = True
+                    farahitems.append(Livraisonitem(**livraison_data))
+                else:
+                    if not i.bon_no in noteorgh:
+                        noteorgh+=i.bon_no+' '
+                    totalorgh += round(round(price-(price*0.25), 2)*item.qty, 2)
                     livraison_data['ref']=item.ref.replace('(OR) ', '')
                     livraison_data['isorgh'] = True
                     orghitems.append(Livraisonitem(**livraison_data))
