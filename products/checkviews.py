@@ -182,18 +182,18 @@ def addbonsortie(request):
             farah=i['farah']=='1'
             product=Produit.objects.get(pk=i['productid'])
             #create sortie items
-            achatids=i['achatids'].split(',')
-            remainqties=i['remainqties'].split(',')
-            oldqties=i['oldqties'].split(',')
+            # achatids=i['achatids'].split(',')
+            # remainqties=i['remainqties'].split(',')
+            # oldqties=i['oldqties'].split(',')
             sortitem=Sortieitem.objects.create(
                 bon=order,
                 remise=i['remise'],
                 name=i['name'],
                 ref=i['ref'],
                 product=product,
-                achatids=achatids,
-                remainqties=remainqties,
-                oldqties=oldqties,
+                # achatids=achatids,
+                # remainqties=remainqties,
+                # oldqties=oldqties,
                 coutmoyen=i['coutmoyen'],
                 qty=i['qty'],
                 price=i['price'],
