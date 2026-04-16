@@ -244,7 +244,12 @@ class Produit(models.Model):
     def coutmoyenorgh(self):
         stock = self.stocktotalorgh
         if stock <= 0:
-            return 0
+            return {
+                "cout": 0,
+                "coutttc": 0,
+                "coutstock": 0,
+                "coutstockttc": 0,
+            }
         entries = (
             Stockin.objects
             .filter(
@@ -286,7 +291,12 @@ class Produit(models.Model):
     def coutmoyenfarah(self):
         stock = self.stocktotalfarah
         if stock <= 0:
-            return 0
+            return {
+                "cout": 0,
+                "coutttc": 0,
+                "coutstock": 0,
+                "coutstockttc": 0,
+            }
         entries = (
             Stockin.objects .filter(
                 product=self,
