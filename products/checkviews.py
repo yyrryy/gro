@@ -550,7 +550,7 @@ def validatebonsortieproductprice(request):
         prices=Stockin.objects.filter(pk__in=json.loads(i.pricesofout))
         qtyofout=json.loads(i.qtyofout)
         print('>> price hist', prices, i.pricesofout)
-        p=round(i.price/0.75, 2)
+        p=round(i.coutmoyen/0.75, 2)
         pbrut=i.price
         print('>>> price before', p, i.price)
         if prices:
@@ -559,9 +559,6 @@ def validatebonsortieproductprice(request):
                 allprices+=pr.net*qty
             p=round(allprices/sum(qtyofout), 2)
             p=round(p/0.65, 2)
-            #p=round(p-(p*0.25), 2)
-        print('>>>> price', p)
-
         livraison_data = {
             'pricesofout':i.pricesofout,
             'qtyofout':i.qtyofout,

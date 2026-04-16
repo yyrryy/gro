@@ -282,8 +282,43 @@ class Produit(models.Model):
             "coutstock": coutstock,
             "coutstockttc": coutstockttc,
         }
+    
+    def coutmoyenfarah(self):
+        stock = self.stocktotalfarah
+        if stock <= 0:
+            return 0
+        entries = (
+            Stockin.objects .filter(
+                product=self,
+                isfarah=True,
+                issortie=False,
+                isavoir=False
+            )
+        )
+        remaining = stock
+        total_cost = 0.0
+        total_qty = 0.0
+        for entry in entries:
+            if remaining <= 0:
+                break
+            available_qty = entry.quantity
+            if available_qty <= 0:
+                continue
+            take_qty = min(available_qty, remaining)
+            total_cost += take_qty * entry.net
+            total_qty += take_qty
+            remaining -= take_qty
+        cout = round(total_cost / total_qty, 2) if total_qty else 0
+        coutttc=round(cout/1.2, 2)
+        coutstock=round(cout*self.stocktotalfarah, 2)
+        coutstockttc=round(coutttc*self.stocktotalfarah, 2)
+        return {
+            "cout": cout,
+            "coutttc": coutttc,
+            "coutstock": coutstock,
+            "coutstockttc": coutstockttc,
+        }
 # cupppon codes table
-
 
 
 class Attribute(models.Model):
