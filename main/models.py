@@ -1378,7 +1378,7 @@ class Sortieitem(models.Model):
     isfacture=models.BooleanField(default=False)
     isavoir=models.BooleanField(default=False)
     date=models.DateField(default=None, null=True, blank=True)
-    
+
 class Factureachat(models.Model):
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     iscaceled=models.BooleanField(default=False)

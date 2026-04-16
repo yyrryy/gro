@@ -2960,12 +2960,13 @@ def validercoutmoyenbulk(request):
                 product = item.product
                 item_total = float(item.total)
                 price=round(item.coutmoyen/0.65, 2)
+                price = round(price-(price*0.25), 2)
                 livraison_data = {
-                    'total': round(round(price-(price*0.25), 2)*item.qty, 2),
+                    'total': round(price*item.qty, 2),
                     'qty': item.qty,
                     'bonsortie':i,
                     'name': item.name,
-                    'remise': 25,
+                    'remise': 0,
                     'product': product,
                     'price': price,
                     'client': item.client,
@@ -2975,14 +2976,14 @@ def validercoutmoyenbulk(request):
                 if item.isfarah:
                     if not i.bon_no in notefarah:
                         notefarah+=i.bon_no+' '
-                    totalfarah += round(round(price-(price*0.25), 2)*item.qty, 2)
+                    totalfarah += round(price*item.qty, 2)
                     livraison_data['ref']=item.ref.replace('(FR) ', '')
                     livraison_data['isfarah'] = True
                     farahitems.append(Livraisonitem(**livraison_data))
                 else:
                     if not i.bon_no in noteorgh:
                         noteorgh+=i.bon_no+' '
-                    totalorgh += round(round(price-(price*0.25), 2)*item.qty, 2)
+                    totalorgh += round(price*item.qty, 2)
                     livraison_data['ref']=item.ref.replace('(OR) ', '')
                     livraison_data['isorgh'] = True
                     orghitems.append(Livraisonitem(**livraison_data))
