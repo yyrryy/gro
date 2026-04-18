@@ -2584,14 +2584,7 @@ def updatebonsortie(request):
             farah=i['farah']=='1'
             product=Produit.objects.get(pk=i['productid'])
             #create sortie items
-            if '[' in i['achatids']:   
-                achatids=ast.literal_eval(i['achatids'])
-                remainqties=ast.literal_eval(i['remainqties'])
-                oldqties=ast.literal_eval(i['oldqties'])
-            else:
-                achatids=[i['achatids']]
-                remainqties=[i['remainqties']]
-                oldqties=[i['oldqties']]
+            
             sortitem=Sortieitem.objects.create(
                 bon=bon,
                 remise=i['remise'],
@@ -2604,9 +2597,6 @@ def updatebonsortie(request):
                 client_id=clientid,
                 date=datebon,
                 isfarah=farah,
-                achatids=achatids,
-                remainqties=remainqties,
-                oldqties=oldqties,
                 coutmoyen=i['coutmoyen'],
             )
             if not bon.generated:
