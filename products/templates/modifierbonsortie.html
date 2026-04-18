@@ -165,13 +165,13 @@
                 <tr class="itemrow" productid={{i.product.id}} farah={%if i.isfarah%}1{%else%}0{%endif%}>
                   <!-- <td style="padding: 2px 0; font-size: 13px;" class="ref">{{i.ref}}</td> -->
                   <!-- if remove need to work it should remove the sortieitem -->
-                  <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, '{{i.product.id}}', '{{i.id}}')">{{i.ref}} CM: {{i.coutmoyen}}</td>
+                  <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, '{{i.product.id}}', '{{i.id}}')">{{i.ref}}</td>
                   <td style="padding: 2px 0; font-size: 13px;" class="name text-start">{{i.name}}</td>
                   <!-- <td style="padding: 2px 0; font-size: 13px;"><input type="number" readonly class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td> -->
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event)" max="{%if i.isfarah%}{{i.product.stocktotalfarah}}{%else%}{{i.product.stocktotalorgh}}{%endif%}" name="qty" value="{{i.qty}}" style="height:23px; width:100%;"></td>
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event);" name="price" value="{{i.price}}" step=0.01 style="height:23px; width:100%;"></td>
                   <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="{{i.remise}}" class="calculate remise" onkeyup="calculate(event);" name="remise" style="height:23px; width:100%;"></td>
-                  <td style="padding: 2px 0; font-size: 13px;" class="netprice">{{i.netprice}}</td>
+                  <td style="padding: 2px 0; font-size: 13px;" class="netprice">{{i.netprice}} CM: {{i.coutmoyen}}</td>
                   <td style="padding: 2px 0; font-size: 13px;" class="total">{{i.total}}</td>
                   <input type="hidden" name="productid" value="{{i.product.id}}">
                   <input type="hidden" name="productid" value="{{i.product.id}}">
@@ -424,12 +424,12 @@
         // ${stock<=0? "text-danger":"" }"
         let tr = `
         <tr class="itemrow" productid=${id} farah=${farah}>
-            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${farah=='1'?'(FR)':'(OR)'} ${ref}  CM:${farah=='1'?coutfarah:coutorgh}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${farah=='1'?'(FR)':'(OR)'} ${ref}  </td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" readonly onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="${addqty.val()}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="${addprice.val()}" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${addremise.val()}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="remise" style="height:23px; width:100%;"></td>
-            <td style="padding: 2px 0; font-size: 13px;" class="netprice"></td>
+            <td style="padding: 2px 0; font-size: 13px;" class="netprice">CM:${farah=='1'?coutfarah:coutorgh}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="total">${addtotal}</td>
             <input type="hidden" name="productid" value="${id}">
             <input type="hidden" name="coutmoyen" value="${farah=='1'?coutfarah:coutorgh}" remainqties="${remainqties}" oldqties="${oldqties}">
