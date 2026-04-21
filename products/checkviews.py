@@ -903,6 +903,7 @@ def listdevi(request):
         'suppliersection':suppliersection
     }
     return render(request, 'listdevi.html', ctx)
+@login_required(login_url='main:home')
 def bondevi(request):
     target=request.GET.get('target')
     
@@ -936,6 +937,7 @@ def devitoboncommand(request):
     }
 
     return render(request, 'devitoboncommand.html', ctx)
+@login_required(login_url='main:home')
 def createdevi(request):
     target=request.POST.get('target')
     isfarah=False
@@ -1335,7 +1337,7 @@ def listcommand(request):
         'target':request.GET.get('target')
     }
     return render(request, 'listcommand.html', ctx)
-        
+
 def supplierlistdevi(request):
     target=request.GET.get('target')
     if target=='f':
@@ -1348,6 +1350,7 @@ def supplierlistdevi(request):
         'target':target,
     }
     return render(request, 'listdevisupplier.html', ctx)
+@login_required(login_url='main:home')
 def supplierbondevi(request):
     target=request.GET.get('target')
     
