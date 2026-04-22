@@ -549,10 +549,17 @@ def validatebonsortieproductprice(request):
         # cou moyen
         prices=Stockin.objects.filter(pk__in=json.loads(i.pricesofout))
         qtyofout=json.loads(i.qtyofout)
-        print('>> price hist', prices, i.pricesofout)
-        p=round(i.coutmoyen/0.65, 2)
+        if i.isfarah:
+            if product.stocktotalfarah <= 0:
+                p=round(i.coutmoyen, 2)
+            else:
+                p=round(i.coutmoyen/0.65, 2)
+        else:
+            if product.stocktotalorgh <= 0:
+                p=round(i.coutmoyen, 2)
+            else:
+                p=round(i.coutmoyen/0.65, 2)
         pbrut=i.price
-        print('>>> price before', p, i.price)
         livraison_data = {
             'pricesofout':i.pricesofout,
             'qtyofout':i.qtyofout,
