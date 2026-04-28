@@ -552,18 +552,22 @@ def validatebonsortieproductprice(request):
         if i.isfarah:
             if product.stocktotalfarah <= 0:
                 p=round(i.coutmoyen, 2)
+                total = round(p*i.qty, 2)
             else:
                 p=round(i.coutmoyen/0.65, 2)
+                total = round(round(p-(p*0.25), 2)*i.qty, 2)
         else:
             if product.stocktotalorgh <= 0:
                 p=round(i.coutmoyen, 2)
+                total = round(p*i.qty, 2)
             else:
                 p=round(i.coutmoyen/0.65, 2)
+                total = round(round(p-(p*0.25), 2)*i.qty, 2)
         pbrut=i.price
         livraison_data = {
             'pricesofout':i.pricesofout,
             'qtyofout':i.qtyofout,
-            'total': round(round(p-(p*0.25), 2)*i.qty, 2),
+            'total': total,
             'price':p,
             'remise':25,
             'qty': i.qty,
@@ -574,13 +578,13 @@ def validatebonsortieproductprice(request):
         }
 
         if i.isfarah:
-            totalfarah += round(round(p-(p*0.25), 2)*i.qty, 2)
+            totalfarah += total
             livraison_data['ref']=i.ref.replace('(FR) ', '')
             livraison_data['isfarah'] = True
             #livraison_data['price'] = product.frsellprice
             farahitems.append(Livraisonitem(**livraison_data))
         else:
-            totalorgh += round(round(p-(p*0.25), 2)*i.qty, 2)
+            totalorgh += total
             livraison_data['ref']=i.ref.replace('(OR) ', '')
             livraison_data['isorgh'] = True
             #livraison_data['price'] = product.sellprice
