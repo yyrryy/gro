@@ -1,2 +1,2 @@
 @echo off
-call py waitress.py
+call py standalone.py
