@@ -77,8 +77,8 @@ WSGI_APPLICATION = 'Gro.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-in1337 = os.getenv('HOME')=='/home/aaliali'
-print('in1337', os.getenv('HOME'), os.getenv('HOME')=='/home/aaliali')
+in1337 = os.getenv('HOME')=='/home/aaliali' #or os.getenv("DEBUG")=="True"
+print('in1337', in1337)
 if in1337:
     DATABASES = {
         'default': {

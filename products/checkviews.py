@@ -2711,6 +2711,8 @@ def removeavancefromregl(request):
     })
 
 def deletereglementclient(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     reglid=request.GET.get('reglid')
     reglement=PaymentClientbl.objects.get(pk=reglid)
     avoirs=reglement.avoirs.all()
@@ -2779,6 +2781,8 @@ def deletereglementsupplier(request):
     })
 
 def deleteavancesupp(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     avanceid=request.GET.get('avanceid')
     avance=Avancesupplier.objects.get(pk=avanceid)
     avance.delete()
@@ -2787,6 +2791,8 @@ def deleteavancesupp(request):
     })
 
 def deleteavanceclient(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     avanceid=request.GET.get('avanceid')
     avance=Avanceclient.objects.get(pk=avanceid)
     avance.delete()
@@ -3135,6 +3141,8 @@ def replaceproduct(request):
     })
 
 def stockgeneral(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     target=request.GET.get('target')
     isfarah=target=='f'
     errorref=''
@@ -3321,6 +3329,8 @@ def cancelcommandfarah(request):
     })
 
 def caissepage(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     target=request.GET.get('target')
     caisses=Caisse.objects.filter(target=target)
     print('>> caisses', caisses)

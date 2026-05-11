@@ -7,7 +7,6 @@ import qrcode
 # import Count
 from django.contrib.auth.models import User
 from django.db.models import Count, F, Sum, Q, BooleanField, Case, When, Value
-from django.db.models.functions import Cast
 from django.contrib.sessions.models import Session
 from functools import wraps
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -26,8 +25,7 @@ from collections import defaultdict
 import calendar
 from django.db.models.functions import TruncDay
 import uuid
-import ast
-
+from django.contrib.auth.decorators import permission_required
 today = timezone.now().date()
 thisyear=timezone.now().year
 
@@ -243,6 +241,8 @@ def checkref(request):
     #     })
 
 def supplierspage(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     target=request.GET.get('target')
     lastid=Supplier.objects.last()
     print(lastid)
@@ -1501,6 +1501,8 @@ def dashboard(request):
     return render(request, 'pdashboard.html', ctx)
 
 def clientspage(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     # sortie=request.GET.get('sortie')=='1'
     # farah=request.GET.get('farah')=='1'
     # orgh=request.GET.get('orgh')=='1'
@@ -2685,6 +2687,8 @@ def modifieravoirsupp(request):
 
 
 def modifierfacture(request, id):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     facture=Facture.objects.get(pk=id)
     items=Outfacture.objects.filter(facture=facture)
     try:
@@ -5644,6 +5648,8 @@ def getclientfactureprice(request):
 
 
 def updatereglebons(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     reglementid=request.GET.get('reglementid')
     mantant=request.GET.get('mantant')
     mode=request.GET.get('mode')
@@ -5693,6 +5699,8 @@ def updatereglebons(request):
     # substract the old total from client soldbl
 
 def updateavanceclient(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     avanceid=request.GET.get('avanceid')
     mantant=request.GET.get('mantant')
     mode=request.GET.get('mode')
