@@ -241,8 +241,6 @@ def checkref(request):
     #     })
 
 def supplierspage(request):
-    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
-        return render(request, 'nopermission.html')
     target=request.GET.get('target')
     lastid=Supplier.objects.last()
     print(lastid)
@@ -1501,8 +1499,7 @@ def dashboard(request):
     return render(request, 'pdashboard.html', ctx)
 
 def clientspage(request):
-    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
-        return render(request, 'nopermission.html')
+    
     # sortie=request.GET.get('sortie')=='1'
     # farah=request.GET.get('farah')=='1'
     # orgh=request.GET.get('orgh')=='1'
@@ -4438,6 +4435,8 @@ def modifierbonachat(request, id):
 
 
 def modifierfactureachat(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     target=request.GET.get('target')
     id=request.GET.get('id')
     print('>>', target)
@@ -5731,6 +5730,8 @@ def updateavanceclient(request):
     })
 
 def updatereglesupp(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     reglementid=request.GET.get('reglementid')
     mantant=request.GET.get('mantant')
     mode=request.GET.get('mode')

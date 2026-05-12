@@ -2697,6 +2697,8 @@ def removeavoirfromregl(request):
     })
 
 def removeavancefromregl(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     reglid=request.GET.get('reglid')
     avanceid=request.GET.get('avanceid')
     avance=Avanceclient.objects.get(pk=avanceid)
@@ -2751,6 +2753,8 @@ def deletereglementclient(request):
 
 
 def deletereglementsupplier(request):
+    if request.user.username == "employee" and not request.user.has_perm('main.view_avanceclient'):
+        return render(request, 'nopermission.html')
     reglid=request.GET.get('reglid')
     reglement=PaymentSupplier.objects.get(pk=reglid)
     avoirs=reglement.avoirs.all()
