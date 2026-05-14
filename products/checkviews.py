@@ -2977,18 +2977,23 @@ def validercoutmoyenbulk(request):
                 price = round(price-(price*0.25), 2)
                 if item.isfarah:
                     if product.stocktotalfarah <= 0:
+                        print("stock farah is null")
                         p=round(item.coutmoyen, 2)
                         total = round(p*item.qty, 2)
                     else:
+                        print('stock farah is not null')
                         p=round(item.coutmoyen/0.65, 2)
                         total = round(round(p-(p*0.25), 2)*item.qty, 2)
                 else:
                     if product.stocktotalorgh <= 0:
+                        print("stock orgh is null")
                         p=round(item.coutmoyen, 2)
                         total = round(p*item.qty, 2)
                     else:
+                        print('stock orgh is not null')
                         p=round(item.coutmoyen/0.65, 2)
                         total = round(round(p-(p*0.25), 2)*item.qty, 2)
+                print('price>>>', p)
                 livraison_data = {
                     'total': total,
                     'qty': item.qty,
