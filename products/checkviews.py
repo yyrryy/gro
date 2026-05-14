@@ -2983,7 +2983,8 @@ def validercoutmoyenbulk(request):
                     else:
                         print(product.ref, 'stock farah is not null')
                         p=round(item.coutmoyen/0.65, 2)
-                        total = round(round(p-(p*0.25), 2)*item.qty, 2)
+                        p=round(p-(p*0.25), 2)
+                        total = round(p*item.qty, 2)
                 else:
                     if product.stocktotalorgh <= 0:
                         print(product.ref, "stock orgh is null")
