@@ -399,6 +399,7 @@ urlpatterns = [
     path('getbonachatvalider', checkviews.getbonachatvalider, name='getbonachatvalider'),
     path('getfactureachatvalider', checkviews.getfactureachatvalider, name='getfactureachatvalider'),
     path('printbarcode', checkviews.printbarcode, name='printbarcode'),
+    path('printbarcodewdlink', checkviews.printbarcodewdlink, name='printbarcodewdlink'),
     path('validatebonsortieproductprice', checkviews.validatebonsortieproductprice, name='validatebonsortieproductprice'),
     path('getlastbuyprice', checkviews.getlastbuyprice, name='getlastbuyprice'),
     path('modifierbonsortie', checkviews.modifierbonsortie, name='modifierbonsortie'),

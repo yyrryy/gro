@@ -16,7 +16,7 @@
     {% endif %}
     <button class="w-100" onclick="printbarcode()">Barcode</button>
     <!-- barcode WDLink -->
-    <button class="w-100">Barcode WDLink</button>
+    <button class="w-100" onclick="printbarcodewdlink()">Barcode WDLink</button>
     <!-- {% if order.isfacture %}
     <button class="btn w-100 btn-danger" onclick="degenerer(event, {{bon.id}}, 'bonl{{bon.id}}', '/products/bonbonachatdetails/{{bon.id}}')">
       Dégenerer Facture
@@ -251,6 +251,59 @@
       })
       console.log(products)
     var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printbarcode?target={{target}}&products='+JSON.stringify(products)+'&supplierid='+supplierid+'&date='+datebonachat, '', 'width=900,height=900');
+
+    myWindow.focus();
+
+    myWindow.addEventListener('load', function() {
+    console.log('New window loaded.');
+
+    // Wait for 5 seconds before printing
+    // setTimeout(function() {
+    // try {
+    //   myWindow.print();
+    //   console.log('Print command issued.');
+    //   myWindow.close();
+    //   console.log('New window closed.');
+    // } catch (e) {
+    //   console.error('Failed to print and close the window:', e);
+    // }
+    // }, 300);
+  }, false);
+    // $.get('/products/printbarcode', {
+    //   'products': JSON.stringify(products),
+    // }, function(data){
+    //   console.log(data)
+    // })
+  }
+  
+  function printbarcodewdlink(){
+    console.log(">>>fff, {{bon.supplier.id}}")
+    supplierid="{{bon.supplier.id}}"
+    datebonachat="{{bon.date|date:'Y-m-d'}}"
+    
+    trs=$('.bonachatbody tr')
+    let products = []
+    trs.each(function(){
+        let tr = $(this)
+        let qty = tr.find('.qtybarcode').val() || tr.find('.qty').text()
+        let name = tr.find('.name').text()
+        let ref = tr.find('.ref').text()
+        let price = tr.find('.price').text()
+        let remise1 = tr.find('.remise1').text()
+        let productid = tr.find('input[name="productid"]').val()
+        let product = {
+            'qty': qty,
+            'name': name,
+            'ref': ref,
+            'price': price,
+            'remise1': remise1,
+            'productid': productid,
+            
+        }
+        products.push(product)
+      })
+      console.log(products)
+    var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+'/products/printbarcodewdlink?target={{target}}&products='+JSON.stringify(products)+'&supplierid='+supplierid+'&date='+datebonachat, '', 'width=900,height=900');
 
     myWindow.focus();
 
