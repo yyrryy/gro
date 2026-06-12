@@ -282,11 +282,11 @@
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp} CM:${coutmoyen}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">0</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" readonly onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="0" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="0" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="0" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="0" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">0</td>
-            <td style="padding: 2px 0; font-size: 13px;" class="total">$0</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="total">0</td>
             <input type="hidden" name="productid" value="${id}">
             <input type="hidden" name="coutmoyen" value="${coutmoyen}">
 
@@ -328,6 +328,7 @@
         
         savetolocalstorage(item, totalSum, 'bonsortie')
         totalbon.text(totalSum.toFixed(2))
+        $('.scanner-input').val('').focus()
       })
     }
 
