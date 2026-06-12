@@ -278,7 +278,7 @@
         
         let tr = `
         <tr class="itemrow" productid=${id} farah=${isfarah}>
-            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${farah=='1'?'(FR)':'(OR)'} ${ref}</td>
+            <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${isfarah=='1'?'(FR)':'(OR)'} ${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp} CM:${coutmoyen}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${priceclient}</td>
