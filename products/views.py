@@ -5371,6 +5371,26 @@ def searchproductbonsortie(request):
             'term':term
         })
     return JsonResponse({'results': results})
+# global for qr code
+def searchproductqrcode(request):
+    # get url pams
+    term=request.GET.get('term').lower().strip()
+    products=Produit.objects.filter(Q(ref=term) |Q(farahref=term))
+    print('term>>', term)
+    results=[]
+    for i in products:
+        ref=i.farahref if term.startswith('fr-') else i.ref
+        results.append({
+            'id':f'{i.ref}§{i.name}§{i.buyprice}§{i.stocktotalfarah}§{i.stockfacturefarah}§{i.stocktotalorgh}§{i.stockfactureorgh}§{i.id}§{i.sellprice}§{i.remisesell}§{i.prixnet}§{i.representprice}§{term}§{i.coutmoyenfarah()["cout"]}§{i.coutmoyenorgh()["cout"]}',
+            'text':f'{ref.upper()} - {i.name.upper()}',
+            'stock':i.stocktotalfarah+i.stocktotalorgh,
+            'stockfacture':i.stockfacturefarah,
+            'image':i.image.url if i.image else "",
+            'mark':i.mark.name if i.mark else "",
+            # return term to use it as adistinguisher
+            'term':term
+        })
+    return JsonResponse({'results': results})
 # regular search fro products
 def searchproductforbonachat(request):
     term=request.GET.get('term')
