@@ -246,7 +246,7 @@
   <script>
     function handleScan(term) {
       $.get('/products/searchproductqrcode', {term:term}, (data)=>{
-
+        console.log(data)
         var [ref, name, dp, stocktotalfarah, stockfacturefarah, stocktotalorgh, stockfactureorgh, id, sellprice, remise, netprice, representprice, term, coutfarah, coutorgh] = data.results[0].id.split('§');
         let addname=$('input[name="addname"]')
         let addprice=$('input[name="addprice"]')
