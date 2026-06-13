@@ -2182,24 +2182,7 @@ a .uil {
               .sort(intcomparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
               .forEach(tr => table.appendChild(tr) );
       };
-      $(document).on('keydown', function (e) {
-
-        // Check if the key combination is Ctrl + Shift + A
-        if (e.shiftKey && e.key === 'b') {
-          ajaxpage('addlistbonlivraison', 'list bl', '/products/listbonlivraison')
-        }
-        if (e.altKey && e.key === 'B') {
-          console.log('Alt + b was pressed'); // Debugging line
-          ajaxpage('addbonlivraison', '+livraison', '/products/bonlivraison');
-        }
-
-        if (e.shiftKey && e.key === 'f') {
-          ajaxpage('addlistfactures', 'Factures', '/products/listfactures')
-        }
-        if (e.shiftKey && e.key === 'c') {
-          ajaxpage('addCommandestab', 'lict BC', 'products/listboncommnd')
-        }
-      });
+      
       let clicksinbl = 0;
       let clicksinupdateachat = 0;
       let clicksinavcl=0;
