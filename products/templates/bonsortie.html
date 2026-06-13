@@ -734,7 +734,7 @@
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${item.name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${item.dp} CM:${item.coutmoyen}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="clientprice">${item.clientprice}</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" readonly onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" max=${item.max} name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" max=${item.max} name="qty" value="${item.qty}" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" name="price" value="${item.price}" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="${item.remise}" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${item.id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;" class="netprice">${item.netprice}</td>
