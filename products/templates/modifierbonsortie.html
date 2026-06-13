@@ -339,7 +339,7 @@
         $('.scanner-input').val('').focus()
       })
     }
-
+    const scannerInput = document.getElementById('scannerInput');
     scannerInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
