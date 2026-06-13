@@ -342,7 +342,7 @@
     $('#scannerInput').on('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        handleScan(scannerInput.value);
+        handleScan($('#scannerInput').val());
       }
     });
     $('.select2').select2()
