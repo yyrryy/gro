@@ -29,7 +29,7 @@
           <div class="bg-darkblue" style="height: 90vh; overflow-y: scroll;">
             <nav class="account-nav__list mt-2">
               
-              <li class="account-nav__item tab-link" onclick="ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
+              <li class="account-nav__item tab-link" onclick="window.location.reload();//ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')">
                 <a  href="#">+ Bon de sortie</a>
         
               </li>
@@ -177,7 +177,7 @@
 
 {% block js %}
 <script>
-  ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')
+  window.location.reload();//ajaxpage('addbonsortie', '+sortie', '/products/bonsortie')
   // $.get('/products/echeancetoday', (data)=>{
   //   if (data.length > 0){
   //     $('.echeanceindex').removeClass('d-none').text(data.length)
