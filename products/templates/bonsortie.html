@@ -230,11 +230,11 @@
   </div>
 
   <script>
-    const scannerInput = document.getElementById('scannerInput');
-    const resultText = document.getElementById('resultText');
-    const statusText = document.getElementById('statusText');
-    const focusBtn = document.getElementById('focusBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    scannerInput = document.getElementById('scannerInput');
+    resultText = document.getElementById('resultText');
+    statusText = document.getElementById('statusText');
+    focusBtn = document.getElementById('focusBtn');
+    clearBtn = document.getElementById('clearBtn');
 
     function handleScan(term) {
       $.get('/products/searchproductqrcode', {term:term}, (data)=>{
