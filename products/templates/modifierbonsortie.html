@@ -285,10 +285,10 @@
         localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
         
         let tr = `
-        <tr class="itemrow" productid=${id} farah=${isfarah}>
+        <tr class="itemrow bg-yellowgreen" productid=${id} farah=${isfarah}>
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${isfarah=='1'?'(FR)':'(OR)'} ${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
-            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="0" style="height:23px; width:100%;"></td>
+            <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate qty notemptylivraison" onkeyup="calculate(event); checkmax(event); updateinlocalstorage(event, 'bonsortie', ${id})" max=${max} name="qty" value="1" style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" class="calculate price notemptylivraison" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="price" value="0" step=0.01 style="height:23px; width:100%;"></td>
             <td style="padding: 2px 0; font-size: 13px;"><input type="number" value="0" class="calculate remise" onkeyup="calculate(event); updateinlocalstorage(event, 'bonsortie', ${id})" name="remise" style="height:23px; width:100%;"></td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">CM:${coutmoyen}</td>
@@ -301,7 +301,7 @@
         item={
           'farah':isfarah,
           'id': id,
-          'qty': 0,
+          'qty': 1,
           'max':max,
           'price': 0,
           'remise': 0,
@@ -930,7 +930,6 @@
                 return
             }
 
-          
           trs=parentdiv.find('.bonsortiebody tr')
           let products = []
           trs.each(function(){
@@ -941,6 +940,11 @@
               let price = tr.find('.price').val()
               let remise = tr.find('.remise').val()
               let total = tr.find('.total').text()
+              if (total=='' || total==0 || total=='0.00' || total=='0' || total==null || total==undefined || isNaN(total) || total=='NaN' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN' || total=='NaN' || total=='nAn' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN'){
+                alertify.error('Total invalide')
+                tr.addClass('border border-danger')
+                return
+              }
               let achatids= tr.find('input[name="coutmoyen"]').attr('achatids')
               let remainqties= tr.find('input[name="coutmoyen"]').attr('remainqties')
               let oldqties= tr.find('input[name="coutmoyen"]').attr('oldqties')
