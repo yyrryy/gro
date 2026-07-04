@@ -268,7 +268,8 @@
       
         stock = isfarah==1?stockfarah:stockorgh
         if (stock <= 0){
-          coutmoyen=addprice.val()
+          alertify.error("saisie manuel, makaynch cout moyen")
+          return
         }else{
           coutmoyen=isfarah==1?coutfarah:coutorgh
         }
@@ -277,7 +278,7 @@
         localStorage.setItem('pdctsinbonsortie', JSON.stringify(pdcts))
         
         let tr = `
-        <tr class="itemrow bg-yellowgreen" productid=${id} farah=${isfarah}>
+        <tr class="itemrow" style="background:yellowgreen;" productid=${id} farah=${isfarah}>
             <td style="padding: 2px 0; font-size: 13px;" class="ref" onclick="removelinebl(event, ${id})">${isfarah=='1'?'(FR)':'(OR)'} ${ref}</td>
             <td style="padding: 2px 0; font-size: 13px;" class="name text-start">${name}</td>
             <td style="paddingpx 0; font-size: 13px;" class="dp">${dp} CM:${coutmoyen}</td>
@@ -867,43 +868,47 @@
           
           trs=parentdiv.find('.bonsortiebody tr')
           let products = []
+          hastotalerror=false
           trs.each(function(){
-              let tr = $(this)
-              let qty = tr.find('.qty').val()
-              let name = tr.find('.name').text()
-              let ref = tr.find('.ref').text()
-              let price = tr.find('.price').val()
-              let remise = tr.find('.remise').val()
-              let total = tr.find('.total').text()
-              if (total=='' || total==0 || total=='0.00' || total=='0' || total==null || total==undefined || isNaN(total) || total=='NaN' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN' || total=='NaN' || total=='nAn' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN'){
-                alertify.error('Total invalide')
-                tr.addClass('border border-danger')
-                return
-              }
-              let clientprice= tr.find('.clientprice').text()
-              let productid = tr.find('input[name="productid"]').val()
-              let achatids= tr.find('input[name="coutmoyen"]').attr('achatids')
-              let remainqties= tr.find('input[name="coutmoyen"]').attr('remainqties')
-              let oldqties= tr.find('input[name="coutmoyen"]').attr('oldqties')
-              let coutmoyen = tr.find('input[name="coutmoyen"]').val()
-              let product = {
-                'farah':tr.attr('farah'),
-                'qty': qty,
-                'name': name,
-                'ref': ref,
-                'price': price,
-                'remise': remise,
-                'total': total,
-                'productid': productid,
-                'clientprice':clientprice,
-                'coutmoyen': coutmoyen,
-                'achatids':achatids,
-                'remainqties':remainqties,
-                'oldqties':oldqties
-              }
-              products.push(product)
-            })
-            console.log(products)
+            let tr = $(this)
+            let qty = tr.find('.qty').val()
+            let name = tr.find('.name').text()
+            let ref = tr.find('.ref').text()
+            let price = tr.find('.price').val()
+            let remise = tr.find('.remise').val()
+            let total = tr.find('.total').text()
+            if (total=='' || total==0 || total=='0.00' || total=='0' || total==null || total==undefined || isNaN(total) || total=='NaN' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN' || total=='NaN' || total=='nAn' || total=='nan' || total=='NAN' || total=='Nan' || total=='nAn' || total=='naN' || total=='nAN'){
+              alertify.error('Total invalide')
+              tr.addClass('border border-danger')
+              hastotalerror=true
+              return false
+            }
+            let clientprice= tr.find('.clientprice').text()
+            let productid = tr.find('input[name="productid"]').val()
+            let achatids= tr.find('input[name="coutmoyen"]').attr('achatids')
+            let remainqties= tr.find('input[name="coutmoyen"]').attr('remainqties')
+            let oldqties= tr.find('input[name="coutmoyen"]').attr('oldqties')
+            let coutmoyen = tr.find('input[name="coutmoyen"]').val()
+            let product = {
+              'farah':tr.attr('farah'),
+              'qty': qty,
+              'name': name,
+              'ref': ref,
+              'price': price,
+              'remise': remise,
+              'total': total,
+              'productid': productid,
+              'clientprice':clientprice,
+              'coutmoyen': coutmoyen,
+              'achatids':achatids,
+              'remainqties':remainqties,
+              'oldqties':oldqties
+            }
+            products.push(product)
+          })
+          if (hastotalerror) {
+              return; // Stop the rest of your function if needed
+          }
           if (products.length==0){
             alertify.error('NO PRODUCTS')
             return
@@ -915,9 +920,6 @@
           let note = parentdiv.find('.note').val()
           let payment = parentdiv.find('.payment').val()
           let totalbon=parseFloat(parentdiv.find('.totalbon').text())
-          console.log(products)
-          console.log(totalbon)
-          console.log('sending')
           // data={
           //     'totalbon': totalbon,
           //     'clientid': clientid,
