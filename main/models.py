@@ -1323,6 +1323,7 @@ class DeviItemsupplier(models.Model):
 
 
 class Bonsortie(models.Model):
+    isopened=models.BooleanField(default=False)
     pricesofout=models.TextField(default=None, blank=True, null=True)
     remise=models.BooleanField(default=False)
     paidamount=models.FloatField(default=0.00)

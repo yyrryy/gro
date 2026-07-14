@@ -2614,6 +2614,9 @@ def getlastbuyprice(request):
 def modifierbonsortie(request):
     id=request.GET.get('id')
     bon=Bonsortie.objects.get(pk=id)
+    if bon.isopened:
+        return render(request, 'bonopened.html')
+    bon.isopened=True
     avances=Avanceclient.objects.filter(bonofavance=bon.bon_no).exists()
     items=Sortieitem.objects.filter(bon=bon)
     ctx={
@@ -2640,7 +2643,6 @@ def updatebonsortie(request):
     #transport=request.POST.get('transport')
     note=request.POST.get('note')
     payment=request.POST.get('payment', 0)
-    print('>>>>>>', products, totalbon, payment)
     datebon=request.POST.get('datebon')
     datebon=datetime.strptime(f'{datebon}', '%Y-%m-%d')
     client=Client.objects.get(pk=clientid)
@@ -2651,7 +2653,7 @@ def updatebonsortie(request):
     bon.car=car
     bon.note=note
     bon.remise=remise
-    
+    bon.isopened=False
     items=Sortieitem.objects.filter(bon=bon)
     #initiate stock and price history
     for i in items:
