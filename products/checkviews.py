@@ -2617,6 +2617,7 @@ def modifierbonsortie(request):
     if bon.isopened:
         return render(request, 'bonopened.html')
     bon.isopened=True
+    bon.save()
     avances=Avanceclient.objects.filter(bonofavance=bon.bon_no).exists()
     items=Sortieitem.objects.filter(bon=bon)
     ctx={
