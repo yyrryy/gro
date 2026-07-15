@@ -2614,8 +2614,8 @@ def getlastbuyprice(request):
 def modifierbonsortie(request):
     id=request.GET.get('id')
     bon=Bonsortie.objects.get(pk=id)
-    if bon.isopened:
-        return render(request, 'bonopened.html')
+    # if bon.isopened:
+    #     return render(request, 'bonopened.html')
     bon.isopened=True
     bon.save()
     avances=Avanceclient.objects.filter(bonofavance=bon.bon_no).exists()
