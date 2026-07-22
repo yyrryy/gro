@@ -94,6 +94,7 @@ def bonsortie(request):
     # else increment it by one
 
     # increment it
+    # Bonsortie.objects.update(isopened=False)
     year = timezone.now().strftime("%y")
     latest_receipt = Bonsortie.objects.filter(
         bon_no__startswith=f'BS{year}'
@@ -2614,8 +2615,8 @@ def getlastbuyprice(request):
 def modifierbonsortie(request):
     id=request.GET.get('id')
     bon=Bonsortie.objects.get(pk=id)
-    # if bon.isopened:
-    #     return render(request, 'bonopened.html')
+    if bon.isopened:
+        return render(request, 'bonopened.html')
     bon.isopened=True
     bon.save()
     avances=Avanceclient.objects.filter(bonofavance=bon.bon_no).exists()
@@ -3798,3 +3799,17 @@ def getbonsortievalider(request):
     if bons:
         ctx['total']=round(Bonsortie.objects.filter(generated=True).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
+def releasebonsortie(request):
+    id=request.GET.get('id')
+    if not id:
+        print("no id, releasing all")
+        Bonsortie.objects.update(isopened=False)
+        return JsonResponse({
+            'success':True
+        })
+    bon=Bonsortie.objects.get(pk=id)
+    bon.isopened=False
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })

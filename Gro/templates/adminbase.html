@@ -1244,6 +1244,13 @@ a .uil {
       localStorage.removeItem('pdctsin'+target)
       ajaxpage(target, 'Bons Sortie', url)
     }
+    function annulerbonsortie(id, target, url){
+      $.get("/products/releasebonsortie?id="+id)
+      localStorage.removeItem(target)
+      localStorage.removeItem('total'+target)
+      localStorage.removeItem('pdctsin'+target)
+      ajaxpage(target, 'Bons Sortie', url)
+    }
       function checksamefacture(event){
         // Get the checkbox that triggered the event
         const checkbox = event.target;
