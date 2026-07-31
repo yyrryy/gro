@@ -8,11 +8,17 @@
     <button class="btn w-100 btn-info mb-2" onclick="printachat('{{bon.id}}')">
       Telecharger
     </button>
-    {% if not bon.ispaid %}
-    
+    {% if request.user.groups.all.0.name == 'admin' %}
     <button class="btn w-100 btn-success" onclick="ajaxpage('addmodifierbonachat{{bon.id}}', 'Modifier Bon achat {{bon.nbon}}', '/products/modifierbonachat/{{bon.id}}?target={{target}}')">
       Modifier
     </button>
+    {%else%}
+      {% if not bon.ispaid %}
+      
+      <button class="btn w-100 btn-success" onclick="ajaxpage('addmodifierbonachat{{bon.id}}', 'Modifier Bon achat {{bon.nbon}}', '/products/modifierbonachat/{{bon.id}}?target={{target}}')">
+        Modifier
+      </button>
+      {% endif %}
     {% endif %}
     <button class="w-100" onclick="printbarcode()">Barcode</button>
     <!-- barcode WDLink -->

@@ -3799,6 +3799,18 @@ def getbonsortievalider(request):
     if bons:
         ctx['total']=round(Bonsortie.objects.filter(generated=True).aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
+
+def getbonsortievalider(request):
+    bons = Bonsortie.objects.filter(ispaid=False).order_by('-bon_no')
+    
+    ctx={
+        'html':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
+        'total':0,
+        'valider':1
+    }
+    if bons:
+        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+    return JsonResponse(ctx)
 def releasebonsortie(request):
     id=request.GET.get('id')
     if not id:
