@@ -47,9 +47,11 @@
   <div class="text-white rounded h3 d-flex align-items-center justify-content-between bg-darkblue">
     <div>
       <button class="btn border btnselect btn-dark active" style="
-      border-radius: 11px;" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">En attend</button>
+      border-radius: 11px;" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">Tous</button>
       <button class="btn border btnselect btn-dark" style="
       border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortienonpaye()">non paye</button>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortienonvalide()">Validation</button>
       
     </div>
     <div>
@@ -274,6 +276,31 @@
   function getbonsortievalider(){
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonsortievalider?target={{target}}', (data)=>{
+      currentPagelistbl=1
+      $('.listblholder').on('scroll', handleScrolllistbl);
+      $('.searchinputlistbl').attr('waiting', '0')
+      $('.searchinputlistbl').attr('searchtype', 'valid')
+      $('.listblbody').html(data.html)
+      $('.hidebltotal').html(data.total)
+      $('.listblbody').removeClass('blurred')
+    })
+  }
+  function getbonsortienonvalide(){
+    $('.listblbody').addClass('blurred')
+    $.get('/products/getbonsortienonvalide?target={{target}}', (data)=>{
+      currentPagelistbl=1
+      $('.listblholder').on('scroll', handleScrolllistbl);
+      $('.searchinputlistbl').attr('waiting', '0')
+      $('.searchinputlistbl').attr('searchtype', 'valid')
+      $('.listblbody').html(data.html)
+      $('.hidebltotal').html(data.total)
+      $('.listblbody').removeClass('blurred')
+    })
+  }
+
+  function getbonsortienonpaye(){
+    $('.listblbody').addClass('blurred')
+    $.get('/products/getbonsortienonpaye?target={{target}}', (data)=>{
       currentPagelistbl=1
       $('.listblholder').on('scroll', handleScrolllistbl);
       $('.searchinputlistbl').attr('waiting', '0')
