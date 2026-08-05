@@ -8156,11 +8156,23 @@ def searchforlistbs(request):
             )
     print(">> here 1",startdate, enddate)
     if startdate=='0' and enddate=='0':
+        if searchtype=='nonpaye':
+            bons=Bonsortie.objects.filter(q_objects).filter(ispaid=False).order_by('-bon_no')
+            total=round(Bonsortie.objects.filter(q_objects).filter(ispaid=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        elif searchtype=='valid':
+            bons=Bonsortie.objects.filter(q_objects).filter(generated=False).order_by('-bon_no')
+            total=round(Bonsortie.objects.filter(q_objects).filter(generated=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         bons=Bonsortie.objects.filter(q_objects).order_by('-bon_no')[:50]
         # generated=isgenerated
         total=round(Bonsortie.objects.filter(q_objects).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         # generated=isgenerated
     else:
+        if searchtype=='nonpaye':
+            bons=Bonsortie.objects.filter(q_objects).filter(ispaid=False, date__range=[startdate, enddate]).order_by('-bon_no')
+            total=round(Bonsortie.objects.filter(q_objects).filter(ispaid=False, date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+        elif searchtype=='valid':
+            bons=Bonsortie.objects.filter(q_objects).filter(generated=False, date__range=[startdate, enddate]).order_by('-bon_no')
+            total=round(Bonsortie.objects.filter(q_objects).filter(generated=False, date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         print(">> here 1²",startdate, enddate)
         bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
         # generated=isgenerated
