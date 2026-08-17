@@ -3788,13 +3788,12 @@ def getinventairedata(request):
         'html': render(request, 'inventairedata.html', {'items': items, 'target': target}).content.decode('utf-8')
     })
 
-def getbonsortienonvalide(request):
-    bons = Bonsortie.objects.filter(generated=False).order_by('-bon_no')
+def getbonsortievalide(request):
+    bons = Bonsortie.objects.filter(generated=True).order_by('-bon_no')[:50]
     
     ctx={
         'html':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
         'total':0,
-        
     }
     if bons:
         ctx['total']=round(Bonsortie.objects.filter(generated=True).aggregate(Sum('total')).get('total__sum'), 2)
@@ -3810,16 +3809,15 @@ def getbonsortienonpaye(request):
         ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 
-def getbonsortievalider(request):
-    bons = Bonsortie.objects.filter(generated=False).order_by('-bon_no')
-    
+def getbonsortienonvalide(request):
+    bons = Bonsortie.objects.filter(generated=False).order_by('-bon_no')[:50]
     ctx={
         'html':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
         'total':0,
         'valider':1
     }
     if bons:
-        ctx['total']=round(bons.aggregate(Sum('total')).get('total__sum'), 2)
+        ctx['total']=round(Bonsortie.objects.filter(generated=False).order_by('-bon_no').aggregate(Sum('total')).get('total__sum'), 2)
     return JsonResponse(ctx)
 def releasebonsortie(request):
     id=request.GET.get('id')

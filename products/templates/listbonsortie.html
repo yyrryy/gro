@@ -48,10 +48,10 @@
     <div>
       <button class="btn border btnselect btn-dark active" style="
       border-radius: 11px;" onclick="ajaxpage('addbonsortie', '+sortie', '/products/listbonsortie')">Tous</button>
-      <!-- <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortienonpaye()">non paye</button> -->
       <button class="btn border btnselect btn-dark" style="
-      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortienonvalide()">Validation</button>
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortienonvalide()">En attend</button>
+      <button class="btn border btnselect btn-dark" style="
+      border-radius: 11px;" onclick="$('.btnselect').removeClass('active'); $(this).addClass('active'); getbonsortievalide()">Validation</button>
       
     </div>
     <div>
@@ -79,7 +79,7 @@
     background: #80808038;
     border-radius: 11px;
     margin-bottom: 9px;
-" type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl">
+" type="text" name="" id="" placeholder="Recherche" class="searchinputlistbl" searchtype="all">
     <!-- <div hidden>
       <input style="width: 20em;
     background: #c3e6ff;
@@ -273,10 +273,10 @@
 
 <script>
   currentPagelistbl=1
-  function getbonsortievalider(){
+  function getbonsortievalide(){
     loadinglistbl=false
     $('.listblbody').addClass('blurred')
-    $.get('/products/getbonsortievalider?target={{target}}', (data)=>{
+    $.get('/products/getbonsortievalide?target={{target}}', (data)=>{
       currentPagelistbl=1
       $('.listblholder').on('scroll', handleScrolllistbl);
       $('.searchinputlistbl').attr('waiting', '0')
@@ -286,6 +286,7 @@
       $('.listblbody').removeClass('blurred')
     })
   }
+
   function getbonsortienonvalide(){
     loadinglistbl=false
     $('.listblbody').addClass('blurred')
@@ -293,7 +294,7 @@
       currentPagelistbl=1
       $('.listblholder').on('scroll', handleScrolllistbl);
       $('.searchinputlistbl').attr('waiting', '0')
-      $('.searchinputlistbl').attr('searchtype', 'valid')
+      $('.searchinputlistbl').attr('searchtype', 'nonvalide')
       $('.listblbody').html(data.html)
       $('.hidebltotal').html(data.total)
       $('.listblbody').removeClass('blurred')

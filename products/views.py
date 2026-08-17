@@ -7767,6 +7767,7 @@ def loadlistbs(request):
     trs=''
     start = (page - 1) * per_page
     end = page * per_page
+    q_objects = Q()
     if term != '0':
         print('>>term', term)
         # Split the term into individual words separated by '*'
@@ -7777,7 +7778,6 @@ def loadlistbs(request):
         print(search_terms)
 
         # Create a list of Q objects for each search term and combine them with &
-        q_objects = Q()
         for term in search_terms:
 
             # if '-' in term:
@@ -7813,7 +7813,8 @@ def loadlistbs(request):
                 Q(statusreg__iregex=term)|
                 Q(note__iregex=term)
                 )
-        print(startdate, enddate)
+        if 'valid' in searchtype:
+            q_objects &= Q(isgenerated=isgenerated)
         if startdate=='0' and enddate=='0':
             bons=Bonsortie.objects.filter(q_objects).order_by('-bon_no')[start:end]
             #total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
@@ -7872,18 +7873,20 @@ def loadlistbs(request):
             'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
+    if 'valid' in searchtype:
+        q_objects &= Q(isgenerated=isgenerated)
     if startdate != '0' and enddate != '0':
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
-        bons=Bonsortie.objects.filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
-        total=round(Bonsortie.objects.filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'] or 0, 2)
+        bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[start:end]
+        total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).aggregate(Sum('total'))['total__sum'] or 0, 2)
         print('>>>load bl date f')
         return JsonResponse({
             'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
             'has_more': len(bons) == per_page
         })
-    bons= Bonsortie.objects.order_by('-bon_no')[start:end]
-    total=round(Bonsortie.objects.order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
+    bons= Bonsortie.objects.filter(q_objects).order_by('-bon_no')[start:end]
+    total=round(Bonsortie.objects.filter(q_objects).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
 
     return JsonResponse({
         'trs':render(request, 'bslist.html', {'bons':bons}).content.decode('utf-8'),
@@ -8083,64 +8086,8 @@ def searchforlistbs(request):
     target=request.GET.get('target')
     startdate=request.GET.get('startdate')
     enddate=request.GET.get('enddate')
-    # we dont need this
-    # if(term==''):
-
-    #     bons=Bonsortie.objects.filter(date__year=thisyear)[:50]
-    #     total=round(Bonsortie.objects.filter(date__year=thisyear).aggregate(Sum('total'))['total__sum'] or 0, 2)
-    #     trs=''
-    #     for i in bons:
-    #         trs+=f'''
-    #         <tr class="ord {"text-danger" if i.ispaid else ''} bl-row" orderid="{i.id}" ondblclick="ajaxpage('bonl{i.id}', 'Bon livraison {i.bon_no}', '/products/Bonsortiedetails/{i.id}')">
-    #             <td>{ i.bon_no }</td>
-    #             <td>{ i.date.strftime("%d/%m/%Y")}</td>
-    #             <td>{ i.client.name }</td>
-    #             <td>{ i.client.code }</td>
-    #             <td>{ i.total}</td>
-    #             <td>{ i.client.region}</td>
-    #             <td>{ i.client.city}</td>
-    #             <td>{ i.client.soldbl}</td>
-    #             <td>{ i.salseman }</td>
-    #             <td class="d-flex justify-content-between">
-    #             <div>
-    #             {'R0' if i.ispaid else 'N1' }
-
-    #             </div>
-    #             <div style="width:15px; height:15px; border-radius:50%; background:{'green' if i.ispaid else 'orange' };" ></div>
-
-    #             </td>
-    #             <td class="text-danger">
-
-    #             </td>
-    #             <td class="text-danger">
-    #             {'OUI' if i.isfacture else 'NON'}
-
-    #             </td>
-
-    #             <td>
-
-
-    #             </td>
-    #             <td>
-    #             {i.note}
-    #             </td>
-    #             <td>
-    #             {i.modlvrsn}
-    #             </td>
-    #             <td class="d-flex">
-    #               <button class="btn btn-sm btn-info" onclick="makedelivered('{i.id}', event)"></button>
-    #             <button class="btn btn-sm bi bi-download" onclick="printlivraison('{i.id}')"></button>
-    #             </td>
-    #         </tr>
-    #         '''
-    #     return JsonResponse({
-    #         'trs':trs
-    #     })
-
-    # Split the term into individual words separated by '*'
+    
     search_terms = term.split('+')
-    print(search_terms)
-
     # Create a list of Q objects for each search term and combine them with &
     q_objects = Q()
     for i in search_terms:
@@ -8154,26 +8101,14 @@ def searchforlistbs(request):
                 Q(car__iregex=i)
                 
             )
-    print(">> here 1",startdate, enddate)
+    if 'valid' in searchtype:
+        q_objects &= Q(isgenerated=isgenerated)
     if startdate=='0' and enddate=='0':
-        if searchtype=='nonpaye':
-            bons=Bonsortie.objects.filter(q_objects).filter(ispaid=False).order_by('-bon_no')
-            total=round(Bonsortie.objects.filter(q_objects).filter(ispaid=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        elif searchtype=='valid':
-            bons=Bonsortie.objects.filter(q_objects).filter(generated=False).order_by('-bon_no')
-            total=round(Bonsortie.objects.filter(q_objects).filter(generated=False).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         bons=Bonsortie.objects.filter(q_objects).order_by('-bon_no')[:50]
         # generated=isgenerated
         total=round(Bonsortie.objects.filter(q_objects).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
         # generated=isgenerated
     else:
-        if searchtype=='nonpaye':
-            bons=Bonsortie.objects.filter(q_objects).filter(ispaid=False, date__range=[startdate, enddate]).order_by('-bon_no')
-            total=round(Bonsortie.objects.filter(q_objects).filter(ispaid=False, date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        elif searchtype=='valid':
-            bons=Bonsortie.objects.filter(q_objects).filter(generated=False, date__range=[startdate, enddate]).order_by('-bon_no')
-            total=round(Bonsortie.objects.filter(q_objects).filter(generated=False, date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
-        print(">> here 1²",startdate, enddate)
         bons=Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no')[:50]
         # generated=isgenerated
         total=round(Bonsortie.objects.filter(q_objects).filter(date__range=[startdate, enddate]).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
