@@ -7814,7 +7814,7 @@ def loadlistbs(request):
                 Q(note__iregex=term)
                 )
         if 'valid' in searchtype:
-            q_objects &= Q(isgenerated=isgenerated)
+            q_objects &= Q(generated=isgenerated)
         if startdate=='0' and enddate=='0':
             bons=Bonsortie.objects.filter(q_objects).order_by('-bon_no')[start:end]
             #total=round(Bonsortie.objects.filter(q_objects).filter(date__year=thisyear).order_by('-bon_no').aggregate(Sum('total'))['total__sum'] or 0, 2)
@@ -7874,7 +7874,7 @@ def loadlistbs(request):
             'has_more': len(bons) == per_page
         })
     if 'valid' in searchtype:
-        q_objects &= Q(isgenerated=isgenerated)
+        q_objects &= Q(generated=isgenerated)
     if startdate != '0' and enddate != '0':
         startdate = datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.strptime(enddate, '%Y-%m-%d')
