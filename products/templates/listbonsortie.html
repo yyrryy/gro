@@ -274,7 +274,6 @@
 <script>
   currentPagelistbl=1
   function getbonsortievalide(){
-    loadinglistbl=false
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonsortievalide?target={{target}}', (data)=>{
       currentPagelistbl=1
@@ -288,7 +287,6 @@
   }
 
   function getbonsortienonvalide(){
-    loadinglistbl=false
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonsortienonvalide?target={{target}}', (data)=>{
       currentPagelistbl=1
@@ -302,7 +300,6 @@
   }
 
   function getbonsortienonpaye(){
-    loadinglistbl=false
     $('.listblbody').addClass('blurred')
     $.get('/products/getbonsortienonpaye?target={{target}}', (data)=>{
       currentPagelistbl=1
@@ -330,7 +327,6 @@
   }
   function validerbulk() {
     let oldval, ids;
-    
     try {
         oldval = JSON.parse($('.bonstoprint').val() || '[]');
         ids = JSON.parse($('.bonstoprint').attr('ids') || '[]');
