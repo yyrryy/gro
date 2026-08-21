@@ -1356,6 +1356,8 @@ class Bonsortie(models.Model):
         return self.bon_no
 # lines in bon sorie
 class Sortieitem(models.Model):
+    stockfarahnull=models.BooleanField(default=False)
+    stockorghnull=models.BooleanField(default=False)
     pricesofout=models.TextField(default=None, blank=True, null=True)
     qtyofout=models.TextField(default=None, blank=True, null=True)
     bon=models.ForeignKey(Bonsortie, on_delete=models.CASCADE, default=None)

@@ -202,6 +202,8 @@ def addbonsortie(request):
                 client_id=clientid,
                 date=datebon,
                 isfarah=farah,
+                stockfarahnull=product.stocktotalfarah<=0,
+                stockorghnull=product.stocktotalorgh<=0
             )
             
             # stockins=Stockin.objects.filter(pk__in=achatids)
@@ -2688,6 +2690,8 @@ def updatebonsortie(request):
                 date=datebon,
                 isfarah=farah,
                 coutmoyen=i['coutmoyen'],
+                stockfarahnull=product.stocktotalfarah<=0,
+                stockorghnull=product.stocktotalorgh<=0
             )
             if not bon.generated:
                 if farah:
@@ -3052,23 +3056,32 @@ def validercoutmoyenbulk(request):
                 price=round(item.coutmoyen/0.65, 2)
                 price = round(price-(price*0.25), 2)
                 if item.isfarah:
-                    if product.stocktotalfarah <= 0:
-                        print(product.ref, "stock farah is null")
+                    # if product.stocktotalfarah <= 0:
+                    #     print(product.ref, "stock farah is null")
+                    #     p=round(item.price, 2)
+                    #     total = round(p*item.qty, 2)
+                    # else:
+                    #     print(product.ref, 'stock farah is not null')
+                    if item.stockfarahnull:
                         p=round(item.price, 2)
                         total = round(p*item.qty, 2)
                     else:
-                        print(product.ref, 'stock farah is not null')
-                        p=round(item.product.coutmoyenfarah()["cout"]/0.65, 2)
+                        p=round(item.coutmoyen/0.65, 2)
                         p=round(p-(p*0.25), 2)
                         total = round(p*item.qty, 2)
                 else:
-                    if product.stocktotalorgh <= 0:
-                        print(product.ref, "stock orgh is null")
+                    # if product.stocktotalorgh <= 0:
+                    #     print(product.ref, "stock orgh is null")
+                    #     p=round(item.price, 2)
+                    #     total = round(p*item.qty, 2)
+                    # else:
+                    if item.stockorghnull:
+                        print(product.ref, 'stock orgh is null')
                         p=round(item.price, 2)
                         total = round(p*item.qty, 2)
                     else:
                         print(product.ref, 'stock orgh is not null')
-                        p=round(item.product.coutmoyenorgh()["cout"]/0.65, 2)
+                        p=round(item.coutmoyen/0.65, 2)
                         p = round(p-(p*0.25), 2)
                         total = round(p*item.qty, 2)
                 print('price>>>', p)
