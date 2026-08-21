@@ -3058,7 +3058,7 @@ def validercoutmoyenbulk(request):
                         total = round(p*item.qty, 2)
                     else:
                         print(product.ref, 'stock farah is not null')
-                        p=round(item.product.coutmoyenfarah()/0.65, 2)
+                        p=round(item.product.coutmoyenfarah()["cout"]/0.65, 2)
                         p=round(p-(p*0.25), 2)
                         total = round(p*item.qty, 2)
                 else:
@@ -3068,7 +3068,7 @@ def validercoutmoyenbulk(request):
                         total = round(p*item.qty, 2)
                     else:
                         print(product.ref, 'stock orgh is not null')
-                        p=round(item.product.coutmoyenorgh()/0.65, 2)
+                        p=round(item.product.coutmoyenorgh()["cout"]/0.65, 2)
                         p = round(p-(p*0.25), 2)
                         total = round(p*item.qty, 2)
                 print('price>>>', p)
