@@ -6,3 +6,7 @@ write in categiry and marq in viewproduct
 users and permissions
 login required each time
 recherch in categoruside when doing serach
+
+
+close bons achat, livraison when opened in another pc
+user permissions

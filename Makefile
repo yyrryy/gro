@@ -1,5 +1,5 @@
 PORT?=8000
-run:
+run: migrate
 	uv run python manage.py runserver ${PORT}
 
 migrate:

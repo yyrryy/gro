@@ -617,6 +617,7 @@ class Avancesupplier(models.Model):
 
 class Bonlivraison(models.Model):
     # track history prices whenavoir or modifier bon, restore qty of qtyprice
+    isopened=models.BooleanField(default=False)
     pricesofout=models.TextField(default=None, blank=True, null=True)
     isvalid=models.BooleanField(default=False)
     iscanceled=models.BooleanField(default=False)
@@ -1383,6 +1384,7 @@ class Sortieitem(models.Model):
     date=models.DateField(default=None, null=True, blank=True)
 
 class Factureachat(models.Model):
+    isopened=models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     iscaceled=models.BooleanField(default=False)
     isvalid=models.BooleanField(default=False)

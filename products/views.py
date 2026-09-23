@@ -2642,6 +2642,10 @@ def degenerer(request):
 def modifierlivraison(request, id):
     target=request.GET.get('target')
     livraison=Bonlivraison.objects.get(pk=id)
+    if livraison.isopened:
+        return render(request, 'bonopened.html')
+    livraison.isopened=True
+    livraison.save()
     items=Livraisonitem.objects.filter(bon=livraison, isfacture=False)
     ctx={
         'target':target,
@@ -2751,7 +2755,9 @@ def updatebonlivraison(request):
     livraison.total=totalbon
     livraison.date=datebon
     # livraison.bon_no=request.POST.get('orderno')
+    livraison.isopened=False
     livraison.save()
+
     items=Livraisonitem.objects.filter(bon=livraison)
     # update this items
     for i in items:
@@ -4423,6 +4429,10 @@ def modifierbonachat(request, id):
     target=request.GET.get('target')
     print('>>', target)
     bon=Itemsbysupplier.objects.get(pk=id)
+    if bon.isopened:
+        return render(request, 'bonopened.html')
+    bon.isopened=True
+    bon.save()
     items=Stockin.objects.filter(nbon=bon)
     ctx={
         'title':'Modifier bon achat',
@@ -4505,6 +4515,7 @@ def updatebonachat(request):
 
     bon.supplier=supplier
     bon.total=totalbon
+    bon.isopened=False
     bon.nbon=request.POST.get('orderno')
     # bon.isfacture=isfacture
     bon.save()
