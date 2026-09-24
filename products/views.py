@@ -2642,9 +2642,9 @@ def degenerer(request):
 def modifierlivraison(request, id):
     target=request.GET.get('target')
     livraison=Bonlivraison.objects.get(pk=id)
-    if livraison.isopened:
-        return render(request, 'bonopened.html')
-    livraison.isopened=True
+    # if livraison.isopened:
+    #     return render(request, 'bonopened.html')
+    # livraison.isopened=True
     livraison.save()
     items=Livraisonitem.objects.filter(bon=livraison, isfacture=False)
     ctx={
@@ -4429,9 +4429,9 @@ def modifierbonachat(request, id):
     target=request.GET.get('target')
     print('>>', target)
     bon=Itemsbysupplier.objects.get(pk=id)
-    if bon.isopened:
-        return render(request, 'bonopened.html')
-    bon.isopened=True
+    # if bon.isopened:
+    #     return render(request, 'bonopened.html')
+    # bon.isopened=True
     bon.save()
     items=Stockin.objects.filter(nbon=bon)
     ctx={
