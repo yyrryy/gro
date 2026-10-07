@@ -374,6 +374,7 @@ class Supplier(models.Model):
 
 
 class Itemsbysupplier(models.Model):
+    isopened=models.BooleanField(default=False)
     supplier= models.ForeignKey(Supplier, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name='provider')
     date = models.DateTimeField(default=None)
     # track bon achat farah
