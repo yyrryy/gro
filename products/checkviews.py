@@ -3846,3 +3846,33 @@ def releasebonsortie(request):
     return JsonResponse({
         'success':True
     })
+
+def releasebonlivraison(request):
+    id=request.GET.get('id')
+    if not id:
+        print("no id, releasing all")
+        Bonlivraison.objects.update(isopened=False)
+        return JsonResponse({
+            'success':True
+        })
+    bon=Bonlivraison.objects.get(pk=id)
+    bon.isopened=False
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })
+
+def releasebonachat(request):
+    id=request.GET.get('id')
+    if not id:
+        print("no id, releasing all")
+        Itemsbysupplier.objects.update(isopened=False)
+        return JsonResponse({
+            'success':True
+        })
+    bon=Itemsbysupplier.objects.get(pk=id)
+    bon.isopened=False
+    bon.save()
+    return JsonResponse({
+        'success':True
+    })

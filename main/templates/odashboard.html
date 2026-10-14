@@ -191,7 +191,12 @@
         <i class="bi bi-list"></i>
         <small>Inventaire</small>
       </a>
-      
+      <button class="btn btn-warning me-3" onclick="$.get('/products/releasebonlivraison')">
+        Deblocker bon livraison
+      </button>
+      <button class="btn btn-warning" onclick="$.get('/products/releasebonachat')">
+        Deblocker bon achats
+      </button>
       <!-- <div class="d-flex flex-column btn p-2 bi bi-cart-plus-fill text-white sectionbtn position-relative" onclick="ajaxpage('addpducts', 'ARTICLES', '/products/bankpage?target=o')">
         <small>Banque</small>
       </div> -->
