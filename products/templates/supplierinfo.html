@@ -33,7 +33,7 @@
                 </tr>
                 <tr>
                     <td>Total bons</td>
-                    <td>{{totaltr|floatformat:2|intspace}} DH</td>
+                    <td>{{totalbons|floatformat:2|intspace}} DH</td>
                 </tr>
                 <tr>
                     <td>Total payements</td>
@@ -117,12 +117,14 @@
         </div>
         <!-- bons -->
         <div class="bons tables">
+          <!-- search in the table -->
+            
             <div class="bg-white shadow rounded p-2">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4>Bon</h4>
-                    <strong>
-                        {{nbrbons}}
-                    </strong>
+                    <h4>{{nbrbons}} Bon</h4>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listbachatbody')">
+                    </div>
                 </div>
                 <div style="height: 70vh; overflow: scroll;" class="listachatholder">
                     <table class="listachattable table table-bordered table-hover table-striped achattable" style="font-size: 12px;" id="addbonlivraisonle">
@@ -206,10 +208,10 @@
         <div class="reglements tables d-none">
             <div class="bg-white shadow rounded p-2">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4>Les paiments</h4>
-                    <strong>
-                        {{nbrpayments}}
-                    </strong>
+                    <h4>{{nbrpayments}} Les paiments</h4>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listachatholder tbody')">
+                    </div>
                 </div>
                 <div style="height: 70vh; overflow: scroll;" class="listachatholder">
                     <table style="font-size: 12px;" class="table table-bordered p-2">
@@ -247,6 +249,9 @@
             <div class="bg-white shadow rounded p-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4>Les avances</h4>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listavancesbody')">
+                    </div>
                     <!-- <strong>
                         {{nbrpayments}}
                     </strong> -->
@@ -261,7 +266,7 @@
                                 <th>Echeance</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="listavancesbody">
                             {% for bon in avances %}
                             <tr>
                                 <td>{{bon.date|date:'d/m/Y'}}</td>
@@ -288,9 +293,9 @@
             <div class="bg-white rounded shadow p-2">
                 <div class="p-2 d-flex justify-content-between align-items-center">
                     <h4>Les avoirs</h4>
-                    <strong>
-                        {{navoirs}}
-                    </strong>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listavoirsbody')">
+                    </div>
                 </div>
                 <div style="height: 70vh; overflow: scroll;" class="listachatholder">
                     <table style="font-size: 12px;" class="table table-bordered">
@@ -300,7 +305,7 @@
                             <th>Total</th>
                             <th></th>
                         </thead>
-                        <tbody>
+                        <tbody class="listavoirsbody">
                             {% for i in avoirs %}
                             <tr>
                                 <td>{{i.no}} {%if i.ispaid%}(R){%endif%}</td>
@@ -322,9 +327,9 @@
             <div class="bg-white rounded shadow p-2">
                 <div class="p-2 d-flex justify-content-between align-items-center">
                     <h4>Les factures</h4>
-                    <strong>
-                        {{nfactures}}
-                    </strong>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listfcbody')">
+                    </div>
                 </div>
                 <div class="listfcholder" style="height:70vh;overflow: scroll;">
                     <table class="table table-bordered table-hover facturestable listfctable" style="font-size: 12px;" id="">
@@ -454,6 +459,9 @@
             <div class="bg-white rounded shadow p-2">
                 <div class="p-2 d-flex justify-content-between align-items-center">
                     <h4>Les devis</h4>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listdevisbody')">
+                    </div>
                     <!-- <strong>
                         {{nfactures}}
                     </strong> -->
@@ -479,7 +487,7 @@
                             <td style="width:10%;" ></td>
                           </tr>
                         </thead>
-                        <tbody class="listblbody">
+                        <tbody class="listdevisbody">
                           <!-- {% if order.generated %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%} {% if order.ispaid %} text-danger{% endif %} -->
                           {% for order in devis %}
                             <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/supplierdevidetails?id={{order.id}}&&target={{target}}')" style="background:" >
@@ -563,6 +571,9 @@
             <div class="bg-white rounded shadow p-2">
                 <div class="p-2 d-flex justify-content-between align-items-center">
                     <h4>Les commandes</h4>
+                    <div class="col-4">
+                      <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="searchTable(this, '.listcommandesbody')">
+                    </div>
                     <!-- <strong>
                         {{nfactures}}
                     </strong> -->
@@ -588,7 +599,7 @@
                             <td style="width:10%;" ></td>
                           </tr>
                         </thead>
-                        <tbody class="listblbody">
+                        <tbody class="listcommandesbody">
                           <!-- {% if order.generated %}  lightgreen;{% endif %} {% if i.isfacture%} color:blue;{%endif%} {% if order.ispaid %} text-danger{% endif %} -->
                           {% for order in commandes %}
                             <tr class="ord bl-row" orderid="{{order.code}}" ondblclick="ajaxpage('bons{{order.id}}', 'Bon livraison {{order.bon_no}}', '/products/supplierboncommanddetails?id={{order.id}}&&target={{target}}')" style="background:" >
@@ -712,6 +723,6 @@
     //     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
     // });
     // });
- 
+    
 
 </script>

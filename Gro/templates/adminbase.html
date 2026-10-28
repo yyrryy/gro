@@ -1007,6 +1007,24 @@ a .uil {
     <script src="{% static 'js/main.js'%}"></script>
     <script src="{% static 'js/alertify.min.js'%}"></script>
     <script>
+      function searchTable(input, tableClass) {
+        var filter = input.value.toUpperCase();
+        var table = document.querySelector(tableClass);
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 0; i < tr.length; i++) {
+            var td = tr[i].getElementsByTagName("td");
+            var found = false;
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    if (td[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            tr[i].style.display = found ? "" : "none";
+        }
+    }
       function openwindow(id, title, url){
         var myWindow = window.open('http://'+window.location.href.split( '/' )[2]+url, '', 'width=900,height=900');
 

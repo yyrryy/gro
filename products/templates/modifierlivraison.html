@@ -37,10 +37,11 @@ margin: 0;
           <div class="col-5">
               <div class="mb-2">
                 <small>Client: {{livraison.client.name}} </small>
-
+                {% if not livraison.isfacture %}
                   <select name="client" id="" style="width:100%;" class="select2 clientselectlivraison{{livraison.id}} form-select notemptylivraison{{livraison.id}}">
 
                   </select>
+                {% endif %}
               </div>
               <div hidden class="mb-2">
                   <small>Representant:</small>

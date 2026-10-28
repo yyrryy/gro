@@ -1438,7 +1438,7 @@ def supplierinfo(request, id):
         'supplier':supplier,
         'totalavoirs':Avoirsupplier.objects.filter(supplier=supplier, isfarah=isfarah, ispaid=False).aggregate(Sum('total'))['total__sum'] or 0,
         'totalpayments':PaymentSupplier.objects.filter(supplier=supplier, isfarah=isfarah, isavoir=False).aggregate(Sum('amount'))['amount__sum'] or 0,
-        'totaltr':Itemsbysupplier.objects.filter(supplier=supplier, isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0,
+        'totalbons':Itemsbysupplier.objects.filter(supplier=supplier, isfarah=isfarah).aggregate(Sum('total'))['total__sum'] or 0,
         'bons':Itemsbysupplier.objects.filter(supplier=supplier, isfarah=isfarah),
         'payments':PaymentSupplier.objects.filter(supplier=supplier, isfarah=isfarah, isavoir=False),
         'factures':Factureachat.objects.filter(supplier=supplier, isfarah=isfarah),
