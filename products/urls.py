@@ -254,6 +254,7 @@ urlpatterns = [
     path('sendrelevclient', views.sendrelevclient, name='sendrelevclient'),
     path('sendrelevclientfc', views.sendrelevclientfc, name='sendrelevclientfc'),
     path('sd52/8554/tsgs', views.tsgs, name='tsgs'),
+    path('bons/bprint/12455t/printboncommandesupplier/<int:id>', views.printboncommandesupplier, name='printboncommandesupplier'),
     path('bons/bprint/12455t/bonlivraisonprint/<int:id>', views.bonlivraisonprint, name='bonlivraisonprint'),
     path('bons/bprint/12455t/bonlivraisonprintht/<int:id>', views.bonlivraisonprintht, name='bonlivraisonprintht'),
     path('bons/bprint/12455t/boncmndprint/<int:id>', views.boncmndprint, name='boncmndprint'),

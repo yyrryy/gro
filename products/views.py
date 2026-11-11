@@ -10829,6 +10829,20 @@ def bonlivraisonprint(request, id):
     }
     return render(request, 'bonlivraisonprint.html', ctx)
 
+def printboncommandesupplier(request, id):
+    isfarah=request.GET.get('target')=='f'
+    print('<>> target', request.GET.get('target'))
+    order=Commandsupplier.objects.get(pk=id)
+    orderitems=CommandItemsupplier.objects.filter(command=order)
+    orderitems=list(orderitems)
+    ctx={
+        'isfarah':isfarah,
+        'title':f'Bon de livraison {order.bon_no}',
+        'order':order,
+        'orderitems':orderitems,
+    }
+    return render(request, 'printboncommandesupplier.html', ctx)
+
 def bonlivraisonprintht(request, id):
     isfarah=request.GET.get('target')=='f'
     category=request.GET.get('category')=='1'
