@@ -920,12 +920,14 @@ def listdevi(request):
 @login_required(login_url='main:home')
 def bondevi(request):
     target=request.GET.get('target')
-    
+    template='bondevi.html'
+    if target=='s':
+        template='bondevisortie.html'        
     ctx={
         'title':'Bon de Devi',
         'target':target
     }
-    return render(request, 'bondevi.html', ctx)
+    return render(request, template, ctx)
 def boncommand(request):
     target=request.GET.get('target')
     
@@ -2443,12 +2445,14 @@ def validation(request):
     return render(request, 'validation.html', ctx)
 
 def printbarcode(request):
-    products=json.loads(request.GET.get('products'))
+    # products=json.loads(request.GET.get('products'))
     supplierid=request.GET.get('supplierid')
     suppliercode=Supplier.objects.get(pk=supplierid).code
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
+    bon=Itemsbysupplier.objects.get(pk=bonid)
+    products=Stockin.objects.filter(nbon=bon)
     isfarah=target=='f'
     barcodes = []
     for i in products:
@@ -2515,12 +2519,14 @@ def printbarcode(request):
     })
 
 def printbarcodewdlink(request):
-    products=json.loads(request.GET.get('products'))
+    # products=json.loads(request.GET.get('products'))
     supplierid=request.GET.get('supplierid')
     suppliercode=Supplier.objects.get(pk=supplierid).code
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
+    bon=Itemsbysupplier.objects.get(pk=bonid)
+    products=Stockin.objects.filter(nbon=bon)
     isfarah=target=='f'
     barcodes = []
     for i in products:
