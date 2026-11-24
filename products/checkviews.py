@@ -2538,7 +2538,7 @@ def printbarcodewdlink(request):
         else:
             ref=i.ref.strip()
         print('>>> ref', ref)
-        name=i.name
+        name=i.product.name
         remise1=0 if i.remise1=='' else float(i.remise1)
         price=i.price
         net=float(price)-(float(price)*int(remise1)/100)
