@@ -2534,9 +2534,9 @@ def printbarcodewdlink(request):
     barcodes = []
     for i in products:
         if isfarah:
-            ref='fr-'+i.ref.strip()
+            ref='fr-'+i.product.ref.strip()
         else:
-            ref=i.ref.strip()
+            ref=i.product.ref.strip()
         print('>>> ref', ref)
         name=i.product.name
         remise1=0 if i.remise1=='' else float(i.remise1)
