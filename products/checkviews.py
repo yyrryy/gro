@@ -2445,31 +2445,37 @@ def validation(request):
     return render(request, 'validation.html', ctx)
 
 def printbarcode(request):
-    # products=json.loads(request.GET.get('products'))
     supplierid=request.GET.get('supplierid')
     suppliercode=Supplier.objects.get(pk=supplierid).code
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
     bonid=request.GET.get('bonid')
-    bon=Itemsbysupplier.objects.get(pk=bonid)
-    products=Stockin.objects.filter(nbon=bon)
+    products=json.loads(request.GET.get('products'))
+    # bon=Itemsbysupplier.objects.get(pk=bonid)
+    # products=Stockin.objects.filter(nbon=bon)
     isfarah=target=='f'
     barcodes = []
     print('>>> products', products)
     for i in products:
         if isfarah:
-            ref='fr-'+i.product.ref.strip()
+            ref='fr-'+i['ref'].strip()
+            # ref='fr-'+i.product.ref.strip()
         else:
-            ref=i.product.ref.strip()
+            ref=i['ref'].strip()
+            # ref=i.product.ref.strip()
         print('>>> ref', ref)
-        name=i.product.name
-        remise1=0 if i.remise1=='' else float(i.remise1)
-        price=i.price
+        name=i['name']
+        # name=i.product.name
+        remise1=0 if i['remise']=='' else float(i['remise'])
+        # remise1=0 if i.remise=='' else float(i.remise)
+        price=i['price']
+        # price=i.price
         net=float(price)-(float(price)*int(remise1)/100)
         price=round(net*2, 2)
         #price=str(price).replace('.', '')
-        qty=float(i.quantity)
+        qty=float(i['qty'])
+        # qty=float(i.quantity)
         # # List to hold the barcodes in base64 format
         
         # Generate barcodes for the specified quantity
@@ -2521,30 +2527,36 @@ def printbarcode(request):
     })
 
 def printbarcodewdlink(request):
-    # products=json.loads(request.GET.get('products'))
     supplierid=request.GET.get('supplierid')
     bonid=request.GET.get('bonid')
     suppliercode=Supplier.objects.get(pk=supplierid).code
     date=request.GET.get('date')
     date=datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%y')
     target=request.GET.get('target')
-    bon=Itemsbysupplier.objects.get(pk=bonid)
-    products=Stockin.objects.filter(nbon=bon)
+    # bon=Itemsbysupplier.objects.get(pk=bonid)
+    # products=Stockin.objects.filter(nbon=bon)
+    products=json.loads(request.GET.get('products'))
     isfarah=target=='f'
     barcodes = []
     for i in products:
         if isfarah:
-            ref='fr-'+i.product.ref.strip()
+            ref='fr-'+i['ref'].strip()
+            # ref='fr-'+i.product.ref.strip()
         else:
-            ref=i.product.ref.strip()
+            ref=i['ref'].strip()
+            # ref=i.product.ref.strip()
         print('>>> ref', ref)
-        name=i.product.name
-        remise1=0 if i.remise1=='' else float(i.remise1)
-        price=i.price
+        name=i['name']
+        # name=i.product.name
+        remise1=0 if i['remise']=='' else float(i['remise'])
+        # remise1=0 if i.remise=='' else float(i.remise)
+        price=i['price']
+        # price=i.price
         net=float(price)-(float(price)*int(remise1)/100)
         price=round(net*2, 2)
         #price=str(price).replace('.', '')
-        qty=float(i.quantity)
+        qty=float(i['qty'])
+        # qty=float(i.quantity)
         # # List to hold the barcodes in base64 format
         
         # Generate barcodes for the specified quantity
