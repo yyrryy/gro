@@ -2467,7 +2467,7 @@ def printbarcode(request):
         print('>>> ref', ref)
         name=i['name']
         # name=i.product.name
-        remise1=0 if i['remise']=='' else float(i['remise'])
+        remise1=0 if i['remise1']=='' else float(i['remise1'])
         # remise1=0 if i.remise=='' else float(i.remise)
         price=i['price']
         # price=i.price
@@ -2548,7 +2548,7 @@ def printbarcodewdlink(request):
         print('>>> ref', ref)
         name=i['name']
         # name=i.product.name
-        remise1=0 if i['remise']=='' else float(i['remise'])
+        remise1=0 if i['remise1']=='' else float(i['remise1'])
         # remise1=0 if i.remise=='' else float(i.remise)
         price=i['price']
         # price=i.price
